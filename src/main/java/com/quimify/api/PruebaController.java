@@ -15,4 +15,10 @@ public class PruebaController {
     public String hugo() {
         return "Gay";
     }
+
+    @GetMapping("/mateo")
+    public String mateo() {
+        return "El ateo";
+    }
+
 }
