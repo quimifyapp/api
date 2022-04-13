@@ -1,4 +1,4 @@
-package com.quimify.api;
+package com.quimify.api.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

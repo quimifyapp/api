@@ -1,10 +1,14 @@
-package com.quimify.api;
+package com.quimify.api.models;
 
-import javax.persistence.Table;
+import javax.persistence.*;
 
+@Entity
 @Table(name = "inorganico")
 public class InorganicoModel {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
     private Integer id;
     private Boolean premium;
 
