@@ -1,27 +1,96 @@
 package com.quimify.api.models;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@Table(name = "inorganico")
+// Esta clase representa los compuestos inorgánicos.
+
+// Inorganico = (id, busquedas, premium, formula, nombre, alternativo, masa, densidad, fu., eb.)
+
+@Entity // Es un modelo real
+@Table(name = "inorganico") // En la tabla 'inorganico' de la DB
 public class InorganicoModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Integer id;
-    private Boolean premium;
+
+    // Con valor predeterminado:
+
+    private Integer busquedas = 0;
+    private Boolean premium = false;
+
+    // Con valor predeterminado 'null':
 
     private String formula;     // "MgH2"
     private String nombre;      // "hidruro de magnesio
     private String alternativo; // "dihidruro de magnesio"
-    private String masa;        // (g)
-    private String densidad;    // (g/cm3)
-    private String fusion;      // (K)
-    private String ebullicion;  // (K)
+
+        // De tipo 'String' porque no se realizan cálculos con ellos:
+
+        private String masa;        // (g)
+        private String densidad;    // (g/cm3)
+        private String fusion;      // (K)
+        private String ebullicion;  // (K)
+
+    /*
+    private List<String> etiquetas;
+
+    public List<String> getEtiquetas() {
+        return etiquetas;
+    }
+    */
+
+    // Getters y setters:
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Integer getBusquedas() {
+        return busquedas;
+    }
+
+    public Boolean getPremium() {
+        return premium;
+    }
+
+    public String getFormula() {
+        return formula;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getAlternativo() {
+        return alternativo;
+    }
+
+    public String getMasa() {
+        return masa;
+    }
+
+    public String getDensidad() {
+        return densidad;
+    }
+
+    public String getFusion() {
+        return fusion;
+    }
+
+    public String getEbullicion() {
+        return ebullicion;
+    }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setBusquedas(Integer frecuencia) {
+        this.busquedas = frecuencia;
     }
 
     public void setPremium(Boolean premium) {
@@ -56,39 +125,4 @@ public class InorganicoModel {
         this.ebullicion = ebullicion;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Boolean getPremium() {
-        return premium;
-    }
-
-    public String getFormula() {
-        return formula;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getAlternativo() {
-        return alternativo;
-    }
-
-    public String getMasa() {
-        return masa;
-    }
-
-    public String getDensidad() {
-        return densidad;
-    }
-
-    public String getFusion() {
-        return fusion;
-    }
-
-    public String getEbullicion() {
-        return ebullicion;
-    }
 }
