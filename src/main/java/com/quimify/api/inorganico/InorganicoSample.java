@@ -4,11 +4,14 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 
 // Esta clase representa los compuestos inorgánicos que están en memoria para realizar búsquedas.
+// (id, fórmula, nombre) ~ (alternativo) ~ (etiqueta0, etiqueta1...)
 
 public class InorganicoSample {
 
     private final Integer id;
     private ArrayList<String> keywords = new ArrayList<>();
+
+    // TODO: Levenshtein o similar
 
     // "Óxido de hierro (III)" -> "oxidodehierroiii"
     private String normalizar(String input) {

@@ -1,9 +1,12 @@
 package com.quimify.api.inorganico;
 
+// Esta clase representa las entregas al cliente de un compuesto inorgánico.
+// (resultado, inorgánico)
+
 public class InorganicoResult {
 
-    final private Integer resultado;
-    final private InorganicoModel inorganico;
+    private final Integer resultado;
+    private final InorganicoModel inorganico;
 
     public final static Integer NO_ENCONTRADO = 0;
     public final static Integer ENCONTRADO = 1;

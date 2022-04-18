@@ -1,13 +1,11 @@
 package com.quimify.api.inorganico;
 
-// Esta clase procesa los compuestos inorgánicos y realiza conexiones con la DB.
-
-// Inorganico = (id, busquedas, premium, formula, nombre, alternativo, masa, densidad, fu., eb.)
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+
+// Esta clase procesa los compuestos inorgánicos y realiza conexiones con la DB.
 
 @Service
 public class InorganicoService {

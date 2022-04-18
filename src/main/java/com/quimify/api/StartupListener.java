@@ -9,7 +9,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-// Esta clase contiene el código propio que se ejecutará al iniciarse el servidor.
+// Esta clase contiene el código que se ejecutará cuando Spring Boot indique
+// que el servidor está iniciado y listo.
 
 @Component
 public class StartupListener implements ApplicationListener<ApplicationReadyEvent> {

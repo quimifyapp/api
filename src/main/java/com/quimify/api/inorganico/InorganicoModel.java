@@ -4,8 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 
 // Esta clase representa los compuestos inorgánicos.
-
-// Inorganico = (id, busquedas, premium, formula, nombre, alternativo, masa, densidad, fu., eb.)
+// (id, busquedas, premium, fórmula, nombre, alternativo, masa, densidad, p. fusión, p. ebullición)
 
 @Entity // Es un modelo real
 @Table(name = "inorganico") // En la tabla 'inorganico' de la DB
