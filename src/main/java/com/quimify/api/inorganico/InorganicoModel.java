@@ -122,4 +122,8 @@ public class InorganicoModel {
         this.ebullicion = ebullicion;
     }
 
+    public void setEtiquetas(ArrayList<String> etiquetas) {
+        this.etiquetas = etiquetas;
+    }
+
 }

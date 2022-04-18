@@ -14,6 +14,8 @@ public class InorganicoService {
     @Autowired
     InorganicoRepository inorganicoRepository; // Conexión con la DB.
 
+    public static ArrayList<InorganicoSample> samples = new ArrayList<>();
+
     private final static InorganicoResult NO_ENCONTRADO =
             new InorganicoResult(InorganicoResult.NO_ENCONTRADO);
     private final static InorganicoResult PREMIUM =
