@@ -1,4 +1,4 @@
-package com.quimify.api.models;
+package com.quimify.api.inorganico;
 
 import javax.persistence.*;
 import java.util.ArrayList;

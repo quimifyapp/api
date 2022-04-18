@@ -1,6 +1,4 @@
-package com.quimify.api.results;
-
-import com.quimify.api.models.InorganicoModel;
+package com.quimify.api.inorganico;
 
 public class InorganicoResult {
 

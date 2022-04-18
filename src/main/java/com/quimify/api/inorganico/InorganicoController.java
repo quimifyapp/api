@@ -1,8 +1,5 @@
-package com.quimify.api.controllers;
+package com.quimify.api.inorganico;
 
-import com.quimify.api.models.InorganicoModel;
-import com.quimify.api.results.InorganicoResult;
-import com.quimify.api.services.InorganicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
