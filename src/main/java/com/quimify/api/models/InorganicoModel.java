@@ -2,7 +2,6 @@ package com.quimify.api.models;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.List;
 
 // Esta clase representa los compuestos inorgánicos.
 
@@ -35,13 +34,7 @@ public class InorganicoModel {
         private String fusion;      // (K)
         private String ebullicion;  // (K)
 
-    /*
-    private List<String> etiquetas;
-
-    public List<String> getEtiquetas() {
-        return etiquetas;
-    }
-    */
+    private ArrayList<String> etiquetas; // ("hidruromagnesico", "hidrogenodemagnesio")
 
     // Getters y setters:
 
@@ -83,6 +76,10 @@ public class InorganicoModel {
 
     public String getEbullicion() {
         return ebullicion;
+    }
+
+    public ArrayList<String> getEtiquetas() {
+        return etiquetas;
     }
 
     public void setId(Integer id) {

@@ -2,8 +2,6 @@ package com.quimify.api.results;
 
 import com.quimify.api.models.InorganicoModel;
 
-import javax.persistence.criteria.CriteriaBuilder;
-
 public class InorganicoResult {
 
     final private Integer resultado;

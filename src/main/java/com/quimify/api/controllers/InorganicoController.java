@@ -28,7 +28,7 @@ public class InorganicoController {
     public ArrayList<InorganicoModel> obtenerTodos() {
         return inorganicoService.obtenerTodos();
     }
-//ola
+
     @PostMapping("/guardar")
     public InorganicoModel guardarInorganico(@RequestBody InorganicoModel inorganico) {
         return inorganicoService.guardarInorganico(inorganico);
