@@ -10,7 +10,7 @@ import java.util.ArrayList;
 @Service
 public class InorganicoService {
     @Autowired
-    InorganicoRepository inorganicoRepository; // Conexión con la DB.
+    InorganicoRepository inorganicoRepository; // Conexión con la DB
 
     public static ArrayList<InorganicoSearchable> searchables = new ArrayList<>();
 
@@ -42,12 +42,14 @@ public class InorganicoService {
         InorganicoResult resultado;
 
         try {
-            ArrayList<InorganicoModel> identicos = inorganicoRepository.findByFormula(input);
+            ArrayList<InorganicoModel> identicos =
+                    inorganicoRepository.findByFormulaOrderByBusquedasDesc(input);
 
             if(identicos.size() != 0) {
                 InorganicoModel encontrado = identicos.get(0);
                 if(!encontrado.getPremium() || premium) {
                     resultado = new InorganicoResult(encontrado);
+                    inorganicoRepository.incrementarBusquedas(encontrado);
 
                     // Como si fuera uno nuevo:
                     /* InorganicoModel prueba = new InorganicoModel();
