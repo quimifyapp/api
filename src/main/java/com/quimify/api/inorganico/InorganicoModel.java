@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 
 // Esta clase representa los compuestos inorgánicos.
-// (id, busquedas, premium, fórmula, nombre, alternativo, masa, densidad, p. fusión, p. ebullición)
 
 @Entity // Es un modelo real
 @Table(name = "inorganico") // En la tabla 'inorganico' de la DB
@@ -15,25 +14,34 @@ public class InorganicoModel {
     @Column(unique = true, nullable = false)
     private Integer id;
 
+    // Necesarias:
+
+    @Column(nullable = false)
+    private String formula; // "MgH2"
+    @Column(nullable = false)
+    private String nombre;  // "hidruro de magnesio
+
     // Con valor predeterminado:
 
-    private Integer busquedas = 0;
+    @Column(columnDefinition = "INT default 1", nullable = false)
+    private Integer busquedas = 1;
+    @Column(columnDefinition = "BIT(1) default false", nullable = false)
     private Boolean premium = false;
 
     // Con valor predeterminado 'null':
 
-    private String formula;     // "MgH2"
-    private String nombre;      // "hidruro de magnesio
     private String alternativo; // "dihidruro de magnesio"
 
-        // De tipo 'String' porque no se realizan cálculos con ellos:
+    // De tipo 'String' porque no se realizan cálculos con ellos:
 
-        private String masa;        // (g)
-        private String densidad;    // (g/cm3)
-        private String fusion;      // (K)
-        private String ebullicion;  // (K)
+    private String masa;        // (g)
+    private String densidad;    // (g/cm3)
+    private String fusion;      // (K)
+    private String ebullicion;  // (K)
 
     private ArrayList<String> etiquetas; // ("hidruromagnesico", "hidrogenodemagnesio")
+
+    // --------------------------------------------------------------------------------
 
     // Getters y setters:
 

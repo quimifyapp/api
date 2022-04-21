@@ -1,25 +1,41 @@
 package com.quimify.api.inorganico;
 
 // Esta clase representa las entregas al cliente de un compuesto inorgánico.
-// (resultado, inorgánico)
 
 public class InorganicoResult {
 
-    private final Integer resultado;
-    private final InorganicoModel inorganico;
+    public final static Integer NO_ENCONTRADO = 0; // Eso, o se ha producido un error
+    public final static Integer ENCONTRADO = 1; // OK
+    public final static Integer NO_PREMIUM = 2; // Compuesto premium, usuario no-premium
 
-    public final static Integer NO_ENCONTRADO = 0;
-    public final static Integer ENCONTRADO = 1;
-    public final static Integer PREMIUM = 2;
+    private final Integer resultado;
+
+    private String formula;       // "MgH2"
+    private String nombre;        // "hidruro de magnesio
+    private String alternativo;   // "dihidruro de magnesio"
+    private String masa;          // (g)
+    private String densidad;      // (g/cm3)
+    private String fusion;        // (K)
+    private String ebullicion;    // (K)
+
+    private Boolean premium; // Para futura "insignia"
+
+    // --------------------------------------------------------------------------------
 
     public InorganicoResult(InorganicoModel inorganico) {
         resultado = ENCONTRADO;
-        this.inorganico = inorganico;
+
+        this.formula = inorganico.getFormula();
+        this.nombre = inorganico.getNombre();
+        this.alternativo = inorganico.getAlternativo();
+        this.masa = inorganico.getMasa();
+        this.densidad = inorganico.getDensidad();
+        this.fusion = inorganico.getFusion();
+        this.ebullicion = inorganico.getEbullicion();
     }
 
     public InorganicoResult(Integer resultado) {
         this.resultado = resultado;
-        inorganico = null;
     }
 
     // Getters:
@@ -28,8 +44,32 @@ public class InorganicoResult {
         return resultado;
     }
 
-    public InorganicoModel getInorganico() {
-        return inorganico;
+    public String getFormula() {
+        return formula;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getAlternativo() {
+        return alternativo;
+    }
+
+    public String getMasa() {
+        return masa;
+    }
+
+    public String getDensidad() {
+        return densidad;
+    }
+
+    public String getFusion() {
+        return fusion;
+    }
+
+    public String getEbullicion() {
+        return ebullicion;
     }
 
 }

@@ -3,17 +3,18 @@ package com.quimify.api.inorganico;
 import java.text.Normalizer;
 import java.util.ArrayList;
 
-// Esta clase representa los compuestos inorgánicos que están en memoria para realizar búsquedas.
-// (id, fórmula, nombre) ~ (alternativo) ~ (etiqueta0, etiqueta1...)
+// Esta clase representa los compuestos inorgánicos en memoria, simplificados para hacer búsquedas.
 
-public class InorganicoSample {
+public class InorganicoSearchable {
 
     private final Integer id;
-    private ArrayList<String> keywords = new ArrayList<>();
+    private final ArrayList<String> keywords = new ArrayList<>(); // Modificable, no re-atribuible
+
+    // --------------------------------------------------------------------------------
 
     // TODO: Levenshtein o similar
 
-    // "Óxido de hierro (III)" -> "oxidodehierroiii"
+    // Ej.: "Óxido de hierro (III)" -> "oxidodehierroiii"
     private String normalizar(String input) {
         input = Normalizer.normalize(input, Normalizer.Form.NFD);
         input = input.replaceAll("[^\\p{ASCII}]", "");
@@ -22,7 +23,9 @@ public class InorganicoSample {
         return input;
     }
 
-    public InorganicoSample(InorganicoModel inorganico) {
+    // Constructor:
+
+    public InorganicoSearchable(InorganicoModel inorganico) {
         this.id = inorganico.getId();
 
         keywords.add(normalizar(inorganico.getFormula()));
@@ -30,10 +33,11 @@ public class InorganicoSample {
 
         String alternativo = inorganico.getAlternativo();
         if(alternativo != null)
-            keywords.add(normalizar(alternativo));
+            keywords.add(normalizar(inorganico.getAlternativo()));
 
         ArrayList<String> etiquetas = inorganico.getEtiquetas();
         if(etiquetas != null)
             keywords.addAll(etiquetas); // Las etiquetas ya están normalizadas
     }
+
 }

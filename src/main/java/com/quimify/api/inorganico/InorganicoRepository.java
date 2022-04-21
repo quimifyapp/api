@@ -1,8 +1,6 @@
 package com.quimify.api.inorganico;
 
-// Esta clase realiza conexiones automáticas con la DB.
-
-// Inorganico = (id, busquedas, premium, formula, nombre, alternativo, masa, densidad, fu., eb.)
+// Esta clase implementa conexiones con la DB. automáticamente gracias a la librería JPA.
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
