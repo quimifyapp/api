@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public interface InorganicoRepository extends CrudRepository<InorganicoModel, Integer> {
     ArrayList<InorganicoModel> findByFormulaOrderByBusquedasDesc(String formula); // Test
 
-    @Modifying
-    @Transactional
+    @Modifying // Modifica la DB
+    @Transactional // Por seguridad
     @Query("UPDATE InorganicoModel i SET i.busquedas = i.busquedas + 1 " +
-            "WHERE i.id = :#{#inorganico.id}")
+            "WHERE i.id = :#{#inorganico.id}") // MySQL
     void incrementarBusquedas(@Param("inorganico") InorganicoModel inorganico);
 }

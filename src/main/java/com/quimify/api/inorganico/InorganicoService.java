@@ -49,7 +49,7 @@ public class InorganicoService {
                 InorganicoModel encontrado = identicos.get(0);
                 if(!encontrado.getPremium() || premium) {
                     resultado = new InorganicoResult(encontrado);
-                    inorganicoRepository.incrementarBusquedas(encontrado);
+                    inorganicoRepository.incrementarBusquedas(encontrado); // Su contador
 
                     // Como si fuera uno nuevo:
                     /* InorganicoModel prueba = new InorganicoModel();
