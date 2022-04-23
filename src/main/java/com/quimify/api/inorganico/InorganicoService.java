@@ -33,7 +33,17 @@ public class InorganicoService {
         return insertado;
     }
 
-    public void guardar(InorganicoModel inorganico) { // En construcción
+    public InorganicoResult autoCompletar(String input) {
+        input = InorganicoSearchable.normalizar(input);
+
+        for(InorganicoSearchable ejemplar : searchables) // Ordenados por nº de búsquedas
+            if(ejemplar.puedeCompletar(input))
+                return new InorganicoResult(inorganicoRepository.findOneById(ejemplar.getId()));
+
+        return NO_ENCONTRADO;
+    }
+
+    private void guardar(InorganicoModel inorganico) { // En construcción
         searchables.add(new InorganicoSearchable( // En memoria para ser buscado
                 inorganicoRepository.save(inorganico))); // En la DB
     }

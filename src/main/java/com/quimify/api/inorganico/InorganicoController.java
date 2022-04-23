@@ -21,6 +21,11 @@ public class InorganicoController {
         return inorganicoService.buscar(input, premium);
     }
 
+    @GetMapping("/autocompletar")
+    public InorganicoResult autoCompletar(@RequestParam("input") String input) {
+        return inorganicoService.autoCompletar(input);
+    }
+
     @GetMapping("/todos") // Test
     public ArrayList<InorganicoModel> obtenerTodos() {
         return inorganicoService.obtenerTodos();

@@ -19,7 +19,7 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        for(InorganicoModel inorganico : inorganicoRepository.findAll())
+        for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
             InorganicoService.searchables.add(new InorganicoSearchable(inorganico));
     }
 }

@@ -14,8 +14,19 @@ public class InorganicoSearchable {
 
     // TODO: Levenshtein o similar
 
+    // Ej.: (this.keywords[1] = "ácido sulfuroso") "acidosulf" -> 'true'
+    // 'input' debe estar previamente normalizado
+    public boolean puedeCompletar(String input) {
+        for(String keyword : keywords)
+            if(keyword.length() >= input.length())
+                if(keyword.substring(0, input.length()).contentEquals(input))
+                    return true;
+
+        return false;
+    }
+
     // Ej.: "Óxido de hierro (III)" -> "oxidodehierroiii"
-    private String normalizar(String input) {
+    public static String normalizar(String input) {
         input = Normalizer.normalize(input, Normalizer.Form.NFD);
         input = input.replaceAll("[^\\p{ASCII}]", "");
         input = input.replaceAll("[^A-Za-z0-9]", "").toLowerCase();
@@ -38,6 +49,12 @@ public class InorganicoSearchable {
         ArrayList<String> etiquetas = inorganico.getEtiquetas();
         if(etiquetas != null)
             keywords.addAll(etiquetas); // Las etiquetas ya están normalizadas
+    }
+
+    // Getters:
+
+    public Integer getId() {
+        return id;
     }
 
 }
