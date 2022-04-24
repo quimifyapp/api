@@ -38,7 +38,7 @@ public class InorganicoService {
 
         for(InorganicoSearchable ejemplar : searchables) // Ordenados por nº de búsquedas
             if(ejemplar.puedeCompletar(input))
-                return new InorganicoResult(inorganicoRepository.findOneById(ejemplar.getId()));
+                return new InorganicoResult(inorganicoRepository.encontrarPorId(ejemplar.getId()));
 
         return NO_ENCONTRADO;
     }
