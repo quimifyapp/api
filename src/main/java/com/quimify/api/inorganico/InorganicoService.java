@@ -51,31 +51,38 @@ public class InorganicoService {
     public InorganicoResult buscar(String input, Boolean premium) { // En construcción
         InorganicoResult resultado;
 
-        try {
-            ArrayList<InorganicoModel> identicos =
-                    inorganicoRepository.findByFormulaOrderByBusquedasDesc(input);
+        Integer id = buscarDB(input); // Flowchart #0
 
-            if(identicos.size() != 0) {
-                InorganicoModel encontrado = identicos.get(0);
-                if(!encontrado.getPremium() || premium) {
-                    resultado = new InorganicoResult(encontrado);
-                    inorganicoRepository.incrementarBusquedas(encontrado); // Su contador
-
-                    // Como si fuera uno nuevo:
-                    /* InorganicoModel prueba = new InorganicoModel();
-                    prueba.setFormula(encontrado.getFormula());
-                    prueba.setNombre(encontrado.getNombre());
-                    guardar(prueba); */
-                }
-                else resultado = NO_PREMIUM;
-            }
-            else resultado = NO_ENCONTRADO;
-        } catch (Exception error) {
+        // Flowchart #1
+        if(id == null) {
+            // Flowchart #2,3,4,5,6
             // ...
             resultado = NO_ENCONTRADO;
         }
+        else {
+            resultado = decidirPremium(id, premium); // Flowchart #7
+        }
 
         return resultado;
+    }
+
+    // Flowchart #0
+    private Integer buscarDB(String input) {
+        input = InorganicoSearchable.normalizar(input);
+
+        for(InorganicoSearchable ejemplar : searchables) // Ordenados por nº de búsquedas
+            if(ejemplar.coincide(input))
+                return ejemplar.getId();
+
+        return null;
+    }
+
+    // Flowchart #7
+    private InorganicoResult decidirPremium(Integer id, Boolean premium) {
+        InorganicoModel resultado = inorganicoRepository.encontrarPorId(id);
+
+        return (!resultado.getPremium() || premium)
+                ? new InorganicoResult(resultado) : NO_PREMIUM;
     }
 
 }

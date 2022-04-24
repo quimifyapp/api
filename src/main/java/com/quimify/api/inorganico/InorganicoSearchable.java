@@ -14,12 +14,22 @@ public class InorganicoSearchable {
 
     // TODO: Levenshtein o similar
 
-    // Ej.: (this.keywords[1] = "ácido sulfuroso") "acidosulf" -> 'true'
+    // Ej.: (this.keywords[...] = "acidosulfuroso") "acidosu" -> 'true'
     // 'input' debe estar previamente normalizado
     public boolean puedeCompletar(String input) {
         for(String keyword : keywords)
             if(keyword.length() >= input.length())
                 if(keyword.substring(0, input.length()).contentEquals(input))
+                    return true;
+
+        return false;
+    }
+
+    // Ej.: (this.keywords[...] = "acidosulfuroso") "acidosulfuroso" -> 'true', "acidosu" -> 'false'
+    // 'input' debe estar previamente normalizado
+    public boolean coincide(String input) {
+        for(String keyword : keywords)
+            if(keyword.equals(input))
                     return true;
 
         return false;
