@@ -27,15 +27,22 @@ public class InorganicoService {
 
     // --------------------------------------------------------------------------------
 
-    public ArrayList<InorganicoModel> obtenerTodos() { // Test
+    public ArrayList<InorganicoModel> obtenerTodos() { // TEST
         return (ArrayList<InorganicoModel>) inorganicoRepository.findAll();
     }
 
-    public InorganicoModel insertarInorganico(InorganicoModel inorganico) {  // Test
+    public InorganicoModel insertarInorganico(InorganicoModel inorganico) {  // TEST
         InorganicoModel insertado = inorganicoRepository.save(inorganico);
         BUSCABLES.add(new InorganicoBuscable(insertado));
 
         return insertado;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public void cargarSearchables() {
+        for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
+            BUSCABLES.add(new InorganicoBuscable(inorganico));
     }
 
     public InorganicoResultado autoCompletar(String input) {
@@ -53,26 +60,39 @@ public class InorganicoService {
                 inorganicoRepository.save(inorganico))); // En la DB
     }
 
-    public InorganicoResultado buscar(String input, Boolean premium) { // En construcción
+    public InorganicoResultado buscar(String input, Boolean usuario_premium) { // En construcción
         InorganicoResultado resultado;
 
         Integer id = buscarDB(input); // Flowchart #0
 
         // Flowchart #1
         if(id == null) {
-            // resultado_web[0]: un identificador suficiente (nombre, fórmula...)
-            // resultado_web[1]: la URL del resultado de la búsqueda
+            String[] resultado_web; // [0]: un identificador suficiente (generalmente la fórmula)
+            // [1]: la URL del resultado de la búsqueda ("www.fq.com/H2O")
 
-            String[] resultado_web = new String[2];
+            // Flowchart #2
+            if(configuracionService.getApiGoogleON() /*&& limite no superado*/)
+                resultado_web = buscarApiGoogle(input);
+            // Flowchart #3
+            else if(configuracionService.getApiBingGratisON())
+                resultado_web = buscarApiBingGratis(input);
+            // Flowchart #4
+            else if(configuracionService.getApiBingDePagoON() /*&& limite no superado*/)
+                resultado_web = buscarApiBingDePago(input);
 
-            String url = configuracionService.getApiGoogleURL(); // Test
+            // Flowchart #7
+            else {
+                // ...
+            }
+
+            id = buscarDB(resultado_web[0]); // Flowchart #0
 
             // ...
 
             resultado = NO_ENCONTRADO;
         }
         else {
-            resultado = decidirPremium(id, premium); // Flowchart #7
+            resultado = decidirPremium(id, usuario_premium); // Flowchart #7
         }
 
         return resultado;
@@ -89,9 +109,37 @@ public class InorganicoService {
         return null;
     }
 
-    /*private String[] buscarApiGoogle(String input) {
+    // Flowchart #2
+    private String[] buscarApiGoogle(String input) {
+        String URL = configuracionService.getApiGoogleURL() + // Parte no variable
+                formatearHTTP(input); // Parámetro HTTP de búsqueda
 
-    }*/
+        // ...
+    }
+
+    // Flowchart #3
+    private String[] buscarApiBingGratis(String input) {
+        return buscarApiBing(configuracionService.getApiBingGratisURL() + // Parte no variable
+                formatearHTTP(input)); // Parámetro HTTP de búsqueda
+    }
+
+    // Flowchart #4
+    private String[] buscarApiBingDePago(String input) {
+        return buscarApiBing(configuracionService.getApiBingDePagoURL() + // Parte no variable
+                formatearHTTP(input)); // Parámetro HTTP de búsqueda
+    }
+
+    // Flowchart #3 ó #4
+    private String[] buscarApiBing(String URL) {
+
+        // ...
+    }
+
+    // Flowchart #2 ó #3 ó #4
+    private String formatearHTTP(String input) {
+        return input.replaceAll(" ", "+"); // Mejor "%20" en vez de "+"?
+        // URLEncoder.encode(q, StandardCharsets.UTF_8);?
+    }
 
     // Flowchart #7
     private InorganicoResultado decidirPremium(Integer id, Boolean premium) {
@@ -99,11 +147,6 @@ public class InorganicoService {
 
         return (!resultado.getPremium() || premium)
                 ? new InorganicoResultado(resultado) : NO_PREMIUM;
-    }
-
-    public void cargarSearchables() {
-        for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
-            BUSCABLES.add(new InorganicoBuscable(inorganico));
     }
 
 }

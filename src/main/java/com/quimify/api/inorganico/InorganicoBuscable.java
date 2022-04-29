@@ -14,8 +14,8 @@ public class InorganicoBuscable {
 
     // TODO: Levenshtein o similar
 
-    // Ej.: (this.keywords[...] = "acidosulfuroso") "acidosu" -> 'true'
     // 'input' debe estar previamente normalizado
+    // Ej.: (this.keywords[i] = "acidosulfuroso") "acidosu" -> 'true'
     public boolean puedeCompletar(String input) {
         for(String keyword : keywords)
             if(keyword.length() >= input.length())
@@ -25,8 +25,8 @@ public class InorganicoBuscable {
         return false;
     }
 
-    // Ej.: (this.keywords[...] = "acidosulfuroso") "acidosulfuroso" -> 'true', "acidosu" -> 'false'
     // 'input' debe estar previamente normalizado
+    // Ej.: (this.keywords[i] = "h2so4") "h2so4" -> 'true', "h2so" -> 'false'
     public boolean coincide(String input) {
         for(String keyword : keywords)
             if(keyword.equals(input))
@@ -35,11 +35,13 @@ public class InorganicoBuscable {
         return false;
     }
 
+    // TODO: Comentar esta función
     // Ej.: "Óxido de hierro (III)" -> "oxidodehierroiii"
     public static String normalizar(String input) {
-        input = Normalizer.normalize(input, Normalizer.Form.NFD);
-        input = input.replaceAll("[^\\p{ASCII}]", "");
-        input = input.replaceAll("[^A-Za-z0-9]", "").toLowerCase();
+        input = Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll("[^A-Za-z0-9]", "")
+                .toLowerCase();
 
         return input;
     }

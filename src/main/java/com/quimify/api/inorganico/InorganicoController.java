@@ -16,25 +16,27 @@ public class InorganicoController {
 
     // --------------------------------------------------------------------------------
 
+    @GetMapping("/todos") // TEST
+    public ArrayList<InorganicoModel> obtenerTodos() {
+        return inorganicoService.obtenerTodos();
+    }
+
+    @PostMapping("/guardar") // TEST
+    public InorganicoModel guardarInorganico(@RequestBody InorganicoModel inorganico) {
+        return inorganicoService.insertarInorganico(inorganico);
+    }
+
+    // --------------------------------------------------------------------------------
+
     @GetMapping()
     public InorganicoResultado buscar(@RequestParam("input") String input,
-                                      @RequestParam("premium") Boolean premium) {
-        return inorganicoService.buscar(input, premium);
+                                      @RequestParam("usuario_premium") Boolean usuario_premium) {
+        return inorganicoService.buscar(input, usuario_premium);
     }
 
     @GetMapping("/autocompletar")
     public InorganicoResultado autoCompletar(@RequestParam("input") String input) {
         return inorganicoService.autoCompletar(input);
-    }
-
-    @GetMapping("/todos") // Test
-    public ArrayList<InorganicoModel> obtenerTodos() {
-        return inorganicoService.obtenerTodos();
-    }
-
-    @PostMapping("/guardar") // Test
-    public InorganicoModel guardarInorganico(@RequestBody InorganicoModel inorganico) {
-        return inorganicoService.insertarInorganico(inorganico);
     }
 
 }

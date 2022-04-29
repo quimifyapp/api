@@ -15,6 +15,10 @@ public class ConfiguracionService {
 
     // --------------------------------------------------------------------------------
 
+    public Boolean getApiGoogleON() {
+        return configuracionRepository.encontrarApiGoogleON(VERSION);
+    }
+
     public String getApiGoogleURL() {
         return configuracionRepository.encontrarApiGoogleURL(VERSION);
     }

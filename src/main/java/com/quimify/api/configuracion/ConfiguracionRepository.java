@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConfiguracionRepository extends CrudRepository<ConfiguracionModel, Integer> {
 
-    // --------------------------------------------------------------------------------
+    @Query(value = "SELECT api_google_on FROM configuracion WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    Boolean encontrarApiGoogleON(@Param("version") Integer version);
 
     @Query(value = "SELECT api_google_url FROM configuracion WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL

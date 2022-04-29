@@ -34,6 +34,8 @@ public class InorganicoResultado {
         this.ebullicion = inorganico.getEbullicion();
     }
 
+    // Constructor:
+
     public InorganicoResultado(Integer resultado) {
         this.resultado = resultado;
     }
