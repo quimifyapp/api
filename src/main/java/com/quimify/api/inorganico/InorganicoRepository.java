@@ -1,7 +1,5 @@
 package com.quimify.api.inorganico;
 
-// Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
-
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,8 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+// Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
+
 @Repository
 public interface InorganicoRepository extends CrudRepository<InorganicoModel, Integer> {
+
     ArrayList<InorganicoModel> findByFormulaOrderByBusquedasDesc(String formula); // Test
 
     ArrayList<InorganicoModel> findAllByOrderByBusquedasDesc();

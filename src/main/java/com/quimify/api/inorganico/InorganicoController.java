@@ -11,18 +11,18 @@ import java.util.ArrayList;
 @RequestMapping("/inorganico")
 public class InorganicoController {
     @Autowired
-    InorganicoService inorganicoService; // Conexión con la DB.
+    InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
 
     // --------------------------------------------------------------------------------
 
     @GetMapping()
-    public InorganicoResult buscar(@RequestParam("input") String input,
-                                   @RequestParam("premium") Boolean premium) {
+    public InorganicoResultado buscar(@RequestParam("input") String input,
+                                      @RequestParam("premium") Boolean premium) {
         return inorganicoService.buscar(input, premium);
     }
 
     @GetMapping("/autocompletar")
-    public InorganicoResult autoCompletar(@RequestParam("input") String input) {
+    public InorganicoResultado autoCompletar(@RequestParam("input") String input) {
         return inorganicoService.autoCompletar(input);
     }
 

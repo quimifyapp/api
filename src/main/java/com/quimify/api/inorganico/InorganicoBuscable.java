@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 // Esta clase representa los compuestos inorgánicos en memoria, simplificados para hacer búsquedas.
 
-public class InorganicoSearchable {
+public class InorganicoBuscable {
 
     private final Integer id;
     private final ArrayList<String> keywords = new ArrayList<>(); // Modificable, no re-atribuible
@@ -46,7 +46,7 @@ public class InorganicoSearchable {
 
     // Constructor:
 
-    public InorganicoSearchable(InorganicoModel inorganico) {
+    public InorganicoBuscable(InorganicoModel inorganico) {
         this.id = inorganico.getId();
 
         keywords.add(normalizar(inorganico.getFormula()));

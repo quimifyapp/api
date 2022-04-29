@@ -2,7 +2,7 @@ package com.quimify.api.inorganico;
 
 // Esta clase representa las entregas al cliente de un compuesto inorgánico.
 
-public class InorganicoResult {
+public class InorganicoResultado {
 
     public final static Integer NO_ENCONTRADO = 0; // Eso, o se ha producido un error
     public final static Integer ENCONTRADO = 1; // OK
@@ -22,7 +22,7 @@ public class InorganicoResult {
 
     // --------------------------------------------------------------------------------
 
-    public InorganicoResult(InorganicoModel inorganico) {
+    public InorganicoResultado(InorganicoModel inorganico) {
         resultado = ENCONTRADO;
 
         this.formula = inorganico.getFormula();
@@ -34,7 +34,7 @@ public class InorganicoResult {
         this.ebullicion = inorganico.getEbullicion();
     }
 
-    public InorganicoResult(Integer resultado) {
+    public InorganicoResultado(Integer resultado) {
         this.resultado = resultado;
     }
 
