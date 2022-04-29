@@ -1,5 +1,6 @@
 package com.quimify.api.inorganico;
 
+import com.quimify.api.configuracion.ConfiguracionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,9 @@ public class InorganicoService {
 
     @Autowired
     private InorganicoRepository inorganicoRepository; // Conexión con la DB
+
+    @Autowired
+    ConfiguracionService configuracionService;  // Procesos de la configuración
 
     private static final ArrayList<InorganicoBuscable> BUSCABLES = new ArrayList<>();
 
@@ -59,7 +63,9 @@ public class InorganicoService {
             // resultado_web[0]: un identificador suficiente (nombre, fórmula...)
             // resultado_web[1]: la URL del resultado de la búsqueda
 
-            String[] resultado_web = new String[2];  // Flowchart #2
+            String[] resultado_web = new String[2];
+
+            String url = configuracionService.getApiGoogleURL(); // Test
 
             // ...
 
@@ -83,7 +89,7 @@ public class InorganicoService {
         return null;
     }
 
-    /*private String[] buscarGoogle(String input) {
+    /*private String[] buscarApiGoogle(String input) {
 
     }*/
 

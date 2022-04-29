@@ -10,6 +10,7 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/inorganico")
 public class InorganicoController {
+
     @Autowired
     InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
 

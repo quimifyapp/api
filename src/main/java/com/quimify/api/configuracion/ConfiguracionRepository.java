@@ -12,7 +12,7 @@ public interface ConfiguracionRepository extends CrudRepository<ConfiguracionMod
 
     // --------------------------------------------------------------------------------
 
-    @Query(value = "SELECT * FROM configuracion WHERE version = :version LIMIT 1",
+    @Query(value = "SELECT api_google_url FROM configuracion WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL
-    ConfiguracionModel encontrarPorVersion(@Param("version") Integer version);
+    String encontrarApiGoogleURL(@Param("version") Integer version);
 }

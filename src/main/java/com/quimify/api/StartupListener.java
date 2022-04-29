@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
+
     @Autowired
     InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
 
