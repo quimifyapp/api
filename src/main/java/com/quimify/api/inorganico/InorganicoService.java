@@ -1,9 +1,16 @@
 package com.quimify.api.inorganico;
 
 import com.quimify.api.configuracion.ConfiguracionService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 // Esta clase procesa los compuestos inorgánicos.
@@ -48,14 +55,16 @@ public class InorganicoService {
     public InorganicoResultado autoCompletar(String input) {
         input = InorganicoBuscable.normalizar(input);
 
-        for(InorganicoBuscable ejemplar : BUSCABLES) // Ordenados por nº de búsquedas
-            if(ejemplar.puedeCompletar(input))
-                return new InorganicoResultado(inorganicoRepository.encontrarPorId(ejemplar.getId()));
+        for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
+            if(buscable.puedeCompletar(input))
+                return new InorganicoResultado(inorganicoRepository
+                        .encontrarPorId(buscable.getId()));
 
         return NO_ENCONTRADO;
     }
 
-    private void guardar(InorganicoModel inorganico) { // En construcción
+    // TODO: Terminar esta función
+    private void guardar(InorganicoModel inorganico) {
         BUSCABLES.add(new InorganicoBuscable( // En memoria para ser buscado
                 inorganicoRepository.save(inorganico))); // En la DB
     }
@@ -67,32 +76,38 @@ public class InorganicoService {
 
         // Flowchart #1
         if(id == null) {
-            String[] resultado_web; // [0]: un identificador suficiente (generalmente la fórmula)
-            // [1]: la URL del resultado de la búsqueda ("www.fq.com/H2O")
+            String[] resultado_web = null; // [0]: identificador suficiente (suele ser la fórmula)
+            // [1]: URL del resultado de la búsqueda ("www.fq.com/H2O")
 
             // Flowchart #2
-            if(configuracionService.getApiGoogleON() /*&& limite no superado*/)
-                resultado_web = buscarApiGoogle(input);
+            if(configuracionService.getGoogleON() /*&& limite */)
+                resultado_web = buscarGoogle(input);
+
             // Flowchart #3
-            else if(configuracionService.getApiBingGratisON())
-                resultado_web = buscarApiBingGratis(input);
+            if(resultado_web == null && configuracionService.getBingGratisON())
+                resultado_web = buscarBingGratis(input);
+
             // Flowchart #4
-            else if(configuracionService.getApiBingDePagoON() /*&& limite no superado*/)
-                resultado_web = buscarApiBingDePago(input);
+            if(resultado_web == null && configuracionService.getBingDePagoON() /*&& limite */)
+                resultado_web = buscarBingDePago(input);
 
-            // Flowchart #7
-            else {
-                // ...
+            // Flowchart #0 ó #5
+            if(resultado_web != null) {
+                id = buscarDB(resultado_web[0]); // Flowchart #0
+
+                if(id != null)
+                    resultado = decidirPremium(id, usuario_premium); // Flowchart #6
+                else { // Flowchart #5
+                    resultado = NO_ENCONTRADO;
+                }
             }
-
-            id = buscarDB(resultado_web[0]); // Flowchart #0
-
-            // ...
-
-            resultado = NO_ENCONTRADO;
+            else { // Flowchart #7
+                // ...
+                resultado = NO_ENCONTRADO;
+            }
         }
         else {
-            resultado = decidirPremium(id, usuario_premium); // Flowchart #7
+            resultado = decidirPremium(id, usuario_premium); // Flowchart #6
         }
 
         return resultado;
@@ -110,35 +125,89 @@ public class InorganicoService {
     }
 
     // Flowchart #2
-    private String[] buscarApiGoogle(String input) {
-        String URL = configuracionService.getApiGoogleURL() + // Parte no variable
-                formatearHTTP(input); // Parámetro HTTP de búsqueda
+    private String[] buscarGoogle(String input) {
+        String[] resultado_web;
 
-        // ...
+        try {
+            URL url = new URL(configuracionService.getGoogleURL() +
+                    formatearHTTP(input)); // Parámetro HTTP de búsqueda
+            HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod("GET");
+            conexion.setRequestProperty("Accept", "application/json");
+
+            JSONObject respuesta = descargarJSON(conexion);
+
+            if(respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
+                JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
+
+                String titulo = resultado.getString("title"); // "H2O / óxido de dihidrógeno"
+                titulo = titulo.substring(0, titulo.indexOf('/') - 1); // "H2O"
+                String direccion = resultado.getString("formattedUrl"); // "www.fq.com/..."
+
+                resultado_web = new String[] {titulo, direccion};
+            }
+            else resultado_web = null;
+        } catch (Exception e) {
+            // Error con la URL, la conexión o HTTP
+            // ...
+            resultado_web = null;
+        }
+
+        return resultado_web;
     }
 
     // Flowchart #3
-    private String[] buscarApiBingGratis(String input) {
-        return buscarApiBing(configuracionService.getApiBingGratisURL() + // Parte no variable
-                formatearHTTP(input)); // Parámetro HTTP de búsqueda
+    private String[] buscarBingGratis(String input) {
+        return buscarBing(input, configuracionService.getBingGratisKey());
     }
 
     // Flowchart #4
-    private String[] buscarApiBingDePago(String input) {
-        return buscarApiBing(configuracionService.getApiBingDePagoURL() + // Parte no variable
-                formatearHTTP(input)); // Parámetro HTTP de búsqueda
+    private String[] buscarBingDePago(String input) {
+        return buscarBing(input, configuracionService.getBingDePagoKey());
     }
 
     // Flowchart #3 ó #4
-    private String[] buscarApiBing(String URL) {
+    private String[] buscarBing(String input, String key) {
+        String[] resultado_web;
 
-        // ...
+        try {
+            URL url = new URL(configuracionService.getBingURL() +
+                    formatearHTTP(input)); // Parámetro HTTP de búsqueda
+            HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestProperty("Ocp-Apim-Subscription-Key", key);
+
+            JSONObject respuesta = descargarJSON(conexion);
+
+            if(false) {
+
+            }
+            else resultado_web = null;
+        } catch (Exception e) {
+            // Error con la URL, la conexión o HTTP
+            // ...
+            resultado_web = null;
+        }
+
+        return resultado_web;
     }
 
     // Flowchart #2 ó #3 ó #4
     private String formatearHTTP(String input) {
-        return input.replaceAll(" ", "+"); // Mejor "%20" en vez de "+"?
-        // URLEncoder.encode(q, StandardCharsets.UTF_8);?
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
+    }
+
+    // Flowchart #2 ó #3 ó #4
+    private JSONObject descargarJSON(HttpURLConnection conexion) throws Exception {
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader((conexion.getInputStream())));
+
+        String temp;
+        StringBuilder texto = new StringBuilder();
+        while ((temp = br.readLine()) != null)
+            texto.append(temp);
+
+        conexion.disconnect();
+        return new JSONObject(texto.toString());
     }
 
     // Flowchart #7

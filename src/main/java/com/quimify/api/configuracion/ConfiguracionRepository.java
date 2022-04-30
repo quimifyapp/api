@@ -10,11 +10,39 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConfiguracionRepository extends CrudRepository<ConfiguracionModel, Integer> {
 
-    @Query(value = "SELECT api_google_on FROM configuracion WHERE version = :version LIMIT 1",
+    @Query(value = "SELECT google_on FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL
-    Boolean encontrarApiGoogleON(@Param("version") Integer version);
+    Boolean encontrarGoogleON(@Param("version") Integer version);
 
-    @Query(value = "SELECT api_google_url FROM configuracion WHERE version = :version LIMIT 1",
+    @Query(value = "SELECT google_url FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL
-    String encontrarApiGoogleURL(@Param("version") Integer version);
+    String encontrarGoogleURL(@Param("version") Integer version);
+
+    @Query(value = "SELECT bing_url FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    String encontrarBingURL(@Param("version") Integer version);
+
+    @Query(value = "SELECT bing_gratis_on FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    Boolean encontrarBingGratisON(@Param("version") Integer version);
+
+    @Query(value = "SELECT bing_gratis_key FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    String encontrarBingGratisKey(@Param("version") Integer version);
+
+    @Query(value = "SELECT bing_pago_on FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    Boolean encontrarBingDePagoON(@Param("version") Integer version);
+
+    @Query(value = "SELECT bing_pago_key FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    String encontrarBingDePagoKey(@Param("version") Integer version);
+
 }

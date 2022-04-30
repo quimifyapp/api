@@ -15,12 +15,32 @@ public class ConfiguracionService {
 
     // --------------------------------------------------------------------------------
 
-    public Boolean getApiGoogleON() {
-        return configuracionRepository.encontrarApiGoogleON(VERSION);
+    public Boolean getGoogleON() {
+        return configuracionRepository.encontrarGoogleON(VERSION);
     }
 
-    public String getApiGoogleURL() {
-        return configuracionRepository.encontrarApiGoogleURL(VERSION);
+    public String getGoogleURL() {
+        return configuracionRepository.encontrarGoogleURL(VERSION);
+    }
+
+    public String getBingURL() {
+        return configuracionRepository.encontrarBingURL(VERSION);
+    }
+
+    public Boolean getBingGratisON() {
+        return configuracionRepository.encontrarBingGratisON(VERSION);
+    }
+
+    public String getBingGratisKey() {
+        return configuracionRepository.encontrarBingGratisKey(VERSION);
+    }
+
+    public Boolean getBingDePagoON() {
+        return configuracionRepository.encontrarBingDePagoON(VERSION);
+    }
+
+    public String getBingDePagoKey() {
+        return configuracionRepository.encontrarBingDePagoKey(VERSION);
     }
 
 }

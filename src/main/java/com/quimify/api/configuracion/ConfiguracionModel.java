@@ -23,24 +23,28 @@ public class ConfiguracionModel {
     // API de Google:
 
     @Column(nullable = false)
-    private Boolean api_google_on = false; // Interruptor
+    private Boolean google_on = false; // Interruptor
     @Column(nullable = false)
-    private Integer api_google_limite; // Nº máx. de búsquedas diarias
-    private String api_google_url; // URL + key
+    private Integer google_limite; // Nº máx. de búsquedas diarias
+    private String google_url; // URL + key
+
+    // API de Bing:
+
+    private String bing_url; // URL
 
     // API de Bing gratis:
 
     @Column(nullable = false)
-    private Boolean api_bing_gratis_on = false; // Interruptor
-    private String api_bing_gratis_url; // URL + key
+    private Boolean bing_gratis_on = false; // Interruptor
+    private String bing_gratis_key; // Suscripcion
 
     // API de Bing de pago:
 
     @Column(nullable = false)
-    private Boolean api_bing_pago_on = false; // Interruptor
+    private Boolean bing_pago_on = false; // Interruptor
     @Column(nullable = false)
-    private Integer api_bing_pago_limite; // Nº máx. de búsquedas diarias
-    private String api_bing_pago_url; // URL + key
+    private Integer bing_pago_limite; // Nº máx. de búsquedas diarias
+    private String bing_pago_key; // Suscripcion
 
     // --------------------------------------------------------------------------------
 
@@ -70,67 +74,76 @@ public class ConfiguracionModel {
         this.actualizacion_necesaria = actualizacion_necesaria;
     }
 
-    public Boolean getApi_google_on() {
-        return api_google_on;
+    public Boolean getGoogle_on() {
+        return google_on;
     }
 
-    public void setApi_google_on(Boolean api_google_on) {
-        this.api_google_on = api_google_on;
+    public void setGoogle_on(Boolean google_on) {
+        this.google_on = google_on;
     }
 
-    public Integer getApi_google_limite() {
-        return api_google_limite;
+    public Integer getGoogle_limite() {
+        return google_limite;
     }
 
-    public void setApi_google_limite(Integer api_google_limite) {
-        this.api_google_limite = api_google_limite;
+    public void setGoogle_limite(Integer google_limite) {
+        this.google_limite = google_limite;
     }
 
-    public String getApi_google_url() {
-        return api_google_url;
+    public String getGoogle_url() {
+        return google_url;
     }
 
-    public void setApi_google_url(String api_google_url) {
-        this.api_google_url = api_google_url;
+    public void setGoogle_url(String google_url) {
+        this.google_url = google_url;
     }
 
-    public Boolean getApi_bing_gratis_on() {
-        return api_bing_gratis_on;
+    public String getBing_url() {
+        return bing_url;
     }
 
-    public void setApi_bing_gratis_on(Boolean api_bing_gratis_on) {
-        this.api_bing_gratis_on = api_bing_gratis_on;
+    public void setBing_url(String bing_url) {
+        this.bing_url = bing_url;
     }
 
-    public String getApi_bing_gratis_url() {
-        return api_bing_gratis_url;
+    public Boolean getBing_gratis_on() {
+        return bing_gratis_on;
     }
 
-    public void setApi_bing_gratis_url(String api_bing_gratis_url) {
-        this.api_bing_gratis_url = api_bing_gratis_url;
+    public void setBing_gratis_on(Boolean bing_gratis_on) {
+        this.bing_gratis_on = bing_gratis_on;
     }
 
-    public Boolean getApi_bing_pago_on() {
-        return api_bing_pago_on;
+    public String getBing_gratis_key() {
+        return bing_gratis_key;
     }
 
-    public void setApi_bing_pago_on(Boolean api_bing_pago_on) {
-        this.api_bing_pago_on = api_bing_pago_on;
+    public void setBing_gratis_key(String bing_gratis_key) {
+        this.bing_gratis_key = bing_gratis_key;
     }
 
-    public Integer getApi_bing_pago_limite() {
-        return api_bing_pago_limite;
+    public Boolean getBing_pago_on() {
+        return bing_pago_on;
     }
 
-    public void setApi_bing_pago_limite(Integer api_bing_pago_limite) {
-        this.api_bing_pago_limite = api_bing_pago_limite;
+    public void setBing_pago_on(Boolean bing_pago_on) {
+        this.bing_pago_on = bing_pago_on;
     }
 
-    public String getApi_bing_pago_url() {
-        return api_bing_pago_url;
+    public Integer getBing_pago_limite() {
+        return bing_pago_limite;
     }
 
-    public void setApi_bing_pago_url(String api_bing_pago_url) {
-        this.api_bing_pago_url = api_bing_pago_url;
+    public void setBing_pago_limite(Integer bing_pago_limite) {
+        this.bing_pago_limite = bing_pago_limite;
     }
+
+    public String getBing_pago_key() {
+        return bing_pago_key;
+    }
+
+    public void setBing_pago_key(String bing_pago_key) {
+        this.bing_pago_key = bing_pago_key;
+    }
+
 }
