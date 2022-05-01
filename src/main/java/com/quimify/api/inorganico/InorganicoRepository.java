@@ -25,7 +25,6 @@ public interface InorganicoRepository extends CrudRepository<InorganicoModel, In
 
     @Modifying // Modifica la DB
     @Transactional // Por seguridad
-    @Query("UPDATE InorganicoModel i SET i.busquedas = i.busquedas + 1 " +
-            "WHERE i.id = :#{#inorganico.id}") // MySQL
-    void incrementarBusquedas(@Param("inorganico") InorganicoModel inorganico);
+    @Query("UPDATE InorganicoModel i SET i.busquedas = i.busquedas + 1 WHERE i.id = :id") // MySQL
+    void registrarBusqueda(@Param("id") Integer id);
 }

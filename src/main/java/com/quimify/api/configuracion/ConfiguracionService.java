@@ -35,12 +35,12 @@ public class ConfiguracionService {
         return configuracionRepository.encontrarBingGratisKey(VERSION);
     }
 
-    public Boolean getBingDePagoON() {
-        return configuracionRepository.encontrarBingDePagoON(VERSION);
+    public Boolean getBingPagoON() {
+        return configuracionRepository.encontrarBingPagoON(VERSION);
     }
 
-    public String getBingDePagoKey() {
-        return configuracionRepository.encontrarBingDePagoKey(VERSION);
+    public String getBingPagoKey() {
+        return configuracionRepository.encontrarBingPagoKey(VERSION);
     }
 
 }

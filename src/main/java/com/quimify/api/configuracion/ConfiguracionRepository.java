@@ -38,11 +38,11 @@ public interface ConfiguracionRepository extends CrudRepository<ConfiguracionMod
     @Query(value = "SELECT bing_pago_on FROM configuracion " +
             "WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL
-    Boolean encontrarBingDePagoON(@Param("version") Integer version);
+    Boolean encontrarBingPagoON(@Param("version") Integer version);
 
     @Query(value = "SELECT bing_pago_key FROM configuracion " +
             "WHERE version = :version LIMIT 1",
             nativeQuery = true) // MySQL
-    String encontrarBingDePagoKey(@Param("version") Integer version);
+    String encontrarBingPagoKey(@Param("version") Integer version);
 
 }
