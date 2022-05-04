@@ -45,6 +45,20 @@ public class InorganicoService {
         return insertado;
     }
 
+    public InorganicoResultado probarPaginaFQ(String direccion) { // TEST
+        try {
+            HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
+            conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
+
+            PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
+            InorganicoModel inorganico = pagina.nuevoInorganico();
+
+            return new InorganicoResultado(inorganico);
+        } catch (Exception e) {
+            return NO_ENCONTRADO;
+        }
+    }
+
     // --------------------------------------------------------------------------------
 
     public void cargarSearchables() {

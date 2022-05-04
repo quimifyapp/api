@@ -26,6 +26,11 @@ public class InorganicoController {
         return inorganicoService.insertarInorganico(inorganico);
     }
 
+    @GetMapping("/probarfq") // TEST
+    public InorganicoResultado probarPaginaFQ(@RequestParam("direccion") String direccion) {
+        return inorganicoService.probarPaginaFQ(direccion);
+    }
+
     // --------------------------------------------------------------------------------
 
     @GetMapping()
