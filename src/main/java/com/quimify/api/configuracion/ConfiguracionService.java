@@ -43,4 +43,8 @@ public class ConfiguracionService {
         return configuracionRepository.encontrarBingPagoKey(VERSION);
     }
 
+    public String getUserAgent() {
+        return configuracionRepository.encontrarUserAgent(VERSION);
+    }
+
 }

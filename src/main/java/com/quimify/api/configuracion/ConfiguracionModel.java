@@ -46,6 +46,11 @@ public class ConfiguracionModel {
     private Integer bing_pago_limite; // Nº máx. de búsquedas diarias
     private String bing_pago_key; // Suscripcion
 
+    // Para FQ.com:
+
+    @Column(nullable = false)
+    private String user_agent; // Requisito HTTP para parecer un visitante corriente
+
     // --------------------------------------------------------------------------------
 
     // Getters y setters:

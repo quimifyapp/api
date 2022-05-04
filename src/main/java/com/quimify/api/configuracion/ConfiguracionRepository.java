@@ -45,4 +45,9 @@ public interface ConfiguracionRepository extends CrudRepository<ConfiguracionMod
             nativeQuery = true) // MySQL
     String encontrarBingPagoKey(@Param("version") Integer version);
 
+    @Query(value = "SELECT user_agent FROM configuracion " +
+            "WHERE version = :version LIMIT 1",
+            nativeQuery = true) // MySQL
+    String encontrarUserAgent(@Param("version") Integer version);
+
 }

@@ -9,5 +9,6 @@ bing_pago_limite as "Bing de pago límite",
 google_url as "Google URL", 
 bing_url as "Bing URL",
 bing_gratis_key as "Bing gratis key",
-bing_pago_key as "Bing de pago key"
+bing_pago_key as "Bing de pago key",
+user_agent as "User-Agent"
 FROM configuracion
