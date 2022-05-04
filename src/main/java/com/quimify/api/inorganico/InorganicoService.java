@@ -11,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 // Esta clase procesa los compuestos inorgánicos.
@@ -264,15 +263,6 @@ public class InorganicoService {
         conexion.disconnect();
 
         return texto.toString();
-    }
-
-    // Flowchart #5
-    private int indiceDespuesDeEn(String fragmento, String texto){
-        int indice = texto.indexOf(fragmento);
-        if(indice != -1)
-            indice += fragmento.length();
-
-        return indice;
     }
 
     // Flowchart #7
