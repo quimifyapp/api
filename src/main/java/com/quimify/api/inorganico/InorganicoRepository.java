@@ -17,7 +17,7 @@ public interface InorganicoRepository extends CrudRepository<InorganicoModel, In
     ArrayList<InorganicoModel> findAllByOrderByBusquedasDesc();
 
     // --------------------------------------------------------------------------------
-
+    // TODO: Cambiar esto?
     @Query(value = "SELECT * FROM inorganico WHERE id = :id LIMIT 1", nativeQuery = true) // MySQL
     InorganicoModel encontrarPorId(@Param("id") Integer id);
 

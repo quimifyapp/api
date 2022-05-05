@@ -141,8 +141,6 @@ public class PaginaFQ {
         resultado.setNombre(nombre);
         resultado.setAlternativo(alternativo);
 
-        // TODO: etiquetas, revisar que lo de abajo not null antes de set()
-
         try {
             resultado.setMasa(masaFQ());
             resultado.setDensidad(densidadFQ());
@@ -172,6 +170,8 @@ public class PaginaFQ {
         int indice = indiceDespuesDeEn("Masa molar:", pagina);
         if(indice == -1)
             indice = indiceDespuesDeEn("Masa Molar:", pagina);
+        if(indice == -1)
+            indice = indiceDespuesDeEn("Peso Molecular:", pagina);
         if(indice != -1) { // Aparece la masa molecular
             masa = pagina.substring(indice + 1);
             masa = masa.substring(0, indiceDespuesDeEn("g", masa) - 1);
@@ -207,16 +207,18 @@ public class PaginaFQ {
                     formato.setMaximumFractionDigits(6);
                     densidad = quitarEspaciosYComas(formato.format(valor_densidad));
 
-                    // El número se adapta para tener 3 dígitos significativos
-                    // Ej.: "0.000ABCD" -> "0.000ABC"
+                    // El número se adapta para tener 3 decimales significativos
+                    // Ej.: "X.000ABCD" -> "X.000ABC"
                     indice = indiceDespuesDeEn(".", densidad);
                     if(indice != -1)
                         for(int i = indice, digitos = 0; i < densidad.length() && digitos < 3; i++)
                             if(densidad.charAt(i) != '0')
                                 if(++digitos == 3)
-                                    densidad = densidad.substring(0, i - indice + 1);
+                                    densidad = densidad.substring(0, i + 1);
                 }
                 else densidad = quitarEspaciosYComas(dato.substring(0, indice + 1));
+
+                densidad = quitarCerosDecimalesALaDerecha(densidad);
             }
             else densidad = null;
         }

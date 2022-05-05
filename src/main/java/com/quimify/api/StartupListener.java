@@ -1,6 +1,5 @@
 package com.quimify.api;
 
-import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.inorganico.InorganicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
