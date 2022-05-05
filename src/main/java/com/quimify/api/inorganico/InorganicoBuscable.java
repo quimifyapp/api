@@ -60,7 +60,7 @@ public class InorganicoBuscable {
 
         ArrayList<String> etiquetas = inorganico.getEtiquetas();
         if(etiquetas != null)
-            keywords.addAll(etiquetas); // Las etiquetas ya están normalizadas
+            keywords.addAll(etiquetas); // Las etiquetas ya deben estar normalizadas
     }
 
     // Getters:

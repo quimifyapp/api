@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Optional;
 
 // Esta clase procesa los compuestos inorgánicos.
 
@@ -32,18 +33,7 @@ public class InorganicoService {
     private static final InorganicoResultado NO_PREMIUM = // Compuesto premium y usuario no-premium
             new InorganicoResultado(InorganicoResultado.NO_PREMIUM);
 
-    // --------------------------------------------------------------------------------
-
-    public ArrayList<InorganicoModel> obtenerTodos() { // TEST
-        return (ArrayList<InorganicoModel>) inorganicoRepository.findAll();
-    }
-
-    public InorganicoModel insertarInorganico(InorganicoModel inorganico) {  // TEST
-        InorganicoModel insertado = inorganicoRepository.save(inorganico);
-        BUSCABLES.add(new InorganicoBuscable(insertado));
-
-        return insertado;
-    }
+    // ADMIN --------------------------------------------------------------------------
 
     public InorganicoResultado probarPaginaFQ(String direccion) { // TEST
         try {
@@ -51,7 +41,7 @@ public class InorganicoService {
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
 
             PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
-            InorganicoModel inorganico = pagina.nuevoInorganico();
+            InorganicoModel inorganico = pagina.escanearInorganico();
 
             return new InorganicoResultado(inorganico);
         } catch (Exception e) {
@@ -59,12 +49,75 @@ public class InorganicoService {
         }
     }
 
-    // --------------------------------------------------------------------------------
+    public Optional<InorganicoModel> seleccionar(Integer id) {
+        return inorganicoRepository.findById(id);
+    }
+
+    public Optional<InorganicoModel> reemplazar(InorganicoModel nuevo) {
+        Optional<InorganicoModel> reemplazado;
+
+        reemplazado = inorganicoRepository.findById(nuevo.getId());
+        if(reemplazado.isPresent()) { // Si existe
+            inorganicoRepository.save(nuevo); // De la DB
+
+            for(int i = 0; i < BUSCABLES.size(); i++) // De la memoria principal para ser buscado
+                if(BUSCABLES.get(i).getId().equals(nuevo.getId())) {
+                    BUSCABLES.set(i, new InorganicoBuscable(reemplazado.get()));
+                    break;
+                }
+        }
+
+        return reemplazado;
+    }
+
+    public Optional<InorganicoModel> insertar(InorganicoModel inorganico) {
+        Optional<InorganicoModel> insertado;
+
+        try {
+            insertado = Optional.of(inorganicoRepository.save(inorganico)); // En la DB
+            BUSCABLES.add(new InorganicoBuscable(insertado.get())); // En memoria principal
+        }
+        catch (Exception e) { // No se ha podido insertar (probablemente falte un campo)
+            insertado = Optional.empty();
+        }
+
+        return insertado;
+    }
+
+    public Optional<InorganicoModel> eliminar(Integer id) {
+        Optional<InorganicoModel> eliminado;
+
+        try {
+            eliminado = inorganicoRepository.findById(id);
+
+            inorganicoRepository.deleteById(id); // De la DB
+            BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
+        }
+        catch (Exception e) { // No se ha podido eliminar (probablemente no exista)
+            eliminado = Optional.empty();
+        }
+
+        return eliminado;
+    }
+
+    // SERVIDOR -----------------------------------------------------------------------
 
     public void cargarSearchables() {
         for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
             BUSCABLES.add(new InorganicoBuscable(inorganico));
     }
+
+    private void guardarNuevo(InorganicoModel nuevo) {
+        BUSCABLES.add(new InorganicoBuscable( // En memoria principal para ser buscado
+                inorganicoRepository.save(nuevo))); // En la DB
+    }
+
+    // Incrementa el contador de busquedas de ese inorgánico porque ha sido buscado
+    private void registrarBusqueda(Integer id) {
+        inorganicoRepository.registrarBusqueda(id);
+    }
+
+    // CLIENTE -----------------------------------------------------------------------
 
     public InorganicoResultado autoCompletar(String input) {
         input = InorganicoBuscable.normalizar(input);
@@ -77,30 +130,16 @@ public class InorganicoService {
         return NO_ENCONTRADO;
     }
 
-    // TODO: Terminar esta función
-    private void guardarNuevo(InorganicoModel inorganico) {
-        // ver que no está repe
-        // si lo está, sumar
-
-        BUSCABLES.add(new InorganicoBuscable( // En memoria para ser buscado
-                inorganicoRepository.save(inorganico))); // En la DB
-    }
-
-    private void registrarBusqueda(Integer id) {
-        inorganicoRepository.registrarBusqueda(id);
-    }
-
     public InorganicoResultado buscar(String input, Boolean usuario_premium) { // En construcción
         InorganicoResultado resultado;
 
-        // Flowchart #0
-        Integer id = buscarDB(input);
+        Integer id = buscarDB(input); // Flowchart #0
 
         // Flowchart #1
-        if(id == null) {
+        if(id == null) { // No se encuentra en la DB
             String[] resultado_web = null; // Resultado de una búsqueda web
-            // [0]: identificador suficiente (suele ser la fórmula)
-            // [1]: dirección del resultado ("www.fq.com/H2O")
+            // [0]: identificador suficiente como identificadorSuficiente(/titulo del resultado/)
+            // [1]: dirección del resultado como "www.fq.com/H2O"
 
             // Flowchart #2
             if(configuracionService.getGoogleON() /*&& limite */)
@@ -115,32 +154,27 @@ public class InorganicoService {
                 resultado_web = tryBuscarBing(input, configuracionService.getBingPagoKey());
 
             // Flowchart #0 ó #5
-            if(resultado_web != null) {
-                // Flowchart #0
-                id = buscarDB(resultado_web[0]); // Identificador suficiente
+            if(resultado_web != null) { // Se ha podido buscar con Google o Bing
+                id = buscarDB(resultado_web[0]); // Flowchart #0
 
-                if(id != null) {
-                    resultado = decidirPremium(id, usuario_premium); // Flowchart #6
+                // Flowchart #5
+                if(id == null) // No estaba en la DB, es nuevo
+                    resultado = escanearFQ(resultado_web[1]);
+                // Flowchart #6
+                else { // Ya estaba en la DB
+                    resultado = decidirPremium(id, usuario_premium);
                     registrarBusqueda(id);
                 }
-                else { // Flowchart #5
-                    InorganicoModel nuevo = tryParsearFQ(resultado_web[1]);
-
-                    if(nuevo != null) {
-                        resultado = (!nuevo.getPremium() || usuario_premium)
-                                ? new InorganicoResultado(nuevo) : NO_PREMIUM;
-                        // guardar el nuevo
-                    }
-                    else resultado = NO_ENCONTRADO;
-                }
             }
-            else { // Flowchart #7
+            // Flowchart #7
+            else { // No se ha podido buscar ni con Google ni con Bing
                 // ...
                 resultado = NO_ENCONTRADO; // Test
             }
         }
-        else {
-            resultado = decidirPremium(id, usuario_premium); // Flowchart #6
+        // Flowchart #6
+        else { // Está en la DB
+            resultado = decidirPremium(id, usuario_premium);
             registrarBusqueda(id);
         }
 
@@ -164,7 +198,8 @@ public class InorganicoService {
 
         try {
             resultado_web = buscarGoogle(input);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // ...
             resultado_web = null;
         }
@@ -186,7 +221,7 @@ public class InorganicoService {
         if(respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
             JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
 
-            resultado_web = new String[] {identificador(resultado.getString("title")),
+            resultado_web = new String[] {identificadorSuficiente(resultado.getString("title")),
                     resultado.getString("formattedUrl")}; // "www.fq.com/..."
         }
         else resultado_web = null;
@@ -200,7 +235,8 @@ public class InorganicoService {
 
         try {
             resultado_web = buscarBing(input, key);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // ...
             resultado_web = null;
         }
@@ -222,7 +258,7 @@ public class InorganicoService {
             JSONObject resultado = respuesta.getJSONObject("webPages")
                     .getJSONArray("value").getJSONObject(0);
 
-            resultado_web = new String[] {identificador(resultado.getString("name")),
+            resultado_web = new String[] {identificadorSuficiente(resultado.getString("name")),
                     resultado.getString("url")}; // "www.fq.com/..."
         }
         else resultado_web = null;
@@ -236,28 +272,37 @@ public class InorganicoService {
     }
 
     // Flowchart #2 ó #3 ó #4
-    private String identificador(String titulo) {
-        // "H2O / óxido de dihidrógeno", "metanol - www.fq.com", "etanol"...
+    // Ej.: "H2O / óxido de dihidrógeno" -> "H2O"
+    // Ej.: "metanol - www.fq.com" -> "metanol"
+    private String identificadorSuficiente(String titulo) {
         int espacio = titulo.indexOf(' ');
         if(espacio > 0)
-            titulo = titulo.substring(0, titulo.indexOf(' ')); // "H2O", "metanol", "etanol"...
+            titulo = titulo.substring(0, titulo.indexOf(' '));
 
         return titulo;
     }
 
     // Flowchart #5
-    private InorganicoModel tryParsearFQ(String direccion) {
-        InorganicoModel resultado;
+    private InorganicoResultado escanearFQ(String direccion) {
+        InorganicoResultado resultado;
 
         try {
             HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
             PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
 
-            resultado = pagina_fq.nuevoInorganico();
-        } catch (Exception e) {
+            InorganicoModel escaneado = pagina_fq.escanearInorganico();
+            if(escaneado != null) {
+                if(pagina_fq.getEscaneadoCorrecto())
+                    guardarNuevo(escaneado);
+
+                resultado = new InorganicoResultado(escaneado);
+            }
+            else resultado = NO_ENCONTRADO;
+        }
+        catch (Exception e) {
             // ...
-            resultado = null;
+            resultado = NO_ENCONTRADO;
         }
 
         return resultado;

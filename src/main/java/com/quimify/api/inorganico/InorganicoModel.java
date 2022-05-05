@@ -39,7 +39,7 @@ public class InorganicoModel {
     private String fusion;      // (K)
     private String ebullicion;  // (K)
 
-    private ArrayList<String> etiquetas; // ("hidruromagnesico", "hidrogenodemagnesio")
+    private ArrayList<String> etiquetas; // ("hidruromagnesico", "hidrogenodemagnesio", ...)
 
     // --------------------------------------------------------------------------------
 

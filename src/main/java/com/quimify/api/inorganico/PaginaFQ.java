@@ -6,12 +6,21 @@ import java.text.NumberFormat;
 
 public class PaginaFQ {
 
-    private String pagina;
+    private String pagina; // Documento HTML
+    boolean escaneado_correcto = false; // No ha dado ningún fallo al escanear la página
 
     // --------------------------------------------------------------------------------
 
+    PaginaFQ(String pagina) {
+        this.pagina = pagina;
+    }
+
+    public boolean getEscaneadoCorrecto() {
+        return escaneado_correcto;
+    }
+
     // Flowchart #5
-    public InorganicoModel nuevoInorganico() {
+    public InorganicoModel escanearInorganico() {
         InorganicoModel resultado = new InorganicoModel();
 
         pagina = pagina.substring(indiceDespuesDeEn("<h1>", pagina)); // Lo relevante
@@ -133,12 +142,18 @@ public class PaginaFQ {
         resultado.setAlternativo(alternativo);
 
         // TODO: etiquetas, revisar que lo de abajo not null antes de set()
-        // TODO: catch error de las caracteristicas
 
-        resultado.setMasa(masaFQ());
-        resultado.setDensidad(densidadFQ());
-        resultado.setFusion(puntoFusionFQ());
-        resultado.setEbullicion(puntoEbullicionFQ());
+        try {
+            resultado.setMasa(masaFQ());
+            resultado.setDensidad(densidadFQ());
+            resultado.setFusion(temperaturaFQ("fusión"));
+            resultado.setEbullicion(temperaturaFQ("ebullición"));
+
+            escaneado_correcto = true; // Ha podido con todos
+        }
+        catch (Exception e) {
+            // ...
+        }
 
         return resultado;
     }
@@ -241,14 +256,6 @@ public class PaginaFQ {
         return temperatura;
     }
 
-    private String puntoFusionFQ() {
-        return temperaturaFQ("fusión");
-    }
-
-    private String puntoEbullicionFQ() {
-        return temperaturaFQ("ebullición");
-    }
-
     // Ej.: "12.104 - 13.2" -> "12.104"
     private String primeroDelIntervalo(String dato) {
         int indice = indiceDespuesDeEn("-", dato);
@@ -293,10 +300,6 @@ public class PaginaFQ {
 
     private static boolean noEsNumero(char c) {
         return (c < '0' || c > '9') && c != '-' && c != '.'; // Signo negativo y punto decimal
-    }
-
-    PaginaFQ(String pagina) {
-        this.pagina = pagina;
     }
 
 }

@@ -14,8 +14,6 @@ import java.util.ArrayList;
 @Repository
 public interface InorganicoRepository extends CrudRepository<InorganicoModel, Integer> {
 
-    ArrayList<InorganicoModel> findByFormulaOrderByBusquedasDesc(String formula); // Test
-
     ArrayList<InorganicoModel> findAllByOrderByBusquedasDesc();
 
     // --------------------------------------------------------------------------------
