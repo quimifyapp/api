@@ -174,11 +174,19 @@ public class PaginaFQ {
             indice = indiceDespuesDeEn("Peso Molecular:", pagina);
         if(indice != -1) { // Aparece la masa molecular
             masa = pagina.substring(indice + 1);
-            masa = masa.substring(0, indiceDespuesDeEn("g", masa) - 1);
+            masa = masa.substring(0, indiceDespuesDeEn("</", masa) - 2);
 
-            masa = primeroDelIntervalo(masa);
-            masa = quitarEspaciosYComas(masa);
-            masa = formatearDosDecimales(masa);
+            indice = indiceDespuesDeEn("g", masa);
+            if(indice != -1) { // Aparece la unidad
+                masa = masa.substring(0, indice - 1);
+
+                masa = masa.replaceAll(" ", "")
+                        .replaceAll(",", ".");
+                masa = soloNumeros(masa);
+                masa = primeroDelIntervalo(masa);
+                masa = quitarCerosDecimalesALaDerecha(masa);
+            }
+            else masa = null;
         }
         else masa = null;
 
@@ -190,33 +198,37 @@ public class PaginaFQ {
 
         int indice = indiceDespuesDeEn("Densidad:", pagina);
         if (indice != -1) { // Aparece la densidad
-            String dato = pagina.substring(indice + 1);
+            densidad = pagina.substring(indice + 1);
+            densidad = densidad.substring(0, indiceDespuesDeEn("</", densidad) - 2);
 
-            indice = indiceDespuesDeEn("g", dato);
+            indice = indiceDespuesDeEn("g", densidad);
             if (indice != -1) { // Aparece la unidad ("g", "Kg", "kg")
-                dato = dato.substring(0, indiceDespuesDeEn("</", dato) - 2);
-                indice -= 2;
-                if (dato.charAt(indice) == 'k' || dato.charAt(indice) == 'K') {
-                    dato = dato.substring(0, indice - 1);
+                boolean en_kilogramos;
+                if (densidad.charAt(indice - 2) == 'k' || densidad.charAt(indice - 2) == 'K') {
+                    densidad = densidad.substring(0, indice - 2);
+                    en_kilogramos = true;
+                }
+                else {
+                    densidad = densidad.substring(0, indice - 1);
+                    en_kilogramos = false;
+                }
 
-                    float valor_densidad = Float.parseFloat(quitarEspaciosYComas(dato));
+                densidad = densidad.replaceAll(" ", "")
+                        .replaceAll(",", ".");
+                densidad = soloNumeros(densidad);
+                densidad = primeroDelIntervalo(densidad);
+
+                if(en_kilogramos) {
+                    float valor_densidad = Float.parseFloat(densidad);
                     valor_densidad /= 1000; // De kg/m3 a g/cm3
 
                     NumberFormat formato = NumberFormat.getInstance();
                     formato.setGroupingUsed(false);
                     formato.setMaximumFractionDigits(6);
-                    densidad = quitarEspaciosYComas(formato.format(valor_densidad));
+                    densidad = formato.format(valor_densidad).replaceAll(",", ".");
 
-                    // El número se adapta para tener 3 decimales significativos
-                    // Ej.: "X.000ABCD" -> "X.000ABC"
-                    indice = indiceDespuesDeEn(".", densidad);
-                    if(indice != -1)
-                        for(int i = indice, digitos = 0; i < densidad.length() && digitos < 3; i++)
-                            if(densidad.charAt(i) != '0')
-                                if(++digitos == 3)
-                                    densidad = densidad.substring(0, i + 1);
+                    densidad = tresDecimalesSignificativos(densidad);
                 }
-                else densidad = quitarEspaciosYComas(dato.substring(0, indice + 1));
 
                 densidad = quitarCerosDecimalesALaDerecha(densidad);
             }
@@ -234,22 +246,24 @@ public class PaginaFQ {
         if(indice == -1)
             indice = indiceDespuesDeEn("Temperatura de " + tipo + ":", pagina);
         if(indice != -1) {
-            StringBuilder dato = new StringBuilder(pagina.substring(indice + 1));
-            dato = new StringBuilder(dato.substring(0,
-                    indiceDespuesDeEn("</", dato.toString()) - 2));
+            temperatura = pagina.substring(indice + 1);
+            temperatura = temperatura.substring(0,
+                    indiceDespuesDeEn("</", temperatura) - 2);
 
-            indice = indiceDespuesDeEn("°", dato.toString()); // Es distinto al siguiente
-            if(indice != -1 || indiceDespuesDeEn("º", dato.toString()) != - 1) {
-                dato = new StringBuilder(quitarEspaciosYComas(dato.toString()));
-                dato = new StringBuilder(primeroDelIntervalo(dato.toString()));
+            indice = indiceDespuesDeEn("°", temperatura);
+            if(indice == -1)
+                indice = indiceDespuesDeEn("º", temperatura); // Es distinto al anterior
+            if(indice != -1) { // Aparece el símbolo de grado
+                temperatura = temperatura.substring(0, indice - 1);
 
-                for(int i = 0; i < dato.length(); i++)
-                    if(noEsNumero(dato.charAt(i)))
-                        dato.deleteCharAt(i--);
+                temperatura = temperatura.replaceAll(" ", "")
+                        .replaceAll(",", ".");
+                temperatura = soloNumeros(temperatura);
+                temperatura = primeroDelIntervalo(temperatura);
+                temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
 
-                temperatura = formatearDosDecimales(dato.toString());
-                temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura)); // De ºC a K
-                temperatura = formatearDosDecimales(temperatura); // Float produce más decimales
+                temperatura = truncarDosDecimales(temperatura);
+                temperatura = quitarCerosDecimalesALaDerecha(temperatura);
             }
             else temperatura = null;
         }
@@ -260,48 +274,68 @@ public class PaginaFQ {
 
     // Ej.: "12.104 - 13.2" -> "12.104"
     private String primeroDelIntervalo(String dato) {
+        String resultado = dato;
+
+        if(dato.charAt(0) == '-' && dato.length() > 1)
+            dato = dato.substring(1); // Para el signo negativo
+
         int indice = indiceDespuesDeEn("-", dato);
-        if(indice > 1) // No es signo negativo
-            dato = dato.substring(0, indice - 1);
+        if(indice != -1)
+            resultado = resultado.substring(0, indice);
 
-        return dato;
+        return resultado;
     }
 
-    // Ej.: " 12 ,104 " -> "12.104"
-    private String quitarEspaciosYComas(String numero) {
-        return numero.replaceAll(" ", "").replaceAll(",", ".");
-    }
+    // Ej.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
+    private String soloNumeros(String dato) {
+        StringBuilder resultado = new StringBuilder();
 
-    // Ej.: "12.104" -> "12.1"
-    private String formatearDosDecimales(String dato) {
-        int indice = indiceDespuesDeEn(".", dato);
-        if(indice != -1) {
-            indice += 2;
-            if(dato.length() > indice) // Hay más de dos decimales
-                dato = dato.substring(0, indice);
+        for(int i = 0; i < dato.length(); i++)
+            if(esNumero(dato.charAt(i)))
+                resultado.append(dato.charAt(i));
 
-            dato = quitarCerosDecimalesALaDerecha(dato);
-
-            if(dato.charAt(dato.length() - 1) == '.') // Por si se queda el punto suelto
-                dato = dato.substring(0, dato.length() - 1);
-        }
-
-        return dato;
+        return resultado.toString();
     }
 
     // Ej.: "13.450" -> "13.45"
     // Ej.: "6.000" -> "6"
     private String quitarCerosDecimalesALaDerecha(String numero) {
-        if(indiceDespuesDeEn(".", numero) != -1) {
+        if(indiceDespuesDeEn(".", numero) != -1)
             while (numero.charAt(numero.length() - 1) == '0')
                 numero = numero.substring(0, numero.length() - 1);
+
+        if(numero.charAt(numero.length() - 1) == '.') // Por si se queda el punto suelto
+            numero = numero.substring(0, numero.length() - 1);
+
+        return numero;
+    }
+
+    private static boolean esNumero(char c) {
+        return (c >= '0' && c <= '9') || c == '-' || c == '.'; // Signo negativo y punto decimal
+    }
+
+    // Ej.: "14.457 -> 14.45"
+    private String truncarDosDecimales(String numero) {
+        int indice = indiceDespuesDeEn(".", numero);
+        if(indice != -1) {
+            indice += 2;
+            if(numero.length() > indice) // Hay más de dos decimales
+                numero = numero.substring(0, indice);
         }
 
         return numero;
     }
 
-    private static boolean noEsNumero(char c) {
-        return (c < '0' || c > '9') && c != '-' && c != '.'; // Signo negativo y punto decimal
+    // Ej.: "X.000ABCD" -> "X.000ABC"
+    private String tresDecimalesSignificativos(String numero) {
+        int punto = indiceDespuesDeEn(".", numero);
+        if(punto != -1)
+            for(int i = punto, digitos = 0; i < numero.length() && digitos < 3; i++)
+                if(numero.charAt(i) != '0')
+                    if(++digitos == 3)
+                        numero = numero.substring(0, i + 1);
+
+        return numero;
     }
 
 }
