@@ -144,9 +144,9 @@ public class PaginaFQ {
 
         try {
             resultado.setMasa(masaFQ());
-            resultado.setDensidad(densidadFQ());
             resultado.setFusion(temperaturaFQ("fusión"));
             resultado.setEbullicion(temperaturaFQ("ebullición"));
+            resultado.setDensidad(densidadFQ());
 
             escaneado_correcto = true; // Ha podido con todos
         }
@@ -192,6 +192,39 @@ public class PaginaFQ {
         else masa = null;
 
         return masa;
+    }
+
+    private String temperaturaFQ(String tipo) {
+        String temperatura;
+
+        int indice = indiceDespuesDeEn("Punto de " + tipo + ":", pagina);
+        if(indice == -1)
+            indice = indiceDespuesDeEn("Temperatura de " + tipo + ":", pagina);
+        if(indice != -1) {
+            temperatura = pagina.substring(indice + 1);
+            temperatura = temperatura.substring(0,
+                    indiceDespuesDeEn("</", temperatura) - 2);
+
+            indice = indiceDespuesDeEn("°", temperatura);
+            if(indice == -1)
+                indice = indiceDespuesDeEn("º", temperatura); // Es distinto al anterior
+            if(indice != -1) { // Aparece el símbolo de grado
+                temperatura = temperatura.substring(0, indice - 1);
+
+                temperatura = temperatura.replaceAll(" ", "")
+                        .replaceAll(",", ".");
+                temperatura = soloNumeros(temperatura);
+                temperatura = primeroDelIntervalo(temperatura);
+                temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
+
+                temperatura = truncarDosDecimales(temperatura);
+                temperatura = quitarCerosDecimalesALaDerecha(temperatura);
+            }
+            else temperatura = null;
+        }
+        else temperatura = null;
+
+        return temperatura;
     }
 
     private String densidadFQ() {
@@ -240,37 +273,19 @@ public class PaginaFQ {
         return densidad;
     }
 
-    private String temperaturaFQ(String tipo) {
-        String temperatura;
+    // Ej.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
+    private String soloNumeros(String dato) {
+        StringBuilder resultado = new StringBuilder();
 
-        int indice = indiceDespuesDeEn("Punto de " + tipo + ":", pagina);
-        if(indice == -1)
-            indice = indiceDespuesDeEn("Temperatura de " + tipo + ":", pagina);
-        if(indice != -1) {
-            temperatura = pagina.substring(indice + 1);
-            temperatura = temperatura.substring(0,
-                    indiceDespuesDeEn("</", temperatura) - 2);
+        for(int i = 0; i < dato.length(); i++)
+            if(esNumero(dato.charAt(i)))
+                resultado.append(dato.charAt(i));
 
-            indice = indiceDespuesDeEn("°", temperatura);
-            if(indice == -1)
-                indice = indiceDespuesDeEn("º", temperatura); // Es distinto al anterior
-            if(indice != -1) { // Aparece el símbolo de grado
-                temperatura = temperatura.substring(0, indice - 1);
+        return resultado.toString();
+    }
 
-                temperatura = temperatura.replaceAll(" ", "")
-                        .replaceAll(",", ".");
-                temperatura = soloNumeros(temperatura);
-                temperatura = primeroDelIntervalo(temperatura);
-                temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
-
-                temperatura = truncarDosDecimales(temperatura);
-                temperatura = quitarCerosDecimalesALaDerecha(temperatura);
-            }
-            else temperatura = null;
-        }
-        else temperatura = null;
-
-        return temperatura;
+    private static boolean esNumero(char c) {
+        return (c >= '0' && c <= '9') || c == '-' || c == '.'; // Signo negativo y punto decimal
     }
 
     // Ej.: "12.104 - 13.2" -> "12.104"
@@ -287,17 +302,6 @@ public class PaginaFQ {
         return resultado;
     }
 
-    // Ej.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
-    private String soloNumeros(String dato) {
-        StringBuilder resultado = new StringBuilder();
-
-        for(int i = 0; i < dato.length(); i++)
-            if(esNumero(dato.charAt(i)))
-                resultado.append(dato.charAt(i));
-
-        return resultado.toString();
-    }
-
     // Ej.: "13.450" -> "13.45"
     // Ej.: "6.000" -> "6"
     private String quitarCerosDecimalesALaDerecha(String numero) {
@@ -309,10 +313,6 @@ public class PaginaFQ {
             numero = numero.substring(0, numero.length() - 1);
 
         return numero;
-    }
-
-    private static boolean esNumero(char c) {
-        return (c >= '0' && c <= '9') || c == '-' || c == '.'; // Signo negativo y punto decimal
     }
 
     // Ej.: "14.457 -> 14.45"
