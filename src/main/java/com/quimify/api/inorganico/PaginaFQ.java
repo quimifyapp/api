@@ -7,7 +7,7 @@ import java.text.NumberFormat;
 public class PaginaFQ {
 
     private String pagina; // Documento HTML
-    boolean escaneado_correcto = false; // No ha dado ningún fallo al escanear la página
+    boolean escaneado_correcto = false; // No ha crasheado al escanear las características
 
     // --------------------------------------------------------------------------------
 
@@ -28,13 +28,13 @@ public class PaginaFQ {
         String nombre, formula;
 
         int indice = indiceDespuesDeEn("/", pagina);
-        int indice_2 = indiceDespuesDeEn("<", pagina) + 1;
-        if(indice != indice_2) { // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
-            nombre = pagina.substring(indice + 1, indice_2 - 2);
+        int etiqueta_cerrada = indiceDespuesDeEn("</", pagina);
+        if(indice != etiqueta_cerrada) { // Como en "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
+            nombre = pagina.substring(indice + 1, etiqueta_cerrada - 2);
             formula = pagina.substring(0, indice - 2);
         }
-        else { // "metano</h1>..."
-            nombre = pagina.substring(0, indice_2 - 2);
+        else { // Como en "metano</h1>..."
+            nombre = pagina.substring(0, etiqueta_cerrada - 2);
 
             indice = indiceDespuesDeEn(">Fórmula:", pagina);
             if (indice == -1)
@@ -117,18 +117,19 @@ public class PaginaFQ {
             }
         }
 
+        // Nomenclatura obsoleta:
         if (alternativo != null && (nombre.contentEquals(alternativo) ||
                 (indiceDespuesDeEn("oxo", alternativo) != -1)))
             alternativo = null;
 
+        // Un error antiguo que pasaba con algunos orgánicos:
         if(indiceDespuesDeEn("br/>", nombre) != -1) {
             nombre = nombre.substring(4);
-            if (nombre.contentEquals(alternativo))
+            if (alternativo != null && nombre.contentEquals(alternativo))
                 alternativo = null;
 
             resultado.setPremium(true);
         }
-
         if(alternativo != null && indiceDespuesDeEn("br/>", alternativo) != -1) {
             alternativo = alternativo.substring(4);
             if (nombre.contentEquals(alternativo))
