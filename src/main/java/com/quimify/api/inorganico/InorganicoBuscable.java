@@ -30,7 +30,7 @@ public class InorganicoBuscable {
     public boolean coincide(String input) {
         for(String keyword : keywords)
             if(keyword.equals(input))
-                    return true;
+                return true;
 
         return false;
     }
@@ -49,18 +49,16 @@ public class InorganicoBuscable {
     // Constructor:
 
     public InorganicoBuscable(InorganicoModel inorganico) {
-        this.id = inorganico.getId();
+        id = inorganico.getId();
 
         keywords.add(normalizar(inorganico.getFormula()));
         keywords.add(normalizar(inorganico.getNombre()));
 
-        String alternativo = inorganico.getAlternativo();
-        if(alternativo != null)
+        if(inorganico.getAlternativo() != null)
             keywords.add(normalizar(inorganico.getAlternativo()));
 
-        ArrayList<String> etiquetas = inorganico.getEtiquetas();
-        if(etiquetas != null)
-            keywords.addAll(etiquetas); // Las etiquetas ya deben estar normalizadas
+        if(inorganico.getEtiquetas() != null)
+            keywords.addAll(inorganico.getEtiquetas()); // Ya deben estar normalizadas
     }
 
     // Getters:

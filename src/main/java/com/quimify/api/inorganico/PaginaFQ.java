@@ -43,20 +43,17 @@ public class PaginaFQ {
             formula = pagina.substring(indice);
             formula = formula.substring(0, indiceDespuesDeEn("</p>", formula) - 4);
 
-            formula = formula.replaceAll("</b>", "")
-                    .replaceAll("<sub>", "")
-                    .replaceAll("</sub>", "")
-                    .replaceAll(" ", "");
+            formula = formula.replaceAll("</b>", "").replaceAll("<sub>", "")
+                    .replaceAll("</sub>", "").replaceAll(" ", "");
         }
 
-        /*
+        /* ORDEN DE PREFERENCIA:
         ÁCIDOS:
             nombre:         TRADICIONAL > STOCK > SISTEMÁTICA
             alternativo:    TÍTULO (solo si no es "oxo...")
         OTROS:
             nombre:         TÍTULO
-            alternativo:    STOCK > SISTEMÁTICA > TRADICIONAL
-        */
+            alternativo:    STOCK > SISTEMÁTICA > TRADICIONAL */
 
         String alternativo = null;
 
@@ -86,8 +83,7 @@ public class PaginaFQ {
                     // No había sistemática o había pero es igual
                     if (indice_tradicional != -1) {
                         String dato = pagina.substring(indice_tradicional + 1);
-                        alternativo = dato.substring(0,
-                                indiceDespuesDeEn("</p>", dato) - 4);
+                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
                     }
                 }
             }
@@ -108,10 +104,8 @@ public class PaginaFQ {
                     // No había stock o había pero es igual
                     if (indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
                         // Hay sistemática
-                        String dato = pagina.substring(indiceDespuesDeEn(
-                                "sistemática:</b>", pagina) + 1);
-                        alternativo = dato.substring(0,
-                                indiceDespuesDeEn("</p>", dato) - 4);
+                        String dato = pagina.substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
+                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
                     }
                 }
             }
@@ -181,8 +175,7 @@ public class PaginaFQ {
             if(indice != -1) { // Aparece la unidad
                 masa = masa.substring(0, indice - 1);
 
-                masa = masa.replaceAll(" ", "")
-                        .replaceAll(",", ".");
+                masa = masa.replaceAll(" ", "").replaceAll(",", ".");
                 masa = soloNumeros(masa);
                 masa = primeroDelIntervalo(masa);
                 masa = quitarCerosDecimalesALaDerecha(masa);
@@ -202,8 +195,7 @@ public class PaginaFQ {
             indice = indiceDespuesDeEn("Temperatura de " + tipo + ":", pagina);
         if(indice != -1) {
             temperatura = pagina.substring(indice + 1);
-            temperatura = temperatura.substring(0,
-                    indiceDespuesDeEn("</", temperatura) - 2);
+            temperatura = temperatura.substring(0, indiceDespuesDeEn("</", temperatura) - 2);
 
             indice = indiceDespuesDeEn("°", temperatura);
             if(indice == -1)
@@ -211,8 +203,7 @@ public class PaginaFQ {
             if(indice != -1) { // Aparece el símbolo de grado
                 temperatura = temperatura.substring(0, indice - 1);
 
-                temperatura = temperatura.replaceAll(" ", "")
-                        .replaceAll(",", ".");
+                temperatura = temperatura.replaceAll(" ", "").replaceAll(",", ".");
                 temperatura = soloNumeros(temperatura);
                 temperatura = primeroDelIntervalo(temperatura);
                 temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
@@ -247,8 +238,7 @@ public class PaginaFQ {
                     en_kilogramos = false;
                 }
 
-                densidad = densidad.replaceAll(" ", "")
-                        .replaceAll(",", ".");
+                densidad = densidad.replaceAll(" ", "").replaceAll(",", ".");
                 densidad = soloNumeros(densidad);
                 densidad = primeroDelIntervalo(densidad);
 
@@ -295,9 +285,9 @@ public class PaginaFQ {
         if(dato.charAt(0) == '-' && dato.length() > 1)
             dato = dato.substring(1); // Para el signo negativo
 
-        int indice = indiceDespuesDeEn("-", dato);
-        if(indice != -1)
-            resultado = resultado.substring(0, indice);
+        int guion = indiceDespuesDeEn("-", dato);
+        if(guion != -1)
+            resultado = resultado.substring(0, guion);
 
         return resultado;
     }
@@ -317,11 +307,11 @@ public class PaginaFQ {
 
     // Ej.: "14.457 -> 14.45"
     private String truncarDosDecimales(String numero) {
-        int indice = indiceDespuesDeEn(".", numero);
-        if(indice != -1) {
-            indice += 2;
-            if(numero.length() > indice) // Hay más de dos decimales
-                numero = numero.substring(0, indice);
+        int punto = indiceDespuesDeEn(".", numero);
+        if(punto != -1) {
+            punto += 2;
+            if(numero.length() > punto) // Hay más de dos decimales
+                numero = numero.substring(0, punto);
         }
 
         return numero;
@@ -331,9 +321,9 @@ public class PaginaFQ {
     private String tresDecimalesSignificativos(String numero) {
         int punto = indiceDespuesDeEn(".", numero);
         if(punto != -1)
-            for(int i = punto, digitos = 0; i < numero.length() && digitos < 3; i++)
+            for(int i = punto, decimales_significativos = 0; i < numero.length() && decimales_significativos < 3; i++)
                 if(numero.charAt(i) != '0')
-                    if(++digitos == 3)
+                    if(++decimales_significativos == 3)
                         numero = numero.substring(0, i + 1);
 
         return numero;

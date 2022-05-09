@@ -44,8 +44,8 @@ public class InorganicoController {
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
-    public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
-                                      @RequestParam("usuario_premium") Boolean usuario_premium) {
+    public InorganicoResultado buscarInorganico(@RequestParam("input") String input, @RequestParam("usuario_premium")
+            Boolean usuario_premium) {
         return inorganicoService.buscar(input, usuario_premium);
     }
 

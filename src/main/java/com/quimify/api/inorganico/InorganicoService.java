@@ -124,8 +124,7 @@ public class InorganicoService {
 
         for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
             if(buscable.puedeCompletar(input))
-                return new InorganicoResultado(inorganicoRepository
-                        .encontrarPorId(buscable.getId()));
+                return new InorganicoResultado(inorganicoRepository.encontrarPorId(buscable.getId()));
 
         return NO_ENCONTRADO;
     }
@@ -138,8 +137,8 @@ public class InorganicoService {
         // Flowchart #1
         if(id == null) { // No se encuentra en la DB
             String[] resultado_web = null; // Resultado de una búsqueda web
-            // [0]: identificador suficiente como identificadorSuficiente(/titulo del resultado/)
-            // [1]: dirección del resultado como "www.fq.com/H2O"
+            // [0]: identificador suficiente, como identificadorSuficiente("H2O - agua")
+            // [1]: dirección del resultado, como "www.fq.com/H2O"
 
             // Flowchart #2
             if(configuracionService.getGoogleON() /*&& limite */)
@@ -255,8 +254,7 @@ public class InorganicoService {
         JSONObject respuesta = new JSONObject(descargarTexto(conexion));
 
         if(respuesta.has("webPages")) {
-            JSONObject resultado = respuesta.getJSONObject("webPages")
-                    .getJSONArray("value").getJSONObject(0);
+            JSONObject resultado = respuesta.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
 
             resultado_web = new String[] {identificadorSuficiente(resultado.getString("name")),
                     resultado.getString("url")}; // "www.fq.com/..."
@@ -310,8 +308,7 @@ public class InorganicoService {
 
     // Flowchart #2 ó #3 ó #4 ó #5
     private String descargarTexto(HttpURLConnection conexion) throws Exception {
-        BufferedReader descarga = new BufferedReader(
-                new InputStreamReader(conexion.getInputStream()));
+        BufferedReader descarga = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
 
         String linea;
         StringBuilder texto = new StringBuilder();
