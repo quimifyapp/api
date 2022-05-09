@@ -43,6 +43,10 @@ public class InorganicoModel {
 
     // --------------------------------------------------------------------------------
 
+    public void registrarBusqueda() {
+        busquedas++;
+    }
+
     // Getters y setters:
 
     public Integer getId() {

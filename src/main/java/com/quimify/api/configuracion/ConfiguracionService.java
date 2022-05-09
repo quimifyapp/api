@@ -16,35 +16,35 @@ public class ConfiguracionService {
     // --------------------------------------------------------------------------------
 
     public Boolean getGoogleON() {
-        return configuracionRepository.encontrarGoogleON(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getGoogle_on();
     }
 
     public String getGoogleURL() {
-        return configuracionRepository.encontrarGoogleURL(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getGoogle_url();
     }
 
     public String getBingURL() {
-        return configuracionRepository.encontrarBingURL(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getBing_url();
     }
 
     public Boolean getBingGratisON() {
-        return configuracionRepository.encontrarBingGratisON(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getBing_gratis_on();
     }
 
     public String getBingGratisKey() {
-        return configuracionRepository.encontrarBingGratisKey(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getBing_gratis_key();
     }
 
     public Boolean getBingPagoON() {
-        return configuracionRepository.encontrarBingPagoON(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getBing_pago_on();
     }
 
     public String getBingPagoKey() {
-        return configuracionRepository.encontrarBingPagoKey(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getBing_pago_key();
     }
 
     public String getUserAgent() {
-        return configuracionRepository.encontrarUserAgent(VERSION);
+        return configuracionRepository.findByVersion(VERSION).getUser_agent();
     }
 
 }

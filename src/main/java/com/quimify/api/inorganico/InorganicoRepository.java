@@ -16,13 +16,4 @@ public interface InorganicoRepository extends CrudRepository<InorganicoModel, In
 
     ArrayList<InorganicoModel> findAllByOrderByBusquedasDesc();
 
-    // --------------------------------------------------------------------------------
-    // TODO: Cambiar esto por método JPA?
-    @Query(value = "SELECT * FROM inorganico WHERE id = :id LIMIT 1", nativeQuery = true) // MySQL
-    InorganicoModel encontrarPorId(@Param("id") Integer id);
-
-    @Modifying // Modifica la DB
-    @Transactional // Por seguridad
-    @Query("UPDATE InorganicoModel i SET i.busquedas = i.busquedas + 1 WHERE i.id = :id") // MySQL
-    void registrarBusqueda(@Param("id") Integer id);
 }

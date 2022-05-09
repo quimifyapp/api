@@ -54,9 +54,7 @@ public class InorganicoService {
     }
 
     public Optional<InorganicoModel> reemplazar(InorganicoModel nuevo) {
-        Optional<InorganicoModel> reemplazado;
-
-        reemplazado = inorganicoRepository.findById(nuevo.getId());
+        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(nuevo.getId());
         if(reemplazado.isPresent()) { // Si existe
             inorganicoRepository.save(nuevo); // De la DB
 
@@ -71,31 +69,18 @@ public class InorganicoService {
     }
 
     public Optional<InorganicoModel> insertar(InorganicoModel inorganico) {
-        Optional<InorganicoModel> insertado;
+        Optional<InorganicoModel> insertado = Optional.of(inorganicoRepository.save(inorganico)); // En la DB
 
-        try {
-            insertado = Optional.of(inorganicoRepository.save(inorganico)); // En la DB
-            BUSCABLES.add(new InorganicoBuscable(insertado.get())); // En memoria principal
-        }
-        catch (Exception e) { // No se ha podido insertar (probablemente falte un campo)
-            insertado = Optional.empty();
-        }
+        BUSCABLES.add(new InorganicoBuscable(insertado.get())); // En memoria principal
 
         return insertado;
     }
 
     public Optional<InorganicoModel> eliminar(Integer id) {
-        Optional<InorganicoModel> eliminado;
+        Optional<InorganicoModel> eliminado = inorganicoRepository.findById(id);
 
-        try {
-            eliminado = inorganicoRepository.findById(id);
-
-            inorganicoRepository.deleteById(id); // De la DB
-            BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
-        }
-        catch (Exception e) { // No se ha podido eliminar (probablemente no exista)
-            eliminado = Optional.empty();
-        }
+        inorganicoRepository.deleteById(id); // De la DB
+        BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
 
         return eliminado;
     }
@@ -114,7 +99,12 @@ public class InorganicoService {
 
     // Incrementa el contador de busquedas de ese inorgánico porque ha sido buscado
     private void registrarBusqueda(Integer id) {
-        inorganicoRepository.registrarBusqueda(id);
+        Optional<InorganicoModel> buscado = inorganicoRepository.findById(id);
+
+        if(buscado.isPresent()) {
+            buscado.get().registrarBusqueda();
+            inorganicoRepository.save(buscado.get());
+        }
     }
 
     // CLIENTE -----------------------------------------------------------------------
@@ -124,7 +114,7 @@ public class InorganicoService {
 
         for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
             if(buscable.puedeCompletar(input))
-                return new InorganicoResultado(inorganicoRepository.encontrarPorId(buscable.getId()));
+                return new InorganicoResultado(inorganicoRepository.findById(buscable.getId()).get());
 
         return NO_ENCONTRADO;
     }
@@ -323,7 +313,7 @@ public class InorganicoService {
 
     // Flowchart #7
     private InorganicoResultado decidirPremium(Integer id, Boolean usuario_premium) {
-        InorganicoModel resultado = inorganicoRepository.encontrarPorId(id);
+        InorganicoModel resultado = inorganicoRepository.findById(id).get();
 
         return (!resultado.getPremium() || usuario_premium)
                 ? new InorganicoResultado(resultado) : NO_PREMIUM;

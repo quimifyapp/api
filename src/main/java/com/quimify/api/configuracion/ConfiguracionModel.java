@@ -151,4 +151,12 @@ public class ConfiguracionModel {
         this.bing_pago_key = bing_pago_key;
     }
 
+    public String getUser_agent() {
+        return user_agent;
+    }
+
+    public void setUser_agent(String user_agent) {
+        this.user_agent = user_agent;
+    }
+
 }
