@@ -109,14 +109,33 @@ public class InorganicoService {
 
     // CLIENTE -----------------------------------------------------------------------
 
-    public InorganicoResultado autoCompletar(String input) {
-        input = InorganicoBuscable.normalizar(input);
+    public String autoCompletar(String input) {
+        String resultado = "";
 
-        for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
-            if(buscable.puedeCompletar(input))
-                return new InorganicoResultado(inorganicoRepository.findById(buscable.getId()).get());
+        input = InorganicoBuscable.normalizar(input); // Para poder hacer la búsqueda
+        for(InorganicoBuscable buscable : BUSCABLES) { // Ordenados por nº de búsquedas
+            String complecion = buscable.autoCompletar(input); // Devuelve un keyword solo si puede autocompletar
+            if(complecion != null) {
+                InorganicoModel encontrado = inorganicoRepository.findById(buscable.getId()).get();
 
-        return NO_ENCONTRADO;
+                if(complecion.equals(InorganicoBuscable.normalizar(encontrado.getFormula())))
+                    resultado = encontrado.getFormula(); // La fórmula puede autocompletar
+                else if(complecion.equals(InorganicoBuscable.normalizar(encontrado.getAlternativo())))
+                    resultado = encontrado.getAlternativo(); // El alternativo puede autocompletar
+                else resultado = encontrado.getNombre(); // El nobre (o una etiqueta) puede autocompletar
+
+                break;
+            }
+        }
+
+        return resultado;
+    }
+
+    private static class BusquedaWeb {
+        // Resultado de una búsqueda web (de cualquier buscador)
+        boolean encontrado; // Se ha encontrado algo
+        String titulo; // Como "H2O - óxido de dihidrógeno" o "metano"
+        String direccion; // Como "www.fq.com/H2O"
     }
 
     public InorganicoResultado buscar(String input, Boolean usuario_premium) { // En construcción
@@ -126,29 +145,28 @@ public class InorganicoService {
 
         // Flowchart #1
         if(id == null) { // No se encuentra en la DB
-            String[] resultado_web = null; // Resultado de una búsqueda web
-            // [0]: identificador suficiente, como identificadorSuficiente("H2O - agua")
-            // [1]: dirección del resultado, como "www.fq.com/H2O"
+            BusquedaWeb busqueda_web = null;
 
             // Flowchart #2
             if(configuracionService.getGoogleON() /*&& limite */)
-                resultado_web = tryBuscarGoogle(input);
+                busqueda_web = tryBuscarGoogle(input);
 
             // Flowchart #3
-            if(resultado_web == null && configuracionService.getBingGratisON())
-                resultado_web = tryBuscarBing(input, configuracionService.getBingGratisKey());
+            if(busqueda_web == null && configuracionService.getBingGratisON())
+                busqueda_web = tryBuscarBing(input, configuracionService.getBingGratisKey());
 
             // Flowchart #4
-            if(resultado_web == null && configuracionService.getBingPagoON() /*&& limite */)
-                resultado_web = tryBuscarBing(input, configuracionService.getBingPagoKey());
+            if(busqueda_web == null && configuracionService.getBingPagoON() /*&& limite */)
+                busqueda_web = tryBuscarBing(input, configuracionService.getBingPagoKey());
 
             // Flowchart #0 ó #5
-            if(resultado_web != null) { // Se ha podido buscar con Google o Bing
-                id = buscarDB(resultado_web[0]); // Flowchart #0
+            if(busqueda_web != null && busqueda_web.encontrado) { // Se ha podido encontrar con Google o Bing
+                String primera_palabra = busqueda_web.titulo.trim().split(" ", 2)[0];
+                id = buscarDB(primera_palabra); // Flowchart #0
 
                 // Flowchart #5
                 if(id == null) // No estaba en la DB, es nuevo
-                    resultado = escanearFQ(resultado_web[1]);
+                    resultado = escanearFQ(busqueda_web.direccion);
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     resultado = decidirPremium(id, usuario_premium);
@@ -156,7 +174,7 @@ public class InorganicoService {
                 }
             }
             // Flowchart #7
-            else { // No se ha podido buscar ni con Google ni con Bing
+            else { // No se ha podido encontrar ni con Google ni con Bing
                 // ...
                 resultado = NO_ENCONTRADO; // Test
             }
@@ -182,23 +200,22 @@ public class InorganicoService {
     }
 
     // Flowchart #2
-    private String[] tryBuscarGoogle(String input) {
-        String[] resultado_web;
+    private BusquedaWeb tryBuscarGoogle(String input) {
+        BusquedaWeb busqueda_web;
 
         try {
-            resultado_web = buscarGoogle(input);
+            busqueda_web = buscarGoogle(input);
         }
         catch (Exception e) {
-            // ...
-            resultado_web = null;
+            busqueda_web = null;
         }
 
-        return resultado_web;
+        return busqueda_web;
     }
 
     // Flowchart #2
-    private String[] buscarGoogle(String input) throws Exception {
-        String[] resultado_web;
+    private BusquedaWeb buscarGoogle(String input) throws Exception {
+        BusquedaWeb busqueda_web = new BusquedaWeb();
 
         HttpURLConnection conexion = (HttpURLConnection) new URL(
                 configuracionService.getGoogleURL() + formatearHTTP(input)).openConnection();
@@ -210,32 +227,32 @@ public class InorganicoService {
         if(respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
             JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
 
-            resultado_web = new String[] {identificadorSuficiente(resultado.getString("title")),
-                    resultado.getString("formattedUrl")}; // "www.fq.com/..."
+            busqueda_web.encontrado = true;
+            busqueda_web.titulo = resultado.getString("title");
+            busqueda_web.direccion = resultado.getString("formattedUrl"); // "www.fq.com/..."
         }
-        else resultado_web = null;
+        else busqueda_web.encontrado = false;
 
-        return resultado_web;
+        return busqueda_web;
     }
 
     // Flowchart #3 ó #4
-    private String[] tryBuscarBing(String input, String key) {
-        String[] resultado_web;
+    private BusquedaWeb tryBuscarBing(String input, String key) {
+        BusquedaWeb busqueda_web;
 
         try {
-            resultado_web = buscarBing(input, key);
+            busqueda_web = buscarBing(input, key);
         }
         catch (Exception e) {
-            // ...
-            resultado_web = null;
+            busqueda_web = null;
         }
 
-        return resultado_web;
+        return busqueda_web;
     }
 
     // Flowchart #3 ó #4
-    private String[] buscarBing(String input, String key) throws Exception {
-        String[] resultado_web;
+    private BusquedaWeb buscarBing(String input, String key) throws Exception {
+        BusquedaWeb busqueda_web = new BusquedaWeb();
 
         HttpURLConnection conexion = (HttpURLConnection) new URL(
                 configuracionService.getBingURL() + formatearHTTP(input)).openConnection();
@@ -246,28 +263,18 @@ public class InorganicoService {
         if(respuesta.has("webPages")) {
             JSONObject resultado = respuesta.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
 
-            resultado_web = new String[] {identificadorSuficiente(resultado.getString("name")),
-                    resultado.getString("url")}; // "www.fq.com/..."
+            busqueda_web.encontrado = true;
+            busqueda_web.titulo = resultado.getString("name");
+            busqueda_web.direccion = resultado.getString("url"); // "www.fq.com/..."
         }
-        else resultado_web = null;
+        else busqueda_web.encontrado = false;
 
-        return resultado_web;
+        return busqueda_web;
     }
 
     // Flowchart #2 ó #3 ó #4
     private String formatearHTTP(String input) {
         return URLEncoder.encode(input, StandardCharsets.UTF_8);
-    }
-
-    // Flowchart #2 ó #3 ó #4
-    // Ej.: "H2O / óxido de dihidrógeno" -> "H2O"
-    // Ej.: "metanol - www.fq.com" -> "metanol"
-    private String identificadorSuficiente(String titulo) {
-        int espacio = titulo.indexOf(' ');
-        if(espacio > 0)
-            titulo = titulo.substring(0, titulo.indexOf(' '));
-
-        return titulo;
     }
 
     // Flowchart #5

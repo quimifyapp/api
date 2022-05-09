@@ -21,22 +21,22 @@ public class InorganicoController {
         return inorganicoService.probarPaginaFQ(direccion);
     }
 
-    @GetMapping("/seleccionar")
-    public Optional<InorganicoModel> actualizarInorganico(@RequestParam("id") Integer id) {
+    @GetMapping("/{id}")
+    public Optional<InorganicoModel> seleccionarInorganico(@PathVariable("id") Integer id) {
         return inorganicoService.seleccionar(id);
     }
 
-    @PutMapping("/reemplazar")
+    @PutMapping()
     public Optional<InorganicoModel> reemplazarInorganico(@RequestBody InorganicoModel nuevo) {
         return inorganicoService.reemplazar(nuevo);
     }
 
-    @PostMapping("/insertar")
+    @PostMapping()
     public Optional<InorganicoModel> insertarInorganico(@RequestBody InorganicoModel nuevo) {
         return inorganicoService.insertar(nuevo);
     }
 
-    @DeleteMapping("/eliminar")
+    @DeleteMapping()
     public Optional<InorganicoModel> eliminarInorganico(@RequestParam("id") Integer id) {
         return inorganicoService.eliminar(id);
     }
@@ -50,7 +50,7 @@ public class InorganicoController {
     }
 
     @GetMapping("/autocompletar")
-    public InorganicoResultado autoCompletarInorganico(@RequestParam("input") String input) {
+    public String autoCompletarInorganico(@RequestParam("input") String input) {
         return inorganicoService.autoCompletar(input);
     }
 
