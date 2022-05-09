@@ -165,7 +165,7 @@ public class InorganicoService {
                 id = buscarDB(primera_palabra); // Flowchart #0
 
                 // Flowchart #5
-                if(id == null) // No estaba en la DB, es nuevo
+                if(id == null) // Parece no estar en la DB
                     resultado = escanearFQ(busqueda_web.direccion);
                 // Flowchart #6
                 else { // Ya estaba en la DB
@@ -293,10 +293,12 @@ public class InorganicoService {
 
                 resultado = new InorganicoResultado(escaneado);
             }
-            else resultado = NO_ENCONTRADO;
+            else {
+                // ...
+                resultado = NO_ENCONTRADO;
+            }
         }
         catch (Exception e) {
-            // ...
             resultado = NO_ENCONTRADO;
         }
 

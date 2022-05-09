@@ -23,130 +23,137 @@ public class PaginaFQ {
     public InorganicoModel escanearInorganico() {
         InorganicoModel resultado = new InorganicoModel();
 
-        pagina = pagina.substring(indiceDespuesDeEn("<h1>", pagina)); // Lo relevante
+        int indice = indiceDespuesDeEn("<h1>", pagina);
+        if(indice != -1) {
+            pagina = pagina.substring(indice); // Lo relevante
 
-        String nombre, formula;
+            // Escanea el nombre y la fórmula:
 
-        int indice = indiceDespuesDeEn("/", pagina);
-        int etiqueta_cerrada = indiceDespuesDeEn("</", pagina);
-        if(indice != etiqueta_cerrada) { // Como en "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
-            nombre = pagina.substring(indice + 1, etiqueta_cerrada - 2);
-            formula = pagina.substring(0, indice - 2);
-        }
-        else { // Como en "metano</h1>..."
-            nombre = pagina.substring(0, etiqueta_cerrada - 2);
+            String nombre, formula;
 
-            indice = indiceDespuesDeEn(">Fórmula:", pagina);
-            if (indice == -1)
-                indice = indiceDespuesDeEn("\"frm\">", pagina);
+            indice = indiceDespuesDeEn("/", pagina);
+            int etiqueta_cerrada = indiceDespuesDeEn("</", pagina);
 
-            formula = pagina.substring(indice);
-            formula = formula.substring(0, indiceDespuesDeEn("</p>", formula) - 4);
-
-            formula = formula.replaceAll("</b>", "").replaceAll("<sub>", "")
-                    .replaceAll("</sub>", "").replaceAll(" ", "");
-        }
-
-        /* ORDEN DE PREFERENCIA:
-        ÁCIDOS:
-            nombre:         TRADICIONAL > STOCK > SISTEMÁTICA
-            alternativo:    TÍTULO (solo si no es "oxo...")
-        OTROS:
-            nombre:         TÍTULO
-            alternativo:    STOCK > SISTEMÁTICA > TRADICIONAL */
-
-        String alternativo = null;
-
-        int indice_tradicional = indiceDespuesDeEn("tradicional:</b>", pagina);
-        int indice_stock = indiceDespuesDeEn("stock:</b>", pagina);
-
-        // Si no pone "ácido" ni en el título ni en tradicional, si tuviera
-        if(!((indiceDespuesDeEn("ácido", nombre) != -1) ||
-                (indice_tradicional != -1 && indiceDespuesDeEn("ácido",
-                        pagina.substring(indice_tradicional, indice_tradicional + 6)) != -1))) {
-
-            if (indice_stock != -1) {
-                // Hay nomenclatura stock en la página
-                String dato = pagina.substring(indice_stock + 1);
-                alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+            if(indice != etiqueta_cerrada) { // Como en "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
+                nombre = pagina.substring(indice + 1, etiqueta_cerrada - 2);
+                formula = pagina.substring(0, indice - 2);
             }
-            if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
-                // No había stock o había pero es igual
-                int indice_sistematica = indiceDespuesDeEn("sistemática:</b>", pagina);
+            else { // Como en "metano</h1>..."
+                nombre = pagina.substring(0, etiqueta_cerrada - 2);
 
-                if (indice_sistematica != -1) {
-                    // Hay sistemática
-                    String dato = pagina.substring(indice_sistematica + 1);
-                    alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
-                }
-                if (indice_sistematica == -1 || nombre.contentEquals(alternativo)) {
-                    // No había sistemática o había pero es igual
-                    if (indice_tradicional != -1) {
-                        String dato = pagina.substring(indice_tradicional + 1);
-                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
-                    }
-                }
+                indice = indiceDespuesDeEn(">Fórmula:", pagina);
+                if (indice == -1)
+                    indice = indiceDespuesDeEn("\"frm\">", pagina);
+
+                formula = pagina.substring(indice);
+                formula = formula.substring(0, indiceDespuesDeEn("</p>", formula) - 4);
+
+                formula = formula.replaceAll("</b>", "").replaceAll("<sub>", "")
+                        .replaceAll("</sub>", "").replaceAll(" ", "");
             }
-        }
-        else { // Pone "ácido" en el título o en tradicional si lo tuviera
-            if (indice_tradicional != -1) { // Hay tradicional
-                alternativo = nombre;
-                String dato = pagina.substring(indice_tradicional + 1);
-                nombre = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
-            }
-            if (indice_tradicional == -1 || nombre.contentEquals(alternativo)) {
-                // No había tradicional o había pero es igual
-                if (indice_stock != -1) { // Hay nomenclatura stock en la página
+
+            /* Escanea el nombre alternativo siguiendo este esquema:
+            Ácidos:
+                nombre = tradicional > stock > sistemática
+                alternativo = nombre actual
+            Otros:
+                alternativo = stock > sistemática > tradicional */
+
+            String alternativo = null;
+
+            int indice_tradicional = indiceDespuesDeEn("tradicional:</b>", pagina);
+            int indice_stock = indiceDespuesDeEn("stock:</b>", pagina);
+
+            // Si no pone "ácido" ni en el título ni en tradicional, si tuviera
+            if(!((indiceDespuesDeEn("ácido", nombre) != -1) ||
+                    (indice_tradicional != -1 && indiceDespuesDeEn("ácido",
+                            pagina.substring(indice_tradicional, indice_tradicional + 6)) != -1))) {
+
+                if (indice_stock != -1) {
+                    // Hay nomenclatura stock en la página
                     String dato = pagina.substring(indice_stock + 1);
                     alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
                 }
                 if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
                     // No había stock o había pero es igual
-                    if (indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
+                    int indice_sistematica = indiceDespuesDeEn("sistemática:</b>", pagina);
+
+                    if (indice_sistematica != -1) {
                         // Hay sistemática
-                        String dato = pagina.substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
+                        String dato = pagina.substring(indice_sistematica + 1);
                         alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                    }
+                    if (indice_sistematica == -1 || nombre.contentEquals(alternativo)) {
+                        // No había sistemática o había pero es igual
+                        if (indice_tradicional != -1) {
+                            String dato = pagina.substring(indice_tradicional + 1);
+                            alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                        }
                     }
                 }
             }
+            else { // Pone "ácido" en el título o en tradicional si lo tuviera
+                if (indice_tradicional != -1) { // Hay tradicional
+                    alternativo = nombre;
+                    String dato = pagina.substring(indice_tradicional + 1);
+                    nombre = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                }
+                if (indice_tradicional == -1 || nombre.contentEquals(alternativo)) {
+                    // No había tradicional o había pero es igual
+                    if (indice_stock != -1) { // Hay nomenclatura stock en la página
+                        String dato = pagina.substring(indice_stock + 1);
+                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                    }
+                    if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
+                        // No había stock o había pero es igual
+                        if (indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
+                            // Hay sistemática
+                            String dato = pagina.substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
+                            alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                        }
+                    }
+                }
+            }
+
+            // Correcciones:
+
+            if(indiceDespuesDeEn("br/>", nombre) != -1) { // Error con algunos orgánicos
+                nombre = nombre.substring(4);
+                resultado.setPremium(true);
+            }
+            if (alternativo != null) {
+                if(indiceDespuesDeEn("oxo", alternativo) != -1) // Nomenclatura obsoleta
+                    alternativo = null;
+                else if(indiceDespuesDeEn("br/>", alternativo) != -1) { // Error con algunos orgánicos
+                    alternativo = alternativo.substring(4);
+                    resultado.setPremium(true);
+                }
+
+                if(alternativo != null && nombre.contentEquals(alternativo)) // Duplicado
+                    alternativo = null;
+            }
+
+            // Características numéricas:
+
+            try {
+                resultado.setMasa(masaFQ());
+                resultado.setFusion(temperaturaFQ("fusión"));
+                resultado.setEbullicion(temperaturaFQ("ebullición"));
+                resultado.setDensidad(densidadFQ());
+
+                escaneado_correcto = true; // Ha podido con todos
+            }
+            catch (Exception e) {
+                // ...
+            }
+
+            // Fin:
+
+            resultado.setFormula(formula);
+            resultado.setNombre(nombre);
+            resultado.setAlternativo(alternativo);
         }
-
-        // Nomenclatura obsoleta:
-        if (alternativo != null && (nombre.contentEquals(alternativo) ||
-                (indiceDespuesDeEn("oxo", alternativo) != -1)))
-            alternativo = null;
-
-        // Un error antiguo que pasaba con algunos orgánicos:
-        if(indiceDespuesDeEn("br/>", nombre) != -1) {
-            nombre = nombre.substring(4);
-            if (alternativo != null && nombre.contentEquals(alternativo))
-                alternativo = null;
-
-            resultado.setPremium(true);
-        }
-        if(alternativo != null && indiceDespuesDeEn("br/>", alternativo) != -1) {
-            alternativo = alternativo.substring(4);
-            if (nombre.contentEquals(alternativo))
-                alternativo = null;
-
-            resultado.setPremium(true);
-        }
-
-        resultado.setFormula(formula);
-        resultado.setNombre(nombre);
-        resultado.setAlternativo(alternativo);
-
-        try {
-            resultado.setMasa(masaFQ());
-            resultado.setFusion(temperaturaFQ("fusión"));
-            resultado.setEbullicion(temperaturaFQ("ebullición"));
-            resultado.setDensidad(densidadFQ());
-
-            escaneado_correcto = true; // Ha podido con todos
-        }
-        catch (Exception e) {
-            // ...
-        }
+        else resultado = null;
 
         return resultado;
     }
