@@ -79,8 +79,10 @@ public class InorganicoService {
     public Optional<InorganicoModel> eliminar(Integer id) {
         Optional<InorganicoModel> eliminado = inorganicoRepository.findById(id);
 
-        inorganicoRepository.deleteById(id); // De la DB
-        BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
+        if(eliminado.isPresent()) {
+            inorganicoRepository.deleteById(id); // De la DB
+            BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
+        }
 
         return eliminado;
     }
