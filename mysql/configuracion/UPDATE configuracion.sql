@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET google_on = 0
+SET bing_pago_on = 1
 WHERE version = 1

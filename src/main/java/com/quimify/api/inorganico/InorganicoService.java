@@ -87,7 +87,7 @@ public class InorganicoService {
 
     // SERVIDOR -----------------------------------------------------------------------
 
-    public void cargarSearchables() {
+    public void cargarBuscables() {
         for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
             BUSCABLES.add(new InorganicoBuscable(inorganico));
     }
