@@ -1,13 +1,14 @@
 package com.quimify.api.inorganico;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 // Esta clase contiene el código para analizar una página de FQ.com.
 
 public class PaginaFQ {
 
     private String pagina; // Documento HTML
-    boolean escaneado_correcto = false; // No ha crasheado al escanear las características
+    boolean escaneado_correcto = true; // 'False' si alguna de las características produce una excepción
 
     // --------------------------------------------------------------------------------
 
@@ -135,17 +136,16 @@ public class PaginaFQ {
 
             // Características numéricas:
 
-            try {
-                resultado.setMasa(masaFQ());
-                resultado.setFusion(temperaturaFQ("fusión"));
-                resultado.setEbullicion(temperaturaFQ("ebullición"));
-                resultado.setDensidad(densidadFQ());
+            resultado.setMasa(tryMasaFQ());
+            resultado.setFusion(tryTemperaturaFQ("fusión"));
+            resultado.setEbullicion(tryTemperaturaFQ("ebullición"));
+            resultado.setDensidad(tryDensidadFQ());
 
-                escaneado_correcto = true; // Ha podido con todos
-            }
-            catch (Exception e) {
-                // ...
-            }
+            // Etiquetas:
+
+            ArrayList<String> etiquetas = etiquetasDeAcido(nombre, alternativo);
+            if(etiquetas.size() != 0)
+                resultado.setEtiquetas(etiquetas);
 
             // Fin:
 
@@ -166,6 +166,21 @@ public class PaginaFQ {
         return indice;
     }
 
+    private String tryMasaFQ() {
+        String masa;
+
+        try {
+            masa = masaFQ();
+        }
+        catch (Exception e){
+            //...
+            masa = null;
+            escaneado_correcto = false;
+        }
+
+        return masa;
+    }
+
     private String masaFQ() {
         String masa;
 
@@ -183,8 +198,10 @@ public class PaginaFQ {
                 masa = masa.substring(0, indice - 1);
 
                 masa = masa.replaceAll(" ", "").replaceAll(",", ".");
+                masa = masa.replaceAll("a", "-"); // Otro formato de intervalo
                 masa = soloNumeros(masa);
                 masa = primeroDelIntervalo(masa);
+                masa = truncarDosDecimales(masa);
                 masa = quitarCerosDecimalesALaDerecha(masa);
             }
             else masa = null;
@@ -192,6 +209,21 @@ public class PaginaFQ {
         else masa = null;
 
         return masa;
+    }
+
+    private String tryTemperaturaFQ(String tipo) {
+        String temperatura;
+
+        try {
+            temperatura = temperaturaFQ(tipo);
+        }
+        catch (Exception e){
+            //...
+            temperatura = null;
+            escaneado_correcto = false;
+        }
+
+        return temperatura;
     }
 
     private String temperaturaFQ(String tipo) {
@@ -211,6 +243,7 @@ public class PaginaFQ {
                 temperatura = temperatura.substring(0, indice - 1);
 
                 temperatura = temperatura.replaceAll(" ", "").replaceAll(",", ".");
+                temperatura = temperatura.replaceAll("a", "-"); // Otro formato de intervalo
                 temperatura = soloNumeros(temperatura);
                 temperatura = primeroDelIntervalo(temperatura);
                 temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
@@ -223,6 +256,21 @@ public class PaginaFQ {
         else temperatura = null;
 
         return temperatura;
+    }
+
+    private String tryDensidadFQ() {
+        String densidad;
+
+        try {
+            densidad = densidadFQ();
+        }
+        catch (Exception e){
+            //...
+            densidad = null;
+            escaneado_correcto = false;
+        }
+
+        return densidad;
     }
 
     private String densidadFQ() {
@@ -246,6 +294,7 @@ public class PaginaFQ {
                 }
 
                 densidad = densidad.replaceAll(" ", "").replaceAll(",", ".");
+                densidad = densidad.replaceAll("a", "-"); // Otro formato de intervalo
                 densidad = soloNumeros(densidad);
                 densidad = primeroDelIntervalo(densidad);
 
@@ -285,16 +334,15 @@ public class PaginaFQ {
         return (c >= '0' && c <= '9') || c == '-' || c == '.'; // Signo negativo y punto decimal
     }
 
-    // Ej.: "12.104 - 13.2" -> "12.104"
+    // Ej.: "12.104 - 13.2 ºC" -> "12.104"
+    // Ej.: "12.104 a 13.2 ºC" -> "12.104"
     private String primeroDelIntervalo(String dato) {
-        String resultado = dato;
+        String resultado;
 
-        if(dato.charAt(0) == '-' && dato.length() > 1)
-            dato = dato.substring(1); // Para el signo negativo
-
-        int guion = indiceDespuesDeEn("-", dato);
-        if(guion != -1)
-            resultado = resultado.substring(0, guion);
+        dato = dato.trim();
+        if(indiceDespuesDeEn("-", dato.substring(1)) != -1) // Por si es el signo negativo
+            resultado = dato.split("-", 2)[0];
+        else resultado = dato;
 
         return resultado;
     }
@@ -334,6 +382,22 @@ public class PaginaFQ {
                         numero = numero.substring(0, i + 1);
 
         return numero;
+    }
+
+    private ArrayList<String> etiquetasDeAcido(String nombre, String alternativo) {
+        ArrayList<String> etiquetas = new ArrayList<>();
+
+        String etiqueta = nombre.replaceAll("ácido ", "");
+        if(!etiqueta.contentEquals(nombre))
+            etiquetas.add(InorganicoBuscable.normalizar(etiqueta));
+
+        if(alternativo != null) {
+            etiqueta = alternativo.replaceAll("ácido ", "");
+            if(!etiqueta.contentEquals(alternativo))
+                etiquetas.add(InorganicoBuscable.normalizar(etiqueta));
+        }
+
+        return etiquetas;
     }
 
 }

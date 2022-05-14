@@ -43,6 +43,70 @@ public class InorganicoModel {
 
     // --------------------------------------------------------------------------------
 
+    public boolean igualA(InorganicoModel igual) {
+        if(!formula.contentEquals(igual.getFormula()))
+            return false;
+        if(!nombre.contentEquals(igual.getNombre()))
+            return false;
+
+        if(premium != igual.getPremium())
+            return false;
+
+        if(alternativo != null) {
+            if(igual.getAlternativo() == null)
+                return false;
+            if(!alternativo.contentEquals(igual.getAlternativo()))
+                return false;
+        }
+        else if(igual.getAlternativo() != null)
+            return false;
+
+        if(masa != null) {
+            if(igual.getMasa() == null)
+                return false;
+            if(!masa.contentEquals(igual.getMasa()))
+                return false;
+        }
+
+        if(densidad != null) {
+            if(igual.getDensidad() == null)
+                return false;
+            if(!densidad.contentEquals(igual.getDensidad()))
+                return false;
+        }
+        else if(igual.getDensidad() != null)
+            return false;
+
+        if(fusion != null) {
+            if(igual.getFusion() == null)
+                return false;
+            if(!fusion.contentEquals(igual.getFusion()))
+                return false;
+        }
+        else if(igual.getFusion() != null)
+            return false;
+
+        if(ebullicion != null) {
+            if(igual.getEbullicion() == null)
+                return false;
+            if(!ebullicion.contentEquals(igual.getEbullicion()))
+                return false;
+        }
+        else if(igual.getEbullicion() != null)
+            return false;
+
+        if(etiquetas != null) {
+            if(igual.getEtiquetas() != null && etiquetas.size() == igual.getEtiquetas().size()) {
+                for(int i = 0; i < etiquetas.size(); i++)
+                    if(!etiquetas.get(i).contentEquals(igual.getEtiquetas().get(i)))
+                        return false;
+            }
+            else return false;
+        }
+
+        return true;
+    }
+
     public void registrarBusqueda() {
         busquedas++;
     }

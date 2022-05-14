@@ -35,7 +35,40 @@ public class InorganicoService {
 
     // ADMIN --------------------------------------------------------------------------
 
-    public InorganicoResultado probarPaginaFQ(String direccion) { // TEST
+    //TODO: quitar etiquetas estúpidas
+    public void actualizarFQ() { // TEST
+        ArrayList<InorganicoModel> todos = (ArrayList<InorganicoModel>) inorganicoRepository.findAll();
+
+        for(int i = 4144; i < todos.size(); i++) {
+            try {
+                InorganicoModel inorganico = todos.get(i);
+                String direccion = "https://www.formulacionquimica.com/" + inorganico.getFormula();
+
+                HttpURLConnection conexion = (HttpURLConnection)
+                        new URL(direccion).openConnection();
+                conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
+
+                PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
+                InorganicoModel escaneado = pagina_fq.escanearInorganico();
+
+                if(!escaneado.igualA(inorganico)) {
+                    boolean reemplazar = true;
+                    if(reemplazar) {
+                        escaneado.setId(inorganico.getId());
+                        escaneado.setBusquedas(inorganico.getBusquedas());
+                        reemplazar(escaneado);
+                    }
+                }
+            }
+            catch (Exception e) {
+                String s = e.toString();
+            }
+        }
+    }
+
+    public Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
+        Optional<InorganicoModel> resultado;
+
         try {
             HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
@@ -43,10 +76,12 @@ public class InorganicoService {
             PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
             InorganicoModel inorganico = pagina.escanearInorganico();
 
-            return new InorganicoResultado(inorganico);
+            resultado = Optional.of(inorganico);
         } catch (Exception e) {
-            return NO_ENCONTRADO;
+            resultado = Optional.empty();
         }
+
+        return resultado;
     }
 
     public Optional<InorganicoModel> seleccionar(Integer id) {
@@ -87,6 +122,21 @@ public class InorganicoService {
         return eliminado;
     }
 
+    public Optional<InorganicoModel> hacerPremium(Integer id) {
+        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(id);
+        if(reemplazado.isPresent()) { // Si existe
+            reemplazado.get().setPremium(true);
+            inorganicoRepository.save(reemplazado.get()); // De la DB
+
+            for(int i = 0; i < BUSCABLES.size(); i++) // De la memoria principal para ser buscado
+                if(BUSCABLES.get(i).getId().equals(id)) {
+                    BUSCABLES.set(i, new InorganicoBuscable(reemplazado.get()));
+                    break;
+                }
+        }
+
+        return reemplazado;
+    }
     // SERVIDOR -----------------------------------------------------------------------
 
     public void cargarBuscables() {
@@ -286,8 +336,8 @@ public class InorganicoService {
         try {
             HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
-            PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
 
+            PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
             InorganicoModel escaneado = pagina_fq.escanearInorganico();
             if(escaneado != null) {
                 if(pagina_fq.getEscaneadoCorrecto())
