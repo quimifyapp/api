@@ -35,36 +35,7 @@ public class InorganicoService {
 
     // ADMIN --------------------------------------------------------------------------
 
-    //TODO: quitar etiquetas estúpidas
-    public void actualizarFQ() { // TEST
-        ArrayList<InorganicoModel> todos = (ArrayList<InorganicoModel>) inorganicoRepository.findAll();
-
-        for(int i = 4144; i < todos.size(); i++) {
-            try {
-                InorganicoModel inorganico = todos.get(i);
-                String direccion = "https://www.formulacionquimica.com/" + inorganico.getFormula();
-
-                HttpURLConnection conexion = (HttpURLConnection)
-                        new URL(direccion).openConnection();
-                conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
-
-                PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
-                InorganicoModel escaneado = pagina_fq.escanearInorganico();
-
-                if(!escaneado.igualA(inorganico)) {
-                    boolean reemplazar = true;
-                    if(reemplazar) {
-                        escaneado.setId(inorganico.getId());
-                        escaneado.setBusquedas(inorganico.getBusquedas());
-                        reemplazar(escaneado);
-                    }
-                }
-            }
-            catch (Exception e) {
-                String s = e.toString();
-            }
-        }
-    }
+    //TODO: quitar etiquetas estúpidas de los inorgánicos
 
     public Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
         Optional<InorganicoModel> resultado;
