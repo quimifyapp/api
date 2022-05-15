@@ -14,12 +14,6 @@ public class InorganicoBuscable {
 
     // TODO: Levenshtein o similar
 
-    // puedeCompletar(...) = true
-    // Ej.: "ácido sulf" -> "ácido sulfúrico"
-    /*public String autoCompletar(String input) {
-        InorganicoModel encontrado
-    }*/
-
     // 'input' debe estar previamente normalizado
     // Ej.: (this.keywords[i] = "acidosulfuroso") "acidosu" -> "acidosulfuroso"
     public String autoCompletar(String input) {
@@ -31,7 +25,7 @@ public class InorganicoBuscable {
         return null;
     }
 
-    // 'input' debe estar previamente normalizado
+    // Pre.: 'input' debe estar previamente normalizado
     // Ej.: (this.keywords[i] = "h2so4") "h2so4" -> 'true', "h2so" -> 'false'
     public boolean coincide(String input) {
         for(String keyword : keywords)
@@ -41,17 +35,15 @@ public class InorganicoBuscable {
         return false;
     }
 
-    // TODO: Comentar esta función
     // Ej.: "Óxido de hierro (III)" -> "oxidodehierroiii"
     public static String normalizar(String input) {
-        if(input != null) {
-            input = Normalizer.normalize(input, Normalizer.Form.NFD)
-                    .replaceAll("[^\\p{ASCII}]", "")
-                    .replaceAll("[^A-Za-z0-9]", "")
-                    .toLowerCase();
-        }
+        if(input == null)
+            return null;
 
-        return input;
+        return Normalizer.normalize(input, Normalizer.Form.NFD) // Sin acentos ni diacríticos
+                .replaceAll("[^\\p{ASCII}]", "") // Solo ASCII
+                .replaceAll("[^A-Za-z0-9]", "") // Solo alfanumérico
+                .toLowerCase(); // Solo minúsculas
     }
 
     // Constructor:

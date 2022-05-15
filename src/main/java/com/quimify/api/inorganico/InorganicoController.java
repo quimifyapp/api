@@ -37,7 +37,7 @@ public class InorganicoController {
     }
 
     @PostMapping()
-    public Optional<InorganicoModel> insertarInorganico(@RequestBody InorganicoModel nuevo) {
+    public InorganicoModel insertarInorganico(@RequestBody InorganicoModel nuevo) {
         return inorganicoService.insertar(nuevo);
     }
 

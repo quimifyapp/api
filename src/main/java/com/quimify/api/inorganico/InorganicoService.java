@@ -61,6 +61,7 @@ public class InorganicoService {
 
     public Optional<InorganicoModel> reemplazar(InorganicoModel nuevo) {
         Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(nuevo.getId());
+
         if(reemplazado.isPresent()) { // Si existe
             inorganicoRepository.save(nuevo); // De la DB
 
@@ -74,10 +75,27 @@ public class InorganicoService {
         return reemplazado;
     }
 
-    public Optional<InorganicoModel> insertar(InorganicoModel inorganico) {
-        Optional<InorganicoModel> insertado = Optional.of(inorganicoRepository.save(inorganico)); // En la DB
+    public Optional<InorganicoModel> hacerPremium(Integer id) {
+        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(id);
 
-        BUSCABLES.add(new InorganicoBuscable(insertado.get())); // En memoria principal
+        if(reemplazado.isPresent()) { // Si existe
+            reemplazado.get().setPremium(true);
+            inorganicoRepository.save(reemplazado.get()); // De la DB
+
+            for(int i = 0; i < BUSCABLES.size(); i++) // De la memoria principal para ser buscado
+                if(BUSCABLES.get(i).getId().equals(id)) {
+                    BUSCABLES.set(i, new InorganicoBuscable(reemplazado.get()));
+                    break;
+                }
+        }
+
+        return reemplazado;
+    }
+
+    public InorganicoModel insertar(InorganicoModel nuevo) {
+        InorganicoModel insertado = inorganicoRepository.save(nuevo); // En la DB
+
+        BUSCABLES.add(new InorganicoBuscable(insertado)); // En memoria principal
 
         return insertado;
     }
@@ -93,21 +111,6 @@ public class InorganicoService {
         return eliminado;
     }
 
-    public Optional<InorganicoModel> hacerPremium(Integer id) {
-        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(id);
-        if(reemplazado.isPresent()) { // Si existe
-            reemplazado.get().setPremium(true);
-            inorganicoRepository.save(reemplazado.get()); // De la DB
-
-            for(int i = 0; i < BUSCABLES.size(); i++) // De la memoria principal para ser buscado
-                if(BUSCABLES.get(i).getId().equals(id)) {
-                    BUSCABLES.set(i, new InorganicoBuscable(reemplazado.get()));
-                    break;
-                }
-        }
-
-        return reemplazado;
-    }
     // SERVIDOR -----------------------------------------------------------------------
 
     public void cargarBuscables() {

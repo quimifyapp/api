@@ -19,7 +19,7 @@ public class InorganicoModel {
     @Column(nullable = false)
     private String formula; // "MgH2"
     @Column(nullable = false)
-    private String nombre;  // "hidruro de magnesio
+    private String nombre;  // "hidruro de magnesio"
 
     // Con valor predeterminado:
 

@@ -4,4 +4,4 @@ FROM inorganico
 # WHERE formula = "HCl"
 # WHERE nombre = "metanol"
 # WHERE nombre LIKE "m%"
-order by busquedas desc
+ORDER BY busquedas DESC
