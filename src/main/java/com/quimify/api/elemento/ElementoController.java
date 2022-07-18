@@ -35,4 +35,9 @@ public class ElementoController {
     public Optional<ElementoModel> eliminarElemento(@RequestParam("id") Integer id) {
         return elementoService.eliminar(id);
     }
+
+    @GetMapping("/masamolecular") // TEST
+    public Float masaMolecular(@RequestParam("formula") String formula) {
+        return elementoService.masaMolecular(formula);
+    }
 }

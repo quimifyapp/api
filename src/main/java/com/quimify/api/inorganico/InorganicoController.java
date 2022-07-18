@@ -1,6 +1,5 @@
 package com.quimify.api.inorganico;
 
-import com.quimify.api.MasaMolecular;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,11 +44,6 @@ public class InorganicoController {
     @GetMapping("/probarfq") // TEST
     public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
         return inorganicoService.probarPaginaFQ(direccion);
-    }
-
-    @GetMapping("/masamolecular") // TEST
-    public Float masaMolecular(@RequestParam("formula") String formula) {
-        return new MasaMolecular(formula).get();
     }
 
     // CLIENTE ------------------------------------------------------------------------
