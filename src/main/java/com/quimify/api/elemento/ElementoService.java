@@ -51,26 +51,8 @@ public class ElementoService {
     private Float masaMolecular(String formula) throws NoSuchElementException {
         Float resultado;
 
-        Optional<ElementoModel> buscado = elementoRepository.findBySimbolo(formula);
+        resultado = masaElemento(formula);
 
-        if(buscado.isPresent())
-            resultado = buscado.get().getMasa();
-        else resultado = null;
-
-        return resultado;
-    }
-
-    public Float tryMasaMolecular(String formula) {
-        Float resultado;
-
-        try {
-            resultado = masaMolecular(formula);
-        } catch (NoSuchElementException e) {
-            // Error...
-            resultado = null;
-        }
-
-        return resultado;
         /*
 class calc_masmol {
     float masmol;
@@ -225,6 +207,21 @@ class analysis {
     }
 }
 */
+
+        return resultado;
+    }
+
+    public Float tryMasaMolecular(String formula) {
+        Float resultado;
+
+        try {
+            resultado = masaMolecular(formula);
+        } catch (NoSuchElementException e) {
+            // Error...
+            resultado = null;
+        }
+
+        return resultado;
     }
 
 }
