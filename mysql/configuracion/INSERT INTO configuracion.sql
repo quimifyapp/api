@@ -1,9 +1,9 @@
 INSERT INTO configuracion(version, actualizacion_disponible, actualizacion_necesaria,
-google_on, google_limite, 
-bing_gratis_on, 
-bing_pago_on,  bing_pago_limite, 
-google_url, 
-bing_url, 
+google_on, google_limite,
+bing_gratis_on,
+bing_pago_on,  bing_pago_limite,
+google_url,
+bing_url,
 bing_gratis_key, bing_pago_key,
 user_agent)
 VALUES(0, false, false, # Versiones
