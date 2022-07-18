@@ -16,11 +16,6 @@ public class InorganicoController {
 
     // ADMIN --------------------------------------------------------------------------
 
-    @GetMapping("/probarfq") // TEST
-    public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
-        return inorganicoService.probarPaginaFQ(direccion);
-    }
-
     @GetMapping("/{id}")
     public Optional<InorganicoModel> seleccionarInorganico(@PathVariable("id") Integer id) {
         return inorganicoService.seleccionar(id);
@@ -44,6 +39,11 @@ public class InorganicoController {
     @DeleteMapping()
     public Optional<InorganicoModel> eliminarInorganico(@RequestParam("id") Integer id) {
         return inorganicoService.eliminar(id);
+    }
+
+    @GetMapping("/probarfq") // TEST
+    public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
+        return inorganicoService.probarPaginaFQ(direccion);
     }
 
     // CLIENTE ------------------------------------------------------------------------

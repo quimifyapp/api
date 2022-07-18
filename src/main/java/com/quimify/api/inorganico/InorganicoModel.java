@@ -1,7 +1,10 @@
 package com.quimify.api.inorganico;
 
+import org.hibernate.collection.internal.PersistentSet;
+
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 // Esta clase representa los compuestos inorgánicos.
 
@@ -39,76 +42,20 @@ public class InorganicoModel {
     private String fusion;      // (K)
     private String ebullicion;  // (K)
 
-    private ArrayList<String> etiquetas; // ("hidruromagnesico", "hidrogenodemagnesio", ...)
+    // Referencia externa (one to many):
+
+    @OneToMany(cascade = CascadeType.ALL) // Se crean de la mano y se borran de la mano
+    @JoinColumn(name = "inorganico_id") // Cada etiqueta lleva asociado el inorgánico al que pertenece
+    private Set<EtiquetaModel> etiquetas = new HashSet<>(); // "hidruromagnesico" | "aguaoxigenada" | ...
 
     // --------------------------------------------------------------------------------
 
-    public boolean igualA(InorganicoModel igual) {
-        if(!formula.contentEquals(igual.getFormula()))
-            return false;
-        if(!nombre.contentEquals(igual.getNombre()))
-            return false;
-
-        if(premium != igual.getPremium())
-            return false;
-
-        if(alternativo != null) {
-            if(igual.getAlternativo() == null)
-                return false;
-            if(!alternativo.contentEquals(igual.getAlternativo()))
-                return false;
-        }
-        else if(igual.getAlternativo() != null)
-            return false;
-
-        if(masa != null) {
-            if(igual.getMasa() == null)
-                return false;
-            if(!masa.contentEquals(igual.getMasa()))
-                return false;
-        }
-
-        if(densidad != null) {
-            if(igual.getDensidad() == null)
-                return false;
-            if(!densidad.contentEquals(igual.getDensidad()))
-                return false;
-        }
-        else if(igual.getDensidad() != null)
-            return false;
-
-        if(fusion != null) {
-            if(igual.getFusion() == null)
-                return false;
-            if(!fusion.contentEquals(igual.getFusion()))
-                return false;
-        }
-        else if(igual.getFusion() != null)
-            return false;
-
-        if(ebullicion != null) {
-            if(igual.getEbullicion() == null)
-                return false;
-            if(!ebullicion.contentEquals(igual.getEbullicion()))
-                return false;
-        }
-        else if(igual.getEbullicion() != null)
-            return false;
-
-        if(etiquetas != null) {
-            if(igual.getEtiquetas() != null && etiquetas.size() == igual.getEtiquetas().size()) {
-                for(int i = 0; i < etiquetas.size(); i++)
-                    if(!etiquetas.get(i).contentEquals(igual.getEtiquetas().get(i)))
-                        return false;
-            }
-            else return false;
-        }
-
-        return true;
-    }
-
     public void registrarBusqueda() {
         busquedas++;
+    }
+
+    public void nuevaEtiqueta(EtiquetaModel nueva) {
+        etiquetas.add(nueva);
     }
 
     // Getters y setters:
@@ -153,7 +100,7 @@ public class InorganicoModel {
         return ebullicion;
     }
 
-    public ArrayList<String> getEtiquetas() {
+    public Set<EtiquetaModel> getEtiquetas() {
         return etiquetas;
     }
 
@@ -197,7 +144,7 @@ public class InorganicoModel {
         this.ebullicion = ebullicion;
     }
 
-    public void setEtiquetas(ArrayList<String> etiquetas) {
+    public void setEtiquetas(Set<EtiquetaModel> etiquetas) {
         this.etiquetas = etiquetas;
     }
 

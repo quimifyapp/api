@@ -1,7 +1,8 @@
 package com.quimify.api.inorganico;
 
+import com.quimify.api.Normalizar;
+
 import java.text.NumberFormat;
-import java.util.ArrayList;
 
 // Esta clase contiene el código para analizar una página de FQ.com.
 
@@ -11,14 +12,6 @@ public class PaginaFQ {
     boolean escaneado_correcto = true; // 'False' si alguna de las características produce una excepción
 
     // --------------------------------------------------------------------------------
-
-    PaginaFQ(String pagina) {
-        this.pagina = pagina;
-    }
-
-    public boolean getEscaneadoCorrecto() {
-        return escaneado_correcto;
-    }
 
     // Flowchart #5
     public InorganicoModel escanearInorganico() {
@@ -143,9 +136,15 @@ public class PaginaFQ {
 
             // Etiquetas:
 
-            ArrayList<String> etiquetas = etiquetasDeAcido(nombre, alternativo);
-            if(etiquetas.size() != 0)
-                resultado.setEtiquetas(etiquetas);
+            String etiqueta = nombre.replaceAll("ácido ", "");
+            if(!etiqueta.contentEquals(nombre))
+                resultado.nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+
+            if(alternativo != null) {
+                etiqueta = alternativo.replaceAll("ácido ", "");
+                if(!etiqueta.contentEquals(alternativo))
+                    resultado.nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+            }
 
             // Fin:
 
@@ -384,20 +383,16 @@ public class PaginaFQ {
         return numero;
     }
 
-    private ArrayList<String> etiquetasDeAcido(String nombre, String alternativo) {
-        ArrayList<String> etiquetas = new ArrayList<>();
+    // --------------------------------------------------------------------------------
 
-        String etiqueta = nombre.replaceAll("ácido ", "");
-        if(!etiqueta.contentEquals(nombre))
-            etiquetas.add(InorganicoBuscable.normalizar(etiqueta));
+    // Getters y setters:
 
-        if(alternativo != null) {
-            etiqueta = alternativo.replaceAll("ácido ", "");
-            if(!etiqueta.contentEquals(alternativo))
-                etiquetas.add(InorganicoBuscable.normalizar(etiqueta));
-        }
+    PaginaFQ(String pagina) {
+        this.pagina = pagina;
+    }
 
-        return etiquetas;
+    public boolean getEscaneadoCorrecto() {
+        return escaneado_correcto;
     }
 
 }

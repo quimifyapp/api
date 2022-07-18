@@ -1,14 +1,16 @@
 package com.quimify.api.inorganico;
 
-import java.text.Normalizer;
+import com.quimify.api.Normalizar;
+
 import java.util.ArrayList;
+import java.util.List;
 
 // Esta clase representa los compuestos inorgánicos en memoria, simplificados para hacer búsquedas.
 
 public class InorganicoBuscable {
 
     private final Integer id;
-    private final ArrayList<String> keywords = new ArrayList<>(); // Modificable, no re-atribuible
+    private final List<String> keywords = new ArrayList<>(); // Modificable, no re-atribuible
 
     // --------------------------------------------------------------------------------
 
@@ -35,30 +37,20 @@ public class InorganicoBuscable {
         return false;
     }
 
-    // Ej.: "Óxido de hierro (III)" -> "oxidodehierroiii"
-    public static String normalizar(String input) {
-        if(input == null)
-            return null;
-
-        return Normalizer.normalize(input, Normalizer.Form.NFD) // Sin acentos ni diacríticos
-                .replaceAll("[^\\p{ASCII}]", "") // Solo ASCII
-                .replaceAll("[^A-Za-z0-9]", "") // Solo alfanumérico
-                .toLowerCase(); // Solo minúsculas
-    }
-
     // Constructor:
 
     public InorganicoBuscable(InorganicoModel inorganico) {
         id = inorganico.getId();
 
-        keywords.add(normalizar(inorganico.getFormula()));
-        keywords.add(normalizar(inorganico.getNombre()));
+        keywords.add(new Normalizar(inorganico.getFormula()).get());
+        keywords.add(new Normalizar(inorganico.getNombre()).get());
 
         if(inorganico.getAlternativo() != null)
-            keywords.add(normalizar(inorganico.getAlternativo()));
+            keywords.add(new Normalizar(inorganico.getAlternativo()).get());
 
         if(inorganico.getEtiquetas() != null)
-            keywords.addAll(inorganico.getEtiquetas()); // Ya deben estar normalizadas
+            for(EtiquetaModel etiqueta : inorganico.getEtiquetas())
+                keywords.add(etiqueta.getTexto_normalizado()); // Ya deben estar normalizadas
     }
 
     // Getters:

@@ -13,7 +13,7 @@ public class ConfiguracionModel {
     @Column(unique = true, nullable = false)
     private Integer version; // Se corresponde con la versión de la API
 
-    // Actualizaciones:
+    // Actualizaciones: esto es una prueba
 
     @Column(nullable = false)
     private Boolean actualizacion_disponible;

@@ -1,4 +1,4 @@
-INSERT INTO configuracion (version, actualizacion_disponible, actualizacion_necesaria,
+INSERT INTO configuracion(version, actualizacion_disponible, actualizacion_necesaria,
 google_on, google_limite, 
 bing_gratis_on, 
 bing_pago_on,  bing_pago_limite, 

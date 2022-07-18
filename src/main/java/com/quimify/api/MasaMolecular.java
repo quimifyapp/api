@@ -12,7 +12,7 @@ public class MasaMolecular {
 
     // --------------------------------------------------------------------------------
 
-    // TODO: Un método en condiciones y no la BASURA de código de abajo sacado de internet
+    // TODO: Un método en condiciones y no la BASURA de código de abajo sacado de Internet
 
 }
 

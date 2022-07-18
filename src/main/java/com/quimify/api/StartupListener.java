@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 // Esta clase contiene las órdenes se ejecutarán cuando Spring Boot indique que el servidor está
 // iniciado y listo.
 
 @Component
+@Transactional
 public class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
