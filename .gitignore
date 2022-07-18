@@ -34,3 +34,4 @@ build/
 
 ### PROPIAS ###
 !/doc/buscar.drawio
+./mysql/backup

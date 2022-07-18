@@ -36,8 +36,6 @@ public class InorganicoService {
 
     // ADMIN --------------------------------------------------------------------------
 
-    // TODO: rutina duplicados
-    // TODO: quitar etiquetas estúpidas y duplicadas, añadir las de los ácidos
     // TODO: quitar los 'usuario_premium'
 
     public Optional<InorganicoModel> seleccionar(Integer id) {
