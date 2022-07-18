@@ -117,43 +117,6 @@ public class InorganicoService {
     public void cargarBuscables() {
         for(InorganicoModel inorganico : inorganicoRepository.findAllByOrderByBusquedasDesc())
             BUSCABLES.add(new InorganicoBuscable(inorganico));
-        for(InorganicoModel inorganico : inorganicoRepository.findAll())
-        {
-            String etiqueta = inorganico.getNombre().replaceAll("ácido ", "");
-            if(!etiqueta.contentEquals(inorganico.getNombre())) {
-
-                etiqueta = new Normalizar(etiqueta).get();
-
-                boolean encontrado = false;
-                for(EtiquetaModel instancia : inorganico.getEtiquetas())
-                    if(etiqueta.contentEquals(instancia.getTexto_normalizado()))
-                        encontrado = true;
-
-                if(!encontrado)
-                    inorganico.nuevaEtiqueta(new EtiquetaModel(etiqueta));
-            }
-
-            if(inorganico.getAlternativo() != null) {
-                etiqueta = inorganico.getAlternativo().replaceAll("ácido ", "");
-
-                if(!etiqueta.contentEquals(inorganico.getAlternativo())) {
-
-                    etiqueta = new Normalizar(etiqueta).get();
-
-                    boolean encontrado = false;
-                    for(EtiquetaModel instancia : inorganico.getEtiquetas())
-                        if(etiqueta.contentEquals(instancia.getTexto_normalizado()))
-                            encontrado = true;
-
-                    if(!encontrado)
-                        inorganico.nuevaEtiqueta(new EtiquetaModel(etiqueta));
-                }
-            }
-        }
-    }
-
-    public void corregirDuplicados() {
-
     }
 
     // INTERNOS ----------------------------------------------------------------------

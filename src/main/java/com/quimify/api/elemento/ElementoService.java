@@ -3,6 +3,7 @@ package com.quimify.api.elemento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 // Esta clase procesa los elementos químicos.
@@ -43,7 +44,11 @@ public class ElementoService {
 
     // INTERNOS ----------------------------------------------------------------------
 
-    public Float masaMolecular(String formula) {
+    private Float masaElemento(String simbolo) throws NoSuchElementException {
+        return elementoRepository.findBySimbolo(simbolo).get().getMasa();
+    }
+
+    private Float masaMolecular(String formula) throws NoSuchElementException {
         Float resultado;
 
         Optional<ElementoModel> buscado = elementoRepository.findBySimbolo(formula);
@@ -51,6 +56,19 @@ public class ElementoService {
         if(buscado.isPresent())
             resultado = buscado.get().getMasa();
         else resultado = null;
+
+        return resultado;
+    }
+
+    public Float tryMasaMolecular(String formula) {
+        Float resultado;
+
+        try {
+            resultado = masaMolecular(formula);
+        } catch (NoSuchElementException e) {
+            // Error...
+            resultado = null;
+        }
 
         return resultado;
         /*

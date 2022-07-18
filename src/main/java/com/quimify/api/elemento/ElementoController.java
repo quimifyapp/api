@@ -38,6 +38,6 @@ public class ElementoController {
 
     @GetMapping("/masamolecular") // TEST
     public Float masaMolecular(@RequestParam("formula") String formula) {
-        return elementoService.masaMolecular(formula);
+        return elementoService.tryMasaMolecular(formula);
     }
 }

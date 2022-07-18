@@ -3,5 +3,5 @@ FROM etiqueta
 INNER JOIN inorganico
 ON etiqueta.inorganico_id = inorganico.id
 
-# WHERE inorganico_id = 3
+# WHERE inorganico_id = 1906
 ORDER BY busquedas DESC
