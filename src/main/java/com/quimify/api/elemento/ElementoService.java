@@ -51,35 +51,21 @@ public class ElementoService {
         return elementoRepository.findBySimbolo(simbolo).get().getMasa();
     }
 
-    private String buscarElemento(String parte) {
-        String[] elemento = parte.split("(?<=\\D)\\d");
-        return elemento[0];
-    }
+    private float masaMolecular(String formula) throws NoSuchElementException {
+        float resultado = 0;
 
-    private Integer buscarAtomos(String parte) {
-        String numAtomos = null;
-        for(char c : parte.toCharArray()) {
-            if(Character.isDigit(c))
-                numAtomos = String.valueOf(c);
-        }
-
-        return Integer.valueOf(numAtomos);
-    }
-    private Float masaMolecular(String formula) throws NoSuchElementException {
-        Float resultado = new Float(0);
-
-        String[] partes = formula.split("(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})");            //La regex para buscar mayusculas en Unicode es "\\p{Lu}", no "[A-Z]+"
+        String regex = "(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})";
+        String[] partes = formula.split(regex); // "Fe2O3" -> ("Fe2", "O3")
 
         for(String parte : partes) {
+            String[] simbolo_numero = parte.split("(?<=\\D)\\d", 2); // "Fe2" -> ("Fe", "2")
 
-            if(parte.matches(".*\\d.*")) {
-                String elemento = buscarElemento(parte);
-                int numAtomos = buscarAtomos(parte);
-                resultado += numAtomos * masaElemento(elemento);
-            }else{
-                resultado += masaElemento(parte);
-            }
+            String simbolo = simbolo_numero[0];
+            int numero = (simbolo_numero.length == 2) // Tiene número como "Fe2", no como "Fe"
+                    ? Integer.parseInt(simbolo_numero[1])
+                    : 1;
 
+            resultado += masaElemento(simbolo) * numero;
         }
 
         /*

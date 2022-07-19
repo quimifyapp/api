@@ -29,8 +29,7 @@ public class InorganicoService {
 
     private static final List<InorganicoBuscable> BUSCABLES = new ArrayList<>(); // Para ser buscados rápidamente
 
-    public final static InorganicoResultado NO_ENCONTRADO = new InorganicoResultado(
-            InorganicoResultado.NO_ENCONTRADO); // Eso, o se ha producido un error
+    public final static InorganicoResultado NO_ENCONTRADO = new InorganicoResultado(InorganicoResultado.NO_ENCONTRADO);
     public final static Integer ENCONTRADO = InorganicoResultado.ENCONTRADO; // OK
     public final static Integer SUGERENCIA = InorganicoResultado.SUGERENCIA; // Quizás quisiste decir...
 
@@ -178,11 +177,12 @@ public class InorganicoService {
 
         // Flowchart #1
         if(id == null) { // No se encuentra en la DB
-            BusquedaWeb busqueda_web = null;
+            BusquedaWeb busqueda_web;
 
             // Flowchart #2
             if(configuracionService.getGoogleON() /*&& limite */)
                 busqueda_web = tryBuscarGoogle(input);
+            else busqueda_web = null;
 
             // Flowchart #3
             if(busqueda_web == null && configuracionService.getBingGratisON())
@@ -219,9 +219,9 @@ public class InorganicoService {
     private Integer buscarMemoriaPrincipal(String input) {
         input = new Normalizar(input).get();
 
-        for(InorganicoBuscable ejemplar : BUSCABLES) // Ordenados por nº de búsquedas
-            if(ejemplar.coincide(input))
-                return ejemplar.getId();
+        for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
+            if(buscable.coincide(input))
+                return buscable.getId();
 
         return null;
     }
@@ -356,8 +356,7 @@ public class InorganicoService {
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> encontrado = inorganicoRepository.findById(id);
-        if(encontrado.isPresent()) // Por si 'BUSCABLES' discrepa con la DB
-        {
+        if(encontrado.isPresent()) { // Por si 'BUSCABLES' discrepa con la DB
             resultado = new InorganicoResultado(encontrado.get(), ENCONTRADO);
             registrarBusqueda(id);
         }
