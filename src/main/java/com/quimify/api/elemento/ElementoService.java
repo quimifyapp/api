@@ -51,21 +51,34 @@ public class ElementoService {
         return elementoRepository.findBySimbolo(simbolo).get().getMasa();
     }
 
+    // Ej.: "Fe2" -> ("Fe2", "2"), "Fe" -> ("Fe2", "")
+    private String[] simboloNumero(String parte) {
+        String[] resultado = {"", ""};
+
+        for(int i = 0; i < parte.length(); i++)
+            resultado[Character.isLetter(parte.charAt(i)) ? 0 : 1] += parte.charAt(i);
+
+        return resultado;
+    }
+
     private float masaMolecular(String formula) throws NoSuchElementException {
         float resultado = 0;
 
-        String regex = "(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})";
-        String[] partes = formula.split(regex); // "Fe2O3" -> ("Fe2", "O3")
+        String[] partes = formula.split("(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})"); // "Fe2O3" -> ("Fe2", "O3")
 
         for(String parte : partes) {
-            String[] simbolo_numero = parte.split("(?<=\\D)\\d", 2); // "Fe2" -> ("Fe", "2")
+            StringBuilder simbolo = new StringBuilder();
+            StringBuilder numero = new StringBuilder();
 
-            String simbolo = simbolo_numero[0];
-            int numero = (simbolo_numero.length == 2) // Tiene número como "Fe2", no como "Fe"
-                    ? Integer.parseInt(simbolo_numero[1])
-                    : 1;
+            for(int i = 0; i < parte.length(); i++)
+                if(Character.isLetter(parte.charAt(i)))
+                    simbolo.append(parte.charAt(i));
+                else if(Character.isDigit(parte.charAt(i)))
+                    numero.append(parte.charAt(i));
 
-            resultado += masaElemento(simbolo) * numero;
+            resultado += (numero.length() != 0)
+                    ? masaElemento(simbolo.toString()) * Integer.parseInt(numero.toString())
+                    : masaElemento(simbolo.toString());
         }
 
         /*
