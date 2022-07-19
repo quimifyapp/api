@@ -44,14 +44,43 @@ public class ElementoService {
 
     // INTERNOS ----------------------------------------------------------------------
 
+    /* Ahora mismo solo funciona para elementos o compuestos que están formados por
+     * un anión y un catión. Ejemplo: Na ó NaCl.
+     */
     private Float masaElemento(String simbolo) throws NoSuchElementException {
         return elementoRepository.findBySimbolo(simbolo).get().getMasa();
     }
 
-    private Float masaMolecular(String formula) throws NoSuchElementException {
-        Float resultado;
+    private String buscarElemento(String parte) {
+        String[] elemento = parte.split("(?<=\\D)\\d");
+        return elemento[0];
+    }
 
-        resultado = masaElemento(formula);
+    private Integer buscarAtomos(String parte) {
+        String numAtomos = null;
+        for(char c : parte.toCharArray()) {
+            if(Character.isDigit(c))
+                numAtomos = String.valueOf(c);
+        }
+
+        return Integer.valueOf(numAtomos);
+    }
+    private Float masaMolecular(String formula) throws NoSuchElementException {
+        Float resultado = new Float(0);
+
+        String[] partes = formula.split("(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})");            //La regex para buscar mayusculas en Unicode es "\\p{Lu}", no "[A-Z]+"
+
+        for(String parte : partes) {
+
+            if(parte.matches(".*\\d.*")) {
+                String elemento = buscarElemento(parte);
+                int numAtomos = buscarAtomos(parte);
+                resultado += numAtomos * masaElemento(elemento);
+            }else{
+                resultado += masaElemento(parte);
+            }
+
+        }
 
         /*
 class calc_masmol {
