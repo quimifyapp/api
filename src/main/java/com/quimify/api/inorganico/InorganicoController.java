@@ -55,7 +55,7 @@ public class InorganicoController {
     }
 
     @GetMapping("/autocompletar")
-    public String autoCompletarInorganico(@RequestParam("input") String input) {
+    public Optional<String> autoCompletarInorganico(@RequestParam("input") String input) {
         return inorganicoService.autoCompletar(input);
     }
 

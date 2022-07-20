@@ -133,8 +133,8 @@ public class InorganicoService {
 
     // CLIENTE -----------------------------------------------------------------------
 
-    public String autoCompletar(String input) {
-        String resultado = "";
+    public Optional<String> autoCompletar(String input) {
+        Optional<String> resultado = Optional.empty();
 
         input = new Normalizar(input).get(); // Para poder hacer la búsqueda
         for(InorganicoBuscable buscable : BUSCABLES) { // Ordenados por nº de búsquedas
@@ -145,14 +145,14 @@ public class InorganicoService {
 
                 if(encontrado.isPresent()) {
                     if(complecion.equals(new Normalizar(encontrado.get().getFormula()).get()))
-                        resultado = encontrado.get().getFormula(); // La fórmula puede autocompletar
+                        resultado = Optional.of(encontrado.get().getFormula()); // Fórmula puede autocompletar
                     else if(complecion.equals(new Normalizar(encontrado.get().getAlternativo()).get()))
-                        resultado = encontrado.get().getAlternativo(); // El alternativo puede autocompletar
-                    else resultado = encontrado.get().getNombre(); // El nombre o una etiqueta pueden autocompletar
+                        resultado = Optional.of(encontrado.get().getAlternativo()); // Alternativo puede autocompletar
+                    else resultado = Optional.of(encontrado.get().getNombre()); // El nombre (o una etiqueta)
 
                     break;
                 }
-                else {
+                else { // 'BUSCABLES' discrepa con la DB
                     // Error...
                 }
             }
@@ -214,7 +214,6 @@ public class InorganicoService {
                         else resultado = buscarDB(id.get()); // Realmente sí estaba en la DB
                     }
                     else resultado = NO_ENCONTRADO;
-
                 }
                 // Flowchart #6
                 else resultado = buscarDB(id.get()); // Ya estaba en la DB
@@ -361,11 +360,11 @@ public class InorganicoService {
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> encontrado = inorganicoRepository.findById(id);
-        if(encontrado.isPresent()) { // Por si 'BUSCABLES' discrepa con la DB
+        if(encontrado.isPresent()) {
             resultado = new InorganicoResultado(encontrado.get(), ENCONTRADO);
             registrarBusqueda(id);
         }
-        else {
+        else { // 'BUSCABLES' discrepa con la DB
             // Error...
             resultado = NO_ENCONTRADO;
         }
