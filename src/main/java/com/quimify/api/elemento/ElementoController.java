@@ -36,8 +36,4 @@ public class ElementoController {
         return elementoService.eliminar(id);
     }
 
-    @GetMapping("/masamolecular") // TEST
-    public Float masaMolecular(@RequestParam("formula") String formula) {
-        return elementoService.tryMasaMolecular(formula);
-    }
 }

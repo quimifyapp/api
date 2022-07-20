@@ -35,7 +35,7 @@ public class InorganicoService {
 
     // ADMIN --------------------------------------------------------------------------
 
-    // TODO: quitar los 'usuario_premium'
+    // TODO: quitar los 'usuario_premium'?
 
     public Optional<InorganicoModel> seleccionar(Integer id) {
         return inorganicoRepository.findById(id);
@@ -245,8 +245,8 @@ public class InorganicoService {
     private BusquedaWeb buscarGoogle(String input) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        HttpURLConnection conexion = (HttpURLConnection) new URL(
-                configuracionService.getGoogleURL() + formatearHTTP(input)).openConnection();
+        String url = configuracionService.getGoogleURL() + formatearHTTP(input);
+        HttpURLConnection conexion = (HttpURLConnection) new URL(url).openConnection();
         conexion.setRequestMethod("GET");
         conexion.setRequestProperty("Accept", "application/json");
 
@@ -283,8 +283,8 @@ public class InorganicoService {
     private BusquedaWeb buscarBing(String input, String key) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        HttpURLConnection conexion = (HttpURLConnection) new URL(
-                configuracionService.getBingURL() + formatearHTTP(input)).openConnection();
+        String url = configuracionService.getBingURL() + formatearHTTP(input);
+        HttpURLConnection conexion = (HttpURLConnection) new URL(url).openConnection();
         conexion.setRequestProperty("Ocp-Apim-Subscription-Key", key);
 
         JSONObject respuesta = new JSONObject(descargarTexto(conexion));
