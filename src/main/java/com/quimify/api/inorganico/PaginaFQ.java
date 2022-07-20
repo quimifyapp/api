@@ -3,6 +3,7 @@ package com.quimify.api.inorganico;
 import com.quimify.api.Normalizar;
 
 import java.text.NumberFormat;
+import java.util.Optional;
 
 // Esta clase contiene el código para analizar una página de FQ.com.
 
@@ -14,8 +15,8 @@ public class PaginaFQ {
     // --------------------------------------------------------------------------------
 
     // Flowchart #5
-    public InorganicoModel escanearInorganico() {
-        InorganicoModel resultado = new InorganicoModel();
+    public Optional<InorganicoModel> escanearInorganico() {
+        Optional<InorganicoModel> resultado = Optional.of(new InorganicoModel());
 
         int indice = indiceDespuesDeEn("<h1>", pagina);
         if(indice != -1) {
@@ -113,14 +114,14 @@ public class PaginaFQ {
 
             if(indiceDespuesDeEn("br/>", nombre) != -1) { // Error con algunos orgánicos
                 nombre = nombre.substring(4);
-                resultado.setPremium(true);
+                resultado.get().setPremium(true);
             }
             if (alternativo != null) {
                 if(indiceDespuesDeEn("oxo", alternativo) != -1) // Nomenclatura obsoleta
                     alternativo = null;
                 else if(indiceDespuesDeEn("br/>", alternativo) != -1) { // Error con algunos orgánicos
                     alternativo = alternativo.substring(4);
-                    resultado.setPremium(true);
+                    resultado.get().setPremium(true);
                 }
 
                 if(alternativo != null && nombre.contentEquals(alternativo)) // Duplicado
@@ -129,30 +130,30 @@ public class PaginaFQ {
 
             // Características numéricas:
 
-            resultado.setMasa(tryMasaFQ());
-            resultado.setFusion(tryTemperaturaFQ("fusión"));
-            resultado.setEbullicion(tryTemperaturaFQ("ebullición"));
-            resultado.setDensidad(tryDensidadFQ());
+            resultado.get().setMasa(tryMasaFQ());
+            resultado.get().setFusion(tryTemperaturaFQ("fusión"));
+            resultado.get().setEbullicion(tryTemperaturaFQ("ebullición"));
+            resultado.get().setDensidad(tryDensidadFQ());
 
             // Etiquetas:
 
             String etiqueta = nombre.replaceAll("ácido ", "");
             if(!etiqueta.contentEquals(nombre))
-                resultado.nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+                resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
 
             if(alternativo != null) {
                 etiqueta = alternativo.replaceAll("ácido ", "");
                 if(!etiqueta.contentEquals(alternativo))
-                    resultado.nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+                    resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
             }
 
             // Fin:
 
-            resultado.setFormula(formula);
-            resultado.setNombre(nombre);
-            resultado.setAlternativo(alternativo);
+            resultado.get().setFormula(formula);
+            resultado.get().setNombre(nombre);
+            resultado.get().setAlternativo(alternativo);
         }
-        else resultado = null;
+        else resultado = Optional.empty();
 
         return resultado;
     }

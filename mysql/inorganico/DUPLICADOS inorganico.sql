@@ -1,4 +1,14 @@
-SELECT nombre, formula, alternativo, COUNT(formula), COUNT(nombre), COUNT(alternativo)
+SELECT formula, COUNT(formula)
+FROM inorganico
+GROUP BY formula
+HAVING COUNT(formula) > 1;
+
+SELECT nombre, COUNT(nombre)
 FROM inorganico
 GROUP BY nombre
-HAVING COUNT(nombre) > 1 or COUNT(formula) > 1 or COUNT(alternativo) > 1
+HAVING COUNT(nombre) > 1;
+
+SELECT alternativo, COUNT(alternativo)
+FROM inorganico
+GROUP BY alternativo
+HAVING COUNT(alternativo) > 1;

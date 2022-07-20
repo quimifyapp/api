@@ -6,4 +6,4 @@ FROM inorganico
 # WHERE formula = "HCl"
 # WHERE nombre = "metanol"
 # WHERE nombre LIKE "m%"
-# ORDER BY busquedas DESC
+ORDER BY id DESC

@@ -99,9 +99,7 @@ public class InorganicoService {
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
 
             PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
-            InorganicoModel inorganico = pagina.escanearInorganico();
-
-            resultado = Optional.of(inorganico);
+            resultado = pagina.escanearInorganico();
         } catch (Exception e) {
             resultado = Optional.empty();
         }
@@ -173,68 +171,86 @@ public class InorganicoService {
     public InorganicoResultado buscar(String input, Boolean usuario_premium) { // En construcción
         InorganicoResultado resultado;
 
-        Integer id = buscarMemoriaPrincipal(input); // Flowchart #0
+        Optional<Integer> id = buscarMemoriaPrincipal(input); // Flowchart #0
 
         // Flowchart #1
-        if(id == null) { // No se encuentra en la DB
-            BusquedaWeb busqueda_web;
+        if(id.isEmpty()) { // No se encuentra en la DB
+            Optional<BusquedaWeb> busqueda_web;
 
             // Flowchart #2
             if(configuracionService.getGoogleON() /*&& limite */)
                 busqueda_web = tryBuscarGoogle(input);
-            else busqueda_web = null;
+            else busqueda_web = Optional.empty();
 
             // Flowchart #3
-            if(busqueda_web == null && configuracionService.getBingGratisON())
+            if(busqueda_web.isEmpty() && configuracionService.getBingGratisON())
                 busqueda_web = tryBuscarBing(input, configuracionService.getBingGratisKey());
 
             // Flowchart #4
-            if(busqueda_web == null && configuracionService.getBingPagoON() /*&& limite */)
+            if(busqueda_web.isEmpty() && configuracionService.getBingPagoON() /*&& limite */)
                 busqueda_web = tryBuscarBing(input, configuracionService.getBingPagoKey());
 
             // Flowchart #0 ó #5
-            if(busqueda_web != null && busqueda_web.encontrado) { // Se ha podido encontrar con Google o Bing
-                String primera_palabra = busqueda_web.titulo.trim().split(" ", 2)[0];
+            if(busqueda_web.isPresent() && busqueda_web.get().encontrado) { // Se ha podido encontrar con Google o Bing
+                String[] palabras = busqueda_web.get().titulo.trim().split(" ");
+
+                String primera_palabra = palabras[0];
+                if(primera_palabra.equals("ácido"))
+                    primera_palabra += palabras[1];
+
                 id = buscarMemoriaPrincipal(primera_palabra); // Flowchart #0
 
                 // Flowchart #5
-                if(id == null) // Parece no estar en la DB
-                    resultado = escanearFQ(busqueda_web.direccion);
+                if(id.isEmpty()) { // Parece no estar en la DB
+                    Optional<InorganicoModel> escaneado = escanearFQ(busqueda_web.get().direccion);
+
+                    if(escaneado.isPresent()) { // Escaneado correctamente
+                        id = buscarMemoriaPrincipal(escaneado.get().getNombre());
+
+                        if(id.isEmpty()) { // En efecto, no estaba en la DB
+                            resultado = new InorganicoResultado(escaneado.get(), ENCONTRADO);
+                            guardarNuevo(escaneado.get());
+                        }
+                        else resultado = buscarDB(id.get()); // Realmente sí estaba en la DB
+                    }
+                    else resultado = NO_ENCONTRADO;
+
+                }
                 // Flowchart #6
-                else resultado = buscarDB(id); // Ya estaba en la DB
+                else resultado = buscarDB(id.get()); // Ya estaba en la DB
             }
             // Flowchart #7
             else { // No se ha podido encontrar ni con Google ni con Bing
-                resultado = NO_ENCONTRADO; // Test
+                resultado = NO_ENCONTRADO; // TEST
                 // ...
             }
         }
         // Flowchart #6
-        else resultado = buscarDB(id); // Está en la DB
+        else resultado = buscarDB(id.get()); // Está en la DB
 
         return resultado;
     }
 
     // Flowchart #0
-    private Integer buscarMemoriaPrincipal(String input) {
+    private Optional<Integer> buscarMemoriaPrincipal(String input) {
         input = new Normalizar(input).get();
 
         for(InorganicoBuscable buscable : BUSCABLES) // Ordenados por nº de búsquedas
             if(buscable.coincide(input))
-                return buscable.getId();
+                return  Optional.of(buscable.getId());
 
-        return null;
+        return Optional.empty();
     }
 
     // Flowchart #2
-    private BusquedaWeb tryBuscarGoogle(String input) {
-        BusquedaWeb busqueda_web;
+    private Optional<BusquedaWeb> tryBuscarGoogle(String input) {
+        Optional<BusquedaWeb> busqueda_web;
 
         try {
-            busqueda_web = buscarGoogle(input);
+            busqueda_web = Optional.of(buscarGoogle(input));
         }
         catch (Exception e) {
-            busqueda_web = null;
+            busqueda_web = Optional.empty();
             // ...
         }
 
@@ -265,14 +281,14 @@ public class InorganicoService {
     }
 
     // Flowchart #3 ó #4
-    private BusquedaWeb tryBuscarBing(String input, String key) {
-        BusquedaWeb busqueda_web;
+    private Optional<BusquedaWeb> tryBuscarBing(String input, String key) {
+        Optional<BusquedaWeb> busqueda_web;
 
         try {
-            busqueda_web = buscarBing(input, key);
+            busqueda_web = Optional.of(buscarBing(input, key));
         }
         catch (Exception e) {
-            busqueda_web = null;
+            busqueda_web = Optional.empty();
             // ...
         }
 
@@ -307,29 +323,18 @@ public class InorganicoService {
     }
 
     // Flowchart #5
-    private InorganicoResultado escanearFQ(String direccion) {
-        InorganicoResultado resultado;
+    private Optional<InorganicoModel> escanearFQ(String direccion) {
+        Optional<InorganicoModel> resultado;
 
         try {
             HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
             conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
 
             PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
-            InorganicoModel escaneado = pagina_fq.escanearInorganico();
-
-            if(escaneado != null) {
-                if(pagina_fq.getEscaneadoCorrecto())
-                    guardarNuevo(escaneado);
-
-                resultado = new InorganicoResultado(escaneado, InorganicoResultado.ENCONTRADO);
-            }
-            else {
-                resultado = NO_ENCONTRADO;
-                // ...
-            }
+            resultado = pagina_fq.escanearInorganico();
         }
         catch (Exception e) {
-            resultado = NO_ENCONTRADO;
+            resultado = Optional.empty();
             // ...
         }
 
@@ -361,8 +366,8 @@ public class InorganicoService {
             registrarBusqueda(id);
         }
         else {
+            // Error...
             resultado = NO_ENCONTRADO;
-            // ...
         }
 
         return resultado;
