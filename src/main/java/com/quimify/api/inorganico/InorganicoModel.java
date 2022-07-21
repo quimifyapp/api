@@ -1,7 +1,5 @@
 package com.quimify.api.inorganico;
 
-import org.hibernate.collection.internal.PersistentSet;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;

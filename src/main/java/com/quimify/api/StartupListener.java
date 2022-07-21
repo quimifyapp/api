@@ -19,6 +19,6 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        inorganicoService.cargarBuscables();
+        inorganicoService.cargarInorganicosBuscables();
     }
 }

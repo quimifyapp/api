@@ -19,6 +19,10 @@ public class ConfiguracionService {
         return configuracionRepository.findByVersion(VERSION).getGoogle_on();
     }
 
+    public Integer getGoogleLimite() {
+        return configuracionRepository.findByVersion(VERSION).getGoogle_limite();
+    }
+
     public String getGoogleURL() {
         return configuracionRepository.findByVersion(VERSION).getGoogle_url();
     }
@@ -29,6 +33,10 @@ public class ConfiguracionService {
 
     public Boolean getBingGratisON() {
         return configuracionRepository.findByVersion(VERSION).getBing_gratis_on();
+    }
+
+    public Integer getBingPagoLimite() {
+        return configuracionRepository.findByVersion(VERSION).getBing_pago_limite();
     }
 
     public String getBingGratisKey() {

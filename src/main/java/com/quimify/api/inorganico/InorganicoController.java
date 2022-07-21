@@ -1,5 +1,6 @@
 package com.quimify.api.inorganico;
 
+import com.quimify.api.ContextoCliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,9 +50,11 @@ public class InorganicoController {
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
-    public InorganicoResultado buscarInorganico(@RequestParam("input") String input, @RequestParam("usuario_premium")
-            Boolean usuario_premium) {
-        return inorganicoService.buscar(input, usuario_premium);
+    public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
+                                                @RequestParam("pantalla") Short pantalla,
+                                                @RequestParam("premium") Boolean premium) {
+        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
+        return inorganicoService.buscarInorganico(input, contexto);
     }
 
     @GetMapping("/autocompletar")

@@ -2,13 +2,15 @@ package com.quimify.api.inorganico;
 
 // Esta clase representa las entregas al cliente de un compuesto inorgánico.
 
+import java.util.Optional;
+
 public class InorganicoResultado {
 
-    public final static Integer NO_ENCONTRADO = 0; // Eso, o se ha producido un error
-    public final static Integer ENCONTRADO = 1; // OK
-    public final static Integer SUGERENCIA = 2; // Quizás quisiste decir...
+    public final static Short ENCONTRADO = 0; // OK
+    public final static Short SUGERENCIA = 1; // Quizás quisiste decir...
+    public final static Short NO_ENCONTRADO = 2; // Eso, o se ha producido un error
 
-    private final Integer RESULTADO;
+    private final Short resultado;
 
     // Si 'resultado' = ENCONTRADO | SUGERENCIA:
 
@@ -23,32 +25,42 @@ public class InorganicoResultado {
 
     // Si 'resultado' = SUGERENCIA:
 
-    private String sugerencia;  // 'formula' | 'nombre' | 'alternativo'
+    private String sugerencia;  // Será = 'formula', 'nombre' ó 'alternativo'
 
     // --------------------------------------------------------------------------------
 
     // Constructor:
 
-    public InorganicoResultado(InorganicoModel inorganico, Integer resultado) {
-        this.RESULTADO = resultado;
-
+    private void copiar(InorganicoModel inorganico) {
         this.formula = inorganico.getFormula();
         this.nombre = inorganico.getNombre();
         this.alternativo = inorganico.getAlternativo();
+        this.premium = inorganico.getPremium();
         this.masa = inorganico.getMasa();
         this.densidad = inorganico.getDensidad();
         this.fusion = inorganico.getFusion();
         this.ebullicion = inorganico.getEbullicion();
     }
 
-    public InorganicoResultado(Integer resultado) {
-        this.RESULTADO = resultado;
+    public InorganicoResultado(InorganicoModel inorganico) {
+        this.resultado = ENCONTRADO;
+        copiar(inorganico);
+    }
+
+    public InorganicoResultado(InorganicoModel inorganico, String sugerencia) {
+        this.resultado = SUGERENCIA;
+        this.sugerencia = sugerencia;
+        copiar(inorganico);
+    }
+
+    public InorganicoResultado() {
+        this.resultado = NO_ENCONTRADO;
     }
 
     // Getters:
 
-    public Integer getRESULTADO() {
-        return RESULTADO;
+    public Short getResultado() {
+        return resultado;
     }
 
     public String getFormula() {
