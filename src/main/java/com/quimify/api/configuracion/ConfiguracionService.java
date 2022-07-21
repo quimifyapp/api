@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class ConfiguracionService {
 
     @Autowired
-    private ConfiguracionRepository configuracionRepository; // Conexión con la DB
+    ConfiguracionRepository configuracionRepository; // Conexión con la DB
 
     public static final Integer VERSION = 1;
 

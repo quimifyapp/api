@@ -17,7 +17,7 @@ import java.util.Optional;
 public class MetricasService {
 
     @Autowired
-    private MetricasRepository metricaRepository; // Conexión con la DB
+    MetricasRepository metricaRepository; // Conexión con la DB
 
     // PRIVADOS ----------------------------------------------------------------------
 
@@ -127,6 +127,13 @@ public class MetricasService {
         else if(pantalla.equals(ContextoCliente.GALERIA)) {
             metricas.nuevaSugerenciaOkPorGaleria();
         }
+    }
+
+    @Transactional
+    public void contarAutocomplecionOk() {
+        MetricasModel metricas = metricasDeHoy();
+
+        metricas.nuevaAutocomplecionOkPorTeclado();
     }
 
     @Transactional

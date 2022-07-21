@@ -25,7 +25,7 @@ import java.util.Random;
 public class InorganicoService {
 
     @Autowired
-    private InorganicoRepository inorganicoRepository; // Conexión con la DB
+    InorganicoRepository inorganicoRepository; // Conexión con la DB
 
     @Autowired
     ConfiguracionService configuracionService; // Procesos de la configuración
@@ -34,83 +34,7 @@ public class InorganicoService {
     MetricasService metricaService; // Procesos de las metricas diarias
 
     private static final List<InorganicoBuscable> BUSCABLES = new ArrayList<>(); // Para ser buscados rápidamente
-
     public static final InorganicoResultado NO_ENCONTRADO = new InorganicoResultado(); // Constante auxiliar
-
-    // ADMIN --------------------------------------------------------------------------
-
-    // TODO: hacer los escaneados orgánicos y "hidrogeno..." premium
-    // TODO: buscar para autocompleciones
-
-    public Optional<InorganicoModel> seleccionar(Integer id) {
-        return inorganicoRepository.findById(id);
-    }
-
-    private void reemplazarExistente(InorganicoModel existente) {
-        inorganicoRepository.save(existente); // En la DB
-
-        for(int i = 0; i < BUSCABLES.size(); i++) // En memoria principal para ser buscado
-            if(BUSCABLES.get(i).getId().equals(existente.getId())) {
-                BUSCABLES.set(i, new InorganicoBuscable(existente));
-                break;
-            }
-    }
-
-    public Optional<InorganicoModel> reemplazar(InorganicoModel nuevo) {
-        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(nuevo.getId());
-
-        if(reemplazado.isPresent()) // Si existe
-            reemplazarExistente(nuevo);
-
-        return reemplazado;
-    }
-
-    public Optional<InorganicoModel> hacerPremium(Integer id) {
-        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(id);
-
-        if(reemplazado.isPresent()) { // Si existe
-            reemplazado.get().setPremium(true);
-            reemplazarExistente(reemplazado.get());
-        }
-
-        return reemplazado;
-    }
-
-    public InorganicoModel insertar(InorganicoModel nuevo) {
-        InorganicoModel insertado;
-
-        insertado = inorganicoRepository.save(nuevo); // En la DB
-        BUSCABLES.add(new InorganicoBuscable(insertado)); // En memoria principal
-
-        return insertado;
-    }
-
-    public Optional<InorganicoModel> eliminar(Integer id) {
-        Optional<InorganicoModel> eliminado = inorganicoRepository.findById(id);
-
-        if(eliminado.isPresent()) {
-            inorganicoRepository.deleteById(id); // De la DB
-            BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
-        }
-
-        return eliminado;
-    }
-
-    public Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
-        Optional<InorganicoModel> resultado;
-
-        try {
-            HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
-            conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
-
-            PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
-            resultado = pagina.escanearInorganico();
-        } catch (Exception e) {
-            resultado = Optional.empty();
-        }
-
-        return resultado;
-    }
 
     // RUTINAS -----------------------------------------------------------------------
 
@@ -119,86 +43,9 @@ public class InorganicoService {
             BUSCABLES.add(new InorganicoBuscable(inorganico));
     }
 
-    // INTERNOS ----------------------------------------------------------------------
-
-    private void guardarNuevo(InorganicoModel nuevo) {
-        BUSCABLES.add(new InorganicoBuscable( // En memoria principal para ser buscado
-                inorganicoRepository.save(nuevo))); // En la DB
-    }
-
-    // Incrementa el contador de búsquedas de ese inorgánico porque ha sido buscado
-    private void registrarBusqueda(Integer id) {
-        Optional<InorganicoModel> buscado = inorganicoRepository.findById(id);
-
-        if(buscado.isPresent()) {
-            buscado.get().registrarBusqueda();
-            inorganicoRepository.save(buscado.get());
-        }
-    }
-
     // CLIENTE -----------------------------------------------------------------------
 
-    public Optional<InorganicoResultado> inorganicoDeBienvenida() {
-        Optional<InorganicoResultado> resultado;
-
-        InorganicoBuscable buscable = BUSCABLES.get(new Random().nextInt(BUSCABLES.size()));
-        Optional<InorganicoModel> inorganico = inorganicoRepository.findById(buscable.getId());
-
-        resultado = inorganico.map(InorganicoResultado::new);
-
-        return resultado;
-    }
-
-    public Optional<String> autoCompletar(String input) {
-        Optional<String> resultado = Optional.empty();
-
-        input = new Normalizar(input).get(); // Para poder hacer la búsqueda
-        for(InorganicoBuscable buscable : BUSCABLES) { // Ordenados por nº de búsquedas
-            String complecion = buscable.autoCompletar(input); // Devuelve un keyword solo si puede autocompletar
-
-            if(complecion != null) { // Encontrado inorgánico que completa
-                Optional<InorganicoModel> encontrado = inorganicoRepository.findById(buscable.getId());
-
-                if(encontrado.isPresent()) {
-                    if(complecion.equals(new Normalizar(encontrado.get().getFormula()).get()))
-                        resultado = Optional.of(encontrado.get().getFormula()); // Fórmula puede autocompletar
-                    else if(complecion.equals(new Normalizar(encontrado.get().getAlternativo()).get()))
-                        resultado = Optional.of(encontrado.get().getAlternativo()); // Alternativo puede autocompletar
-                    else resultado = Optional.of(encontrado.get().getNombre()); // El nombre (o una etiqueta)
-
-                    break;
-                }
-                else { // 'BUSCABLES' discrepa con la DB
-                    // Error...
-                }
-            }
-        }
-
-        return resultado;
-    }
-
-    private static class BusquedaWeb {
-        // Resultado de una búsqueda web (de cualquier buscador)
-        boolean encontrado; // Se ha encontrado algo
-        String titulo; // Como "H2O - óxido de dihidrógeno" o "metano"
-        String direccion; // Como "www.fq.com/H2O"
-    }
-
-    private Boolean disponibleGoogle() {
-        return configuracionService.getGoogleON()
-                && metricaService.getGoogle() < configuracionService.getGoogleLimite();
-    }
-
-    private Boolean disponibleBingGratis() {
-        return configuracionService.getBingGratisON();
-    }
-
-    private Boolean disponibleBingPago() {
-        return configuracionService.getBingPagoON()
-                && metricaService.getBingPago() < configuracionService.getBingPagoLimite();
-    }
-
-    public InorganicoResultado buscarInorganico(String input, ContextoCliente contexto) {
+    public InorganicoResultado buscar(String input, ContextoCliente contexto) {
         InorganicoResultado resultado;
 
         Optional<Integer> id = buscarMemoriaPrincipal(input); // Flowchart #0
@@ -210,14 +57,15 @@ public class InorganicoService {
             // Flowchart #2
             if(disponibleGoogle())
                 busqueda_web = tryBuscarGoogle(input, contexto);
-            // Flowchart #3
+                // Flowchart #3
             else if(disponibleBingGratis())
-                    busqueda_web = tryBuscarBingGratis(input, contexto);
-            // Flowchart #4
-            else if(disponibleBingPago())
-                busqueda_web = tryBuscarBingPago(input, contexto);
-            // Flowchart #7
+                busqueda_web = tryBuscarBingGratis(input, contexto);
+                // Flowchart #7
             else busqueda_web = Optional.empty();
+
+            // Flowchart #4
+            if(busqueda_web.isEmpty() && disponibleBingPago())
+                busqueda_web = tryBuscarBingPago(input, contexto);
 
             // Flowchart #0 ó #5
             if(busqueda_web.isPresent() && busqueda_web.get().encontrado) { // Se ha podido encontrar con Google o Bing
@@ -239,7 +87,7 @@ public class InorganicoService {
 
                         if(id.isEmpty()) { // En efecto, no estaba en la DB
                             resultado = new InorganicoResultado(escaneado.get());
-                            guardarNuevo(escaneado.get());
+                            guardarNuevoEscaneado(escaneado.get());
                         }
                         else resultado = buscarDB(id.get()); // Realmente sí estaba en la DB
                     }
@@ -262,6 +110,65 @@ public class InorganicoService {
         return resultado;
     }
 
+    public String autoCompletar(String input) {
+        String resultado = "";
+
+        input = new Normalizar(input).get(); // Para poder hacer la búsqueda
+        for(InorganicoBuscable buscable : BUSCABLES) { // Ordenados por nº de búsquedas
+            String complecion = buscable.autoCompletar(input); // Devuelve un keyword solo si puede autocompletar
+
+            if(complecion != null) { // Encontrado inorgánico que completa
+                Optional<InorganicoModel> encontrado = inorganicoRepository.findById(buscable.getId());
+
+                if(encontrado.isPresent()) {
+                    if(complecion.equals(new Normalizar(encontrado.get().getFormula()).get()))
+                        resultado = encontrado.get().getFormula(); // Fórmula puede autocompletar
+                    else if(complecion.equals(new Normalizar(encontrado.get().getAlternativo()).get()))
+                        resultado = encontrado.get().getAlternativo(); // Alternativo puede autocompletar
+                    else resultado = encontrado.get().getNombre(); // El nombre (o una etiqueta)
+
+                    break;
+                }
+                else { // 'BUSCABLES' discrepa con la DB
+                    // Error...
+                }
+            }
+        }
+
+        return resultado;
+    }
+
+    public InorganicoResultado buscarAutocomplecion(String autocomplecion, ContextoCliente contexto) {
+        InorganicoResultado resultado;
+
+        Optional<Integer> id = buscarMemoriaPrincipal(autocomplecion);
+        if(id.isPresent())
+            resultado = buscarDB(id.get());
+        else {
+            // Error...
+            resultado = NO_ENCONTRADO;
+        }
+
+        metricaService.contarBusqueda(resultado, contexto);
+        metricaService.contarAutocomplecionOk();
+
+        return resultado;
+    }
+
+    public Optional<InorganicoResultado> inorganicoDeBienvenida() {
+        Optional<InorganicoResultado> resultado;
+
+        InorganicoBuscable buscable = BUSCABLES.get(new Random().nextInt(BUSCABLES.size()));
+        Optional<InorganicoModel> inorganico = inorganicoRepository.findById(buscable.getId());
+
+        resultado = inorganico.map(InorganicoResultado::new);
+
+        return resultado;
+    }
+
+
+    // INTERNOS ----------------------------------------------------------------------
+
     // Flowchart #0
     private Optional<Integer> buscarMemoriaPrincipal(String input) {
         input = new Normalizar(input).get();
@@ -271,6 +178,27 @@ public class InorganicoService {
                 return Optional.of(buscable.getId());
 
         return Optional.empty();
+    }
+
+    private Boolean disponibleGoogle() {
+        return configuracionService.getGoogleON()
+                && metricaService.getGoogle() < configuracionService.getGoogleLimite();
+    }
+
+    private Boolean disponibleBingGratis() {
+        return configuracionService.getBingGratisON();
+    }
+
+    private Boolean disponibleBingPago() {
+        return configuracionService.getBingPagoON()
+                && metricaService.getBingPago() < configuracionService.getBingPagoLimite();
+    }
+
+    private static class BusquedaWeb {
+        // Resultado de una búsqueda web (de cualquier buscador)
+        boolean encontrado; // Se ha encontrado algo
+        String titulo; // Como "H2O - óxido de dihidrógeno" o "metano"
+        String direccion; // Como "www.fq.com/H2O"
     }
 
     // Flowchart #2
@@ -405,6 +333,21 @@ public class InorganicoService {
         return texto.toString();
     }
 
+    private void guardarNuevoEscaneado(InorganicoModel nuevo) {
+        BUSCABLES.add(new InorganicoBuscable( // En memoria principal para ser buscado
+                inorganicoRepository.save(nuevo))); // En la DB
+    }
+
+    // Incrementa el contador de búsquedas de un inorgánico porque ha sido buscado
+    private void nuevaBusquedaInorganico(Integer id) {
+        Optional<InorganicoModel> buscado = inorganicoRepository.findById(id);
+
+        if(buscado.isPresent()) {
+            buscado.get().registrarBusqueda();
+            inorganicoRepository.save(buscado.get());
+        }
+    }
+
     // Flowchart #6
     private InorganicoResultado buscarDB(Integer id) {
         InorganicoResultado resultado;
@@ -412,11 +355,83 @@ public class InorganicoService {
         Optional<InorganicoModel> encontrado = inorganicoRepository.findById(id);
         if(encontrado.isPresent()) {
             resultado = new InorganicoResultado(encontrado.get());
-            registrarBusqueda(id);
+            nuevaBusquedaInorganico(id);
         }
         else { // 'BUSCABLES' discrepa con la DB
             // Error...
             resultado = NO_ENCONTRADO;
+        }
+
+        return resultado;
+    }
+
+    // ADMIN --------------------------------------------------------------------------
+
+    public Optional<InorganicoModel> seleccionar(Integer id) {
+        return inorganicoRepository.findById(id);
+    }
+
+    private void reemplazarExistente(InorganicoModel existente) {
+        inorganicoRepository.save(existente); // En la DB
+
+        for(int i = 0; i < BUSCABLES.size(); i++) // En memoria principal para ser buscado
+            if(BUSCABLES.get(i).getId().equals(existente.getId())) {
+                BUSCABLES.set(i, new InorganicoBuscable(existente));
+                break;
+            }
+    }
+
+    public Optional<InorganicoModel> reemplazar(InorganicoModel nuevo) {
+        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(nuevo.getId());
+
+        if(reemplazado.isPresent()) // Si existe
+            reemplazarExistente(nuevo);
+
+        return reemplazado;
+    }
+
+    public Optional<InorganicoModel> hacerPremium(Integer id) {
+        Optional<InorganicoModel> reemplazado = inorganicoRepository.findById(id);
+
+        if(reemplazado.isPresent()) { // Si existe
+            reemplazado.get().setPremium(true);
+            reemplazarExistente(reemplazado.get());
+        }
+
+        return reemplazado;
+    }
+
+    public InorganicoModel insertar(InorganicoModel nuevo) {
+        InorganicoModel insertado;
+
+        insertado = inorganicoRepository.save(nuevo); // En la DB
+        BUSCABLES.add(new InorganicoBuscable(insertado)); // En memoria principal
+
+        return insertado;
+    }
+
+    public Optional<InorganicoModel> eliminar(Integer id) {
+        Optional<InorganicoModel> eliminado = inorganicoRepository.findById(id);
+
+        if(eliminado.isPresent()) {
+            inorganicoRepository.deleteById(id); // De la DB
+            BUSCABLES.removeIf(i -> id.equals(i.getId())); // De la memoria principal
+        }
+
+        return eliminado;
+    }
+
+    public Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
+        Optional<InorganicoModel> resultado;
+
+        try {
+            HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
+            conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
+
+            PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
+            resultado = pagina.escanearInorganico();
+        } catch (Exception e) {
+            resultado = Optional.empty();
         }
 
         return resultado;

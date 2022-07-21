@@ -16,7 +16,7 @@ public class InorganicoBuscable {
 
     // TODO: Levenshtein o similar
 
-    // 'input' debe estar previamente normalizado
+    // Pre.: 'input' debe estar previamente normalizado
     // Ej.: (this.keywords[i] = "acidosulfuroso") "acidosu" -> "acidosulfuroso"
     public String autoCompletar(String input) {
         for(String keyword : keywords)

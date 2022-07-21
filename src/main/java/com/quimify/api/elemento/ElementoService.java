@@ -12,7 +12,13 @@ import java.util.Optional;
 public class ElementoService {
 
     @Autowired
-    private ElementoRepository elementoRepository; // Conexión con la DB
+    ElementoRepository elementoRepository; // Conexión con la DB
+
+    // INTERNOS ----------------------------------------------------------------------
+
+    public Optional<ElementoModel> buscarSimbolo(String simbolo) {
+        return elementoRepository.findBySimbolo(simbolo);
+    }
 
     // ADMIN --------------------------------------------------------------------------
 
@@ -40,12 +46,6 @@ public class ElementoService {
             elementoRepository.deleteById(id); // De la DB
 
         return eliminado;
-    }
-
-    // INTERNOS ----------------------------------------------------------------------
-
-    public Optional<ElementoModel> buscarSimbolo(String simbolo) {
-        return elementoRepository.findBySimbolo(simbolo);
     }
 
 }
