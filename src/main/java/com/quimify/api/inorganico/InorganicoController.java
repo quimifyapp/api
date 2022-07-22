@@ -15,6 +15,29 @@ public class InorganicoController {
     @Autowired
     InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
 
+    // CLIENTE ------------------------------------------------------------------------
+
+    @GetMapping()
+    public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
+                                                @RequestParam("pantalla") Short pantalla,
+                                                @RequestParam("premium") Boolean premium) {
+        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
+        return inorganicoService.buscar(input, contexto);
+    }
+
+    @GetMapping("/autocompletar/{input}")
+    public String autoCompletarInorganico(@PathVariable("input") String input) {
+        return inorganicoService.autoCompletar(input);
+    }
+
+    @GetMapping("/autocompletar")
+    public InorganicoResultado buscarAutocomplecionInorganico(@RequestParam("autocomplecion") String autocomplecion,
+                                                              @RequestParam("pantalla") Short pantalla,
+                                                              @RequestParam("premium") Boolean premium) {
+        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
+        return inorganicoService.buscarAutocomplecion(autocomplecion, contexto);
+    }
+
     // ADMIN --------------------------------------------------------------------------
 
     @GetMapping("/{id}")
@@ -45,29 +68,6 @@ public class InorganicoController {
     @GetMapping("/probarfq") // TEST
     public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
         return inorganicoService.probarPaginaFQ(direccion);
-    }
-
-    // CLIENTE ------------------------------------------------------------------------
-
-    @GetMapping()
-    public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
-                                                @RequestParam("pantalla") Short pantalla,
-                                                @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
-        return inorganicoService.buscar(input, contexto);
-    }
-
-    @GetMapping("/autocompletar/{input}")
-    public String autoCompletarInorganico(@PathVariable("input") String input) {
-        return inorganicoService.autoCompletar(input);
-    }
-
-    @GetMapping("/autocompletar")
-    public InorganicoResultado buscarAutocomplecionInorganico(@RequestParam("autocomplecion") String autocomplecion,
-                                                              @RequestParam("pantalla") Short pantalla,
-                                                              @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
-        return inorganicoService.buscarAutocomplecion(autocomplecion, contexto);
     }
 
 }

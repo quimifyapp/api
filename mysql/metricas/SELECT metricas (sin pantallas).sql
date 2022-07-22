@@ -1,6 +1,7 @@
 SELECT dia AS "Día", 
 accesos AS "Accesos",
-teclado_encontrados + camara_encontrados + galeria_encontrados + teclado_no_encontrados + camara_no_encontrados + galeria_no_encontrados + teclado_sugerencias + camara_sugerencias + galeria_sugerencias AS "Peticiones",
+teclado_encontrados + camara_encontrados + galeria_encontrados + teclado_no_encontrados + camara_no_encontrados + 
+galeria_no_encontrados + teclado_sugerencias + camara_sugerencias + galeria_sugerencias AS "Peticiones",
 teclado_encontrados + camara_encontrados + galeria_encontrados AS "Encontrados",
 teclado_no_encontrados + camara_no_encontrados + galeria_no_encontrados AS "No encontrados",
 teclado_sugerencias + camara_sugerencias + galeria_sugerencias AS "Sugerencias",
