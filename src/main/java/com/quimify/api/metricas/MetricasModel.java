@@ -63,7 +63,7 @@ public class MetricasModel {
     private Integer teclado_bing_pago = 0; // Búsquedas por teclado que usaron la API de Bing de pago
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_autocompleciones_ok = 0; // Autocompleciones clickadas por el usuario
+    private Integer teclado_compleciones_ok = 0; // Compleciones clickadas por el usuario
 
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer camara_premiums = 0; // Búsquedas por cámara encontradas que son premium
@@ -166,8 +166,8 @@ public class MetricasModel {
         teclado_bing_pago += 1;
     }
 
-    public void nuevaAutocomplecionOkPorTeclado() {
-        teclado_autocompleciones_ok += 1;
+    public void nuevaComplecionOkPorTeclado() {
+        teclado_compleciones_ok += 1;
     }
 
     public void nuevoPremiumPorCamara(){
@@ -340,12 +340,12 @@ public class MetricasModel {
         this.teclado_bing_pago = teclado_bing_pago;
     }
 
-    public Integer getTeclado_autocomplecion_ok() {
-        return teclado_autocompleciones_ok;
+    public Integer getTeclado_complecion_ok() {
+        return teclado_compleciones_ok;
     }
 
-    public void setTeclado_autocomplecion_ok(Integer teclado_autocomplecion_ok) {
-        this.teclado_autocompleciones_ok = teclado_autocomplecion_ok;
+    public void setTeclado_complecion_ok(Integer teclado_complecion_ok) {
+        this.teclado_compleciones_ok = teclado_complecion_ok;
     }
 
     public Integer getCamara_premium() {

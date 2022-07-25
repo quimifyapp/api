@@ -138,10 +138,10 @@ public class InorganicoService {
         return resultado;
     }
 
-    public InorganicoResultado buscarAutocomplecion(String autocomplecion, ContextoCliente contexto) {
+    public InorganicoResultado buscarComplecion(String complecion, ContextoCliente contexto) {
         InorganicoResultado resultado;
 
-        Optional<Integer> id = buscarMemoriaPrincipal(autocomplecion);
+        Optional<Integer> id = buscarMemoriaPrincipal(complecion);
         if(id.isPresent())
             resultado = buscarDB(id.get());
         else {
@@ -150,7 +150,7 @@ public class InorganicoService {
         }
 
         metricaService.contarBusqueda(resultado, contexto);
-        metricaService.contarAutocomplecionOk();
+        metricaService.contarComplecionOk();
 
         return resultado;
     }
@@ -215,6 +215,11 @@ public class InorganicoService {
         }
 
         return busqueda_web;
+    }
+
+    // Flowchart #2 ó #3 ó #4
+    private String formatearHTTP(String input) {
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
     // Flowchart #2
@@ -292,11 +297,6 @@ public class InorganicoService {
         else busqueda_web.encontrado = false;
 
         return busqueda_web;
-    }
-
-    // Flowchart #2 ó #3 ó #4
-    private String formatearHTTP(String input) {
-        return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
     // Flowchart #5

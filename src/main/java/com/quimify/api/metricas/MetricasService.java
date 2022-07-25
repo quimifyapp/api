@@ -130,10 +130,10 @@ public class MetricasService {
     }
 
     @Transactional
-    public void contarAutocomplecionOk() {
+    public void contarComplecionOk() {
         MetricasModel metricas = metricasDeHoy();
 
-        metricas.nuevaAutocomplecionOkPorTeclado();
+        metricas.nuevaComplecionOkPorTeclado();
     }
 
     @Transactional

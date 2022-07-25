@@ -10,5 +10,5 @@ teclado_premiums + camara_premiums + galeria_premiums AS "Encontrados premium",
 teclado_google + camara_google + galeria_google AS "Google",
 teclado_bing_gratis + camara_bing_gratis + galeria_bing_gratis AS "Bing gratis",
 teclado_bing_pago + camara_bing_pago + galeria_bing_pago AS "Bing de pago",
-teclado_autocompleciones_ok AS "Autocompleciones OK"
-FROM metricas;
+teclado_compleciones_ok AS "Compleciones OK"
+FROM metricas ORDER BY dia DESC;

@@ -26,6 +26,11 @@ public class ContextoCliente {
         setPremium(false);
     }
 
+    public ContextoCliente(Boolean premium) {
+        setPantalla(TECLADO);
+        setPremium(premium);
+    }
+
     // Getters y setters:
 
     public Short getPantalla() {

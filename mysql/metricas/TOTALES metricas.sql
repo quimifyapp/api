@@ -10,7 +10,7 @@ SUM(teclado_premiums),
 SUM(teclado_google),
 SUM(teclado_bing_gratis),
 SUM(teclado_bing_pago),
-SUM(teclado_autocompleciones_ok)
+SUM(teclado_compleciones_ok)
 FROM metricas;
 
 SELECT SUM(accesos),

@@ -31,11 +31,10 @@ public class InorganicoController {
     }
 
     @GetMapping("/autocompletar")
-    public InorganicoResultado buscarAutocomplecionInorganico(@RequestParam("autocomplecion") String autocomplecion,
-                                                              @RequestParam("pantalla") Short pantalla,
-                                                              @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
-        return inorganicoService.buscarAutocomplecion(autocomplecion, contexto);
+    public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion,
+                                                          @RequestParam("premium") Boolean premium) {
+        ContextoCliente contexto = new ContextoCliente(premium);
+        return inorganicoService.buscarComplecion(complecion, contexto);
     }
 
     // ADMIN --------------------------------------------------------------------------
