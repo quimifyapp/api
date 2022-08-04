@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET bing_pago_limite = 100
+SET bing_pago_on = 1
 WHERE version = 1

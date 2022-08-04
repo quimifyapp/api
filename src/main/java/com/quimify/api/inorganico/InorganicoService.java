@@ -2,6 +2,7 @@ package com.quimify.api.inorganico;
 
 import com.quimify.api.ContextoCliente;
 import com.quimify.api.Normalizar;
+import com.quimify.api.conexion.Conexion;
 import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.metricas.MetricasService;
 import org.json.JSONObject;
@@ -217,21 +218,13 @@ public class InorganicoService {
         return busqueda_web;
     }
 
-    // Flowchart #2 ó #3 ó #4
-    private String formatearHTTP(String input) {
-        return URLEncoder.encode(input, StandardCharsets.UTF_8);
-    }
-
     // Flowchart #2
     private BusquedaWeb buscarGoogle(String input) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        String url = configuracionService.getGoogleURL() + formatearHTTP(input);
-        HttpURLConnection conexion = (HttpURLConnection) new URL(url).openConnection();
-        conexion.setRequestMethod("GET");
-        conexion.setRequestProperty("Accept", "application/json");
-
-        JSONObject respuesta = new JSONObject(descargarTexto(conexion));
+        Conexion conexion = new Conexion(configuracionService.getGoogleURL(), input);
+        conexion.setPropiedad("Accept", "application/json");
+        JSONObject respuesta = new JSONObject(conexion.getTexto());
 
         if(respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
             JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
@@ -281,18 +274,17 @@ public class InorganicoService {
     private BusquedaWeb buscarBing(String input, String key) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        String url = configuracionService.getBingURL() + formatearHTTP(input);
-        HttpURLConnection conexion = (HttpURLConnection) new URL(url).openConnection();
-        conexion.setRequestProperty("Ocp-Apim-Subscription-Key", key);
-
-        JSONObject respuesta = new JSONObject(descargarTexto(conexion));
+        Conexion conexion = new Conexion(configuracionService.getBingURL(),input);
+        conexion.setPropiedad("Ocp-Apim-Subscription-Key", key);
+        JSONObject respuesta = new JSONObject(conexion.getTexto());
 
         if(respuesta.has("webPages")) {
-            JSONObject resultado = respuesta.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
+            JSONObject resultado = respuesta.getJSONObject("webPages")
+                    .getJSONArray("value").getJSONObject(0);
 
             busqueda_web.encontrado = true;
             busqueda_web.titulo = resultado.getString("name");
-            busqueda_web.direccion = resultado.getString("url"); // "www.fq.com/..."
+            busqueda_web.direccion = resultado.getString("url"); // Será "www.fq.com/..."
         }
         else busqueda_web.encontrado = false;
 
@@ -304,33 +296,18 @@ public class InorganicoService {
         Optional<InorganicoModel> resultado;
 
         try {
-            HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
-            conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
+            Conexion conexion = new Conexion(direccion);
+            conexion.setPropiedad("User-Agent", configuracionService.getUserAgent());
 
-            PaginaFQ pagina_fq = new PaginaFQ(descargarTexto(conexion));
+            PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());
             resultado = pagina_fq.escanearInorganico();
         }
         catch (Exception e) {
             resultado = Optional.empty();
-            // ...
+            // Error...
         }
 
         return resultado;
-    }
-
-    // Flowchart #2 ó #3 ó #4 ó #5
-    private String descargarTexto(HttpURLConnection conexion) throws Exception {
-        BufferedReader descarga = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
-
-        String linea;
-        StringBuilder texto = new StringBuilder();
-        while((linea = descarga.readLine()) != null)
-            texto.append(linea);
-
-        descarga.close();
-        conexion.disconnect();
-
-        return texto.toString();
     }
 
     private void guardarNuevoEscaneado(InorganicoModel nuevo) {
@@ -425,11 +402,11 @@ public class InorganicoService {
         Optional<InorganicoModel> resultado;
 
         try {
-            HttpURLConnection conexion = (HttpURLConnection) new URL(direccion).openConnection();
-            conexion.setRequestProperty("User-Agent", configuracionService.getUserAgent());
+            Conexion conexion = new Conexion(direccion);
+            conexion.setPropiedad("User-Agent", configuracionService.getUserAgent());
 
-            PaginaFQ pagina = new PaginaFQ(descargarTexto(conexion));
-            resultado = pagina.escanearInorganico();
+            PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());
+            resultado = pagina_fq.escanearInorganico();
         } catch (Exception e) {
             resultado = Optional.empty();
         }
