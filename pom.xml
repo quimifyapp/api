@@ -8,14 +8,17 @@
 		<version>2.6.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.quimify</groupId>
-	<artifactId>api</artifactId>
+	<artifactId>servidor</artifactId>
 	<version>0</version>
-	<name>api</name>
-	<description>Quimify API</description>
+	<name>servidor</name>
+	<description>Servidor Quimify</description>
+
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
