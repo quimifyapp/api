@@ -20,7 +20,7 @@ public class MasaMolecularService {
     // INTERNOS ----------------------------------------------------------------------
 
     private Float masaElemento(String simbolo) throws NoSuchElementException {
-        return elementoService.buscarSimbolo(simbolo).get().getMasa();
+        return elementoService.buscarSimbolo(simbolo).get().getMasa(); // TODO: quitar excepción, hacerlo bien abajo
     }
 
     private float masaMolecular(String formula) throws NoSuchElementException {
