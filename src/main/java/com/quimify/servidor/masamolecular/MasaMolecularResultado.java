@@ -8,6 +8,7 @@ public class MasaMolecularResultado {
 
 	private Boolean encontrado;
 	private String masa_molecular;
+	private Map<String, Integer> elemento_a_moles;
 	private Map<String, Float> elemento_a_gramos;
 	private String error;
 
@@ -15,16 +16,16 @@ public class MasaMolecularResultado {
 
 	// Constructores:
 
-	public MasaMolecularResultado(String masa_molecular, Map<String, Float> elemento_a_gramos) {
+	public MasaMolecularResultado(String masa_molecular, Map<String, Integer> elemento_a_moles,
+								  Map<String, Float> elemento_a_gramos) {
 		this.encontrado = Boolean.TRUE;
-
 		this.masa_molecular = masa_molecular;
+		this.elemento_a_moles = elemento_a_moles;
 		this.elemento_a_gramos = elemento_a_gramos;
 	}
 
 	public MasaMolecularResultado(String error) {
 		this.encontrado = Boolean.FALSE;
-
 		this.error = error;
 	}
 
@@ -44,6 +45,14 @@ public class MasaMolecularResultado {
 
 	public void setMasa_molecular(String masa_molecular) {
 		this.masa_molecular = masa_molecular;
+	}
+
+	public Map<String, Integer> getElemento_a_moles() {
+		return elemento_a_moles;
+	}
+
+	public void setElemento_a_moles(Map<String, Integer> elemento_a_moles) {
+		this.elemento_a_moles = elemento_a_moles;
 	}
 
 	public Map<String, Float> getElemento_a_gramos() {

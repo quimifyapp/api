@@ -1,5 +1,6 @@
 package com.quimify.servidor.masamolecular;
 
+import com.quimify.servidor.ContextoCliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +17,9 @@ public class MasaMolecularController {
 
     // ADMIN --------------------------------------------------------------------------
 
-    @GetMapping() // TEST
-    public MasaMolecularResultado calcularMasaMolecular(@RequestParam("formula") String formula) {
-        return masaMolecularService.calcularMasaMolecular(formula);
+    @GetMapping()
+    public MasaMolecularResultado masaMolecular(@RequestParam("formula") String formula) {
+        return masaMolecularService.masaMolecular(formula);
     }
 
 }
