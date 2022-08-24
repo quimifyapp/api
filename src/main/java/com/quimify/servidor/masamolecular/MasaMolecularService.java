@@ -54,12 +54,17 @@ public class MasaMolecularService {
 
                     int moles;
                     if(i < formula.length()) {
-                        String digitos = formula.substring(i).replaceAll("(\\d+).+", "$1");
-                        moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
+                        String digitos = formula.substring(i);
+                        if(digitos.matches("^\\d+.*")) {
+                            digitos = digitos.replaceAll("^(\\d+).+", "$1");
+                            moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
+                        }
+                        else moles = 1;
                     }
                     else moles = 1;
 
-                    formula = formula.replace("(" + anidada + ")" + moles, ""); // Se borra la anidada
+                    // Se borra la anidada:
+                    formula = formula.replace("(" + anidada + ")" + (moles != 1 ? moles : ""), "");
 
                     i = parentesis; // Se vuelve a comenzar por el primer paréntesis
 
@@ -83,8 +88,11 @@ public class MasaMolecularService {
         for(Map.Entry<String, Integer> anidada : anidada_a_moles.entrySet()) {
             MasaMolecularResultado masa_molecular_anidada = calcularMasaMolecular(anidada.getKey());
 
-            for(Map.Entry<String, Integer> elemento : masa_molecular_anidada.getElemento_a_moles().entrySet())
-                agregarAlMapa(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
+            if(masa_molecular_anidada.getEncontrado()) {
+                for(Map.Entry<String, Integer> elemento : masa_molecular_anidada.getElemento_a_moles().entrySet())
+                    agregarAlMapa(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
+            }
+            else return masa_molecular_anidada; // Ha dado error
         }
 
         // Se comprueba que no quede ningún paréntesis suelto:
