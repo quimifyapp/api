@@ -27,7 +27,24 @@ public class InorganicoResultado {
 
     // --------------------------------------------------------------------------------
 
-    // Constructor:
+    // Constructores:
+
+    public InorganicoResultado(InorganicoModel inorganico) {
+        this.resultado = ENCONTRADO;
+
+        copiar(inorganico);
+    }
+
+    public InorganicoResultado(InorganicoModel inorganico, String sugerencia) {
+        this.resultado = SUGERENCIA;
+
+        this.sugerencia = sugerencia;
+        copiar(inorganico);
+    }
+
+    public InorganicoResultado() {
+        this.resultado = NO_ENCONTRADO;
+    }
 
     private void copiar(InorganicoModel inorganico) {
         this.formula = inorganico.getFormula();
@@ -40,22 +57,7 @@ public class InorganicoResultado {
         this.ebullicion = inorganico.getEbullicion();
     }
 
-    public InorganicoResultado(InorganicoModel inorganico) {
-        this.resultado = ENCONTRADO;
-        copiar(inorganico);
-    }
-
-    public InorganicoResultado(InorganicoModel inorganico, String sugerencia) {
-        this.resultado = SUGERENCIA;
-        this.sugerencia = sugerencia;
-        copiar(inorganico);
-    }
-
-    public InorganicoResultado() {
-        this.resultado = NO_ENCONTRADO;
-    }
-
-    // Getters:
+    // Getters y setters:
 
     public Short getResultado() {
         return resultado;

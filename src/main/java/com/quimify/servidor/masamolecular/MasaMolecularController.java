@@ -17,8 +17,8 @@ public class MasaMolecularController {
     // ADMIN --------------------------------------------------------------------------
 
     @GetMapping() // TEST
-    public Optional<Float> calcularMasaMolecular(@RequestParam("formula") String formula) {
-        return masaMolecularService.tryMasaMolecular(formula);
+    public MasaMolecularResultado calcularMasaMolecular(@RequestParam("formula") String formula) {
+        return masaMolecularService.calcularMasaMolecular(formula);
     }
 
 }

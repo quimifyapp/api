@@ -1,15 +1,17 @@
 package com.quimify.servidor.masamolecular;
 
+import com.quimify.servidor.elemento.ElementoModel;
 import com.quimify.servidor.elemento.ElementoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 // Esta clase procesa las masas moleculares.
-
-// TODO: Solo funciona para compuestos formados por un anión y un catión. Ejemplo: Na ó NaCl
 
 @Service
 public class MasaMolecularService {
@@ -19,46 +21,64 @@ public class MasaMolecularService {
 
     // INTERNOS ----------------------------------------------------------------------
 
-    private Float masaElemento(String simbolo) throws NoSuchElementException {
-        return elementoService.buscarSimbolo(simbolo).get().getMasa(); // TODO: quitar excepción, hacerlo bien abajo
+    private Optional<Float> getMasaElemento(String simbolo) {
+        return elementoService.buscarSimbolo(simbolo).map(ElementoModel::getMasa);
     }
 
-    private float masaMolecular(String formula) throws NoSuchElementException {
-        float resultado = 0;
+    public MasaMolecularResultado calcularMasaMolecular(String formula) {
+        MasaMolecularResultado resultado;
 
-        String[] partes = formula.split("(?<=.)(?=\\p{Lu})|(?<=\\d)(?=\\p{Lu})"); // "Fe2O3" -> ("Fe2", "O3")
+        // Se comprueba si tiene aspecto de fórmula:
 
-        for(String parte : partes) {
-            StringBuilder simbolo = new StringBuilder();
-            StringBuilder numero = new StringBuilder();
+        String adaptada = formula.replaceAll("[ ≡=-]", "");
 
-            // Separa la parte:
-            for(int i = 0; i < parte.length(); i++)
-                if(Character.isLetter(parte.charAt(i)))
-                    simbolo.append(parte.charAt(i));
-                else if(Character.isDigit(parte.charAt(i)))
-                    numero.append(parte.charAt(i));
+        if(adaptada.matches("([A-Z]+[a-z]?([1-9]+[0-9]*)?[#≡=-]*)+")) {
+            String[] partes = adaptada.split("(?=[A-Z])"); // "Aa11Bb22" -> ("Aa11", "Bb22")
 
-            resultado += (numero.length() != 0)
-                    ? masaElemento(simbolo.toString()) * Integer.parseInt(numero.toString())
-                    : masaElemento(simbolo.toString());
+            // Se registran los elementos y sus moles:
+
+            Map<String, Integer> elemento_a_moles = new HashMap<>();
+
+            for(String parte : partes) {
+                String simbolo = parte.replaceAll("[0-9]", "");
+                String digitos = parte.replaceAll("[A-Za-z]", "");
+
+                // Registra el elemento:
+
+                int moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
+
+                Integer moles_previos = elemento_a_moles.get(simbolo);
+                if(moles_previos != null)
+                    elemento_a_moles.replace(simbolo, moles_previos + moles);
+                else elemento_a_moles.put(simbolo, moles);
+            }
+
+            // Se calculan los gramos de cada elemento y el total es la masa molecular:
+
+            float masa_molecular = 0;
+            Map<String, Float> elemento_a_gramos = new HashMap<>();
+
+            for(Map.Entry<String, Integer> elemento : elemento_a_moles.entrySet()) {
+                String simbolo = elemento.getKey();
+
+                Optional<Float> masa_elemento = getMasaElemento(simbolo);
+
+                if(masa_elemento.isPresent()) {
+                    float gramos = elemento.getValue() * masa_elemento.get();
+                    masa_molecular += gramos;
+                    elemento_a_gramos.put(simbolo, gramos);
+                }
+                else return new MasaMolecularResultado("No se reconoce el elemento \"" + simbolo + "\".");
+            }
+
+            // Se formatea con 3 dígitos no nulos al final y punto decimal:
+
+            String aproximada = String.format("%.3f", masa_molecular).replace(',', '.')
+                    .replaceAll("0+$", "").replaceAll("[.]+$", "");
+
+            resultado = new MasaMolecularResultado(aproximada, elemento_a_gramos);
         }
-
-        return resultado;
-    }
-
-    public Optional<Float> tryMasaMolecular(String formula) {
-        Optional<Float> resultado;
-
-        formula = formula.replaceAll(" ", ""); // Sin espacios
-        try {
-            if(formula.matches("[a-zA-Z0-9()-=≡]+")) // La fórmula es alfanumérica con: (, ), -, =, ≡
-                resultado = Optional.of(masaMolecular(formula));
-            else resultado = Optional.empty();
-        } catch (NoSuchElementException e) {
-            // Error...
-            resultado = Optional.empty();
-        }
+        else resultado = new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
 
         return resultado;
     }

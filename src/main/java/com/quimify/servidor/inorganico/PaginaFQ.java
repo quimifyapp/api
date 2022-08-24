@@ -43,8 +43,8 @@ public class PaginaFQ {
                 formula = pagina.substring(indice);
                 formula = formula.substring(0, indiceDespuesDeEn("</p>", formula) - 4);
 
-                formula = formula.replaceAll("</b>", "").replaceAll("<sub>", "")
-                        .replaceAll("</sub>", "").replaceAll(" ", "");
+                formula = formula.replace("</b>", "").replace("<sub>", "")
+                        .replace("</sub>", "").replace(" ", "");
             }
 
             /* Escanea el nombre alternativo siguiendo este esquema:
@@ -137,12 +137,12 @@ public class PaginaFQ {
 
             // Etiquetas:
 
-            String etiqueta = nombre.replaceAll("ácido ", "");
+            String etiqueta = nombre.replace("ácido ", "");
             if(!etiqueta.contentEquals(nombre))
                 resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
 
             if(alternativo != null) {
-                etiqueta = alternativo.replaceAll("ácido ", "");
+                etiqueta = alternativo.replace("ácido ", "");
                 if(!etiqueta.contentEquals(alternativo))
                     resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
             }
@@ -197,8 +197,8 @@ public class PaginaFQ {
             if(indice != -1) { // Aparece la unidad
                 masa = masa.substring(0, indice - 1);
 
-                masa = masa.replaceAll(" ", "").replaceAll(",", ".");
-                masa = masa.replaceAll("a", "-"); // Otro formato de intervalo
+                masa = masa.replace(" ", "").replace(",", ".");
+                masa = masa.replace("a", "-"); // Otro formato de intervalo
                 masa = soloNumeros(masa);
                 masa = primeroDelIntervalo(masa);
                 masa = truncarDosDecimales(masa);
@@ -242,8 +242,8 @@ public class PaginaFQ {
             if(indice != -1) { // Aparece el símbolo de grado
                 temperatura = temperatura.substring(0, indice - 1);
 
-                temperatura = temperatura.replaceAll(" ", "").replaceAll(",", ".");
-                temperatura = temperatura.replaceAll("a", "-"); // Otro formato de intervalo
+                temperatura = temperatura.replace(" ", "").replace(",", ".");
+                temperatura = temperatura.replace("a", "-"); // Otro formato de intervalo
                 temperatura = soloNumeros(temperatura);
                 temperatura = primeroDelIntervalo(temperatura);
                 temperatura = String.valueOf(273.15 + Float.parseFloat(temperatura));
@@ -293,8 +293,8 @@ public class PaginaFQ {
                     en_kilogramos = false;
                 }
 
-                densidad = densidad.replaceAll(" ", "").replaceAll(",", ".");
-                densidad = densidad.replaceAll("a", "-"); // Otro formato de intervalo
+                densidad = densidad.replace(" ", "").replace(",", ".");
+                densidad = densidad.replace("a", "-"); // Otro formato de intervalo
                 densidad = soloNumeros(densidad);
                 densidad = primeroDelIntervalo(densidad);
 
@@ -305,7 +305,7 @@ public class PaginaFQ {
                     NumberFormat formato = NumberFormat.getInstance();
                     formato.setGroupingUsed(false);
                     formato.setMaximumFractionDigits(6);
-                    densidad = formato.format(valor_densidad).replaceAll(",", ".");
+                    densidad = formato.format(valor_densidad).replace(",", ".");
 
                     densidad = tresDecimalesSignificativos(densidad);
                 }
