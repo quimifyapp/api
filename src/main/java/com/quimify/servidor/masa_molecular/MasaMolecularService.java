@@ -119,20 +119,20 @@ public class MasaMolecularService {
     public MasaMolecularResultado masaMolecular(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
 
-       formula = formula.replaceAll(" ", ""); // Sin espacios
+        String adaptada = formula.replaceAll("[ #≡=-]", ""); // Sin espacios
 
-        if(!formula.matches("(\\(?[A-Z][a-z]?(([1-9]\\d+)|([2-9]))?(([(#≡=-]*)|(\\)(([1-9]\\d+)|([2-9]))?))*)+"))
+        if(!adaptada.matches("(\\(*[A-Z][a-z]?(([1-9]\\d+)|([2-9]))?((\\(*)|(\\)(([1-9]\\d+)|([2-9]))?))*)+"))
             return new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
-        else if(StringUtils.countOccurrencesOf(formula, "(") != StringUtils.countOccurrencesOf(formula, ")"))
+        else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
             return new MasaMolecularResultado("Los paréntesis no están balanceados.");
-        else if(formula.contains("()"))
+        else if(adaptada.contains("()"))
             return new MasaMolecularResultado("Los paréntesis huecos \"()\" no son válidos.");
 
         // Parece que sí:
 
         MasaMolecularResultado resultado;
 
-        Optional<Map<String, Integer>> elemento_a_moles = calcularMolesDeElementosEn(formula); // Se analiza la fórmula
+        Optional<Map<String, Integer>> elemento_a_moles = calcularMolesDeElementosEn(adaptada); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 
