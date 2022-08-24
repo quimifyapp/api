@@ -30,7 +30,7 @@ public class MasaMolecularService {
         else mapa.put(key, value); // Nuevo
     }
 
-    private Optional<Map<String, Integer>> calcularMolesDeElementosEn(String formula) {
+    private Optional<Map<String, Integer>> getMolesDeElementosEn(String formula) {
         Optional<Map<String, Integer>> resultado;
 
         // Separa las fórmulas anidadas entre paréntesis:
@@ -83,12 +83,11 @@ public class MasaMolecularService {
         Map<String, Integer> elemento_a_moles = new HashMap<>();
 
         for(Map.Entry<String, Integer> anidada : anidada_a_moles.entrySet()) {
-            Optional<Map<String, Integer>> anidados = calcularMolesDeElementosEn(anidada.getKey());
+            Optional<Map<String, Integer>> anidados = getMolesDeElementosEn(anidada.getKey());
 
-            if(anidados.isPresent()) {
+            if(anidados.isPresent())
                 for(Map.Entry<String, Integer> elemento : anidados.get().entrySet())
                     agregarAlMapa(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
-            }
             else return Optional.empty();
         }
 
@@ -121,7 +120,7 @@ public class MasaMolecularService {
 
         String adaptada = formula.replaceAll("[ #≡=-]", ""); // Sin espacios
 
-        if(!adaptada.matches("(\\(*[A-Z][a-z]?(([1-9]\\d+)|([2-9]))?((\\(*)|(\\)(([1-9]\\d+)|([2-9]))?))*)+"))
+        if(!adaptada.matches("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"))
             return new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
         else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
             return new MasaMolecularResultado("Los paréntesis no están balanceados.");
@@ -132,7 +131,7 @@ public class MasaMolecularService {
 
         MasaMolecularResultado resultado;
 
-        Optional<Map<String, Integer>> elemento_a_moles = calcularMolesDeElementosEn(adaptada); // Se analiza la fórmula
+        Optional<Map<String, Integer>> elemento_a_moles = getMolesDeElementosEn(adaptada); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 
