@@ -65,7 +65,7 @@ public class MasaMolecularService {
                     // Finalmente:
 
                     formula = formula.replace("(" + anidada + ")" + (moles != 1 ? moles : ""), "");
-                    i = parentesis; // Continúa donde estaba el primer paréntesis
+                    i = parentesis - 1; // Continúa donde estaba el primer paréntesis (luego se incrementa en 1)
                 }
                 else if(balance < 0)
                     return Optional.empty();
@@ -121,7 +121,7 @@ public class MasaMolecularService {
 
        formula = formula.replaceAll(" ", ""); // Sin espacios
 
-        if(!formula.replaceAll("[()]", "").matches("([A-Z][a-z]?([1-9]+\\d*)?[#≡=-]*)+"))
+        if(!formula.matches("(\\(?[A-Z][a-z]?(([1-9]\\d+)|([2-9]))?(([(#≡=-]*)|(\\)(([1-9]\\d+)|([2-9]))?))*)+"))
             return new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
         else if(StringUtils.countOccurrencesOf(formula, "(") != StringUtils.countOccurrencesOf(formula, ")"))
             return new MasaMolecularResultado("Los paréntesis no están balanceados.");
