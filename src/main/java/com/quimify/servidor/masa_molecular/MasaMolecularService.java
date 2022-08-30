@@ -53,7 +53,7 @@ public class MasaMolecularService {
                     if(i < formula.length()) {
                         String digitos = formula.substring(i);
                         if(digitos.matches("^\\d+.*")) {
-                            digitos = digitos.replaceAll("^(\\d+).+", "$1");
+                            digitos = digitos.replaceAll("^(\\d+)", "$1");
                             moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
                         }
                         else moles = 1;
@@ -155,12 +155,7 @@ public class MasaMolecularService {
                  else return new MasaMolecularResultado("No se reconoce el elemento \"" + simbolo + "\".");
             }
 
-            // Se formatea con 3 dígitos no nulos al final y punto decimal:
-
-            String aproximada = String.format("%.3f", masa_molecular).replace(',', '.')
-                    .replaceAll("0+$", "").replaceAll("[.]+$", "");
-
-            resultado = new MasaMolecularResultado(aproximada, elemento_a_moles.get(), elemento_a_gramos);
+            resultado = new MasaMolecularResultado(masa_molecular, elemento_a_gramos, elemento_a_moles.get());
         }
         else return new MasaMolecularResultado("No se ha podido calcular la masa molecular.");
 

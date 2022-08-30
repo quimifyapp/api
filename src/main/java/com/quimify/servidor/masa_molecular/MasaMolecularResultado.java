@@ -7,22 +7,18 @@ import java.util.Map;
 public class MasaMolecularResultado {
 
 	private Boolean encontrado;
-	private String masa_molecular;
-	private Map<String, Integer> elemento_a_moles;
+	private Float masa;
 	private Map<String, Float> elemento_a_gramos;
+	private Map<String, Integer> elemento_a_moles;
 	private String error;
 
 	// --------------------------------------------------------------------------------
 
 	// Constructores:
 
-	public MasaMolecularResultado(String masa_molecular, Map<String, Integer> elemento_a_moles,
-								  Map<String, Float> elemento_a_gramos) {
-		construir(masa_molecular, elemento_a_moles, elemento_a_gramos);
-	}
-
-	public MasaMolecularResultado(String masa_molecular, Map<String, Integer> elemento_a_moles) {
-		construir(masa_molecular, elemento_a_moles, null);
+	public MasaMolecularResultado(Float masa, Map<String, Float> elemento_a_gramos,
+								  Map<String, Integer> elemento_a_moles) {
+		construir(masa, elemento_a_gramos, elemento_a_moles);
 	}
 
 	public MasaMolecularResultado(String error) {
@@ -30,15 +26,15 @@ public class MasaMolecularResultado {
 		this.error = error;
 	}
 
-	private void construir(String masa_molecular, Map<String, Integer> elemento_a_moles,
-						   Map<String, Float> elemento_a_gramos) {
+	private void construir(Float masa, Map<String, Float> elemento_a_gramos, Map<String, Integer> elemento_a_moles) {
 		this.encontrado = Boolean.TRUE;
-		this.masa_molecular = masa_molecular;
-		this.elemento_a_moles = elemento_a_moles;
+		this.masa = masa;
 		this.elemento_a_gramos = elemento_a_gramos;
+		this.elemento_a_moles = elemento_a_moles;
 	}
 
 	// Getters y setters:
+
 
 	public Boolean getEncontrado() {
 		return encontrado;
@@ -48,20 +44,12 @@ public class MasaMolecularResultado {
 		this.encontrado = encontrado;
 	}
 
-	public String getMasa_molecular() {
-		return masa_molecular;
+	public Float getMasa() {
+		return masa;
 	}
 
-	public void setMasa_molecular(String masa_molecular) {
-		this.masa_molecular = masa_molecular;
-	}
-
-	public Map<String, Integer> getElemento_a_moles() {
-		return elemento_a_moles;
-	}
-
-	public void setElemento_a_moles(Map<String, Integer> elemento_a_moles) {
-		this.elemento_a_moles = elemento_a_moles;
+	public void setMasa(Float masa) {
+		this.masa = masa;
 	}
 
 	public Map<String, Float> getElemento_a_gramos() {
@@ -70,6 +58,14 @@ public class MasaMolecularResultado {
 
 	public void setElemento_a_gramos(Map<String, Float> elemento_a_gramos) {
 		this.elemento_a_gramos = elemento_a_gramos;
+	}
+
+	public Map<String, Integer> getElemento_a_moles() {
+		return elemento_a_moles;
+	}
+
+	public void setElemento_a_moles(Map<String, Integer> elemento_a_moles) {
+		this.elemento_a_moles = elemento_a_moles;
 	}
 
 	public String getError() {
