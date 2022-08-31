@@ -62,51 +62,51 @@ public class MetricasService {
         MetricasModel metricas = metricasDeHoy();
 
         Short resultado = inorganico.getResultado();
-        Short pantalla = contexto.getPantalla();
+        Short medio = contexto.getMedio();
         Boolean premium = inorganico.getPremium();
 
         if(resultado.equals(InorganicoResultado.ENCONTRADO)) {
-            if(pantalla.equals(ContextoCliente.TECLADO)) {
+            if(medio.equals(ContextoCliente.TECLADO)) {
                 metricas.nuevoEncontradoPorTeclado();
                 if(premium)
                     metricas.nuevoPremiumPorTeclado();
             }
-            else if(pantalla.equals(ContextoCliente.CAMARA)) {
+            else if(medio.equals(ContextoCliente.CAMARA)) {
                 metricas.nuevoEncontradoPorCamara();
                 if(premium)
                     metricas.nuevoPremiumPorCamara();
             }
-            else if(pantalla.equals(ContextoCliente.GALERIA)) {
+            else if(medio.equals(ContextoCliente.GALERIA)) {
                 metricas.nuevoEncontradoPorGaleria();
                 if(premium)
                     metricas.nuevoPremiumPorGaleria();
             }
         }
         else if(resultado.equals(InorganicoResultado.SUGERENCIA)) {
-            if(pantalla.equals(ContextoCliente.TECLADO)) {
+            if(medio.equals(ContextoCliente.TECLADO)) {
                 metricas.nuevaSugerenciaPorTeclado();
                 if(premium)
                     metricas.nuevoPremiumPorTeclado();
             }
-            else if(pantalla.equals(ContextoCliente.CAMARA)) {
+            else if(medio.equals(ContextoCliente.CAMARA)) {
                 metricas.nuevaSugerenciaPorCamara();
                 if(premium)
                     metricas.nuevoPremiumPorCamara();
             }
-            else if(pantalla.equals(ContextoCliente.GALERIA)) {
+            else if(medio.equals(ContextoCliente.GALERIA)) {
                 metricas.nuevaSugerenciaPorGaleria();
                 if(premium)
                     metricas.nuevoPremiumPorGaleria();
             }
         }
         else if(resultado.equals(InorganicoResultado.NO_ENCONTRADO)) {
-            if(pantalla.equals(ContextoCliente.TECLADO)) {
+            if(medio.equals(ContextoCliente.TECLADO)) {
                 metricas.nuevoNoEncontradoPorTeclado();
             }
-            else if(pantalla.equals(ContextoCliente.CAMARA)) {
+            else if(medio.equals(ContextoCliente.CAMARA)) {
                 metricas.nuevoNoEncontradoPorCamara();
             }
-            else if(pantalla.equals(ContextoCliente.GALERIA)) {
+            else if(medio.equals(ContextoCliente.GALERIA)) {
                 metricas.nuevoNoEncontradoPorGaleria();
             }
         }
@@ -116,15 +116,15 @@ public class MetricasService {
     public void contarSugerenciaOk(ContextoCliente contexto) {
         MetricasModel metricas = metricasDeHoy();
 
-        Short pantalla = contexto.getPantalla();
+        Short medio = contexto.getMedio();
 
-        if(pantalla.equals(ContextoCliente.TECLADO)) {
+        if(medio.equals(ContextoCliente.TECLADO)) {
             metricas.nuevaSugerenciaOkPorTeclado();
         }
-        else if(pantalla.equals(ContextoCliente.CAMARA)) {
+        else if(medio.equals(ContextoCliente.CAMARA)) {
             metricas.nuevaSugerenciaOkPorCamara();
         }
-        else if(pantalla.equals(ContextoCliente.GALERIA)) {
+        else if(medio.equals(ContextoCliente.GALERIA)) {
             metricas.nuevaSugerenciaOkPorGaleria();
         }
     }
@@ -140,15 +140,15 @@ public class MetricasService {
     public void contarGoogle(ContextoCliente contexto) {
         MetricasModel metricas = metricasDeHoy();
 
-        Short pantalla = contexto.getPantalla();
+        Short medio = contexto.getMedio();
 
-        if(pantalla.equals(ContextoCliente.TECLADO)) {
+        if(medio.equals(ContextoCliente.TECLADO)) {
             metricas.nuevoGooglePorTeclado();
         }
-        else if(pantalla.equals(ContextoCliente.CAMARA)) {
+        else if(medio.equals(ContextoCliente.CAMARA)) {
             metricas.nuevoGooglePorCamara();
         }
-        else if(pantalla.equals(ContextoCliente.GALERIA)) {
+        else if(medio.equals(ContextoCliente.GALERIA)) {
             metricas.nuevoGooglePorGaleria();
         }
     }
@@ -157,15 +157,15 @@ public class MetricasService {
     public void contarBingGratis(ContextoCliente contexto) {
         MetricasModel metricas = metricasDeHoy();
 
-        Short pantalla = contexto.getPantalla();
+        Short medio = contexto.getMedio();
 
-        if(pantalla.equals(ContextoCliente.TECLADO)) {
+        if(medio.equals(ContextoCliente.TECLADO)) {
             metricas.nuevoBingGratisPorTeclado();
         }
-        else if(pantalla.equals(ContextoCliente.CAMARA)) {
+        else if(medio.equals(ContextoCliente.CAMARA)) {
             metricas.nuevoBingGratisPorCamara();
         }
-        else if(pantalla.equals(ContextoCliente.GALERIA)) {
+        else if(medio.equals(ContextoCliente.GALERIA)) {
             metricas.nuevoBingGratisPorGaleria();
         }
     }
@@ -174,15 +174,15 @@ public class MetricasService {
     public void contarBingPago(ContextoCliente contexto) {
         MetricasModel metricas = metricasDeHoy();
 
-        Short pantalla = contexto.getPantalla();
+        Short medio = contexto.getMedio();
 
-        if(pantalla.equals(ContextoCliente.TECLADO)) {
+        if(medio.equals(ContextoCliente.TECLADO)) {
             metricas.nuevoBingPagoPorTeclado();
         }
-        else if(pantalla.equals(ContextoCliente.CAMARA)) {
+        else if(medio.equals(ContextoCliente.CAMARA)) {
             metricas.nuevoBingPagoPorCamara();
         }
-        else if(pantalla.equals(ContextoCliente.GALERIA)) {
+        else if(medio.equals(ContextoCliente.GALERIA)) {
             metricas.nuevoBingPagoPorGaleria();
         }
     }

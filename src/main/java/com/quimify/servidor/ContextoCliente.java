@@ -2,43 +2,43 @@ package com.quimify.servidor;
 
 public class ContextoCliente {
 
-    // Pantallas:
+    // Medios:
     public static final Short TECLADO = 0; // Inorgánicos
     public static final Short CAMARA = 1; // Inorgánicos
     public static final Short GALERIA = 2; // Inorgánicos
 
     // Campos:
 
-    private Short pantalla;
+    private Short medio;
     private Boolean premium;
 
     // --------------------------------------------------------------------------------
 
     // Constructor:
 
-    public ContextoCliente(Short pantalla, Boolean premium) {
-        setPantalla(pantalla);
+    public ContextoCliente(Short medio, Boolean premium) {
+        setMedio(medio);
         setPremium(premium);
     }
 
-    public ContextoCliente(Short pantalla) {
-        setPantalla(pantalla);
+    public ContextoCliente(Short medio) {
+        setMedio(medio);
         setPremium(false);
     }
 
     public ContextoCliente(Boolean premium) {
-        setPantalla(TECLADO);
+        setMedio(TECLADO);
         setPremium(premium);
     }
 
     // Getters y setters:
 
-    public Short getPantalla() {
-        return pantalla;
+    public Short getMedio() {
+        return medio;
     }
 
-    public void setPantalla(Short pantalla) {
-        this.pantalla = pantalla;
+    public void setMedio(Short medio) {
+        this.medio = medio;
     }
 
     public Boolean getPremium() {

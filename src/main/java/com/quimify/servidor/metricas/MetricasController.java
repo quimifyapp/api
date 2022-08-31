@@ -30,8 +30,8 @@ public class MetricasController {
     }
 
     @PutMapping("/sugerencia_ok")
-    public void nuevaSugerenciaOkMetricas(@RequestParam("pantalla") Short pantalla) {
-        ContextoCliente contexto = new ContextoCliente(pantalla);
+    public void nuevaSugerenciaOkMetricas(@RequestParam("medio") Short medio) {
+        ContextoCliente contexto = new ContextoCliente(medio);
         metricasService.contarSugerenciaOk(contexto);
     }
 

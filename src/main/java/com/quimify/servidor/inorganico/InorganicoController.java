@@ -19,9 +19,9 @@ public class InorganicoController {
 
     @GetMapping()
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
-                                                @RequestParam("pantalla") Short pantalla,
+                                                @RequestParam("medio") Short medio,
                                                 @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(pantalla, premium);
+        ContextoCliente contexto = new ContextoCliente(medio, premium);
         return inorganicoService.buscar(input, contexto);
     }
 
