@@ -6,9 +6,12 @@ import com.quimify.servidor.conexion.Conexion;
 import com.quimify.servidor.configuracion.ConfiguracionService;
 import com.quimify.servidor.metricas.MetricasService;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,8 @@ import java.util.Random;
 
 @Service
 public class InorganicoService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     InorganicoRepository inorganicoRepository; // Conexión con la DB
@@ -124,9 +129,7 @@ public class InorganicoService {
 
                     break;
                 }
-                else { // 'BUSCABLES' discrepa con la DB
-                    // Error...
-                }
+                else logger.error("El compuesto en memoria id = " + buscable.getId() + " no está en la DB.");
             }
         }
 
@@ -140,7 +143,7 @@ public class InorganicoService {
         if(id.isPresent())
             resultado = buscarDB(id.get());
         else {
-            // Error...
+            logger.error("La compleción: \"" + complecion + "\" no se encuentra.");
             resultado = NO_ENCONTRADO;
         }
 
@@ -240,9 +243,17 @@ public class InorganicoService {
             busqueda_web = Optional.of(buscarBing(input, configuracionService.getBingGratisKey()));
             metricaService.contarBingGratis(contexto);
         }
-        catch (Exception e) {
-            // Error...
+        catch(IOException exception) {
             busqueda_web = Optional.empty();
+
+            if(exception.toString().contains("HTTP response code: 403"))
+                logger.warn("Bing ha devuelto HTTP 403.");
+            else logger.error("IOException al buscar \"" + input + "\" en Bing: " + exception);
+        }
+        catch (Exception exception) {
+            busqueda_web = Optional.empty();
+
+            logger.error("Exception al buscar \"" + input + "\" en Bing: " + exception);
         }
 
         return busqueda_web;
@@ -256,9 +267,17 @@ public class InorganicoService {
             busqueda_web = Optional.of(buscarBing(input, configuracionService.getBingPagoKey()));
             metricaService.contarBingPago(contexto);
         }
-        catch (Exception e) {
-            // Error...
+        catch(IOException exception) {
             busqueda_web = Optional.empty();
+
+            if(exception.toString().contains("HTTP response code: 403"))
+                logger.warn("Bing de pago ha devuelto HTTP 403.");
+            else logger.error("IOException al buscar \"" + input + "\" en Bing de pago: " + exception);
+        }
+        catch (Exception exception) {
+            busqueda_web = Optional.empty();
+
+            logger.error("Exception al buscar \"" + input + "\" en Bing de pago: " + exception);
         }
 
         return busqueda_web;
@@ -296,9 +315,10 @@ public class InorganicoService {
             PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());
             resultado = pagina_fq.escanearInorganico();
         }
-        catch (Exception e) {
+        catch (Exception exception) {
             resultado = Optional.empty();
-            // Error...
+
+            logger.error("Excepción al escanear la dirección \"" + direccion + "\": " + exception);
         }
 
         return resultado;
@@ -329,8 +349,9 @@ public class InorganicoService {
             nuevaBusquedaInorganico(id);
         }
         else { // 'BUSCABLES' discrepa con la DB
-            // Error...
             resultado = NO_ENCONTRADO;
+
+            logger.error("El compuesto en memoria id = " + id + " no está en la DB.");
         }
 
         return resultado;
