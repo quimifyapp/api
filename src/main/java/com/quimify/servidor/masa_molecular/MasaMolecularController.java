@@ -20,7 +20,7 @@ public class MasaMolecularController {
 
     @GetMapping()
     public MasaMolecularResultado masaMolecular(@RequestParam("formula") String formula) {
-        return masaMolecularService.masaMolecular(formula);
+        return masaMolecularService.tryMasaMolecularDe(formula);
     }
 
 }

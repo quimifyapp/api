@@ -2,6 +2,8 @@ package com.quimify.servidor.masa_molecular;
 
 import com.quimify.servidor.elemento.ElementoModel;
 import com.quimify.servidor.elemento.ElementoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -12,6 +14,8 @@ import java.util.*;
 
 @Service
 public class MasaMolecularService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     ElementoService elementoService; // Procesos de los elementos
@@ -115,10 +119,10 @@ public class MasaMolecularService {
         return resultado;
     }
 
-    public MasaMolecularResultado masaMolecular(String formula) {
+    private MasaMolecularResultado masaMolecularDe(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
 
-        String adaptada = formula.replaceAll("[ #≡=-]", ""); // Sin espacios
+        String adaptada = formula.replaceAll("[\\s#≡=-]", ""); // También sin espacios
 
         if(!adaptada.matches("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"))
             return new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
@@ -158,6 +162,24 @@ public class MasaMolecularService {
             resultado = new MasaMolecularResultado(masa_molecular, elemento_a_gramos, elemento_a_moles.get());
         }
         else return new MasaMolecularResultado("No se ha podido calcular la masa molecular.");
+
+        return resultado;
+    }
+
+    public MasaMolecularResultado tryMasaMolecularDe(String formula) {
+        MasaMolecularResultado resultado;
+
+        try {
+            resultado = masaMolecularDe(formula);
+
+            if(!resultado.getEncontrado())
+                logger.warn("No se ha podido calcular la masa de \"" + formula + "\"");
+        }
+        catch(Exception exception) {
+            resultado = new MasaMolecularResultado("");
+
+            logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
+        }
 
         return resultado;
     }
