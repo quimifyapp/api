@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET bing_gratis_on = 0
+SET mensaje_disponible = 1
 WHERE version = 1

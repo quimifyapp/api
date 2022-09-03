@@ -35,7 +35,6 @@ public class MasaMolecularResultado {
 
 	// Getters y setters:
 
-
 	public Boolean getEncontrado() {
 		return encontrado;
 	}
