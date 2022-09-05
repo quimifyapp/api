@@ -16,7 +16,7 @@ public class BienvenidaService {
 	@Autowired
 	MetricasService metricaService; // Procesos de las métricas diarias
 
-	public BienvenidaResultado bienvenida() {
+	public BienvenidaResultado bienvenida(Short plataforma) {
 		BienvenidaResultado resultado = new BienvenidaResultado(
 				configuracionService.getActualizacionDisponible(),
 				configuracionService.getActualizacionObligatoria(),
@@ -29,7 +29,7 @@ public class BienvenidaService {
 				configuracionService.getMensajeEnlace()
 		);
 
-		metricaService.contarAcceso();
+		metricaService.contarAcceso(plataforma);
 
 		return resultado;
 	}

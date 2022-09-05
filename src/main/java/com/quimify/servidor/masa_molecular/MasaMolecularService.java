@@ -2,6 +2,7 @@ package com.quimify.servidor.masa_molecular;
 
 import com.quimify.servidor.elemento.ElementoModel;
 import com.quimify.servidor.elemento.ElementoService;
+import com.quimify.servidor.metricas.MetricasService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class MasaMolecularService {
 
     @Autowired
     ElementoService elementoService; // Procesos de los elementos
+
+    @Autowired
+    MetricasService metricaService; // Procesos de las metricas diarias
 
     // INTERNOS ----------------------------------------------------------------------
 
@@ -180,6 +184,8 @@ public class MasaMolecularService {
 
             logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
         }
+
+        metricaService.contarMasaMolecular(resultado.getEncontrado());
 
         return resultado;
     }

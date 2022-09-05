@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET mensaje_disponible = 1
+SET bing_pago_on = 0
 WHERE version = 1

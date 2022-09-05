@@ -15,8 +15,8 @@ public class BienvenidaController {
 	// ADMIN --------------------------------------------------------------------------
 
 	@GetMapping()
-	public BienvenidaResultado bienvenida() {
-		return bienvenidaService.bienvenida();
+	public BienvenidaResultado bienvenida(@RequestParam("plataforma") Short plataforma) {
+		return bienvenidaService.bienvenida(plataforma);
 	}
 
 }

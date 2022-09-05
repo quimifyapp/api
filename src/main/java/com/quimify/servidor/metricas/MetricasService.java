@@ -1,7 +1,5 @@
 package com.quimify.servidor.metricas;
 
-import com.quimify.servidor.ContextoCliente;
-import com.quimify.servidor.inorganico.InorganicoResultado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,10 @@ public class MetricasService {
 
     @Autowired
     MetricasRepository metricaRepository; // Conexión con la DB
+
+    private static final short ANDROID = 0;
+    private static final short IOS = 1;
+    private static final short WEB = 2;
 
     // PRIVADOS ----------------------------------------------------------------------
 
@@ -36,155 +38,120 @@ public class MetricasService {
 
     // PÚBLICOS ----------------------------------------------------------------------
 
-    // TODO: los que faltan y ordenarlos
-
-    public Integer getGoogle() {
+    public Integer getBusquedasGoogle() {
         MetricasModel metricas = metricasDeHoy();
 
-        return metricas.getTeclado_google() + metricas.getCamara_google() + metricas.getGaleria_google();
+        return metricas.getGoogle_foto_encontrados() + metricas.getGoogle_foto_no_encontrados() +
+                metricas.getGoogle_teclado_encontrados() + metricas.getGoogle_teclado_no_encontrados();
     }
 
-    public Integer getBingPago() {
-        MetricasModel metricas = metricasDeHoy();
-
-        return metricas.getTeclado_bing_pago() + metricas.getCamara_bing_pago() + metricas.getGaleria_bing_pago();
+    public Integer getBusquedasBingPago() {
+        return metricasDeHoy().getBing_pago_buscados();
     }
+
+    // Contadores:
 
     @Transactional
-    public void contarAcceso() {
-        MetricasModel metricas = metricasDeHoy();
-
-        metricas.nuevoAcceso();
-    }
-
-    @Transactional
-    public void contarBusqueda(InorganicoResultado inorganico, ContextoCliente contexto) {
-        MetricasModel metricas = metricasDeHoy();
-
-        Short resultado = inorganico.getResultado();
-        Short medio = contexto.getMedio();
-        Boolean premium = inorganico.getPremium();
-
-        if(resultado.equals(InorganicoResultado.ENCONTRADO)) {
-            if(medio.equals(ContextoCliente.TECLADO)) {
-                metricas.nuevoEncontradoPorTeclado();
-                if(premium)
-                    metricas.nuevoPremiumPorTeclado();
-            }
-            else if(medio.equals(ContextoCliente.CAMARA)) {
-                metricas.nuevoEncontradoPorCamara();
-                if(premium)
-                    metricas.nuevoPremiumPorCamara();
-            }
-            else if(medio.equals(ContextoCliente.GALERIA)) {
-                metricas.nuevoEncontradoPorGaleria();
-                if(premium)
-                    metricas.nuevoPremiumPorGaleria();
-            }
-        }
-        else if(resultado.equals(InorganicoResultado.SUGERENCIA)) {
-            if(medio.equals(ContextoCliente.TECLADO)) {
-                metricas.nuevaSugerenciaPorTeclado();
-                if(premium)
-                    metricas.nuevoPremiumPorTeclado();
-            }
-            else if(medio.equals(ContextoCliente.CAMARA)) {
-                metricas.nuevaSugerenciaPorCamara();
-                if(premium)
-                    metricas.nuevoPremiumPorCamara();
-            }
-            else if(medio.equals(ContextoCliente.GALERIA)) {
-                metricas.nuevaSugerenciaPorGaleria();
-                if(premium)
-                    metricas.nuevoPremiumPorGaleria();
-            }
-        }
-        else if(resultado.equals(InorganicoResultado.NO_ENCONTRADO)) {
-            if(medio.equals(ContextoCliente.TECLADO)) {
-                metricas.nuevoNoEncontradoPorTeclado();
-            }
-            else if(medio.equals(ContextoCliente.CAMARA)) {
-                metricas.nuevoNoEncontradoPorCamara();
-            }
-            else if(medio.equals(ContextoCliente.GALERIA)) {
-                metricas.nuevoNoEncontradoPorGaleria();
-            }
+    public void contarAcceso(Short plataforma) {
+        switch(plataforma) {
+            case ANDROID:
+                metricasDeHoy().nuevoAccesoAndroid();
+                break;
+            case IOS:
+                metricasDeHoy().nuevoAccesoIOS();
+                break;
+            case WEB:
+                metricasDeHoy().nuevoAccesoWeb();
+                break;
         }
     }
 
     @Transactional
-    public void contarSugerenciaOk(ContextoCliente contexto) {
-        MetricasModel metricas = metricasDeHoy();
-
-        Short medio = contexto.getMedio();
-
-        if(medio.equals(ContextoCliente.TECLADO)) {
-            metricas.nuevaSugerenciaOkPorTeclado();
+    public void contarInorganicoBuscado(boolean encontrado, boolean foto) {
+        if(encontrado) {
+            if(foto)
+                metricasDeHoy().nuevoInorganicoFotoEncontrado();
+            else metricasDeHoy().nuevoInorganicoTecladoEncontrado();
         }
-        else if(medio.equals(ContextoCliente.CAMARA)) {
-            metricas.nuevaSugerenciaOkPorCamara();
-        }
-        else if(medio.equals(ContextoCliente.GALERIA)) {
-            metricas.nuevaSugerenciaOkPorGaleria();
+        else {
+            if(foto)
+                metricasDeHoy().nuevoInorganicoFotoNoEncontrado();
+            else metricasDeHoy().nuevoInorganicoTecladoNoEncontrado();
         }
     }
 
     @Transactional
-    public void contarComplecionOk() {
-        MetricasModel metricas = metricasDeHoy();
-
-        metricas.nuevaComplecionOkPorTeclado();
-    }
-
-    @Transactional
-    public void contarGoogle(ContextoCliente contexto) {
-        MetricasModel metricas = metricasDeHoy();
-
-        Short medio = contexto.getMedio();
-
-        if(medio.equals(ContextoCliente.TECLADO)) {
-            metricas.nuevoGooglePorTeclado();
+    public void contarGoogle(boolean encontrado, boolean foto) {
+        if(encontrado) {
+            if(foto)
+                metricasDeHoy().nuevoGoogleFotoEncontrado();
+            else metricasDeHoy().nuevoGoogleTecladoEncontrado();
         }
-        else if(medio.equals(ContextoCliente.CAMARA)) {
-            metricas.nuevoGooglePorCamara();
-        }
-        else if(medio.equals(ContextoCliente.GALERIA)) {
-            metricas.nuevoGooglePorGaleria();
+        else {
+            if(foto)
+                metricasDeHoy().nuevoGoogleFotoNoEncontrado();
+            else metricasDeHoy().nuevoGoogleTecladoNoEncontrado();
         }
     }
 
     @Transactional
-    public void contarBingGratis(ContextoCliente contexto) {
-        MetricasModel metricas = metricasDeHoy();
-
-        Short medio = contexto.getMedio();
-
-        if(medio.equals(ContextoCliente.TECLADO)) {
-            metricas.nuevoBingGratisPorTeclado();
+    public void contarBing(boolean encontrado, boolean foto) {
+        if(encontrado) {
+            if(foto)
+                metricasDeHoy().nuevoBingFotoEncontrado();
+            else metricasDeHoy().nuevoBingTecladoEncontrado();
         }
-        else if(medio.equals(ContextoCliente.CAMARA)) {
-            metricas.nuevoBingGratisPorCamara();
-        }
-        else if(medio.equals(ContextoCliente.GALERIA)) {
-            metricas.nuevoBingGratisPorGaleria();
+        else {
+            if(foto)
+                metricasDeHoy().nuevoBingFotoNoEncontrado();
+            else metricasDeHoy().nuevoBingTecladoNoEncontrado();
         }
     }
 
     @Transactional
-    public void contarBingPago(ContextoCliente contexto) {
-        MetricasModel metricas = metricasDeHoy();
+    public void contarBingPago() {
+        metricasDeHoy().nuevoBingPagoBuscado();
+    }
 
-        Short medio = contexto.getMedio();
+    @Transactional
+    public void contarInorganicoNuevo() {
+        metricasDeHoy().nuevoInorganicoNuevo();
+    }
 
-        if(medio.equals(ContextoCliente.TECLADO)) {
-            metricas.nuevoBingPagoPorTeclado();
+    @Transactional
+    public void contarInorganicoAutocompletado() {
+        metricasDeHoy().nuevoInorganicoAutocompletado();
+    }
+
+    @Transactional
+    public void contarFormularOrganico(boolean encontrado, boolean foto) {
+        if(encontrado) {
+            if(foto)
+                metricasDeHoy().nuevoFormularOrganicoFotoEncontrado();
+            else metricasDeHoy().nuevoFormularOrganicoTecladoEncontrado();
         }
-        else if(medio.equals(ContextoCliente.CAMARA)) {
-            metricas.nuevoBingPagoPorCamara();
+        else {
+            if(foto)
+                metricasDeHoy().nuevoFormularOrganicoFotoNoEncontrado();
+            else metricasDeHoy().nuevoFormularOrganicoTecladoNoEncontrado();
         }
-        else if(medio.equals(ContextoCliente.GALERIA)) {
-            metricas.nuevoBingPagoPorGaleria();
-        }
+    }
+
+    @Transactional
+    public void contarNombrarOrganicoSimpleBuscado() {
+        metricasDeHoy().nuevoNombrarOrganicoSimpleBuscado();
+    }
+
+    @Transactional
+    public void contarNombrarOrganicoEterBuscado() {
+        metricasDeHoy().nuevoNombrarOrganicoEterBuscado();
+    }
+
+    @Transactional
+    public void contarMasaMolecular(boolean encontrado) {
+        if(encontrado)
+            metricasDeHoy().nuevoMasaMolecularEncontrado();
+        else metricasDeHoy().nuevoMasaMolecularNoEncontrado();
     }
 
 }

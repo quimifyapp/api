@@ -13,93 +13,90 @@ public class MetricasModel {
     @Temporal(TemporalType.DATE)
     private Date dia;
 
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer accesos = 0; // Accesos al cliente
-
-    // Su suma equivale al total de peticiones:
+    // Su suma equivale al total de accesos al cliente:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_encontrados = 0; // Búsquedas por teclado encontradas
+    private Integer accesos_android = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer accesos_ios = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer accesos_web = 0;
+
+    // Su suma equivale al total de peticiones de inorgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_sugerencias = 0; // Búsquedas por teclado que devuelven sugerencia
+    private Integer inorganico_teclado_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganico_teclado_no_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganico_foto_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganico_foto_no_encontrados = 0;
+
+    // Su suma equivale al total de búsquedas web de inorgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_no_encontrados = 0; // Búsquedas por teclado no encontradas
+    private Integer google_teclado_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer google_teclado_no_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer google_foto_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer google_foto_no_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bing_teclado_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bing_teclado_no_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bing_foto_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bing_foto_no_encontrados = 0;
+
+    // Aparte, las búsquedas en Bing *de pago* para poder limitarlas:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_encontrados = 0; // Búsquedas por cámara encontradas
+    private Integer bing_pago_buscados = 0;
+
+    // Inorgánicos añadidos a la base de datos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_sugerencias = 0; // Búsquedas por cámara que devuelven sugerencia
+    private Integer inorganico_nuevos = 0;
+
+    // Compleciones correctas de inorgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_no_encontrados = 0; // Búsquedas por cámara no encontradas
+    private Integer inorganico_autocompletados = 0;
+
+    // Su suma equivale al total de peticiones de formular orgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_encontrados = 0; // Búsquedas por galería encontradas
+    private Integer formular_organico_teclado_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer formular_organico_teclado_no_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer formular_organico_foto_encontrados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer formular_organico_foto_no_encontrados = 0;
+
+    // Su suma equivale al total de peticiones de nombrar orgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_sugerencias = 0; // Búsquedas por galería que devuelven sugerencia
+    private Integer nombrar_organico_simple_buscados = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer nombrar_organico_eter_buscados = 0;
+
+    // Su suma equivale al total de peticiones de calcular masas moleculares:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_no_encontrados = 0; // Búsquedas por galería no encontradas
-
-    // Otras:
-
+    private Integer masa_molecular_encontrados = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_premiums = 0; // Búsquedas por teclado encontradas que son premium
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_sugerencias_ok = 0; // Búsquedas por teclado que devuelven sugerencia acertada
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_google = 0; // Búsquedas por teclado que usaron la API de Google
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_bing_gratis = 0; // Búsquedas por teclado que usaron la API de Bing gratis
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_bing_pago = 0; // Búsquedas por teclado que usaron la API de Bing de pago
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer teclado_compleciones_ok = 0; // Compleciones clickadas por el usuario
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_premiums = 0; // Búsquedas por cámara encontradas que son premium
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_sugerencias_ok = 0; // Búsquedas por cámara que devuelven sugerencia acertada
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_google = 0; // Búsquedas por cámara que usaron la API de Google
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_bing_gratis = 0; // Búsquedas por cámara que usaron la API de Bing gratis
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer camara_bing_pago = 0; // Búsquedas por cámara que usaron la API de Bing de pago
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_premiums = 0; // Búsquedas por galería encontradas que son premium
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_sugerencias_ok = 0; // Búsquedas por galería que devuelven sugerencia acertada
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_google = 0; // Búsquedas por galería que usaron la API de Google
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_bing_gratis = 0; // Búsquedas por galería que usaron la API de Bing gratis
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer galeria_bing_pago = 0; // Búsquedas por galería que usaron la API de Bing de pago
+    private Integer masa_molecular_no_encontrados = 0;
 
     // --------------------------------------------------------------------------------
 
     // Constructores:
 
-    public MetricasModel() {}
+    public MetricasModel() {} // Lo pide JPA
 
     public MetricasModel(Date dia) {
         setDia(dia);
@@ -107,107 +104,108 @@ public class MetricasModel {
 
     // Incrementadores:
 
-    public void nuevoAcceso() {
-       accesos += 1;
-    }
-    public void nuevoEncontradoPorTeclado() {
-        teclado_encontrados += 1;
+    public void nuevoAccesoAndroid() {
+        accesos_android += 1;
     }
 
-    public void nuevaSugerenciaPorTeclado() {
-       teclado_sugerencias += 1;
+    public void nuevoAccesoIOS() {
+        accesos_ios += 1;
     }
 
-    public void nuevoNoEncontradoPorTeclado() {
-       teclado_no_encontrados += 1;
+    public void nuevoAccesoWeb() {
+        accesos_web += 1;
     }
 
-    public void nuevoEncontradoPorCamara() {
-        camara_encontrados += 1;
+    public void nuevoInorganicoTecladoEncontrado() {
+        inorganico_teclado_encontrados += 1;
     }
 
-    public void nuevaSugerenciaPorCamara() {
-        camara_sugerencias += 1;
+    public void nuevoInorganicoTecladoNoEncontrado() {
+        inorganico_teclado_no_encontrados += 1;
     }
 
-    public void nuevoNoEncontradoPorCamara() {
-        camara_no_encontrados += 1;
+    public void nuevoInorganicoFotoEncontrado() {
+        inorganico_foto_encontrados += 1;
     }
 
-    public void nuevoEncontradoPorGaleria() {
-        galeria_encontrados += 1;
+    public void nuevoInorganicoFotoNoEncontrado() {
+        inorganico_foto_no_encontrados += 1;
     }
 
-    public void nuevaSugerenciaPorGaleria() {
-        galeria_sugerencias += 1;
+    public void nuevoGoogleTecladoEncontrado() {
+        google_teclado_encontrados += 1;
     }
 
-    public void nuevoNoEncontradoPorGaleria() {
-        galeria_no_encontrados += 1;
+    public void nuevoGoogleTecladoNoEncontrado() {
+        google_teclado_no_encontrados += 1;
     }
 
-    public void nuevoPremiumPorTeclado(){
-        teclado_premiums += 1;
+    public void nuevoGoogleFotoEncontrado() {
+        google_foto_encontrados += 1;
     }
 
-    public void nuevaSugerenciaOkPorTeclado() {
-        teclado_sugerencias_ok += 1;
+    public void nuevoGoogleFotoNoEncontrado() {
+        google_foto_no_encontrados += 1;
     }
 
-    public void nuevoGooglePorTeclado() {
-        teclado_google += 1;
+    public void nuevoBingTecladoEncontrado() {
+        bing_teclado_encontrados += 1;
     }
 
-    public void nuevoBingGratisPorTeclado() {
-        teclado_bing_gratis += 1;
+    public void nuevoBingTecladoNoEncontrado() {
+        bing_teclado_no_encontrados += 1;
     }
 
-    public void nuevoBingPagoPorTeclado() {
-        teclado_bing_pago += 1;
+    public void nuevoBingFotoEncontrado() {
+        bing_foto_encontrados += 1;
     }
 
-    public void nuevaComplecionOkPorTeclado() {
-        teclado_compleciones_ok += 1;
+    public void nuevoBingFotoNoEncontrado() {
+        bing_foto_no_encontrados += 1;
     }
 
-    public void nuevoPremiumPorCamara(){
-        camara_premiums += 1;
+    public void nuevoBingPagoBuscado() {
+        bing_pago_buscados += 1;
     }
 
-    public void nuevaSugerenciaOkPorCamara() {
-        camara_sugerencias_ok += 1;
+    public void nuevoInorganicoNuevo() {
+        inorganico_nuevos += 1;
     }
 
-    public void nuevoGooglePorCamara() {
-        camara_google += 1;
+    public void nuevoInorganicoAutocompletado() {
+        inorganico_autocompletados += 1;
     }
 
-    public void nuevoBingGratisPorCamara() {
-        camara_bing_gratis += 1;
+    public void nuevoFormularOrganicoTecladoEncontrado() {
+        formular_organico_teclado_encontrados += 1;
     }
 
-    public void nuevoBingPagoPorCamara() {
-        camara_bing_pago += 1;
+    public void nuevoFormularOrganicoTecladoNoEncontrado() {
+        formular_organico_teclado_no_encontrados += 1;
     }
 
-    public void nuevoPremiumPorGaleria(){
-        galeria_premiums += 1;
+    public void nuevoFormularOrganicoFotoEncontrado() {
+        formular_organico_foto_encontrados += 1;
     }
 
-    public void nuevaSugerenciaOkPorGaleria() {
-        galeria_sugerencias_ok += 1;
+    public void nuevoFormularOrganicoFotoNoEncontrado() {
+        formular_organico_foto_no_encontrados += 1;
     }
 
-    public void nuevoGooglePorGaleria() {
-        galeria_google += 1;
+    public void nuevoNombrarOrganicoSimpleBuscado() {
+        nombrar_organico_simple_buscados += 1;
     }
 
-    public void nuevoBingGratisPorGaleria() {
-        galeria_bing_gratis += 1;
+    public void nuevoNombrarOrganicoEterBuscado() {
+        nombrar_organico_eter_buscados += 1;
     }
 
-    public void nuevoBingPagoPorGaleria() {
-        galeria_bing_pago += 1;
+    public void nuevoMasaMolecularEncontrado() {
+        masa_molecular_encontrados += 1;
+    }
+
+    public void nuevoMasaMolecularNoEncontrado() {
+        masa_molecular_no_encontrados += 1;
     }
 
     // Getters y setters:
@@ -220,212 +218,212 @@ public class MetricasModel {
         this.dia = dia;
     }
 
-    public Integer getAccesos() {
-        return accesos;
+    public Integer getAccesos_android() {
+        return accesos_android;
     }
 
-    public void setAccesos(Integer accesos) {
-        this.accesos = accesos;
+    public void setAccesos_android(Integer accesos_android) {
+        this.accesos_android = accesos_android;
     }
 
-    public Integer getTeclado_encontrados() {
-        return teclado_encontrados;
+    public Integer getAccesos_ios() {
+        return accesos_ios;
     }
 
-    public void setTeclado_encontrados(Integer teclado_encontrados) {
-        this.teclado_encontrados = teclado_encontrados;
+    public void setAccesos_ios(Integer accesos_ios) {
+        this.accesos_ios = accesos_ios;
     }
 
-    public Integer getTeclado_sugerencias() {
-        return teclado_sugerencias;
+    public Integer getAccesos_web() {
+        return accesos_web;
     }
 
-    public void setTeclado_sugerencias(Integer teclado_sugerencias) {
-        this.teclado_sugerencias = teclado_sugerencias;
+    public void setAccesos_web(Integer accesos_web) {
+        this.accesos_web = accesos_web;
     }
 
-    public Integer getTeclado_no_encontrados() {
-        return teclado_no_encontrados;
+    public Integer getInorganico_teclado_encontrados() {
+        return inorganico_teclado_encontrados;
     }
 
-    public void setTeclado_no_encontrados(Integer teclado_no_encontrados) {
-        this.teclado_no_encontrados = teclado_no_encontrados;
+    public void setInorganico_teclado_encontrados(Integer inorganico_teclado_encontrados) {
+        this.inorganico_teclado_encontrados = inorganico_teclado_encontrados;
     }
 
-    public Integer getCamara_encontrado() {
-        return camara_encontrados;
+    public Integer getInorganico_teclado_no_encontrados() {
+        return inorganico_teclado_no_encontrados;
     }
 
-    public void setCamara_encontrados(Integer camara_encontrados) {
-        this.camara_encontrados = camara_encontrados;
+    public void setInorganico_teclado_no_encontrados(Integer inorganico_teclado_no_encontrados) {
+        this.inorganico_teclado_no_encontrados = inorganico_teclado_no_encontrados;
     }
 
-    public Integer getCamara_sugerencia() {
-        return camara_sugerencias;
+    public Integer getInorganico_foto_encontrados() {
+        return inorganico_foto_encontrados;
     }
 
-    public void setCamara_sugerencias(Integer camara_sugerencias) {
-        this.camara_sugerencias = camara_sugerencias;
+    public void setInorganico_foto_encontrados(Integer inorganico_foto_encontrados) {
+        this.inorganico_foto_encontrados = inorganico_foto_encontrados;
     }
 
-    public Integer getCamara_no_encontrado() {
-        return camara_no_encontrados;
+    public Integer getInorganico_foto_no_encontrados() {
+        return inorganico_foto_no_encontrados;
     }
 
-    public void setCamara_no_encontrados(Integer camara_no_encontrados) {
-        this.camara_no_encontrados = camara_no_encontrados;
+    public void setInorganico_foto_no_encontrados(Integer inorganico_foto_no_encontrados) {
+        this.inorganico_foto_no_encontrados = inorganico_foto_no_encontrados;
     }
 
-    public Integer getGaleria_encontrado() {
-        return galeria_encontrados;
+    public Integer getGoogle_teclado_encontrados() {
+        return google_teclado_encontrados;
     }
 
-    public void setGaleria_encontrados(Integer galeria_encontrados) {
-        this.galeria_encontrados = galeria_encontrados;
+    public void setGoogle_teclado_encontrados(Integer google_teclado_encontrados) {
+        this.google_teclado_encontrados = google_teclado_encontrados;
     }
 
-    public Integer getGaleria_sugerencia() {
-        return galeria_sugerencias;
+    public Integer getGoogle_teclado_no_encontrados() {
+        return google_teclado_no_encontrados;
     }
 
-    public void setGaleria_sugerencias(Integer galeria_sugerencias) {
-        this.galeria_sugerencias = galeria_sugerencias;
+    public void setGoogle_teclado_no_encontrados(Integer google_teclado_no_encontrados) {
+        this.google_teclado_no_encontrados = google_teclado_no_encontrados;
     }
 
-    public Integer getGaleria_no_encontrado() {
-        return galeria_no_encontrados;
+    public Integer getGoogle_foto_encontrados() {
+        return google_foto_encontrados;
     }
 
-    public void setGaleria_no_encontrados(Integer galeria_no_encontrados) {
-        this.galeria_no_encontrados = galeria_no_encontrados;
+    public void setGoogle_foto_encontrados(Integer google_foto_encontrados) {
+        this.google_foto_encontrados = google_foto_encontrados;
     }
 
-    public Integer getTeclado_premium() {
-        return teclado_premiums;
+    public Integer getGoogle_foto_no_encontrados() {
+        return google_foto_no_encontrados;
     }
 
-    public void setTeclado_premiums(Integer teclado_premiums) {
-        this.teclado_premiums = teclado_premiums;
+    public void setGoogle_foto_no_encontrados(Integer google_foto_no_encontrados) {
+        this.google_foto_no_encontrados = google_foto_no_encontrados;
     }
 
-    public Integer getTeclado_sugerencia_ok() {
-        return teclado_sugerencias_ok;
+    public Integer getBing_teclado_encontrados() {
+        return bing_teclado_encontrados;
     }
 
-    public void setTeclado_sugerencias_ok(Integer teclado_sugerencias_ok) {
-        this.teclado_sugerencias_ok = teclado_sugerencias_ok;
+    public void setBing_teclado_encontrados(Integer bing_teclado_encontrados) {
+        this.bing_teclado_encontrados = bing_teclado_encontrados;
     }
 
-    public Integer getTeclado_google() {
-        return teclado_google;
+    public Integer getBing_teclado_no_encontrados() {
+        return bing_teclado_no_encontrados;
     }
 
-    public void setTeclado_google(Integer teclado_google) {
-        this.teclado_google = teclado_google;
+    public void setBing_teclado_no_encontrados(Integer bing_teclado_no_encontrados) {
+        this.bing_teclado_no_encontrados = bing_teclado_no_encontrados;
     }
 
-    public Integer getTeclado_bing_gratis() {
-        return teclado_bing_gratis;
+    public Integer getBing_foto_encontrados() {
+        return bing_foto_encontrados;
     }
 
-    public void setTeclado_bing_gratis(Integer teclado_bing_gratis) {
-        this.teclado_bing_gratis = teclado_bing_gratis;
+    public void setBing_foto_encontrados(Integer bing_foto_encontrados) {
+        this.bing_foto_encontrados = bing_foto_encontrados;
     }
 
-    public Integer getTeclado_bing_pago() {
-        return teclado_bing_pago;
+    public Integer getBing_foto_no_encontrados() {
+        return bing_foto_no_encontrados;
     }
 
-    public void setTeclado_bing_pago(Integer teclado_bing_pago) {
-        this.teclado_bing_pago = teclado_bing_pago;
+    public void setBing_foto_no_encontrados(Integer bing_foto_no_encontrados) {
+        this.bing_foto_no_encontrados = bing_foto_no_encontrados;
     }
 
-    public Integer getTeclado_complecion_ok() {
-        return teclado_compleciones_ok;
+    public Integer getBing_pago_buscados() {
+        return bing_pago_buscados;
     }
 
-    public void setTeclado_complecion_ok(Integer teclado_complecion_ok) {
-        this.teclado_compleciones_ok = teclado_complecion_ok;
+    public void setBing_pago_buscados(Integer bing_pago_buscados) {
+        this.bing_pago_buscados = bing_pago_buscados;
     }
 
-    public Integer getCamara_premium() {
-        return camara_premiums;
+    public Integer getInorganico_nuevos() {
+        return inorganico_nuevos;
     }
 
-    public void setCamara_premiums(Integer camara_premiums) {
-        this.camara_premiums = camara_premiums;
+    public void setInorganico_nuevos(Integer inorganico_nuevos) {
+        this.inorganico_nuevos = inorganico_nuevos;
     }
 
-    public Integer getCamara_sugerencia_ok() {
-        return camara_sugerencias_ok;
+    public Integer getInorganico_autocompletados() {
+        return inorganico_autocompletados;
     }
 
-    public void setCamara_sugerencias_ok(Integer camara_sugerencias_ok) {
-        this.camara_sugerencias_ok = camara_sugerencias_ok;
+    public void setInorganico_autocompletados(Integer inorganico_autocompletados) {
+        this.inorganico_autocompletados = inorganico_autocompletados;
     }
 
-    public Integer getCamara_google() {
-        return camara_google;
+    public Integer getFormular_organico_teclado_encontrados() {
+        return formular_organico_teclado_encontrados;
     }
 
-    public void setCamara_google(Integer camara_google) {
-        this.camara_google = camara_google;
+    public void setFormular_organico_teclado_encontrados(Integer formular_organico_teclado_encontrados) {
+        this.formular_organico_teclado_encontrados = formular_organico_teclado_encontrados;
     }
 
-    public Integer getCamara_bing_gratis() {
-        return camara_bing_gratis;
+    public Integer getFormular_organico_teclado_no_encontrados() {
+        return formular_organico_teclado_no_encontrados;
     }
 
-    public void setCamara_bing_gratis(Integer camara_bing_gratis) {
-        this.camara_bing_gratis = camara_bing_gratis;
+    public void setFormular_organico_teclado_no_encontrados(Integer formular_organico_teclado_no_encontrados) {
+        this.formular_organico_teclado_no_encontrados = formular_organico_teclado_no_encontrados;
     }
 
-    public Integer getCamara_bing_pago() {
-        return camara_bing_pago;
+    public Integer getFormular_organico_foto_encontrados() {
+        return formular_organico_foto_encontrados;
     }
 
-    public void setCamara_bing_pago(Integer camara_bing_pago) {
-        this.camara_bing_pago = camara_bing_pago;
+    public void setFormular_organico_foto_encontrados(Integer formular_organico_foto_encontrados) {
+        this.formular_organico_foto_encontrados = formular_organico_foto_encontrados;
     }
 
-    public Integer getGaleria_premium() {
-        return galeria_premiums;
+    public Integer getFormular_organico_foto_no_encontrados() {
+        return formular_organico_foto_no_encontrados;
     }
 
-    public void setGaleria_premiums(Integer galeria_premiums) {
-        this.galeria_premiums = galeria_premiums;
+    public void setFormular_organico_foto_no_encontrados(Integer formular_organico_foto_no_encontrados) {
+        this.formular_organico_foto_no_encontrados = formular_organico_foto_no_encontrados;
     }
 
-    public Integer getGaleria_sugerencia_ok() {
-        return galeria_sugerencias_ok;
+    public Integer getNombrar_organico_simple_buscados() {
+        return nombrar_organico_simple_buscados;
     }
 
-    public void setGaleria_sugerencias_ok(Integer galeria_sugerencias_ok) {
-        this.galeria_sugerencias_ok = galeria_sugerencias_ok;
+    public void setNombrar_organico_simple_buscados(Integer nombrar_organico_simple_buscados) {
+        this.nombrar_organico_simple_buscados = nombrar_organico_simple_buscados;
     }
 
-    public Integer getGaleria_google() {
-        return galeria_google;
+    public Integer getNombrar_organico_eter_buscados() {
+        return nombrar_organico_eter_buscados;
     }
 
-    public void setGaleria_google(Integer galeria_google) {
-        this.galeria_google = galeria_google;
+    public void setNombrar_organico_eter_buscados(Integer nombrar_organico_eter_buscados) {
+        this.nombrar_organico_eter_buscados = nombrar_organico_eter_buscados;
     }
 
-    public Integer getGaleria_bing_gratis() {
-        return galeria_bing_gratis;
+    public Integer getMasa_molecular_encontrados() {
+        return masa_molecular_encontrados;
     }
 
-    public void setGaleria_bing_gratis(Integer galeria_bing_gratis) {
-        this.galeria_bing_gratis = galeria_bing_gratis;
+    public void setMasa_molecular_encontrados(Integer masa_molecular_encontrados) {
+        this.masa_molecular_encontrados = masa_molecular_encontrados;
     }
 
-    public Integer getGaleria_bing_pago() {
-        return galeria_bing_pago;
+    public Integer getMasa_molecular_no_encontrados() {
+        return masa_molecular_no_encontrados;
     }
 
-    public void setGaleria_bing_pago(Integer galeria_bing_pago) {
-        this.galeria_bing_pago = galeria_bing_pago;
+    public void setMasa_molecular_no_encontrados(Integer masa_molecular_no_encontrados) {
+        this.masa_molecular_no_encontrados = masa_molecular_no_encontrados;
     }
 
 }

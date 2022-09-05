@@ -4,53 +4,44 @@ package com.quimify.servidor.inorganico;
 
 public class InorganicoResultado {
 
-    public final static Short ENCONTRADO = 0; // OK
-    public final static Short SUGERENCIA = 1; // Quizás quisiste decir...
-    public final static Short NO_ENCONTRADO = 2; // Eso, o se ha producido un error
+    private Boolean encontrado;
+    private Boolean premium;
 
-    private final Short resultado;
-
-    // Si 'resultado' = ENCONTRADO | SUGERENCIA:
+    // Si 'encontrado' = true:
 
     private String formula;     // "MgH2"
     private String nombre;      // "hidruro de magnesio
     private String alternativo; // "dihidruro de magnesio"
     private String masa;        // (g)
-    private String densidad;    // (g/cm3)
+    private String densidad;    // (g/cm³)
     private String fusion;      // (K)
     private String ebullicion;  // (K)
-    private Boolean premium;    // ...
 
-    // Si 'resultado' = SUGERENCIA:
+    // Si 'encontrado' = false:
 
     private String sugerencia;  // Será = 'formula', 'nombre' ó 'alternativo'
+
+    private Boolean es_organico_sugerencia;
 
     // --------------------------------------------------------------------------------
 
     // Constructores:
 
     public InorganicoResultado(InorganicoModel inorganico) {
-        this.resultado = ENCONTRADO;
+        this.encontrado = true;
 
-        copiar(inorganico);
-    }
-
-    public InorganicoResultado(InorganicoModel inorganico, String sugerencia) {
-        this.resultado = SUGERENCIA;
-
-        this.sugerencia = sugerencia;
         copiar(inorganico);
     }
 
     public InorganicoResultado() {
-        this.resultado = NO_ENCONTRADO;
+        this.encontrado = false;
     }
 
     private void copiar(InorganicoModel inorganico) {
+        this.premium = inorganico.getPremium();
         this.formula = inorganico.getFormula();
         this.nombre = inorganico.getNombre();
         this.alternativo = inorganico.getAlternativo();
-        this.premium = inorganico.getPremium();
         this.masa = inorganico.getMasa();
         this.densidad = inorganico.getDensidad();
         this.fusion = inorganico.getFusion();
@@ -59,8 +50,20 @@ public class InorganicoResultado {
 
     // Getters y setters:
 
-    public Short getResultado() {
-        return resultado;
+    public Boolean getEncontrado() {
+        return encontrado;
+    }
+
+    public void setEncontrado(Boolean encontrado) {
+        this.encontrado = encontrado;
+    }
+
+    public Boolean getPremium() {
+        return premium;
+    }
+
+    public void setPremium(Boolean premium) {
+        this.premium = premium;
     }
 
     public String getFormula() {
@@ -119,14 +122,6 @@ public class InorganicoResultado {
         this.ebullicion = ebullicion;
     }
 
-    public Boolean getPremium() {
-        return premium;
-    }
-
-    public void setPremium(Boolean premium) {
-        this.premium = premium;
-    }
-
     public String getSugerencia() {
         return sugerencia;
     }
@@ -134,4 +129,13 @@ public class InorganicoResultado {
     public void setSugerencia(String sugerencia) {
         this.sugerencia = sugerencia;
     }
+
+    public Boolean getEs_organico_sugerencia() {
+        return es_organico_sugerencia;
+    }
+
+    public void setEs_organico_sugerencia(Boolean es_organico_sugerencia) {
+        this.es_organico_sugerencia = es_organico_sugerencia;
+    }
+
 }

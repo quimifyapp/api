@@ -1,6 +1,5 @@
 package com.quimify.servidor.inorganico;
 
-import com.quimify.servidor.ContextoCliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +18,8 @@ public class InorganicoController {
 
     @GetMapping()
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
-                                                @RequestParam("medio") Short medio,
-                                                @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(medio, premium);
-        return inorganicoService.buscar(input, contexto);
+                                                @RequestParam("foto") Boolean foto) {
+        return inorganicoService.buscar(input, foto);
     }
 
     @GetMapping("/autocompletar/{input}")
@@ -31,10 +28,8 @@ public class InorganicoController {
     }
 
     @GetMapping("/autocompletar")
-    public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion,
-                                                          @RequestParam("premium") Boolean premium) {
-        ContextoCliente contexto = new ContextoCliente(premium);
-        return inorganicoService.buscarComplecion(complecion, contexto);
+    public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion) {
+        return inorganicoService.buscarComplecion(complecion);
     }
 
     // ADMIN --------------------------------------------------------------------------
@@ -62,11 +57,6 @@ public class InorganicoController {
     @DeleteMapping()
     public Optional<InorganicoModel> eliminarInorganico(@RequestParam("id") Integer id) {
         return inorganicoService.eliminar(id);
-    }
-
-    @GetMapping("/probarfq") // TEST
-    public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
-        return inorganicoService.probarPaginaFQ(direccion);
     }
 
 }
