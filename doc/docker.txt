@@ -16,10 +16,10 @@ jdbc:mysql://quimify-0-mysql-container/quimify_0
 -----------------------------------------------------------------
 
 FROM openjdk:11
-ADD target/servidor-0.jar servidor-0.jar
+ADD target/api-0.jar api-0.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/servidor-0.jar"]
+ENTRYPOINT ["java", "-jar", "/api-0.jar"]
 
-docker image build -t servidor-0-image .
-docker container run -p 8080:8080 --net quimify-network --name servidor-0-container servidor-0-image
-docker logs servidor-0-container -f
+docker image build -t api-0-image .
+docker container run -p 8080:8080 --net quimify-network --name api-0-container api-0-image
+docker logs api-0-container -f
