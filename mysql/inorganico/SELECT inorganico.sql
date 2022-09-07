@@ -2,8 +2,6 @@ SELECT (SUM(busquedas)) / 1000 FROM inorganico;
 SELECT id, busquedas, formula, nombre, alternativo, premium, masa, densidad, fusion, ebullicion
 FROM inorganico
 
-WHERE nombre LIKE "% %"
-
 # WHERE formula = "H2O2"
 # WHERE alternativo LIKE "ácido%"
 # WHERE formula = "HCl"

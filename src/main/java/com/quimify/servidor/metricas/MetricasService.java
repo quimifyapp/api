@@ -17,9 +17,9 @@ public class MetricasService {
     @Autowired
     MetricasRepository metricaRepository; // Conexión con la DB
 
-    private static final short ANDROID = 0;
-    private static final short IOS = 1;
-    private static final short WEB = 2;
+    public static final short ANDROID = 0;
+    public static final short IOS = 1;
+    public static final short WEB = 2;
 
     // PRIVADOS ----------------------------------------------------------------------
 

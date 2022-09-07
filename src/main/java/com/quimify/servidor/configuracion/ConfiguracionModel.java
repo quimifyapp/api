@@ -11,28 +11,28 @@ public class ConfiguracionModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
-    private Integer version; // Se corresponde con la versión de la API
+    private Integer version; // Se corresponde con la versión del servidor
 
     // Bienvenida:
 
     @Column(nullable = false)
     private Boolean actualizacion_disponible;
-    @Column(nullable = false)
+    @Column()
     private Boolean actualizacion_obligatoria;
-    @Column(nullable = false)
+    @Column()
     private String actualizacion_detalles;
 
     @Column(nullable = false)
     private Boolean mensaje_presente;
-    @Column(nullable = false)
+    @Column()
     private String mensaje_titulo;
-    @Column(nullable = false)
+    @Column()
     private String mensaje_detalles;
-    @Column(nullable = false)
+    @Column()
     private Boolean mensaje_enlace_presente;
-    @Column(nullable = false)
+    @Column()
     private String mensaje_enlace_nombre;
-    @Column(nullable = false)
+    @Column()
     private String mensaje_enlace;
 
     // API de Google:
@@ -41,16 +41,14 @@ public class ConfiguracionModel {
     private Boolean google_on = false; // Interruptor
     @Column(nullable = false)
     private Integer google_limite; // Nº máx. de búsquedas diarias
+    @Column(nullable = false)
     private String google_url; // URL + key
-
-    // API de Bing:
-
-    private String bing_url; // URL
 
     // API de Bing gratis:
 
     @Column(nullable = false)
     private Boolean bing_gratis_on = false; // Interruptor
+    @Column(nullable = false)
     private String bing_gratis_key; // Suscripción
 
     // API de Bing de pago:
@@ -59,7 +57,13 @@ public class ConfiguracionModel {
     private Boolean bing_pago_on = false; // Interruptor
     @Column(nullable = false)
     private Integer bing_pago_limite; // Nº máx. de búsquedas diarias
+    @Column(nullable = false)
     private String bing_pago_key; // Suscripción
+
+    // API de Bing:
+
+    @Column(nullable = false)
+    private String bing_url; // URL
 
     // Para FQ.com:
 

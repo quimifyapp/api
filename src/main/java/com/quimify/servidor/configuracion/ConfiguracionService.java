@@ -11,7 +11,7 @@ public class ConfiguracionService {
     @Autowired
     ConfiguracionRepository configuracionRepository; // Conexión con la DB
 
-    public static final Integer VERSION = 1;
+    public static final Integer VERSION = 0;
 
     // --------------------------------------------------------------------------------
 

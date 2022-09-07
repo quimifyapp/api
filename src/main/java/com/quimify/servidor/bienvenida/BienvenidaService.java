@@ -14,10 +14,11 @@ public class BienvenidaService {
 	ConfiguracionService configuracionService; // Procesos de la configuración
 
 	@Autowired
-	MetricasService metricaService; // Procesos de las métricas diarias
+	MetricasService metricasService; // Procesos de las métricas diarias
 
 	public BienvenidaResultado bienvenida(Short plataforma) {
-		BienvenidaResultado resultado = new BienvenidaResultado(
+		BienvenidaResultado resultado = plataforma != MetricasService.WEB
+				? new BienvenidaResultado(
 				configuracionService.getActualizacionDisponible(),
 				configuracionService.getActualizacionObligatoria(),
 				configuracionService.getActualizacionDetalles(),
@@ -26,10 +27,20 @@ public class BienvenidaService {
 				configuracionService.getMensajeDetalles(),
 				configuracionService.getMensajeEnlacePresente(),
 				configuracionService.getMensajeEnlaceNombre(),
+				configuracionService.getMensajeEnlace())
+				: new BienvenidaResultado(
+				false,
+				null,
+				null,
+				configuracionService.getMensajePresente(),
+				configuracionService.getMensajeTitulo(),
+				configuracionService.getMensajeDetalles(),
+				configuracionService.getMensajeEnlacePresente(),
+				configuracionService.getMensajeEnlaceNombre(),
 				configuracionService.getMensajeEnlace()
 		);
 
-		metricaService.contarAcceso(plataforma);
+		metricasService.contarAcceso(plataforma);
 
 		return resultado;
 	}
