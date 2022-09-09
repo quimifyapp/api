@@ -1,29 +1,31 @@
-package com.quimify.api.bienvenida;
+package com.quimify.api.cliente;
 
 import com.quimify.api.autentificacion.Autentificacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
-// Esta clase implementa los métodos HTTP de la dirección "/bienvenida".
+// Esta clase implementa los métodos HTTP de la dirección "/cliente".
 
 @RestController
-@RequestMapping("/bienvenida")
-public class BienvenidaController {
+@RequestMapping("/cliente")
+public class ClienteController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	BienvenidaService bienvenidaService; // Procesos de la bienvenida
+	ClienteService clienteService; // Procesos de los clientes
 
 	// ADMIN --------------------------------------------------------------------------
 
 	@GetMapping()
-	public BienvenidaResultado bienvenida(@RequestParam("plataforma") Short plataforma,
-										  @RequestParam("clave") String clave) {
+	public ClienteResultado acceso(@RequestParam("version") Integer version,
+								   @RequestParam("plataforma") Short plataforma,
+								   @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
 		if(Autentificacion.esClavePublica(clave))
-			return bienvenidaService.bienvenida(plataforma);
+			return clienteService.acceso(version, plataforma);
 		else {
 			logger.error("Clave pública errónea: \"" + clave + "\".");
 			return null;

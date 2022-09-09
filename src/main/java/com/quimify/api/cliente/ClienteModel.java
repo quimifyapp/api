@@ -1,41 +1,50 @@
-package com.quimify.api.bienvenida;
+package com.quimify.api.cliente;
 
-// Esta clase representa las entregas al cliente de
+import javax.persistence.*;
 
-public class BienvenidaResultado {
+// Esta clase representa la configuración de cada cliente según su versión.
 
+@Entity // Es un modelo real
+@Table(name = "cliente") // En la tabla 'cliente' de la DB
+public class ClienteModel {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(unique = true, nullable = false)
+	private Integer version; // Se corresponde con la versión del cliente
+
+	// Bienvenida:
+
+	@Column(nullable = false)
 	private Boolean actualizacion_disponible;
+	@Column()
 	private Boolean actualizacion_obligatoria;
+	@Column()
 	private String actualizacion_detalles;
-
+	@Column(nullable = false)
 	private Boolean mensaje_presente;
+	@Column()
 	private String mensaje_titulo;
+	@Column()
 	private String mensaje_detalles;
+	@Column()
 	private Boolean mensaje_enlace_presente;
+	@Column()
 	private String mensaje_enlace_nombre;
+	@Column()
 	private String mensaje_enlace;
 
 	// --------------------------------------------------------------------------------
 
-	// Constructor:
-
-	public BienvenidaResultado(Boolean actualizacion_disponible, Boolean actualizacion_obligatoria,
-							   String actualizacion_detalles, Boolean mensaje_disponible, String mensaje_titulo,
-							   String mensaje_detalles, Boolean mensaje_enlace_presente, String mensaje_enlace_nombre,
-							   String mensaje_enlace) {
-		this.actualizacion_disponible = actualizacion_disponible;
-		this.actualizacion_obligatoria = actualizacion_obligatoria;
-		this.actualizacion_detalles = actualizacion_detalles;
-		this.mensaje_presente = mensaje_disponible;
-		this.mensaje_titulo = mensaje_titulo;
-		this.mensaje_detalles = mensaje_detalles;
-		this.mensaje_enlace_presente = mensaje_enlace_presente;
-		this.mensaje_enlace_nombre = mensaje_enlace_nombre;
-		this.mensaje_enlace = mensaje_enlace;
-	}
-
 	// Getters y setters:
 
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 
 	public Boolean getActualizacion_disponible() {
 		return actualizacion_disponible;

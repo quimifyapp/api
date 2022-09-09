@@ -1,5 +1,6 @@
 package com.quimify.api.metricas;
 
+import com.quimify.api.cliente.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,6 @@ public class MetricasService {
 
     @Autowired
     MetricasRepository metricaRepository; // Conexión con la DB
-
-    public static final short ANDROID = 0;
-    public static final short IOS = 1;
-    public static final short WEB = 2;
 
     // PRIVADOS ----------------------------------------------------------------------
 
@@ -54,13 +51,13 @@ public class MetricasService {
     @Transactional
     public void contarAcceso(Short plataforma) {
         switch(plataforma) {
-            case ANDROID:
+            case ClienteService.ANDROID:
                 metricasDeHoy().nuevoAccesoAndroid();
                 break;
-            case IOS:
+            case ClienteService.IOS:
                 metricasDeHoy().nuevoAccesoIOS();
                 break;
-            case WEB:
+            case ClienteService.WEB:
                 metricasDeHoy().nuevoAccesoWeb();
                 break;
         }

@@ -1,4 +1,4 @@
-INSERT INTO configuracion(version, actualizacion_disponible, actualizacion_necesaria,
+INSERT INTO configuracion(version,
 google_on, google_limite,
 bing_gratis_on,
 bing_pago_on,  bing_pago_limite,
@@ -6,7 +6,7 @@ google_url,
 bing_url,
 bing_gratis_key, bing_pago_key,
 user_agent)
-VALUES(0, false, false, # Versiones
+VALUES(0, # Versiones
 false, 100, # Google
 false, # Bing gratis
 true, 0, # Bing de pago

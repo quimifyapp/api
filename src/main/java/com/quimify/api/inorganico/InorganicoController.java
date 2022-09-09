@@ -4,6 +4,7 @@ import com.quimify.api.autentificacion.Autentificacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class InorganicoController {
     @GetMapping()
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
                                                 @RequestParam("foto") Boolean foto,
-                                                @RequestParam("clave") String clave) {
+                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePublica(clave))
             return inorganicoService.buscar(input, foto);
         else {
@@ -35,7 +36,7 @@ public class InorganicoController {
 
     @GetMapping("/autocompletar/{input}")
     public String autoCompletarInorganico(@PathVariable("input") String input,
-                                          @RequestParam("clave") String clave) {
+                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePublica(clave))
             return inorganicoService.autoCompletar(input);
         else {
@@ -46,7 +47,7 @@ public class InorganicoController {
 
     @GetMapping("/autocompletar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion,
-                                                          @RequestParam("clave") String clave) {
+                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePublica(clave))
             return inorganicoService.buscarComplecion(complecion);
         else {
@@ -59,7 +60,7 @@ public class InorganicoController {
 
     @GetMapping("/{id}")
     public Optional<InorganicoModel> seleccionarInorganico(@PathVariable("id") Integer id,
-                                                           @RequestParam("clave") String clave) {
+                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePrivada(clave))
             return inorganicoService.seleccionar(id);
         else {
@@ -70,7 +71,7 @@ public class InorganicoController {
 
     @PutMapping()
     public Optional<InorganicoModel> reemplazarInorganico(@RequestBody InorganicoModel nuevo,
-                                                          @RequestParam("clave") String clave) {
+                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePrivada(clave))
             return inorganicoService.reemplazar(nuevo);
         else {
@@ -81,13 +82,13 @@ public class InorganicoController {
 
     @PutMapping("/hacerpremium")
     public Optional<InorganicoModel> hacerPremiumInorganico(@RequestParam Integer id,
-                                                            @RequestParam("clave") String clave) {
+                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         return inorganicoService.hacerPremium(id);
     }
 
     @PostMapping()
     public InorganicoModel insertarInorganico(@RequestBody InorganicoModel nuevo,
-                                              @RequestParam("clave") String clave) {
+                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePrivada(clave))
             return inorganicoService.insertar(nuevo);
         else {
@@ -98,7 +99,7 @@ public class InorganicoController {
 
     @DeleteMapping()
     public Optional<InorganicoModel> eliminarInorganico(@RequestParam("id") Integer id,
-                                                        @RequestParam("clave") String clave) {
+                                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autentificacion.esClavePrivada(clave))
             return inorganicoService.eliminar(id);
         else {
