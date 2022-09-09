@@ -1,7 +1,7 @@
 package com.quimify.api.inorganico;
 
 import com.quimify.api.Normalizar;
-import com.quimify.api.conexion.Conexion;
+import com.quimify.api.descarga.Descarga;
 import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.metricas.MetricasService;
 import org.json.JSONObject;
@@ -235,7 +235,7 @@ public class InorganicoService {
     private BusquedaWeb buscarGoogle(String input) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        Conexion conexion = new Conexion(configuracionService.getGoogleURL(), input);
+        Descarga conexion = new Descarga(configuracionService.getGoogleURL(), input);
         conexion.setPropiedad("Accept", "application/json");
         JSONObject respuesta = new JSONObject(conexion.getTexto());
 
@@ -305,7 +305,7 @@ public class InorganicoService {
     private BusquedaWeb buscarBing(String input, String key) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        Conexion conexion = new Conexion(configuracionService.getBingURL(),input);
+        Descarga conexion = new Descarga(configuracionService.getBingURL(),input);
         conexion.setPropiedad("Ocp-Apim-Subscription-Key", key);
         JSONObject respuesta = new JSONObject(conexion.getTexto());
 
@@ -331,7 +331,7 @@ public class InorganicoService {
         Optional<InorganicoModel> resultado;
 
         try {
-            Conexion conexion = new Conexion(direccion);
+            Descarga conexion = new Descarga(direccion);
             conexion.setPropiedad("User-Agent", configuracionService.getUserAgent());
 
             PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());
