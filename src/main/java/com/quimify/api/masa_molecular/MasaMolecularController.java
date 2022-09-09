@@ -4,6 +4,7 @@ import com.quimify.api.autorizacion.Autorizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 // Esta clase implementa los métodos HTTP de la dirección "/masamolecular".
@@ -21,7 +22,7 @@ public class MasaMolecularController {
 
     @GetMapping()
     public MasaMolecularResultado masaMolecular(@RequestParam("formula") String formula,
-                                                @RequestParam("clave") String clave) {
+                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
         if(Autorizacion.esClavePublica(clave))
             return masaMolecularService.tryMasaMolecularDe(formula);
         else {
