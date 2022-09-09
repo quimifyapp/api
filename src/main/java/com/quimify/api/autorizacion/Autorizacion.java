@@ -1,6 +1,6 @@
-package com.quimify.api.autentificacion;
+package com.quimify.api.autorizacion;
 
-public class Autentificacion {
+public class Autorizacion {
 
 	private static final String CLAVE_PUBLICA = "qTsXzmRYeM8Bf7uZbK7Df2EyauzZYTm7";
 	private static final String CLAVE_PRIVADA = "m2H8JBfCJ6W9wQNLkTLvekLwt11uJbj4";

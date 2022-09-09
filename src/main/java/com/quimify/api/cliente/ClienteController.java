@@ -1,6 +1,6 @@
 package com.quimify.api.cliente;
 
-import com.quimify.api.autentificacion.Autentificacion;
+import com.quimify.api.autorizacion.Autorizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class ClienteController {
 	public ClienteResultado acceso(@RequestParam("version") Integer version,
 								   @RequestParam("plataforma") Short plataforma,
 								   @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-		if(Autentificacion.esClavePublica(clave))
+		if(Autorizacion.esClavePublica(clave))
 			return clienteService.acceso(version, plataforma);
 		else {
 			logger.error("Clave pública errónea: \"" + clave + "\".");

@@ -1,6 +1,6 @@
 package com.quimify.api.masa_molecular;
 
-import com.quimify.api.autentificacion.Autentificacion;
+import com.quimify.api.autorizacion.Autorizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class MasaMolecularController {
     @GetMapping()
     public MasaMolecularResultado masaMolecular(@RequestParam("formula") String formula,
                                                 @RequestParam("clave") String clave) {
-        if(Autentificacion.esClavePublica(clave))
+        if(Autorizacion.esClavePublica(clave))
             return masaMolecularService.tryMasaMolecularDe(formula);
         else {
             logger.error("Clave pública errónea: \"" + clave + "\".");

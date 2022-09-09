@@ -1,6 +1,6 @@
 package com.quimify.api.elemento;
 
-import com.quimify.api.autentificacion.Autentificacion;
+import com.quimify.api.autorizacion.Autorizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class ElementoController {
     @GetMapping("/{id}")
     public Optional<ElementoModel> seleccionarElemento(@PathVariable("id") Integer id,
                                                        @RequestParam("clave") String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return elementoService.seleccionar(id);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -35,7 +35,7 @@ public class ElementoController {
     @PutMapping()
     public Optional<ElementoModel> reemplazarElemento(@RequestBody ElementoModel nuevo,
                                                       @RequestParam("clave") String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return elementoService.reemplazar(nuevo);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -46,7 +46,7 @@ public class ElementoController {
     @PostMapping()
     public ElementoModel insertarElemento(@RequestBody ElementoModel nuevo,
                                           @RequestParam("clave") String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return elementoService.insertar(nuevo);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -57,7 +57,7 @@ public class ElementoController {
     @DeleteMapping()
     public Optional<ElementoModel> eliminarElemento(@RequestParam("id") Integer id,
                                                     @RequestParam("clave") String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return elementoService.eliminar(id);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");

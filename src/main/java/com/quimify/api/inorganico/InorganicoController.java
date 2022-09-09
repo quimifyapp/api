@@ -1,6 +1,6 @@
 package com.quimify.api.inorganico;
 
-import com.quimify.api.autentificacion.Autentificacion;
+import com.quimify.api.autorizacion.Autorizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class InorganicoController {
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
                                                 @RequestParam("foto") Boolean foto,
                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePublica(clave))
+        if(Autorizacion.esClavePublica(clave))
             return inorganicoService.buscar(input, foto);
         else {
             logger.error("Clave pública errónea: \"" + clave + "\".");
@@ -37,7 +37,7 @@ public class InorganicoController {
     @GetMapping("/autocompletar/{input}")
     public String autoCompletarInorganico(@PathVariable("input") String input,
                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePublica(clave))
+        if(Autorizacion.esClavePublica(clave))
             return inorganicoService.autoCompletar(input);
         else {
             logger.error("Clave pública errónea: \"" + clave + "\".");
@@ -48,7 +48,7 @@ public class InorganicoController {
     @GetMapping("/autocompletar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePublica(clave))
+        if(Autorizacion.esClavePublica(clave))
             return inorganicoService.buscarComplecion(complecion);
         else {
             logger.error("Clave pública errónea: \"" + clave + "\".");
@@ -61,7 +61,7 @@ public class InorganicoController {
     @GetMapping("/{id}")
     public Optional<InorganicoModel> seleccionarInorganico(@PathVariable("id") Integer id,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return inorganicoService.seleccionar(id);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -72,7 +72,7 @@ public class InorganicoController {
     @PutMapping()
     public Optional<InorganicoModel> reemplazarInorganico(@RequestBody InorganicoModel nuevo,
                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return inorganicoService.reemplazar(nuevo);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -89,7 +89,7 @@ public class InorganicoController {
     @PostMapping()
     public InorganicoModel insertarInorganico(@RequestBody InorganicoModel nuevo,
                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return inorganicoService.insertar(nuevo);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");
@@ -100,7 +100,7 @@ public class InorganicoController {
     @DeleteMapping()
     public Optional<InorganicoModel> eliminarInorganico(@RequestParam("id") Integer id,
                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
-        if(Autentificacion.esClavePrivada(clave))
+        if(Autorizacion.esClavePrivada(clave))
             return inorganicoService.eliminar(id);
         else {
             logger.error("Clave privada errónea: \"" + clave + "\".");

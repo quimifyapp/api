@@ -1,0 +1,21 @@
+INSERT INTO cliente(version,
+actualizacion_disponible,
+actualizacion_obligatoria,
+actualizacion_detalles,
+mensaje_presente,
+mensaje_titulo,
+mensaje_detalles,
+mensaje_enlace_presente,
+mensaje_enlace_nombre,
+mensaje_enlace)
+
+VALUES(0,
+true,
+false,
+"Ahora se pueden nombrar compuestos de tipo éster.",
+true,
+"Título del mensaje",
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget lectus id elit iaculis facilisis.",
+true,
+"Acceder al sorteo",
+"quimify.com/web")
