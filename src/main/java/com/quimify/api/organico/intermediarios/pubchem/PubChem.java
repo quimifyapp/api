@@ -1,12 +1,16 @@
 package com.quimify.api.organico.intermediarios.pubchem;
 
-
-
 import com.quimify.api.descarga.Descarga;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class PubChem {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	String smiles;
 
 	private static final String DIR = "https://pubchem.ncbi.nlm.nih.gov/";
 	private static final String REST = DIR + "rest/pug/compound/";
@@ -15,36 +19,44 @@ public class PubChem {
 	private static final String SMILES = "smiles/";
 	private static final String PNG = "/PNG";
 
-	public static PubChemResultado procesarSmiles(String smiles) {
+	// --------------------------------------------------------------------------------
+
+	// Constructor:
+
+	public PubChem(String smiles) {
+		this.smiles = smiles;
+	}
+
+	public PubChemResultado procesar() {
 		PubChemResultado resultado = new PubChemResultado();
 
 		smiles = Descarga.formatearHTTP(smiles);
 
+		String url = REST + SMILES + smiles + "/cids/TXT";
 		try {
-			String cid = new Descarga(REST + SMILES + smiles + "/cids/TXT").getTexto();
+			String cid = new Descarga(url).getTexto();
 
 			if(!cid.equals("0")) {
 				resultado.setUrl_2d(PNG_2D + cid); // Este es de buena calidad (500 x 500 px) :)
 
 				String base = REST + "cid/" + cid + "/property/";
-
 				try {
 					resultado.setMasa(new Descarga(base + "molecularweight/TXT").getTexto());
 				}
 				catch(IOException exception) {
-					// Error...
+					logger.error("Excepción al descargar \"" + base + "molecularweight/TXT" + "\": " + exception);
 				}
 
 				try {
 					resultado.setNombre_ingles(new Descarga(base + "iupacname/TXT").getTexto());
 				}
 				catch(IOException exception) {
-					// Error...
+					logger.error("Excepción al descargar \"" + base + "iupacname/TXT" + "\": " + exception);
 				}
 			}
 		}
 		catch(IOException exception) {
-			// Error...
+			logger.error("Excepción al descargar \"" + url + "\": " + exception);
 		}
 
 		if(resultado.getUrl_2d() == null)

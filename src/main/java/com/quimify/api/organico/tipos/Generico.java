@@ -5,6 +5,8 @@ import com.quimify.api.organico.componentes.Atomo;
 import com.quimify.api.organico.componentes.Atomos;
 import com.quimify.api.organico.componentes.Cadena;
 import com.quimify.api.organico.componentes.Funciones;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 // éster, cíclico...), pero también podría no encajar en ninguno de esos tipos.
 
 public class Generico extends Organica {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Set<Atomo> molecula;
 	private final String smiles;
@@ -219,7 +223,9 @@ public class Generico extends Organica {
 						}
 					}
 					else if (carbonos_extremos.size() == 0) {
-						// Error...
+						logger.error("Hay un puente de oxigeno y 0 carbonos extremos.");
+
+						return Optional.empty();
 					}
 				}
 			}

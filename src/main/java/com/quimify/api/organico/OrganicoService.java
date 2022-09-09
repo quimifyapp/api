@@ -49,7 +49,7 @@ public class OrganicoService {
 			}
 			catch(IllegalArgumentException ignore) {} // Es común que se produzcan errores
 			catch (Exception exception) {
-				// Error...
+				logger.error("Excepción al procesar un Generico de nombre \"" + nombre + "\": " + exception);
 			}
 		}
 		else resultado = NO_ENCONTRADO;
@@ -100,7 +100,7 @@ public class OrganicoService {
 	// INTERNOS ----------------------------------------------------------------------
 
 	private void completarConPubChem(OrganicoResultado resultado, String smiles) {
-		PubChemResultado pub_chem_resultado = PubChem.procesarSmiles(smiles);
+		PubChemResultado pub_chem_resultado = new PubChem(smiles).procesar();
 
 		if(pub_chem_resultado.getMasa().isPresent())
 			resultado.setMasa(pub_chem_resultado.getMasa().get());
