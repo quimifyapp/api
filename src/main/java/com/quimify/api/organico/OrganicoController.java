@@ -37,7 +37,7 @@ public class OrganicoController {
 	}
 
 	@GetMapping("/nombrar/simple")
-	public OrganicoResultado nombrarSimple(@RequestParam("secuencia") List<Integer> secuencia,
+	public OrganicoResultado nombrarSimple(@RequestParam("secuencia") int[] secuencia,
 										   @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
 		if(!Autorizacion.esClavePublica(clave)) {
 			logger.error("Clave pública errónea: \"" + clave + "\".");
@@ -49,7 +49,7 @@ public class OrganicoController {
 	}
 
 	@GetMapping("/nombrar/eter")
-	public OrganicoResultado nombrarEter(@RequestParam("secuencia") List<Integer> secuencia,
+	public OrganicoResultado nombrarEter(@RequestParam("secuencia") int[] secuencia,
 										 @RequestHeader(HttpHeaders.AUTHORIZATION) String clave) {
 		if(!Autorizacion.esClavePublica(clave)) {
 			logger.error("Clave pública errónea: \"" + clave + "\".");

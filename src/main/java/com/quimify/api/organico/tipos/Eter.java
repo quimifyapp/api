@@ -1,7 +1,5 @@
 package com.quimify.api.organico.tipos;
 
-
-
 import com.quimify.api.organico.Organica;
 import com.quimify.api.organico.componentes.Cadena;
 import com.quimify.api.organico.componentes.Funciones;
@@ -60,21 +58,23 @@ public final class Eter extends Organica {
 		empezarCadenaSecundaria();
 	}
 
-	public Eter(List<Integer> secuencia) {
+	public Eter(int[] secuencia) {
 		primaria = new Cadena(0);
 		secundaria = new Cadena(1); // (-C)
 
 		seleccionada = primaria;
 		hay_eter = false;
 
-		for(Integer eleccion : secuencia) {
-			if(eleccion != -1) {
+		for(int i = 0; i < secuencia.length; i++) {
+			if(secuencia[i] != -1) {
 				List<Funciones> disponibles = getSustituyentesDisponibles();
-				Funciones elegida = disponibles.get(eleccion);
 
-
-
-				enlazar(disponibles.get(eleccion));
+				if(disponibles.get(secuencia[i]) != Funciones.radical)
+					enlazar(disponibles.get(secuencia[i]));
+				else {
+					int tipo_radical = secuencia[++i];
+					enlazar(new Sustituyente(secuencia[++i], tipo_radical == 1));
+				}
 			}
 			else enlazarCarbono();
 		}

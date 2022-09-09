@@ -43,13 +43,19 @@ public final class Simple extends Organica {
         cadena = new Cadena();
     }
 
-    public Simple(List<Integer> secuencia) {
+    public Simple(int[] secuencia) {
         cadena = new Cadena(0);
 
-        for(Integer eleccion : secuencia) {
-            if(eleccion != -1) {
+        for(int i = 0; i < secuencia.length; i++) {
+            if(secuencia[i] != -1) {
                 List<Funciones> disponibles = getSustituyentesDisponibles();
-                enlazar(disponibles.get(eleccion));
+
+                if(disponibles.get(secuencia[i]) != Funciones.radical)
+                    enlazar(disponibles.get(secuencia[i]));
+                else {
+                    int tipo_radical = secuencia[++i];
+                    enlazar(new Sustituyente(secuencia[++i], tipo_radical == 1));
+                }
             }
             else enlazarCarbono();
         }
