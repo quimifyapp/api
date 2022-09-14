@@ -59,7 +59,7 @@
 			<artifactId>opsin-es</artifactId>
 			<scope>system</scope>
 			<version>2.6.0</version>
-			<systemPath>${project.basedir}/lib/opsin-es.jar</systemPath>
+			<systemPath>${basedir}/lib/opsin-es.jar</systemPath>
 		</dependency>
 
 	</dependencies>
@@ -69,6 +69,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
