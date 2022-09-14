@@ -29,7 +29,7 @@ public class InorganicoResultado {
 
     public InorganicoResultado(InorganicoModel inorganico) {
         this.encontrado = true;
-
+        this.es_organico_sugerencia = false;
         copiar(inorganico);
     }
 

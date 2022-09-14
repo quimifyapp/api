@@ -3,10 +3,14 @@ package com.quimify.api.organico;
 public class OrganicoResultado {
 
     private Boolean encontrado;
-    private String formula;
     private String nombre;
+    private String formula;
     private String masa;
     private String url_2d;
+
+    // Si 'encontrado' = false:
+
+    private Boolean es_inorganico_sugerencia;
 
     // --------------------------------------------------------------------------------
 
@@ -14,6 +18,7 @@ public class OrganicoResultado {
 
     public OrganicoResultado(boolean encontrado) {
         this.encontrado = encontrado;
+        this.es_inorganico_sugerencia = false;
     }
 
     // Getters y setters:
@@ -56,6 +61,14 @@ public class OrganicoResultado {
 
     public void setUrl_2d(String url_2d) {
         this.url_2d = url_2d;
+    }
+
+    public Boolean getEs_inorganico_sugerencia() {
+        return es_inorganico_sugerencia;
+    }
+
+    public void setEs_inorganico_sugerencia(Boolean es_inorganico_sugerencia) {
+        this.es_inorganico_sugerencia = es_inorganico_sugerencia;
     }
 
 }
