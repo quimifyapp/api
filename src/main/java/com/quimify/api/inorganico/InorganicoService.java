@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class InorganicoService {
 
     // AUTOCOMPLECIÓN ----------------------------------------------------------------
 
-    private static List<InorganicoNormalizado> NORMALIZADOS;
+    private static List<InorganicoNormalizado> NORMALIZADOS = new ArrayList<>();
 
     public void cargarNormalizados() {
         NORMALIZADOS = inorganicoRepository.findAllByOrderByBusquedasDesc()
@@ -47,19 +48,14 @@ public class InorganicoService {
 
         input = Normalizado.of(input); // Para poder hacer la búsqueda
 
-        try {
-            for (InorganicoNormalizado normalizado : NORMALIZADOS) {
-                if (normalizado.completaFormula(input))
-                    return normalizado.getFormulaOriginal(); // Fórmula puede autocompletar
-                if (normalizado.completaAlternativo(input))
-                    return normalizado.getAlternativoOriginal(); // Alternativo puede autocompletar
-                if (normalizado.completaNombre(input)
-                        || normalizado.completanEtiquetas(input))
-                    return normalizado.getNombreOriginal(); // Nombre o una etiqueta puede autocompletar
-            }
-        }
-        catch (Exception exception) {
-            logger.warn("Excepción al autocompletar \"" + input + "\": " + exception);
+        for (InorganicoNormalizado normalizado : NORMALIZADOS) {
+            if (normalizado.completaFormula(input))
+                return normalizado.getFormulaOriginal(); // Fórmula puede autocompletar
+            if (normalizado.completaAlternativo(input))
+                return normalizado.getAlternativoOriginal(); // Alternativo puede autocompletar
+            if (normalizado.completaNombre(input)
+                    || normalizado.completanEtiquetas(input))
+                return normalizado.getNombreOriginal(); // Nombre o una etiqueta puede autocompletar
         }
 
         return resultado;

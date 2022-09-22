@@ -12,6 +12,13 @@ public class InorganicoController {
     @Autowired
     InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
 
+    // ADMIN --------------------------------------------------------------------------
+
+    @GetMapping("/autocompletar/actualizar")
+    public void actualizarNormalizados() {
+        inorganicoService.cargarNormalizados();
+    }
+
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
