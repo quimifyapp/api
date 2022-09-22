@@ -3,6 +3,7 @@ package com.quimify.api.inorganico;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // Esta clase representa los compuestos inorgánicos.
 
@@ -50,6 +51,10 @@ public class InorganicoModel {
 
     public void registrarBusqueda() {
         busquedas++;
+    }
+
+    public Set<String> getEtiquetasString() {
+        return etiquetas.stream().map(EtiquetaModel::getTexto_normalizado).collect(Collectors.toSet());
     }
 
     public void nuevaEtiqueta(EtiquetaModel nueva) {

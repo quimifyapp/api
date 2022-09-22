@@ -27,7 +27,7 @@ public class InorganicoController {
 
     @GetMapping("/autocompletar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion) {
-        return inorganicoService.buscarComplecion(complecion);
+        return inorganicoService.buscarPorComplecion(complecion);
     }
 
 }
