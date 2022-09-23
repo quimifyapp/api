@@ -14,7 +14,7 @@ public class InorganicoController {
 
     // ADMIN --------------------------------------------------------------------------
 
-    @GetMapping("/autocompletar/actualizar")
+    @GetMapping("autocompletar/actualizar")
     public void actualizarNormalizados() {
         inorganicoService.cargarNormalizados();
     }
@@ -27,12 +27,12 @@ public class InorganicoController {
         return inorganicoService.buscar(input, foto);
     }
 
-    @GetMapping("/autocompletar/{input}")
-    public String autoCompletarInorganico(@PathVariable("input") String input) {
+    @GetMapping("/autocompletar")
+    public String autoCompletarInorganico(@RequestParam("input") String input) {
         return inorganicoService.autoCompletar(input);
     }
 
-    @GetMapping("/autocompletar")
+    @GetMapping("/autocompletar/buscar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion) {
         return inorganicoService.buscarPorComplecion(complecion);
     }

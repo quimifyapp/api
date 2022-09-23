@@ -41,6 +41,8 @@ public class InorganicoService {
     public void cargarNormalizados() {
         NORMALIZADOS = inorganicoRepository.findAllByOrderByBusquedasDesc()
                 .stream().map(InorganicoNormalizado::new).collect(Collectors.toList());
+
+        logger.info("Normalizados cargados");
     }
 
     public String autoCompletar(String input) {
@@ -118,7 +120,6 @@ public class InorganicoService {
                             metricaService.contarInorganicoNuevo();
                         } else { // Realmente sí estaba en la DB
                             resultado = new InorganicoResultado(buscado.get());
-                            nuevaBusqueda(buscado.get());
 
                             logger.warn("El inorgánico buscado en la web \"" + input + "\", una vez escaneado, era " +
                                     "id = " + buscado.get() + ".");
@@ -142,7 +143,6 @@ public class InorganicoService {
         // Flowchart #6
         else {
             resultado = new InorganicoResultado(buscado.get()); // Está en la DB
-            nuevaBusqueda(buscado.get());
         }
 
         metricaService.contarInorganicoBuscado(resultado.getEncontrado(), foto);
