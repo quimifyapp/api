@@ -1,6 +1,6 @@
 package com.quimify.api.inorganico;
 
-import com.quimify.api.Normalizar;
+import com.quimify.api.Normalizado;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,6 @@ public class PaginaFQ {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private String pagina; // Documento HTML
-    boolean escaneado_correcto = true; // 'False' si alguna de las características produce una excepción
 
     // --------------------------------------------------------------------------------
 
@@ -141,21 +140,21 @@ public class PaginaFQ {
 
         // Características numéricas:
 
-        resultado.get().setMasa(tryMasaFQ());
-        resultado.get().setFusion(tryTemperaturaFQ("fusión"));
-        resultado.get().setEbullicion(tryTemperaturaFQ("ebullición"));
-        resultado.get().setDensidad(tryDensidadFQ());
+        resultado.get().setMasa(masaFQ());
+        resultado.get().setFusion(temperaturaFQ("fusión"));
+        resultado.get().setEbullicion(temperaturaFQ("ebullición"));
+        resultado.get().setDensidad(densidadFQ());
 
         // Etiquetas:
 
         String etiqueta = nombre.replace("ácido ", "");
         if(!etiqueta.contentEquals(nombre))
-            resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+            resultado.get().nuevaEtiqueta(new EtiquetaModel(Normalizado.of(etiqueta)));
 
         if(alternativo != null) {
             etiqueta = alternativo.replace("ácido ", "");
             if(!etiqueta.contentEquals(alternativo))
-                resultado.get().nuevaEtiqueta(new EtiquetaModel(new Normalizar(etiqueta).get()));
+                resultado.get().nuevaEtiqueta(new EtiquetaModel(Normalizado.of(etiqueta)));
         }
 
         // Fin:
@@ -175,20 +174,7 @@ public class PaginaFQ {
         return indice;
     }
 
-    private String tryMasaFQ() {
-        String masa;
 
-        try {
-            masa = masaFQ();
-        }
-        catch (Exception e){
-            //...
-            masa = null;
-            escaneado_correcto = false;
-        }
-
-        return masa;
-    }
 
     private String masaFQ() {
         String masa;
@@ -218,21 +204,6 @@ public class PaginaFQ {
         else masa = null;
 
         return masa;
-    }
-
-    private String tryTemperaturaFQ(String tipo) {
-        String temperatura;
-
-        try {
-            temperatura = temperaturaFQ(tipo);
-        }
-        catch (Exception e){
-            //...
-            temperatura = null;
-            escaneado_correcto = false;
-        }
-
-        return temperatura;
     }
 
     private String temperaturaFQ(String tipo) {
@@ -265,21 +236,6 @@ public class PaginaFQ {
         else temperatura = null;
 
         return temperatura;
-    }
-
-    private String tryDensidadFQ() {
-        String densidad;
-
-        try {
-            densidad = densidadFQ();
-        }
-        catch (Exception e){
-            //...
-            densidad = null;
-            escaneado_correcto = false;
-        }
-
-        return densidad;
     }
 
     private String densidadFQ() {
@@ -399,10 +355,6 @@ public class PaginaFQ {
 
     PaginaFQ(String pagina) {
         this.pagina = pagina;
-    }
-
-    public boolean getEscaneadoCorrecto() {
-        return escaneado_correcto;
     }
 
 }

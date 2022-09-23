@@ -7,8 +7,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-// Esta clase contiene las órdenes se ejecutarán cuando Spring Boot indique que el servidor está
-// iniciado y listo.
+// Esta clase contiene las órdenes se ejecutarán cuando Spring Boot indique que el servidor está listo.
 
 @Component
 @Transactional
@@ -19,6 +18,6 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        inorganicoService.cargarInorganicosBuscables();
+        inorganicoService.cargarNormalizados();
     }
 }

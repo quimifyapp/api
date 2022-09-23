@@ -75,11 +75,13 @@ public class OrganicoService {
 		// Fórmula:
 		resultado.setFormula(simple.getFormula());
 
+		metricaService.contarNombrarOrganicoSimpleBuscado();
+
 		return resultado;
 	}
 
 	public OrganicoResultado nombrar(Eter eter) {
-		OrganicoResultado resultado = new OrganicoResultado(true);
+		var resultado = new OrganicoResultado(true);
 
 		eter.corregir(); // Es necesario
 
@@ -93,6 +95,8 @@ public class OrganicoService {
 
 		// Fórmula:
 		resultado.setFormula(eter.getFormula());
+
+		metricaService.contarNombrarOrganicoEterBuscado();
 
 		return resultado;
 	}

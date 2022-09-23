@@ -19,32 +19,4 @@ public class ElementoService {
         return elementoRepository.findBySimbolo(simbolo);
     }
 
-    // ADMIN --------------------------------------------------------------------------
-
-    public Optional<ElementoModel> seleccionar(Integer id) {
-        return elementoRepository.findById(id);
-    }
-
-    public Optional<ElementoModel> reemplazar(ElementoModel nuevo) {
-        Optional<ElementoModel> reemplazado = elementoRepository.findById(nuevo.getId());
-
-        if(reemplazado.isPresent()) // Si existe
-            elementoRepository.save(nuevo); // De la DB
-
-        return reemplazado;
-    }
-
-    public ElementoModel insertar(ElementoModel nuevo) {
-        return elementoRepository.save(nuevo); // En la DB
-    }
-
-    public Optional<ElementoModel> eliminar(Integer id) {
-        Optional<ElementoModel> eliminado = elementoRepository.findById(id);
-
-        if(eliminado.isPresent())
-            elementoRepository.deleteById(id); // De la DB
-
-        return eliminado;
-    }
-
 }

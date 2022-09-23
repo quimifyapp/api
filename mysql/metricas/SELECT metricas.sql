@@ -1,1 +1,2 @@
 SELECT * FROM metricas
+ORDER BY dia DESC
