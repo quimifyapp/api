@@ -226,4 +226,9 @@ public final class Ether extends Organic implements OpenChain {
 		return prefijo + cuantificador + enlaces + "il";
 	}
 
+	@Override
+	public String toString() {
+		return getStructure();
+	}
+
 }

@@ -3,95 +3,101 @@ package com.quimify.api.organic.components;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Atomo {
+public class Atom {
 
 	private final Integer id;
-	private final Element functionalGroup;
-	private final List<Atomo> bondedAtoms;
+	private final Element element;
+	private final List<Atom> bondedAtoms;
 
 	// Constantes:
 
-	public static final Atomo H = new Atomo(Element.H);
-	public static final Atomo N = new Atomo(Element.N);
-	public static final Atomo O = new Atomo(Element.O);
-	public static final Atomo OH = new Atomo(Element.O, List.of(H));
-	public static final Atomo NH2 = new Atomo(Element.N, List.of(H, H));
+	public static final Atom H = new Atom(Element.H);
+	public static final Atom N = new Atom(Element.N);
+	public static final Atom O = new Atom(Element.O);
+	public static final Atom OH = new Atom(Element.O, List.of(H));
+	public static final Atom NH2 = new Atom(Element.N, List.of(H, H));
 
-	public static final Atomo OC = new Atomo(Element.O, List.of(new Atomo(Element.C)));
-	public static final Atomo NO2 = new Atomo(Element.N, List.of(O, O));
-	public static final Atomo Br = new Atomo(Element.Br);
-	public static final Atomo Cl = new Atomo(Element.Cl);
-	public static final Atomo F = new Atomo(Element.F);
-	public static final Atomo I = new Atomo(Element.I);
+	public static final Atom OC = new Atom(Element.O, List.of(new Atom(Element.C)));
+	public static final Atom NO2 = new Atom(Element.N, List.of(O, O));
+	public static final Atom Br = new Atom(Element.Br);
+	public static final Atom Cl = new Atom(Element.Cl);
+	public static final Atom F = new Atom(Element.F);
+	public static final Atom I = new Atom(Element.I);
 
 	// Constructor:
 
-	public Atomo(int id, String simbolo) {
+	public Atom(int id, String simbolo) {
 		this.id = id;
 		bondedAtoms = new ArrayList<>();
 
 		switch (simbolo) {
 			case "C":
-				functionalGroup = Element.C;
+				element = Element.C;
 				break;
 			case "H":
-				functionalGroup = Element.H;
+				element = Element.H;
 				break;
 			case "N":
-				functionalGroup = Element.N;
+				element = Element.N;
 				break;
 			case "O":
-				functionalGroup = Element.O;
+				element = Element.O;
 				break;
 			case "Br":
-				functionalGroup = Element.Br;
+				element = Element.Br;
 				break;
 			case "Cl":
-				functionalGroup = Element.Cl;
+				element = Element.Cl;
 				break;
 			case "F":
-				functionalGroup = Element.F;
+				element = Element.F;
 				break;
 			case "I":
-				functionalGroup = Element.I;
+				element = Element.I;
 				break;
 			default:
 				throw new IllegalArgumentException("No se contempla el átomo \"" + simbolo + "\".");
 		}
 	}
 
-	public Atomo(Element functionalGroup, List<Atomo> enlazados) {
+	public Atom(Element element, List<Atom> enlazados) {
 		id = null;
-		this.functionalGroup = functionalGroup;
+		this.element = element;
 		this.bondedAtoms = enlazados;
 	}
 
-	private Atomo(Element functionalGroup) {
+	private Atom(Element element) {
 		id = null;
-		this.functionalGroup = functionalGroup;
+		this.element = element;
 		bondedAtoms = new ArrayList<>();
 	}
 
-	private Atomo(Atomo otro) {
+	private Atom(Atom otro) {
 		id = otro.id;
-		functionalGroup = otro.functionalGroup;
+		element = otro.element;
 		bondedAtoms = new ArrayList<>(otro.bondedAtoms);
 	}
 
 	// Modificadores:
 
-	public void enlazar(Atomo otro) {
+	public void enlazar(Atom otro) {
 		bondedAtoms.add(otro);
+	}
+
+	public void removeEther() {
+		getBondedAtomsSeparatedWithoutCarbon().stream()
+				.filter(bondedAtom -> bondedAtom.toFunctionalGroup() == FunctionalGroup.ether)
+				.forEach(etherAtom -> bondedAtoms.removeIf(bondedAtom -> Objects.equals(bondedAtom.id, etherAtom.id)));
 	}
 
 	// Consultas:
 
 	public boolean esTipo(Element tipo) {
-		return this.functionalGroup == tipo;
+		return this.element == tipo;
 	}
 
 	public boolean todosSusEnlazadosSonTipo(Element tipo) {
-		for (Atomo enlazado : bondedAtoms)
+		for (Atom enlazado : bondedAtoms)
 			if (!enlazado.esTipo(tipo))
 				return false;
 
@@ -107,14 +113,14 @@ public class Atomo {
 		boolean es_igual;
 
 		if (otro != null && otro.getClass() == this.getClass()) {
-			Atomo nuevo = (Atomo) otro;
+			Atom nuevo = (Atom) otro;
 
 			if (Objects.equals(id, nuevo.id)) { // Nota: Objects.equals(null, null) = true
-				if (functionalGroup == nuevo.functionalGroup && bondedAtoms.size() == nuevo.bondedAtoms.size()) {
+				if (element == nuevo.element && bondedAtoms.size() == nuevo.bondedAtoms.size()) {
 					es_igual = true;
 
-					List<Atomo> separados = getBondedAtomsSeparated();
-					List<Atomo> nuevos_separados = nuevo.getBondedAtomsSeparated();
+					List<Atom> separados = getBondedAtomsSeparated();
+					List<Atom> nuevos_separados = nuevo.getBondedAtomsSeparated();
 
 					for (int i = 0; i < separados.size(); i++)
 						if (!separados.get(i).equals(nuevos_separados.get(i))) {
@@ -130,11 +136,11 @@ public class Atomo {
 
 	// Internos:
 
-	private List<Atomo> getBondedAtomsSeparated(List<Atomo> bondedAtoms) {
-		List<Atomo> enlazados_separados = new ArrayList<>();
+	private List<Atom> getBondedAtomsSeparated(List<Atom> bondedAtoms) {
+		List<Atom> enlazados_separados = new ArrayList<>();
 
-		for (Atomo enlazado : bondedAtoms) {
-			Atomo nuevo = new Atomo(enlazado);
+		for (Atom enlazado : bondedAtoms) {
+			Atom nuevo = new Atom(enlazado);
 			nuevo.bondedAtoms.removeIf(otro -> Objects.equals(id, otro.id));
 			enlazados_separados.add(nuevo);
 		}
@@ -142,9 +148,9 @@ public class Atomo {
 		return enlazados_separados;
 	}
 
-	private Atomo toAnonymous() {
-		Atomo anonymousAtom = new Atomo(functionalGroup, getBondedAtomsSeparated());
-		anonymousAtom.bondedAtoms.replaceAll(Atomo::toAnonymous);
+	private Atom toAnonymous() {
+		Atom anonymousAtom = new Atom(element, getBondedAtomsSeparated());
+		anonymousAtom.bondedAtoms.replaceAll(Atom::toAnonymous);
 		return anonymousAtom;
 	}
 
@@ -157,37 +163,37 @@ public class Atomo {
 	public int getNumberOf(Element atom) {
 		int number = 0;
 
-		for (Atomo bonded : bondedAtoms)
+		for (Atom bonded : bondedAtoms)
 			if (bonded.esTipo(atom))
 				number++;
 
 		return number;
 	}
 
-	public List<Atomo> getBondedCarbons() {
+	public List<Atom> getBondedCarbons() {
 		return bondedAtoms.stream().filter(bonded -> bonded.esTipo(Element.C)).collect(Collectors.toList());
 	}
 
-	public List<Atomo> getBondedAtomsWithoutCarbon() {
+	public List<Atom> getBondedAtomsWithoutCarbon() {
 		return bondedAtoms.stream().filter(bonded -> !bonded.esTipo(Element.C)).collect(Collectors.toList());
 	}
 
-	public List<Atomo> getBondedAtomsSeparated() {
+	public List<Atom> getBondedAtomsSeparated() {
 		return getBondedAtomsSeparated(bondedAtoms);
 	}
 
-	public List<Atomo> getBondedCarbonsSeparated() {
+	public List<Atom> getBondedCarbonsSeparated() {
 		return getBondedAtomsSeparated(getBondedCarbons());
 	}
 
-	public List<Atomo> getBondedAtomsSeparatedWithoutCarbon() {
+	public List<Atom> getBondedAtomsSeparatedWithoutCarbon() {
 		return getBondedAtomsSeparated(getBondedAtomsWithoutCarbon());
 	}
 
 	public List<Substituent> getSubstituentsWithoutRadicals() {
 		List<Substituent> substituents = new ArrayList<>();
 
-		for (Atomo bonded : getBondedAtomsSeparatedWithoutCarbon())
+		for (Atom bonded : getBondedAtomsSeparatedWithoutCarbon())
 			substituents.add(new Substituent(bonded.toFunctionalGroup()));
 
 		return substituents;
@@ -196,7 +202,7 @@ public class Atomo {
 	private FunctionalGroup toFunctionalGroup() {
 		FunctionalGroup functionalGroup;
 
-		Atomo anonymous = toAnonymous(); // Sin 'id'
+		Atom anonymous = toAnonymous(); // Sin 'id'
 
 		if (anonymous.equals(N))
 			functionalGroup = FunctionalGroup.nitrile;
@@ -220,7 +226,7 @@ public class Atomo {
 			functionalGroup = FunctionalGroup.iodine;
 		else if (anonymous.equals(H))
 			functionalGroup = FunctionalGroup.hydrogen;
-		else throw new ClassCastException(); // Es un átomo no reconocido, como: Pb, OCl2...
+		else throw new ClassCastException("No se reconoce el átomo [" + element + "]."); // Unrecognized: Pb, OCl2...
 
 		return functionalGroup;
 	}
@@ -231,8 +237,8 @@ public class Atomo {
 		return id;
 	}
 
-	public Element getFunctionalGroup() {
-		return functionalGroup;
+	public Element getElement() {
+		return element;
 	}
 
 }

@@ -74,6 +74,7 @@ public class OrganicService {
 		return organicResult;
 	}
 
+	// TODO: handle exceptions
 	public OrganicResult getFromStructure(int[] inputSequence) {
 		OrganicResult organicResult = new OrganicResult(true);
 

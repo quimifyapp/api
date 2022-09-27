@@ -21,7 +21,7 @@ public final class Simple extends Organic implements OpenChain {
 
     private static final Set<FunctionalGroup> functionalGroups = Set.of(
             FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde,
-            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.nitro,
+            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.ether, FunctionalGroup.nitro,
             FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine, FunctionalGroup.iodine,
             FunctionalGroup.radical, FunctionalGroup.hydrogen
     );
@@ -68,7 +68,6 @@ public final class Simple extends Organic implements OpenChain {
         chain.enlazarCarbono();
     }
 
-    // TODO: sale en consola?
     public void bond(Substituent substituent) {
         if (functionalGroups.contains(substituent.getGroup()))
             chain.enlazar(substituent);
@@ -320,6 +319,11 @@ public final class Simple extends Organic implements OpenChain {
         else suffixName = new Localizador(posiciones, nombre).toString(); // Como "2-3-diona"
 
         return suffixName;
+    }
+
+    @Override
+    public String toString() {
+        return getStructure();
     }
 
 }

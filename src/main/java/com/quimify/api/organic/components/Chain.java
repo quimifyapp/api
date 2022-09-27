@@ -385,4 +385,9 @@ public class Chain extends Organic {
 		return formula.toString();
 	}
 
+	@Override
+	public String toString() {
+		return getStructure();
+	}
+
 }

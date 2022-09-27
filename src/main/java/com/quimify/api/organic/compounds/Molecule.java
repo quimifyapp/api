@@ -1,7 +1,7 @@
 package com.quimify.api.organic.compounds;
 
 import com.quimify.api.organic.Organic;
-import com.quimify.api.organic.components.Atomo;
+import com.quimify.api.organic.components.Atom;
 import com.quimify.api.organic.components.Element;
 import com.quimify.api.organic.compounds.open_chain.Ether;
 import com.quimify.api.organic.compounds.open_chain.Simple;
@@ -29,7 +29,7 @@ public class Molecule extends Organic {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private final Set<Atomo> molecula;
+	private final Set<Atom> molecula;
 	private final String smiles;
 
 	// Constructor:
@@ -50,7 +50,7 @@ public class Molecule extends Organic {
 			int id = Integer.parseInt(atomo.getAttribute("id").replace("a", ""));
 			String tipo = atomo.getAttribute("elementType");
 
-			molecula.add(new Atomo(id, tipo));
+			molecula.add(new Atom(id, tipo));
 		}
 
 		// Se enlazan entre sí:
@@ -65,85 +65,87 @@ public class Molecule extends Organic {
 					Integer.valueOf(id_string[1])
 			};
 
-			Atomo[] atomos = {
-					molecula.stream().filter(atomo -> atomo.getId().equals(id_int[0])).findAny()
+			Atom[] atoms = {
+					molecula.stream().filter(atom -> atom.getId().equals(id_int[0])).findAny()
 							.orElseThrow(NoSuchElementException::new),
-					molecula.stream().filter(atomo -> atomo.getId().equals(id_int[1])).findAny()
+					molecula.stream().filter(atom -> atom.getId().equals(id_int[1])).findAny()
 							.orElseThrow(NoSuchElementException::new)
 			};
 
-			atomos[0].enlazar(atomos[1]);
-			atomos[1].enlazar(atomos[0]);
+			atoms[0].enlazar(atoms[1]);
+			atoms[1].enlazar(atoms[0]);
 		}
 	}
 
 	// Consultas internas:
 
-	private List<Atomo> getCarbonos() {
-		return molecula.stream().filter(atomo -> atomo.getFunctionalGroup() == Element.C).collect(Collectors.toList());
+	private List<Atom> getCarbonos() {
+		return molecula.stream().filter(atom -> atom.getElement() == Element.C).collect(Collectors.toList());
 	}
 
-	private List<Atomo> getCarbonosExtremos() {
-		List<Atomo> carbonos = getCarbonos();
+	private List<Atom> getCarbonosExtremos() {
+		List<Atom> carbonos = getCarbonos();
 		return carbonos.stream().filter(carbono -> carbono.getNumberOf(Element.C) < 2).collect(Collectors.toList());
 	}
 
-	private List<Atomo> getOxigenosPuente() {
-		return molecula.stream().filter(Atomo::esOxigenoPuente).collect(Collectors.toList());
+	private List<Atom> getOxigenosPuente() {
+		return molecula.stream().filter(Atom::esOxigenoPuente).collect(Collectors.toList());
 	}
 
-	private int getCarbonosAlAlcanceDe(Atomo carbono) {
+	private int getCarbonosAlAlcanceDe(Atom carbono) {
 		int cantidad;
 
-		List<Atomo> enlazados = carbono.getBondedCarbonsSeparated();
+		List<Atom> enlazados = carbono.getBondedCarbonsSeparated();
 
 		cantidad = enlazados.size();
-		for(Atomo enlazado : enlazados)
+		for(Atom enlazado : enlazados)
 			cantidad += getCarbonosAlAlcanceDe(enlazado);
 
 		return cantidad;
 	}
 
-	private void continueChainBy(Atomo endingCarbon, OpenChain openChain) {
-		List<Atomo> bondedCarbonsSeparated = endingCarbon.getBondedCarbonsSeparated();
+	private void buildOpenChainStartingFrom(OpenChain openChain, Atom startingCarbon) {
+		// First carbon:
+		startingCarbon.getSubstituentsWithoutRadicals().forEach(openChain::bond);
+
+		// The rest of them:
+		List<Atom> bondedCarbonsSeparated = startingCarbon.getBondedCarbonsSeparated();
 
 		while(bondedCarbonsSeparated.size() > 0) {
 			openChain.bondCarbon();
 
-			Atomo carbon = bondedCarbonsSeparated.get(0);
-			carbon.getSubstituentsWithoutRadicals().forEach(openChain::bond); // Son solo los no-carbonos
+			Atom carbon = bondedCarbonsSeparated.get(0); // A path of multiple possible
+			carbon.getSubstituentsWithoutRadicals().forEach(openChain::bond);
 
 			bondedCarbonsSeparated = carbon.getBondedCarbonsSeparated();
 		}
 	}
 
-	private Simple construirSimple(Atomo endingCarbon) {
+	private Simple buildSimple(Atom startingCarbon) {
 		Simple simple = new Simple();
 
-		// First carbon:
-		endingCarbon.getSubstituentsWithoutRadicals().forEach(simple::bond); // Son solo los no-carbonos
-
-		// The rest:
-		continueChainBy(endingCarbon, simple);
+		buildOpenChainStartingFrom(simple, startingCarbon);
 
 		return simple;
 	}
 
-	private Ether construirEter(List<Atomo> bondedToTheOxygen) {
-		// One chain (C* - (...) - O - R'):
-		Simple simple = construirSimple(bondedToTheOxygen.get(0)); // - O - R
-		Ether ether = new Ether(simple.getReversed()); // R - O -
+	private Ether buildEther(List<Atom> bondedToTheOxygen) {
+		// First chain: [R - O -] R'
+		Atom firstCarbon = bondedToTheOxygen.get(0); // [C] - O - C'
+		Simple firstChain = buildSimple(firstCarbon); // - O - R
+		Ether ether = new Ether(firstChain.getReversed()); // R - O - C ≡
 
-		// The other one (R - O - C*):
-		Atomo endingCarbon = bondedToTheOxygen.get(1);
-		continueChainBy(endingCarbon, ether);
+		// Second chain: R - O - [R']
+		firstCarbon = bondedToTheOxygen.get(1); // C - O - [C']
+		firstCarbon.removeEther(); // It's already bonded
+		buildOpenChainStartingFrom(ether, firstCarbon); // R - O - R'
 
 		return ether;
 	}
 
 	private boolean soloHayUnaRama() {
-		for(Atomo atomo : getCarbonos())
-			if(atomo.getNumberOf(Element.C) > 2)
+		for(Atom atom : getCarbonos())
+			if(atom.getNumberOf(Element.C) > 2)
 				return false;
 
 		return true;
@@ -157,32 +159,32 @@ public class Molecule extends Organic {
 		// Se comprueba que hay ningún ciclo:
 		if(!smiles.matches(".*[0-9].*")) {
 			// Se buscan los extremos de la molécula:
-			List<Atomo> carbonos_extremos = getCarbonosExtremos();
+			List<Atom> carbonos_extremos = getCarbonosExtremos();
 
 			// Se buscan oxígenos que unan cadenas (R-O-R'):
-			List<Atomo> oxigenos_puente = getOxigenosPuente();
+			List<Atom> oxigenos_puente = getOxigenosPuente();
 
 			if(soloHayUnaRama()) {
 				if(oxigenos_puente.size() == 0) {
-					Atomo carbono_extremo = carbonos_extremos.get(0);
+					Atom carbono_extremo = carbonos_extremos.get(0);
 					int contiguos = 1 + getCarbonosAlAlcanceDe(carbono_extremo);
 
 					if (contiguos == getCarbonos().size()) { // No tiene otros puentes
 						// Podría ser un 'Simple':
-						Simple simple = construirSimple(carbono_extremo);
+						Simple simple = buildSimple(carbono_extremo);
 						simple.correctSubstituents();
 						formula = Optional.of(simple.getStructure());
 					}
 				}
 				else if(oxigenos_puente.size() == 1) { // No tiene más que un puente de oxígeno
 					if(carbonos_extremos.size() >= 2 && carbonos_extremos.size() <= 4) {
-						List<Atomo> enlazados_al_oxigeno = oxigenos_puente.get(0).getBondedCarbons();
+						List<Atom> enlazados_al_oxigeno = oxigenos_puente.get(0).getBondedCarbons();
 						int contiguos_izquierda = 1 + getCarbonosAlAlcanceDe(enlazados_al_oxigeno.get(0));
 						int contiguos_derecha = 1 + getCarbonosAlAlcanceDe(enlazados_al_oxigeno.get(1));
 
 						if(contiguos_izquierda + contiguos_derecha == getCarbonos().size()) { // No tiene otros puentes
 							// Podría ser un 'Eter':
-							Ether ether = construirEter(enlazados_al_oxigeno);
+							Ether ether = buildEther(enlazados_al_oxigeno);
 							ether.correctSubstituents();
 							formula = Optional.of(ether.getStructure());
 						}
