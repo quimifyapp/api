@@ -1,7 +1,7 @@
-package com.quimify.api.organico;
+package com.quimify.api.organic;
 
-import com.quimify.api.organico.componentes.Funciones;
-import com.quimify.api.organico.componentes.Sustituyente;
+import com.quimify.api.organic.components.FunctionalGroup;
+import com.quimify.api.organic.components.Substituent;
 
 import java.util.*;
 
@@ -9,24 +9,24 @@ import static java.util.Collections.swap;
 
 // Esta clase generaliza distintos tipos de compuestos orgánicos: cadenas simples, cíclicos, ésteres...
 
-public class Organica {
+public class Organic {
 
-    private static final List<Funciones> halogenos = Arrays.asList(Funciones.bromo, Funciones.cloro, Funciones.fluor, Funciones.yodo);
+    private static final List<FunctionalGroup> halogenos = Arrays.asList(FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine, FunctionalGroup.iodine);
 
     // Consultas:
 
-    protected static boolean esHalogeno(Funciones funcion) {
-        return halogenos.contains(funcion);
+    protected static boolean esHalogeno(FunctionalGroup functionalGroup) {
+        return halogenos.contains(functionalGroup);
     }
 
-    protected static boolean esAlquenoOAlquino(Funciones funcion) {
-        return funcion == Funciones.alqueno || funcion ==  Funciones.alquino;
+    protected static boolean esAlquenoOAlquino(FunctionalGroup functionalGroup) {
+        return functionalGroup == FunctionalGroup.alkene || functionalGroup ==  FunctionalGroup.alkyne;
     }
 
-    protected static void ordenarPorFunciones(List<Sustituyente> sustituyentes) {
-        for(int i = 0; i < sustituyentes.size() - 1;) // Sin incremento
-            if(sustituyentes.get(i).getFuncion().compareTo(sustituyentes.get(i + 1).getFuncion()) > 0) {
-                swap(sustituyentes, i, i + 1); // get(i) > get(i + 1)
+    protected static void ordenarPorFunciones(List<Substituent> substituents) {
+        for(int i = 0; i < substituents.size() - 1;) // Sin incremento
+            if(substituents.get(i).getGroup().compareTo(substituents.get(i + 1).getGroup()) > 0) {
+                swap(substituents, i, i + 1); // get(i) > get(i + 1)
                 i = 0;
             }
             else i++; // get(i) <= get(i + 1)
@@ -216,7 +216,7 @@ public class Organica {
                 auxiliar.append(posiciones.get(posiciones.size() - 1) + 1);
             }
 
-            construir(auxiliar.toString(), Organica.multiplicadorDe(posiciones.size()), lexema);
+            construir(auxiliar.toString(), Organic.multiplicadorDe(posiciones.size()), lexema);
         }
 
         // No se tienen en cuenta los multiplicadores ni las posiciones, como propone la IUPAC.
@@ -244,110 +244,110 @@ public class Organica {
 
     }
 
-    protected static String nombreDeRadical(Sustituyente radical) {
-        String resultado;
+    protected static String getRadicalNameParticle(Substituent radical) {
+        String nameParticle;
 
         if(radical.getIso())
-            resultado = "iso";
-        else resultado = "";
+            nameParticle = "iso";
+        else nameParticle = "";
 
-        resultado += cuantificadorDe(radical.getCarbonos()) + "il";
+        nameParticle += cuantificadorDe(radical.getCarbonCount()) + "il";
 
-        return resultado;
+        return nameParticle;
     }
 
-    protected static String nombreDePrefijo(Funciones funcion) {
-        String nombre_prefijo;
+    protected static String getPrefixNameParticle(FunctionalGroup functionalGroup) {
+        String preffixNameParticle;
 
-        switch(funcion) {
-            case carbamoil:
-                nombre_prefijo = "carbamoil";
+        switch(functionalGroup) {
+            case carbamoyl:
+                preffixNameParticle = "carbamoil";
                 break;
-            case cianuro:
-                nombre_prefijo = "ciano";
+            case cyanide:
+                preffixNameParticle = "ciano";
                 break;
-            case cetona:
-                nombre_prefijo = "oxo";
+            case ketone:
+                preffixNameParticle = "oxo";
                 break;
             case alcohol:
-                nombre_prefijo = "hidroxi";
+                preffixNameParticle = "hidroxi";
                 break;
-            case amina:
-                nombre_prefijo = "amino";
+            case amine:
+                preffixNameParticle = "amino";
                 break;
             case nitro:
-                nombre_prefijo = "nitro";
+                preffixNameParticle = "nitro";
                 break;
-            case bromo:
-                nombre_prefijo = "bromo";
+            case bromine:
+                preffixNameParticle = "bromo";
                 break;
-            case cloro:
-                nombre_prefijo = "cloro";
+            case chlorine:
+                preffixNameParticle = "cloro";
                 break;
-            case fluor:
-                nombre_prefijo = "fluoro";
+            case fluorine:
+                preffixNameParticle = "fluoro";
                 break;
-            case yodo:
-                nombre_prefijo = "yodo";
+            case iodine:
+                preffixNameParticle = "yodo";
                 break;
             default:
-                throw new IllegalArgumentException("No existen prefijos para la función " + funcion + ".");
+                throw new IllegalArgumentException("No existen prefijos para la función " + functionalGroup + ".");
         }
 
-        return nombre_prefijo;
+        return preffixNameParticle;
     }
 
-    protected static String nombreDeEnlace(Funciones enlace) {
-        String nombre_enlace;
+    protected static String getBondNameParticle(FunctionalGroup enlace) {
+        String bondNameParticle;
 
         switch(enlace) {
-            case alqueno:
-                nombre_enlace = "en";
+            case alkene:
+                bondNameParticle = "en";
                 break;
-            case alquino:
-                nombre_enlace = "in";
+            case alkyne:
+                bondNameParticle = "in";
                 break;
             default:
                 throw new IllegalArgumentException("La función " + enlace + " no es un tipo de enlace.");
         }
 
-        return nombre_enlace;
+        return bondNameParticle;
     }
 
-    protected static String nombreDeSufijo(Funciones funcion) {
-        String nombre_sufijo;
+    protected static String getSuffixNameParticle(FunctionalGroup functionalGroup) {
+        String suffixNameParticle;
 
-        switch(funcion) {
-            case acido:
-                nombre_sufijo = "oico";
+        switch(functionalGroup) {
+            case acid:
+                suffixNameParticle = "oico";
                 break;
-            case amida:
-                nombre_sufijo = "amida";
+            case amide:
+                suffixNameParticle = "amida";
                 break;
-            case nitrilo:
-                nombre_sufijo = "nitrilo";
+            case nitrile:
+                suffixNameParticle = "nitrilo";
                 break;
-            case aldehido:
-                nombre_sufijo = "al";
+            case aldehyde:
+                suffixNameParticle = "al";
                 break;
-            case cetona:
-                nombre_sufijo = "ona";
+            case ketone:
+                suffixNameParticle = "ona";
                 break;
             case alcohol:
-                nombre_sufijo = "ol";
+                suffixNameParticle = "ol";
                 break;
-            case amina:
-                nombre_sufijo = "amina";
+            case amine:
+                suffixNameParticle = "amina";
                 break;
             default:
-                throw new IllegalArgumentException("No existen sufijos para la función " + funcion + ".");
+                throw new IllegalArgumentException("No existen sufijos para la función " + functionalGroup + ".");
         }
 
-        return nombre_sufijo;
+        return suffixNameParticle;
     }
 
-    protected static String enlaceDeOrden(int orden) {
-        switch(orden) {
+    protected static String getBondSymbol(int bondOrder) {
+        switch(bondOrder) {
             case 0:
                 return "-";
             case 1:
@@ -355,36 +355,29 @@ public class Organica {
             case 2:
                 return "≡";
             default:
-                throw new IllegalArgumentException("No existen enlaces de orden " + orden + ".");
+                throw new IllegalArgumentException("No existen enlaces de orden " + bondOrder + ".");
         }
     }
 
-    protected static String cuantificadorMolecular(int cantidad) {
-        return (cantidad != 1)
-                ? String.valueOf(cantidad) // Como en "CO2"
-                : ""; // Como en "CO"
+    protected static String getMolecularQuantifier(int count) {
+        return count != 1 ? String.valueOf(count) : ""; // As in "CO2" or "CO"
     }
 
-    protected static char primeraLetraDe(String texto) {
-        for(char c : texto.toCharArray())
-            if(c >= 'a' && c <= 'z')
-                return c;
-
-        return 0;
+    protected static char firstLetterOf(String text) {
+        return (char) text.chars().filter(c -> String.valueOf((char) c).matches("[a-zA-Z]"))
+                .findFirst().orElse(0);
     }
 
-    protected static boolean noEmpiezaPorVocal(String texto) {
-        char primera = primeraLetraDe(texto);
-        return primera != 'a' && primera != 'e' && primera != 'i' && primera != 'o' && primera != 'u';
+    protected static boolean doesNotStartWithVowel(String text) {
+        return "aeiou".indexOf(firstLetterOf(text)) != -1;
     }
 
-    protected static boolean noEmpiezaPorLetra(String texto) {
-        return texto.charAt(0) != primeraLetraDe(texto);
+    protected static boolean doesNotStartWithLetter(String text) {
+        return text.charAt(0) != firstLetterOf(text);
     }
 
-    protected static boolean empiezaPorDigito(String texto) {
-        char primera = texto.charAt(0);
-        return primera >= '0' && primera <= '9';
+    protected static boolean startsWithDigit(String text) {
+        return text.matches("^\\d.*$") ;
     }
 
 }

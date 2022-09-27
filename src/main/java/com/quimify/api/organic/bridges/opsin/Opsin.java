@@ -1,4 +1,4 @@
-package com.quimify.api.organico.intermediarios.opsin;
+package com.quimify.api.organic.bridges.opsin;
 
 import uk.ac.cam.ch.wwmm.opsin.*;
 
@@ -9,8 +9,8 @@ public class Opsin {
     protected static final es.opsin.NameToStructure opsin_es = es.opsin.NameToStructure.getInstance();
     protected static final NameToStructure opsin_en = NameToStructure.getInstance();
 
-    public static Optional<OpsinResultado> procesarNombreES(String nombre) {
-        Optional<OpsinResultado> resultado;
+    public static Optional<OpsinResult> procesarNombreES(String nombre) {
+        Optional<OpsinResult> resultado;
 
         // La sintaxis que permite OPSIN es inglesa, donde "cloruro de sodio" es como "sodio cloruro":
         if(nombre.contains(" de ")) {
@@ -29,23 +29,23 @@ public class Opsin {
 
         // Se convierte a la clase propia 'OpsinResultado':
         if(opsin_result.getStatus() == es.opsin.OpsinResult.OPSIN_RESULT_STATUS.SUCCESS)
-            resultado = Optional.of(new OpsinResultado(opsin_result));
+            resultado = Optional.of(new OpsinResult(opsin_result));
         else resultado = Optional.empty();
 
         return resultado;
     }
-    public static Optional<OpsinResultado> procesarNombreEN(String nombre) {
-        Optional<OpsinResultado> resultado;
+    public static Optional<OpsinResult> procesarNombreEN(String nombre) {
+        Optional<OpsinResult> resultado;
 
         // La librería OPSIN rechaza el prefijo "di" de los éteres simétricos en algunos casos:
         nombre = corregirEter(nombre);
 
         // Se procesa:
-        OpsinResult opsin_result = opsin_en.parseChemicalName(nombre);
+        uk.ac.cam.ch.wwmm.opsin.OpsinResult opsin_result = opsin_en.parseChemicalName(nombre);
 
         // Se convierte a la clase propia 'OpsinResultado':
-        if(opsin_result.getStatus() == OpsinResult.OPSIN_RESULT_STATUS.SUCCESS)
-            resultado = Optional.of(new OpsinResultado(opsin_result));
+        if(opsin_result.getStatus() == uk.ac.cam.ch.wwmm.opsin.OpsinResult.OPSIN_RESULT_STATUS.SUCCESS)
+            resultado = Optional.of(new OpsinResult(opsin_result));
         else resultado = Optional.empty();
 
         return resultado;

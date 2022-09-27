@@ -137,7 +137,7 @@ public class InorganicoService {
                 resultado = NO_ENCONTRADO; // Temporal
                 // Sugerencia...
 
-                logger.warn("No se ha encontrado el inorgánico: " + input);
+                logger.warn("No se ha encontrado el inorgánico \"" + input + "\".");
             }
         }
         // Flowchart #6

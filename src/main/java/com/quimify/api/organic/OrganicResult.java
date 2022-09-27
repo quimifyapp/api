@@ -1,6 +1,6 @@
-package com.quimify.api.organico;
+package com.quimify.api.organic;
 
-public class OrganicoResultado {
+public class OrganicResult {
 
     private Boolean encontrado;
     private String nombre;
@@ -16,7 +16,7 @@ public class OrganicoResultado {
 
     // Constructor:
 
-    public OrganicoResultado(boolean encontrado) {
+    public OrganicResult(boolean encontrado) {
         this.encontrado = encontrado;
         this.es_inorganico_sugerencia = false;
     }

@@ -1,8 +1,8 @@
-package com.quimify.api.organico.intermediarios.pubchem;
+package com.quimify.api.organic.bridges.pubchem;
 
 import java.util.Optional;
 
-public class PubChemResultado {
+public class PubChemResult {
 
 	private String url_2d;
 	private Optional<String> masa = Optional.empty();

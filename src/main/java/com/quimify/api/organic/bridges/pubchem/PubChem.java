@@ -1,4 +1,4 @@
-package com.quimify.api.organico.intermediarios.pubchem;
+package com.quimify.api.organic.bridges.pubchem;
 
 import com.quimify.api.descarga.Descarga;
 import org.slf4j.Logger;
@@ -27,8 +27,8 @@ public class PubChem {
 		this.smiles = smiles;
 	}
 
-	public PubChemResultado procesar() {
-		PubChemResultado resultado = new PubChemResultado();
+	public PubChemResult procesar() {
+		PubChemResult resultado = new PubChemResult();
 
 		smiles = Descarga.formatearHTTP(smiles);
 
