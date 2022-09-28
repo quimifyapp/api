@@ -369,7 +369,7 @@ public class Organic {
     }
 
     protected static boolean doesNotStartWithVowel(String text) {
-        return "aeiou".indexOf(firstLetterOf(text)) != -1;
+        return "aeiou".indexOf(firstLetterOf(text)) == -1;
     }
 
     protected static boolean doesNotStartWithLetter(String text) {

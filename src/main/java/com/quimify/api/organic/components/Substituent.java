@@ -133,7 +133,7 @@ public class Substituent extends Organic {
     // Para radicales:
 
     public boolean esMayorRadicalQue(Substituent radical) {
-        switch(Integer.compare(getCarbonosRectos(), radical.getCarbonosRectos())) {
+        switch(Integer.compare(getStraightCarbonCount(), radical.getStraightCarbonCount())) {
             case 1: // Lo supera
                 return true;
             case 0: // Lo iguala
@@ -166,32 +166,31 @@ public class Substituent extends Organic {
 
     // Para radicales:
 
-    public int getCarbonosRectos() {
+    public int getStraightCarbonCount() {
         return carbonCount - (isIso ? 1 : 0);
     }
 
-    public Chain getCadena() {
-        Chain chain = new Chain();
+    public Chain getChain() {
+        if (carbonCount == 0)
+            return new Chain(); // Empty
 
-        if(carbonCount > 0) {
-            chain.enlazarCarbono(); // (C)
-            chain.enlazar(FunctionalGroup.hydrogen, 3); // CH3-
+        Chain chain = new Chain(0); // (C)
 
-            int anteriores = 1; // CH3-
+        chain.enlazar(FunctionalGroup.hydrogen, 3); // CH3-
 
-            if(isIso) {
-                chain.enlazarCarbono(); // CH3-C≡
-                chain.enlazar(FunctionalGroup.hydrogen); // CH3-CH=
-                chain.enlazar(CH3); // CH3-CH(CH3)-
+        int previous = 1; // CH3-
 
-                anteriores += 2; // CH3-CH(CH3)-
-            }
+        if (isIso) {
+            chain.enlazarCarbono(); // CH3-C≡
+            chain.enlazar(FunctionalGroup.hydrogen); // CH3-CH=
+            chain.enlazar(CH3); // CH3-CH(CH3)-
 
-            for(int i = anteriores; i < carbonCount; i++) {
-                chain.enlazarCarbono(); // CH3-CH(CH3)-C≡
-                chain.enlazar(FunctionalGroup.hydrogen, 2); // CH3-CH(CH3)-CH2-
-            }
+            previous += 2; // CH3-CH(CH3)-
+        }
 
+        for (int i = previous; i < carbonCount; i++) {
+            chain.enlazarCarbono(); // CH3-CH(CH3)-C≡
+            chain.enlazar(FunctionalGroup.hydrogen, 2); // CH3-CH(CH3)-CH2-
         }
 
         return chain; // CH3-CH(CH3)-CH2-

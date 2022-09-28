@@ -14,15 +14,15 @@ public class OrganicController {
 
 	// CLIENTE ------------------------------------------------------------------------
 
-	@GetMapping("/name")
+	@GetMapping("name")
 	public OrganicResult name(@RequestParam("name") String name,
 							  @RequestParam("picture") Boolean picture) {
 		return organicService.getFromName(name, picture);
 	}
 
-	@GetMapping("/structure")
-	public OrganicResult structure(@RequestParam("input-sequence") int[] inputSequence) {
-		return organicService.getFromStructure(inputSequence);
+	@GetMapping("structure")
+	public OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
+		return organicService.getFromStructure(structureSequence);
 	}
 
 }

@@ -16,7 +16,7 @@ public class Chain extends Organic {
 
 	public Chain(int enlaces_previos) {
 		carbons = new ArrayList<>();
-		comenzar(enlaces_previos);
+		carbons.add(new Carbon(enlaces_previos));
 	}
 
 	public Chain(Chain nueva) {
@@ -36,10 +36,6 @@ public class Chain extends Organic {
 
 	private void agregarCopiaDe(Chain otra) {
 		agregarCopiaDe(otra.carbons);
-	}
-
-	private void comenzar(int enlaces_previos) {
-		carbons.add(new Carbon(enlaces_previos));
 	}
 
 	// Modificadores:
@@ -67,15 +63,11 @@ public class Chain extends Organic {
 	}
 
 	public void enlazarCarbono() {
-		if(carbons.size() > 0) {
-			if(getEnlacesLibres() > 0) {
-				Carbon ultimo = getUltimo();
-				ultimo.enlazarCarbono();
-				carbons.add(new Carbon(ultimo.getEnlacesLibres() + 1));
-			}
-			else throw new IllegalStateException("No se puede enlazar un carbono a [" + getStructure() + "].");
-		}
-		else comenzar(0); // TODO: sirve??
+		if (getEnlacesLibres() > 0) {
+			Carbon ultimo = getUltimo();
+			ultimo.enlazarCarbono();
+			carbons.add(new Carbon(ultimo.getEnlacesLibres() + 1));
+		} else throw new IllegalStateException("No se puede enlazar un carbono a [" + getStructure() + "].");
 	}
 
 	private void transformarEn(Chain otra) {
@@ -96,7 +88,7 @@ public class Chain extends Organic {
 				Substituent mayor_radical = carbons.get(i).getMayorRadical();
 
 				// Se calcula si el "camino" por este radical es preferible a la cadena principal:
-				int comparacion = Integer.compare(mayor_radical.getCarbonosRectos(), i);
+				int comparacion = Integer.compare(mayor_radical.getStraightCarbonCount(), i);
 
 				if(comparacion == 1 || (comparacion == 0 && mayor_radical.getIso())) {
 					// Se corrige la cadena por la izquierda:
@@ -122,7 +114,7 @@ public class Chain extends Organic {
 					else carbons.get(0).eliminar(mayor_radical); // Será el camino de la cadena principal
 
 					// Se convierte el radical en el nuevo camino de la cadena principal:
-					Chain parte_izquierda = mayor_radical.getCadena();
+					Chain parte_izquierda = mayor_radical.getChain();
 					parte_izquierda.enlazar(carbons);
 
 					// Se efectúa el cambio:

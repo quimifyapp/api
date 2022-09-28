@@ -108,6 +108,11 @@ public class Atom {
 		return esTipo(Element.O) && getCantidadDeEnlazados() == 2 && todosSusEnlazadosSonTipo(Element.C); // C-O-C
 	}
 
+	public boolean isBondedToEther() {
+		return getBondedAtomsSeparatedWithoutCarbon().stream().map(Atom::toFunctionalGroup)
+				.collect(Collectors.toSet()).contains(FunctionalGroup.ether);
+	}
+
 	@Override
 	public boolean equals(Object otro) {
 		boolean es_igual;

@@ -8,7 +8,7 @@ import com.quimify.api.organic.bridges.pubchem.PubChem;
 import com.quimify.api.organic.bridges.pubchem.PubChemResult;
 import com.quimify.api.organic.components.FunctionalGroup;
 import com.quimify.api.organic.components.Substituent;
-import com.quimify.api.organic.compounds.OpenChain;
+import com.quimify.api.organic.compounds.open_chain.OpenChain;
 import com.quimify.api.organic.compounds.open_chain.Ether;
 import com.quimify.api.organic.compounds.Molecule;
 import com.quimify.api.organic.compounds.open_chain.Simple;

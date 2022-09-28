@@ -5,7 +5,6 @@ import com.quimify.api.organic.components.Chain;
 import com.quimify.api.organic.components.Carbon;
 import com.quimify.api.organic.components.FunctionalGroup;
 import com.quimify.api.organic.components.Substituent;
-import com.quimify.api.organic.compounds.OpenChain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,10 @@ public final class Simple extends Organic implements OpenChain {
         this.chain = new Chain(0);
     }
 
+    public Simple(int previousBonds) {
+        this.chain = new Chain(previousBonds);
+    }
+
     private Simple(Chain chain) {
         this.chain = new Chain(chain);
     }
@@ -40,36 +43,38 @@ public final class Simple extends Organic implements OpenChain {
         return new Simple(chain.getInversa());
     }
 
-    public boolean isDone() {
-        return chain.isDone();
-    }
-
     public int getFreeBonds() {
         return chain.getEnlacesLibres();
     }
 
+    public boolean isDone() {
+        return chain.isDone();
+    }
+
     public List<FunctionalGroup> getOrderedBondableGroups() {
-        List<FunctionalGroup> orderedBondableFunctionalGroups = new ArrayList<>();
+        List<FunctionalGroup> orderedBondableGroups = new ArrayList<>();
 
-        if(getFreeBonds() > 2)
-            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.acid, FunctionalGroup.amide,
-                    FunctionalGroup.nitrile, FunctionalGroup.aldehyde));
+        if (getFreeBonds() > 2)
+            orderedBondableGroups.addAll(List.of(
+                    FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde)
+            );
 
-        if(getFreeBonds() > 1)
-            orderedBondableFunctionalGroups.add(FunctionalGroup.ketone);
+        if (getFreeBonds() > 1)
+            orderedBondableGroups.add(FunctionalGroup.ketone);
 
-        if(getFreeBonds() > 0) {
-            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine));
+        if (getFreeBonds() > 0) {
+            orderedBondableGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine));
 
-            if(getFreeBonds() == 1)
-                orderedBondableFunctionalGroups.add(FunctionalGroup.ether);
+            if (getFreeBonds() == 1)
+                orderedBondableGroups.add(FunctionalGroup.ether);
 
-            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.ether, FunctionalGroup.nitro,
-                    FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
-                    FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen));
+            orderedBondableGroups.addAll(List.of(
+                    FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
+                    FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen)
+            );
         }
 
-        return orderedBondableFunctionalGroups;
+        return orderedBondableGroups;
     }
 
     public void bondCarbon() {

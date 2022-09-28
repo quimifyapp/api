@@ -1,4 +1,4 @@
-package com.quimify.api.organic.compounds;
+package com.quimify.api.organic.compounds.open_chain;
 
 // Esta interfaz implementa compuestos orgánicos no cíclicos:
 //  - Simple: R
@@ -13,9 +13,9 @@ import java.util.List;
 public interface OpenChain {
     OpenChain getReversed();
 
-    boolean isDone();
-
     int getFreeBonds();
+
+    boolean isDone();
 
     List<FunctionalGroup> getOrderedBondableGroups();
 

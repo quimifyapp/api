@@ -4,15 +4,12 @@ import com.quimify.api.organic.Organic;
 import com.quimify.api.organic.components.Chain;
 import com.quimify.api.organic.components.FunctionalGroup;
 import com.quimify.api.organic.components.Substituent;
-import com.quimify.api.organic.compounds.OpenChain;
 
 import java.util.*;
 
 // Esta clase representa éteres: dos cadenas con funciones de prioridad menor a la función éter unidas por un oxígeno.
 
 public final class Ether extends Organic implements OpenChain {
-
-	// R - O - R'
 
 	private final Chain firstChain, secondChain; // R, R'
 
@@ -38,12 +35,12 @@ public final class Ether extends Organic implements OpenChain {
 		return new Ether(secondChain.getInversa(), firstChain.getInversa());
 	}
 
-	public boolean isDone() {
-		return secondChain.isDone();
-	}
-
 	public int getFreeBonds() {
 		return secondChain.getEnlacesLibres();
+	}
+
+	public boolean isDone() {
+		return secondChain.isDone();
 	}
 
 	public List<FunctionalGroup> getOrderedBondableGroups() {
