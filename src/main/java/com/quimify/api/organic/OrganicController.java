@@ -3,7 +3,7 @@ package com.quimify.api.organic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-// Esta clase implementa los métodos HTTP de la dirección "/organico".
+// Esta clase implementa los métodos HTTP de la dirección "/organic".
 
 @RestController
 @RequestMapping("/organic")
@@ -21,7 +21,7 @@ public class OrganicController {
 	}
 
 	@GetMapping("/structure")
-	public OrganicResult structure(@RequestParam("inputSequence") int[] inputSequence) {
+	public OrganicResult structure(@RequestParam("input-sequence") int[] inputSequence) {
 		return organicService.getFromStructure(inputSequence);
 	}
 

@@ -19,9 +19,9 @@ public final class Simple extends Organic implements OpenChain {
 
     private static final Chain CO2 = new Chain(List.of(new Carbon(FunctionalGroup.ketone, 2))); // Auxiliar
 
-    private static final Set<FunctionalGroup> functionalGroups = Set.of(
+    private static final Set<FunctionalGroup> bondableGroups = Set.of(
             FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde,
-            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.ether, FunctionalGroup.nitro,
+            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.nitro,
             FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine, FunctionalGroup.iodine,
             FunctionalGroup.radical, FunctionalGroup.hydrogen
     );
@@ -52,14 +52,22 @@ public final class Simple extends Organic implements OpenChain {
         List<FunctionalGroup> orderedBondableFunctionalGroups = new ArrayList<>();
 
         if(getFreeBonds() > 2)
-            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde));
+            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.acid, FunctionalGroup.amide,
+                    FunctionalGroup.nitrile, FunctionalGroup.aldehyde));
 
         if(getFreeBonds() > 1)
             orderedBondableFunctionalGroups.add(FunctionalGroup.ketone);
 
-        if(getFreeBonds() > 0)
-            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine,
-                    FunctionalGroup.fluorine, FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen));
+        if(getFreeBonds() > 0) {
+            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine));
+
+            if(getFreeBonds() == 1)
+                orderedBondableFunctionalGroups.add(FunctionalGroup.ether);
+
+            orderedBondableFunctionalGroups.addAll(List.of(FunctionalGroup.ether, FunctionalGroup.nitro,
+                    FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
+                    FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen));
+        }
 
         return orderedBondableFunctionalGroups;
     }
@@ -69,7 +77,7 @@ public final class Simple extends Organic implements OpenChain {
     }
 
     public void bond(Substituent substituent) {
-        if (functionalGroups.contains(substituent.getGroup()))
+        if (bondableGroups.contains(substituent.getGroup()))
             chain.enlazar(substituent);
         else throw new IllegalArgumentException("No se puede enlazar [" + substituent.getGroup() + "] a un Simple.");
     }

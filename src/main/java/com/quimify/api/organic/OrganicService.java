@@ -32,7 +32,8 @@ public class OrganicService {
 	@Autowired
 	MetricasService metricaService; // Procesos de las metricas diarias
 
-	public static final OrganicResult NO_ENCONTRADO = new OrganicResult(false); // Constante auxiliar
+	public static final OrganicResult notFound = new OrganicResult(false); // Constante auxiliar
+	public static final int carbonInputCode = -1;
 
 	// CLIENTE -----------------------------------------------------------------------
 
@@ -64,7 +65,7 @@ public class OrganicService {
 			}
 		}
 		else {
-			organicResult = NO_ENCONTRADO;
+			organicResult = notFound;
 
 			logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 		}
@@ -104,20 +105,18 @@ public class OrganicService {
 		OpenChain openChain = new Simple();
 
 		for(int i = 0; i < inputSequence.length; i++) {
-			if(inputSequence[i] != -1) {
-				List<FunctionalGroup> orderedBondableFunctionalGroups = openChain.getOrderedBondableGroups();
+			if(inputSequence[i] != carbonInputCode) {
+				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
 
-				FunctionalGroup election = orderedBondableFunctionalGroups.get(inputSequence[i]);
-
-				if (orderedBondableFunctionalGroups.get(inputSequence[i]) != FunctionalGroup.radical) {
-					openChain.bond(orderedBondableFunctionalGroups.get(inputSequence[i]));
-
-					if (election == FunctionalGroup.ether) {
+				if (groupElection != FunctionalGroup.radical) {
+					if (groupElection != FunctionalGroup.ether)
+						openChain.bond(groupElection);
+					else { // Ether
 						assert openChain instanceof Simple; // Yes, it is...
 						openChain = new Ether((Simple) openChain);
 					}
 				}
-				else {
+				else { // Radical
 					boolean isIso = inputSequence[++i] == 1;
 					int carbonCount = inputSequence[++i];
 					openChain.bond(new Substituent(carbonCount, isIso));

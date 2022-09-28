@@ -16,13 +16,14 @@ public final class Ether extends Organic implements OpenChain {
 
 	private final Chain firstChain, secondChain; // R, R'
 
-	private static final List<FunctionalGroup> orderedFunctionalGroups = List.of(
+	private static final List<FunctionalGroup> orderedBondableGroups = List.of(
 			FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
 			FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen
 	);
 
 	public Ether(Simple firstChain) {
-		this.firstChain = firstChain.getChain(); // R - O -
+		this.firstChain = firstChain.getChain(); // R -
+		this.firstChain.enlazar(FunctionalGroup.ether); // R - O -
 		this.secondChain = new Chain(1); // - C
 	}
 
@@ -30,8 +31,6 @@ public final class Ether extends Organic implements OpenChain {
 		this.firstChain = firstChain; // R - O -
 		this.secondChain = secondChain; // - C
 	}
-
-	// TODO: corregir orden eter?
 
 	// OPEN CHAIN --------------------------------------------------------------------
 
@@ -48,16 +47,15 @@ public final class Ether extends Organic implements OpenChain {
 	}
 
 	public List<FunctionalGroup> getOrderedBondableGroups() {
-		return getFreeBonds() > 1 ? orderedFunctionalGroups : Collections.emptyList();
+		return getFreeBonds() > 0 ? orderedBondableGroups : Collections.emptyList();
 	}
 
 	public void bondCarbon() {
 		secondChain.enlazarCarbono();
 	}
 
-	// TODO: sale en consola?
 	public void bond(Substituent substituent) {
-		if (orderedFunctionalGroups.contains(substituent.getGroup()))
+		if (orderedBondableGroups.contains(substituent.getGroup()))
 			secondChain.enlazar(substituent);
 		else throw new IllegalArgumentException("No se puede enlazar [" + substituent.getGroup() + "] a un Ether.");
 	}
@@ -95,13 +93,13 @@ public final class Ether extends Organic implements OpenChain {
 	// Modifiers:
 
 	private void correctRadicalSubstituents() {
-		if (isDone() && firstChain.hasGroupsWithoutHydrogenNorEther() || secondChain.hasGroupsWithoutHydrogenNorEther()) {
-			firstChain.corregirRadicalesPorLaIzquierda(); // Comprobará internamente si hay radicales
-			if (secondChain.hasGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
-				secondChain.invertirOrden(); // En lugar de corregirlos por la derecha
-				secondChain.corregirRadicalesPorLaIzquierda(); // CHF(CH3)(CH2CH3) → CH3-CH2-CHF-CH3
-				secondChain.invertirOrden(); // Es necesario para no romper el orden del éter
-			}
+		// Se corrigen los radicales que podrían formar parte de las cadenas principales:
+		firstChain.corregirRadicalesPorLaIzquierda(); // Si no tiene radicales, no hará nada
+
+		if (secondChain.hasGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
+			secondChain.invertirOrden(); // En lugar de corregirlos por la derecha
+			secondChain.corregirRadicalesPorLaIzquierda(); // CHF(CH3)(CH2CH3) → CH3-CH2-CHF-CH3
+			secondChain.invertirOrden(); // Es necesario para no romper el orden del éter
 		}
 	}
 
