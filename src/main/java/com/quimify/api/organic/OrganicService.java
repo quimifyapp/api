@@ -30,7 +30,7 @@ public class OrganicService {
 	MasaMolecularService masaMolecularService; // Procesos de las masas moleculares
 
 	@Autowired
-	MetricasService metricaService; // Procesos de las metricas diarias
+	MetricasService metricasService; // Procesos de las metricas diarias
 
 	public static final OrganicResult notFound = new OrganicResult(false); // Constante auxiliar
 	public static final int carbonInputCode = -1;
@@ -70,7 +70,7 @@ public class OrganicService {
 			logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 		}
 
-		metricaService.contarFormularOrganico(organicResult.getEncontrado(), picture);
+		metricasService.contarFormularOrganico(organicResult.getEncontrado(), picture);
 
 		return organicResult;
 	}
@@ -94,7 +94,7 @@ public class OrganicService {
 		// Structure:
 		organicResult.setFormula(openChain.getStructure());
 
-		metricaService.contarNombrarOrganicoSimpleBuscado();
+		metricasService.contarNombrarOrganicoSimpleBuscado();
 
 		return organicResult;
 	}

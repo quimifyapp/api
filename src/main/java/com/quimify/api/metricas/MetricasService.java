@@ -151,4 +151,9 @@ public class MetricasService {
         else metricasDeHoy().nuevoMasaMolecularNoEncontrado();
     }
 
+    @Transactional
+    public void contarReporte() {
+        metricasDeHoy().nuevoReporte();
+    }
+
 }

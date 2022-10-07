@@ -22,7 +22,7 @@ public class MasaMolecularService {
     ElementoService elementoService; // Procesos de los elementos
 
     @Autowired
-    MetricasService metricaService; // Procesos de las metricas diarias
+    MetricasService metricasService; // Procesos de las metricas diarias
 
     // INTERNOS ----------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ public class MasaMolecularService {
             logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
         }
 
-        metricaService.contarMasaMolecular(resultado.getEncontrado());
+        metricasService.contarMasaMolecular(resultado.getEncontrado());
 
         return resultado;
     }

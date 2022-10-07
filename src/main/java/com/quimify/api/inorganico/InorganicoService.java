@@ -30,7 +30,7 @@ public class InorganicoService {
     ConfiguracionService configuracionService; // Procesos de la configuración
 
     @Autowired
-    MetricasService metricaService; // Procesos de las metricas diarias
+    MetricasService metricasService; // Procesos de las metricas diarias
 
     public static final InorganicoResultado NO_ENCONTRADO = new InorganicoResultado(); // Constante auxiliar
 
@@ -78,20 +78,20 @@ public class InorganicoService {
             if (disponibleGoogle()) {
                 busqueda_web = tryBuscarGoogle(input);
 
-                metricaService.contarGoogle(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
+                metricasService.contarGoogle(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
             // Flowchart #3
             else if (disponibleBingGratis()) {
                 busqueda_web = tryBuscarBingGratis(input);
 
-                metricaService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
+                metricasService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
             // Flowchart #4
             else if (disponibleBingPago()) {
                 busqueda_web = tryBuscarBingPago(input);
 
-                metricaService.contarBingPago();
-                metricaService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
+                metricasService.contarBingPago();
+                metricasService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
             // Flowchart #7
             else busqueda_web = Optional.empty();
@@ -117,7 +117,7 @@ public class InorganicoService {
                         if (buscado.isEmpty()) { // En efecto, no estaba en la DB
                             resultado = new InorganicoResultado(escaneado.get());
                             inorganicoRepository.save(escaneado.get());
-                            metricaService.contarInorganicoNuevo();
+                            metricasService.contarInorganicoNuevo();
                         } else { // Realmente sí estaba en la DB
                             resultado = new InorganicoResultado(buscado.get());
 
@@ -145,7 +145,7 @@ public class InorganicoService {
             resultado = new InorganicoResultado(buscado.get()); // Está en la DB
         }
 
-        metricaService.contarInorganicoBuscado(resultado.getEncontrado(), foto);
+        metricasService.contarInorganicoBuscado(resultado.getEncontrado(), foto);
 
         return resultado;
     }
@@ -162,8 +162,8 @@ public class InorganicoService {
             resultado = NO_ENCONTRADO;
         }
 
-        metricaService.contarInorganicoAutocompletado();
-        metricaService.contarInorganicoBuscado(resultado.getEncontrado(), false);
+        metricasService.contarInorganicoAutocompletado();
+        metricasService.contarInorganicoBuscado(resultado.getEncontrado(), false);
 
         return resultado;
     }
@@ -187,7 +187,7 @@ public class InorganicoService {
     }
 
     private Boolean disponibleGoogle() {
-        boolean superadas = metricaService.getBusquedasGoogle() >= configuracionService.getGoogleLimite();
+        boolean superadas = metricasService.getBusquedasGoogle() >= configuracionService.getGoogleLimite();
 
         if (superadas && configuracionService.getGoogleON())
             logger.warn("Búsquedas de Google superadas");
@@ -201,7 +201,7 @@ public class InorganicoService {
     }
 
     private Boolean disponibleBingPago() {
-        boolean superadas = metricaService.getBusquedasBingPago() >= configuracionService.getBingPagoLimite();
+        boolean superadas = metricasService.getBusquedasBingPago() >= configuracionService.getBingPagoLimite();
 
         if (superadas && configuracionService.getBingPagoON())
             logger.warn("Búsquedas de Bing de pago superadas");

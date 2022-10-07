@@ -175,14 +175,15 @@ public class Carbon extends Organic {
         unicos.removeIf(sustituyente -> sustituyente.esTipo(FunctionalGroup.ether));
 
         if(unicos.size() == 1) { // Solo hay un tipo además del hidrógeno y éter
-            Substituent unico = unicos.get(0);
-            String texto = unico.toString();
+            Substituent unique = unicos.get(0);
+            String text = unique.toString();
 
-            if(texto.length() == 1 || unico.esHalogeno() || unico.getEnlaces() == 3)
-                resultado.append(texto); // Como en "CN", "CCl", "COOH", "C(O)(NH2)", "CHO"...
-            else resultado.append("(").append(texto).append(")"); // Como en "CH(OH)3", "CH3(CH2CH3)"...
+            if(!unique.esTipo(FunctionalGroup.aldehyde) // CH(HO)
+                    && (unique.esTipo(FunctionalGroup.ketone) || unique.esHalogeno() || unique.getEnlaces() == 3))
+                resultado.append(text); // "CO", "CCl", "COOH"
+            else resultado.append("(").append(text).append(")"); // "CH(OH)3", "CH3(CH2CH3)"...
 
-            resultado.append((getMolecularQuantifier(getCantidadDe(unico))));
+            resultado.append((getMolecularQuantifier(getCantidadDe(unique))));
         }
         else if(unicos.size() > 1) // Hay más de un tipo además del hidrógeno y éter
             for(Substituent substituent : unicos)

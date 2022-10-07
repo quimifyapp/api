@@ -92,6 +92,10 @@ public class MetricasModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer masa_molecular_no_encontrados = 0;
 
+    // Reportes de errores:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer reportes = 0;
+
     // --------------------------------------------------------------------------------
 
     // Constructores:
@@ -206,6 +210,10 @@ public class MetricasModel {
 
     public void nuevoMasaMolecularNoEncontrado() {
         masa_molecular_no_encontrados += 1;
+    }
+
+    public void nuevoReporte() {
+        reportes += 1;
     }
 
     // Getters y setters:
@@ -424,6 +432,14 @@ public class MetricasModel {
 
     public void setMasa_molecular_no_encontrados(Integer masa_molecular_no_encontrados) {
         this.masa_molecular_no_encontrados = masa_molecular_no_encontrados;
+    }
+
+    public Integer getReportes() {
+        return reportes;
+    }
+
+    public void setReportes(Integer reportes) {
+        this.reportes = reportes;
     }
 
 }

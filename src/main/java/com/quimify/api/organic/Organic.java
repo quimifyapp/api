@@ -69,8 +69,7 @@ public class Organic {
                 resultado = "non";
                 break;
             default:
-                resultado = null;
-                break;
+                throw new IllegalArgumentException("No se contempla el prefijo griego para: " + numero);
         }
 
         return resultado;
@@ -154,7 +153,7 @@ public class Organic {
                         break;
                 }
             }
-            else resultado = null; // 'numero' < 0 | 'numero' > 999
+            else throw new IllegalArgumentException("No se contempla este número de carbonos: " + numero); // > 999
         }
 
         return resultado;

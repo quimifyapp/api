@@ -195,7 +195,7 @@ public class Molecule extends Organic {
 							extremosPosibles--;
 
 						if (contiguos_izquierda + contiguos_derecha == getCarbonos().size()) { // No tiene otros puentes
-							if (extremosPosibles == carbonos_extremos.size()) { // No tiene radicales
+							if (carbonos_extremos.size() == extremosPosibles) { // No tiene radicales
 								// Podría ser un 'Eter':
 								Ether ether = buildEther(enlazados_al_oxigeno);
 								ether.correctSubstituents();
