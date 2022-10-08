@@ -2,7 +2,7 @@ package com.quimify.api.reporte;
 
 import javax.persistence.*;
 
-// Esta clase representa los reportes.
+// Esta clase representa los reportes del cliente.
 
 @Entity // Es un modelo real
 @Table(name = "reporte") // En la tabla 'reporte' de la DB

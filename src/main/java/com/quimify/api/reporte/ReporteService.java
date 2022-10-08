@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// Esta clase procesa los compuestos inorgánicos.
+// Esta clase procesa los compuestos reportes del cliente.
 
 @Service
 public class ReporteService {
@@ -31,7 +31,7 @@ public class ReporteService {
         reporteRepository.save(reporte);
 
         metricasService.contarReporte();
-        logger.warn("Reporte de la versión " + version + ": [" + titulo + "] " + detalles);
+        logger.warn("Reporte de la versión " + version + " - " + titulo + " - \"" + detalles + "\".");
     }
 
 }

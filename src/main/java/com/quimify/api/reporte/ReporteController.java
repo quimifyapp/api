@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReporteController {
 
     @Autowired
-    ReporteService reporteService; // Procesos de los reportes
+    ReporteService reporteService; // Procesos de los reportes del cliente
 
     // CLIENTE ------------------------------------------------------------------------
 
