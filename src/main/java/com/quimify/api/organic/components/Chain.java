@@ -126,15 +126,16 @@ public class Chain extends Organic {
 			else hubo_correcion = false;
 
 			// Se comprueba si este carbono no podría estar en un radical, ergo debe pertenecer a la cadena principal:
-			List<Substituent> substituents = carbons.get(i).getSubstituentsWithoutHydrogen(); // (Se puede asumir que los
-			// carbonos anteriores sí podían estar en un radical gracias a los 'break')
 
-			if(substituents.size() > 0) { // Hay sustituyentes distintos del hidrógeno
+			List<Substituent> substituents = carbons.get(i).getSubstituentsWithoutHydrogen(); // Se da por hecho que
+			// los carbonos anteriores sí pueden estar en un radical gracias a los siguientes 'break'
+
+			if(carbons.get(i).getEnlacesLibres() > 0)
+				break; // Le sigue un alqueno o alquino
+
+			if(substituents.size() > 0) // Hay sustituyentes distintos del hidrógeno
 				if(!(i == 1 && substituents.size() == 1 && substituents.get(0).getCarbonCount() == 1))
-					break; // Y estos no son un solo metil en el segundo carbono (no podría formar un radical 'iso')
-				else if(carbons.get(i).getEnlacesLibres() > 0)
-					break; // Le sigue un alqueno o alquino
-			}
+					break; // Y estos NO son un solo metil en el segundo carbono (NO podría formar un radical 'iso')
 		}
 	}
 

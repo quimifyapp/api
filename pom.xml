@@ -10,10 +10,9 @@
 	</parent>
 
 	<groupId>com.quimify</groupId>
-	<artifactId>api</artifactId>
+	<artifactId>quimify-api</artifactId>
 	<version>0</version>
-	<name>api</name>
-	<description>API Quimify</description>
+	<description>Quimify API</description>
 
 	<properties>
 		<java.version>11</java.version>

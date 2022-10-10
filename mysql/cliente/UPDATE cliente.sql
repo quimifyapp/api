@@ -1,3 +1,3 @@
 UPDATE cliente
-SET mensaje_enlace = "https://quimify.com/web"
+SET mensaje_presente = false
 WHERE version = 0
