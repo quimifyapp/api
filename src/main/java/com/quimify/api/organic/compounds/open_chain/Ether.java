@@ -11,7 +11,8 @@ import java.util.*;
 
 public final class Ether extends Organic implements OpenChain {
 
-	private final Chain firstChain, secondChain; // R, R'
+	private final Chain firstChain; // R
+	private Chain secondChain, currentChain; // R', ->
 
 	private static final List<FunctionalGroup> orderedBondableGroups = List.of(
 			FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
@@ -21,7 +22,10 @@ public final class Ether extends Organic implements OpenChain {
 	public Ether(Simple firstChain) {
 		this.firstChain = firstChain.getChain(); // R -
 		this.firstChain.enlazar(FunctionalGroup.ether); // R - O -
-		this.secondChain = new Chain(1); // - C
+
+		if(firstChain.isDone())
+			startSecondChain(); // - C
+		else currentChain = this.firstChain;
 	}
 
 	private Ether(Chain firstChain, Chain secondChain) {
@@ -36,15 +40,11 @@ public final class Ether extends Organic implements OpenChain {
 	}
 
 	public int getFreeBonds() {
-		return secondChain.getEnlacesLibres();
+		return currentChain.getEnlacesLibres();
 	}
 
 	public boolean isDone() {
-		return secondChain.isDone();
-	}
-
-	public List<FunctionalGroup> getOrderedBondableGroups() {
-		return getFreeBonds() > 0 ? orderedBondableGroups : Collections.emptyList();
+		return currentChain.isDone();
 	}
 
 	public void bondCarbon() {
@@ -52,8 +52,15 @@ public final class Ether extends Organic implements OpenChain {
 	}
 
 	public void bond(Substituent substituent) {
-		if (orderedBondableGroups.contains(substituent.getGroup()))
-			secondChain.enlazar(substituent);
+		if (orderedBondableGroups.contains(substituent.getGroup())) {
+			currentChain.enlazar(substituent);
+
+			if (currentChain == firstChain && firstChain.isDone()) {
+				if (currentChain.isDone()) {
+					startSecondChain();
+				}
+			}
+		}
 		else throw new IllegalArgumentException("No se puede enlazar [" + substituent.getGroup() + "] a un Ether.");
 	}
 
@@ -63,6 +70,10 @@ public final class Ether extends Organic implements OpenChain {
 
 	public void correctSubstituents() {
 		correctRadicalSubstituents();
+	}
+
+	public List<FunctionalGroup> getOrderedBondableGroups() {
+		return getFreeBonds() > 0 ? orderedBondableGroups : Collections.emptyList();
 	}
 
 	public String getName() {
@@ -82,7 +93,11 @@ public final class Ether extends Organic implements OpenChain {
 	}
 
 	public String getStructure() {
-		return firstChain.getStructure() + secondChain.getStructure(); // "R - O" + "R"
+		String firstChainStructure = firstChain.getStructure();
+
+		return currentChain == firstChain
+				? firstChainStructure.substring(0, firstChainStructure.length() - 1)
+				: firstChainStructure + secondChain.getStructure();
 	}
 
 	// PRIVATE -----------------------------------------------------------------------
@@ -93,11 +108,16 @@ public final class Ether extends Organic implements OpenChain {
 		// Se corrigen los radicales que podrían formar parte de las cadenas principales:
 		firstChain.corregirRadicalesPorLaIzquierda(); // Si no tiene radicales, no hará nada
 
-		if (secondChain.hasGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
+		if (secondChain.hasFunctionalGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
 			secondChain.invertirOrden(); // En lugar de corregirlos por la derecha
 			secondChain.corregirRadicalesPorLaIzquierda(); // CHF(CH3)(CH2CH3) → CH3-CH2-CHF-CH3
 			secondChain.invertirOrden(); // Es necesario para no romper el orden del éter
 		}
+	}
+
+	private void startSecondChain() {
+		secondChain = new Chain(1);
+		currentChain = secondChain;
 	}
 
 	// Queries:
@@ -195,7 +215,7 @@ public final class Ether extends Organic implements OpenChain {
 		for (Substituent radical : radicales)
 			prefijos.add(new Localizador(chain.getIndexesOfAll(radical), getRadicalNameParticle(radical)));
 
-		StringBuilder prefijo = new StringBuilder(chain.hasGroup(FunctionalGroup.acid) ? "ácido " : "");
+		StringBuilder prefijo = new StringBuilder(chain.hasFunctionalGroup(FunctionalGroup.acid) ? "ácido " : "");
 		if (prefijos.size() > 0) {
 			Localizador.ordenarAlfabeticamente(prefijos);
 

@@ -140,7 +140,8 @@ public class Chain extends Organic {
 	}
 
 	public void componerAldehido() {
-		if(getFuncionPrioritaria().compareTo(FunctionalGroup.aldehyde) >= 0) // No hay otra de mayor prioridad, puede haber aldehídos
+		if(getFuncionPrioritaria().compareTo(FunctionalGroup.aldehyde) >= 0) // No hay otra de mayor prioridad aunque
+			// puede haber aldehídos
 			sustituirCetonaConPor(FunctionalGroup.hydrogen, FunctionalGroup.aldehyde);
 	}
 
@@ -199,7 +200,7 @@ public class Chain extends Organic {
 		return getEnlacesLibres() == 0;
 	}
 
-	public boolean hasGroup(FunctionalGroup functionalGroup) {
+	public boolean hasFunctionalGroup(FunctionalGroup functionalGroup) {
 		for(Carbon carbon : carbons)
 			if(carbon.contiene(functionalGroup))
 				return true;

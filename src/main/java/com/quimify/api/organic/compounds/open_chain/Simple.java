@@ -51,32 +51,6 @@ public final class Simple extends Organic implements OpenChain {
         return chain.isDone();
     }
 
-    public List<FunctionalGroup> getOrderedBondableGroups() {
-        List<FunctionalGroup> orderedBondableGroups = new ArrayList<>();
-
-        if (getFreeBonds() > 2)
-            orderedBondableGroups.addAll(List.of(
-                    FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde)
-            );
-
-        if (getFreeBonds() > 1)
-            orderedBondableGroups.add(FunctionalGroup.ketone);
-
-        if (getFreeBonds() > 0) {
-            orderedBondableGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine));
-
-            if (getFreeBonds() == 1)
-                orderedBondableGroups.add(FunctionalGroup.ether);
-
-            orderedBondableGroups.addAll(List.of(
-                    FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
-                    FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen)
-            );
-        }
-
-        return orderedBondableGroups;
-    }
-
     public void bondCarbon() {
         chain.enlazarCarbono();
     }
@@ -126,6 +100,32 @@ public final class Simple extends Organic implements OpenChain {
         }
     }
 
+    public List<FunctionalGroup> getOrderedBondableGroups() {
+        List<FunctionalGroup> orderedBondableGroups = new ArrayList<>();
+
+        if (getFreeBonds() > 2)
+            orderedBondableGroups.addAll(List.of(
+                    FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde)
+            );
+
+        if (getFreeBonds() > 1)
+            orderedBondableGroups.add(FunctionalGroup.ketone);
+
+        if (getFreeBonds() > 0) {
+            orderedBondableGroups.addAll(List.of(FunctionalGroup.alcohol, FunctionalGroup.amine));
+
+            if (canBondEther())
+                orderedBondableGroups.add(FunctionalGroup.ether);
+
+            orderedBondableGroups.addAll(List.of(
+                    FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
+                    FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen)
+            );
+        }
+
+        return orderedBondableGroups;
+    }
+
     public String getName() {
         // Se anticipan los casos excepcionales:
         if(chain.equals(CO2))
@@ -155,7 +155,7 @@ public final class Simple extends Organic implements OpenChain {
         for(Substituent radical : radicales)
             prefijos.add(new Localizador(chain.getIndexesOfAll(radical), getRadicalNameParticle(radical)));
 
-        StringBuilder prefijo = new StringBuilder(chain.hasGroup(FunctionalGroup.acid) ? "ácido " : "");
+        StringBuilder prefijo = new StringBuilder(chain.hasFunctionalGroup(FunctionalGroup.acid) ? "ácido " : "");
         if(prefijos.size() > 0) {
             Localizador.ordenarAlfabeticamente(prefijos);
 
@@ -200,6 +200,13 @@ public final class Simple extends Organic implements OpenChain {
 
     // PRIVATE -----------------------------------------------------------------------
 
+    // Queries:
+
+    private boolean canBondEther() {
+        return chain.getSubstituentsWithoutHydrogen().stream()
+                .allMatch((substituent -> substituent.getGroup().ordinal() > FunctionalGroup.ether.ordinal()));
+    }
+
     // Modifiers:
 
     private void reverse() {
@@ -209,7 +216,7 @@ public final class Simple extends Organic implements OpenChain {
     private void correctRadicalSubstituents() {
         // Se corrigen los radicales que podrían formar parte de la cadena principal:
         chain.corregirRadicalesPorLaIzquierda(); // Comprobará internamente si hay radicales
-        if(chain.hasGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
+        if(chain.hasFunctionalGroup(FunctionalGroup.radical)) { // Para ahorrar el invertir la cadena
             reverse(); // En lugar de corregirlos por la derecha
             chain.corregirRadicalesPorLaIzquierda(); // CHF(CH3)(CH2CH3) → CH3-CH2-CHF-CH3
         }
@@ -247,7 +254,7 @@ public final class Simple extends Organic implements OpenChain {
         }
 
         // Los radicales determinan el orden alfabéticamente como última instancia, solo cuando lo demás es indiferente.
-        if(!corrected && chain.hasGroup(FunctionalGroup.radical)) {
+        if(!corrected && chain.hasFunctionalGroup(FunctionalGroup.radical)) {
             // Se obtienen los radicales de ambas versiones, ordenados por sus carbonos:
             List<String> normales = new ArrayList<>();
             chain.getRadicalSubstituents().forEach(radical -> normales.add(Organic.getRadicalNameParticle(radical)));
@@ -274,7 +281,7 @@ public final class Simple extends Organic implements OpenChain {
             es_redundante = bond == FunctionalGroup.alkene && chain.getNumberOf(FunctionalGroup.alkene) == 2; // Es propadieno
             // Derivados del etano:
         else if(chain.getSize() == 2) {
-            if(esAlquenoOAlquino(bond) || chain.hasGroup(FunctionalGroup.alkyne)) // Solo hay una posición posible
+            if(esAlquenoOAlquino(bond) || chain.hasFunctionalGroup(FunctionalGroup.alkyne)) // Solo hay una posición posible
                 es_redundante = true;
             else es_redundante = chain.getSubstituentsWithoutHydrogen().size() == 1; // Solo hay uno, como cloroetino o etanol
         }

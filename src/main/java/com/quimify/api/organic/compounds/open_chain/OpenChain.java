@@ -17,8 +17,6 @@ public interface OpenChain {
 
     boolean isDone();
 
-    List<FunctionalGroup> getOrderedBondableGroups();
-
     void bondCarbon();
 
     void bond(Substituent substituent);
@@ -26,6 +24,8 @@ public interface OpenChain {
     void bond(FunctionalGroup functionalGroup);
 
     void correctSubstituents();
+
+    List<FunctionalGroup> getOrderedBondableGroups();
 
     String getName();
 
