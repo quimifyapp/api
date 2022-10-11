@@ -4,12 +4,8 @@ import com.quimify.api.organic.bridges.opsin.Opsin;
 import com.quimify.api.organic.bridges.opsin.OpsinResult;
 import com.quimify.api.organic.bridges.pubchem.PubChem;
 import com.quimify.api.organic.bridges.pubchem.PubChemResult;
-import com.quimify.api.organic.components.FunctionalGroup;
-import com.quimify.api.organic.components.Substituent;
 import com.quimify.api.organic.compounds.Molecule;
-import com.quimify.api.organic.compounds.open_chain.Ether;
 import com.quimify.api.organic.compounds.open_chain.OpenChain;
-import com.quimify.api.organic.compounds.open_chain.Simple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +16,6 @@ public class OrganicFactory {
     private static final Logger logger = LoggerFactory.getLogger(OrganicFactory.class);
 
     public static final OrganicResult organicNotFound = new OrganicResult(false); // Constante auxiliar
-    public static final int carbonInputCode = -1;
 
     // PUBLIC ------------------------------------------------------------------------
 
@@ -59,10 +54,13 @@ public class OrganicFactory {
     }
 
     // TODO: handle exceptions
-    public static OrganicResult getFromStructure(int[] inputSequence) {
-        OrganicResult organicResult = new OrganicResult(true);
+    public static OrganicResult getFromOpenChain(OpenChain openChain) {
+        if(!openChain.isDone()) {
+            logger.error("OpenChain incompleta: \"" + openChain.getStructure() + "\".");
+            return organicNotFound;
+        }
 
-        OpenChain openChain = getOpenChainFromSequence(inputSequence);
+        OrganicResult organicResult = new OrganicResult(true);
 
         openChain.correctSubstituents(); // It´s necessary
 
@@ -81,33 +79,6 @@ public class OrganicFactory {
     }
 
     // PRIVATE -----------------------------------------------------------------------
-
-    private static OpenChain getOpenChainFromSequence(int[] inputSequence) {
-        OpenChain openChain = new Simple();
-
-        for(int i = 0; i < inputSequence.length; i++) {
-            if(inputSequence[i] != carbonInputCode) {
-                FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
-
-                if (groupElection != FunctionalGroup.radical) {
-                    if (groupElection != FunctionalGroup.ether)
-                        openChain.bond(groupElection);
-                    else { // Ether
-                        assert openChain instanceof Simple; // Yes, it is...
-                        openChain = new Ether((Simple) openChain);
-                    }
-                }
-                else { // Radical
-                    boolean isIso = inputSequence[++i] == 1;
-                    int carbonCount = inputSequence[++i];
-                    openChain.bond(new Substituent(carbonCount, isIso));
-                }
-            }
-            else openChain.bondCarbon();
-        }
-
-        return openChain;
-    }
 
     private static void complementViaPubChem(OrganicResult organicResult, String smiles) {
         PubChemResult pubChemResult = new PubChem(smiles).procesar();

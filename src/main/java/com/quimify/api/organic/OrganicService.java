@@ -3,6 +3,11 @@ package com.quimify.api.organic;
 import com.quimify.api.masa_molecular.MasaMolecularResultado;
 import com.quimify.api.masa_molecular.MasaMolecularService;
 import com.quimify.api.metricas.MetricasService;
+import com.quimify.api.organic.components.FunctionalGroup;
+import com.quimify.api.organic.components.Substituent;
+import com.quimify.api.organic.compounds.open_chain.Ether;
+import com.quimify.api.organic.compounds.open_chain.OpenChain;
+import com.quimify.api.organic.compounds.open_chain.Simple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +26,8 @@ public class OrganicService {
 	@Autowired
 	MetricasService metricasService; // Procesos de las metricas diarias
 
+	public static final int carbonInputCode = -1;
+
 	// CLIENTE -----------------------------------------------------------------------
 
 	public OrganicResult getFromName(String name, Boolean picture) {
@@ -36,9 +43,12 @@ public class OrganicService {
 	}
 
 	public OrganicResult getFromStructure(int[] inputSequence) {
-		OrganicResult organicResult = OrganicFactory.getFromStructure(inputSequence);
+		OpenChain openChain = getOpenChainFromStructure(inputSequence);
 
-		addMolecularMassIfMissing(organicResult);
+		OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
+
+		if(organicResult.getEncontrado())
+			addMolecularMassIfMissing(organicResult);
 
 		metricasService.contarNombrarOrganicoSimpleBuscado();
 
@@ -46,6 +56,33 @@ public class OrganicService {
 	}
 
 	// PRIVATE -----------------------------------------------------------------------
+
+	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
+		OpenChain openChain = new Simple();
+
+		for(int i = 0; i < inputSequence.length; i++) {
+			if(inputSequence[i] != carbonInputCode) {
+				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
+
+				if (groupElection != FunctionalGroup.radical) {
+					if (groupElection != FunctionalGroup.ether)
+						openChain.bond(groupElection);
+					else { // Ether
+						assert openChain instanceof Simple; // Yes, it is...
+						openChain = new Ether((Simple) openChain);
+					}
+				}
+				else { // Radical
+					boolean isIso = inputSequence[++i] == 1;
+					int carbonCount = inputSequence[++i];
+					openChain.bond(new Substituent(carbonCount, isIso));
+				}
+			}
+			else openChain.bondCarbon();
+		}
+
+		return openChain;
+	}
 
 	private void addMolecularMassIfMissing(OrganicResult organicResult) {
 		if(organicResult.getMasa() == null) {
