@@ -1,5 +1,6 @@
 package com.quimify.api.organic;
 
+import com.quimify.api.masa_molecular.MasaMolecularResultado;
 import com.quimify.api.masa_molecular.MasaMolecularService;
 import com.quimify.api.metricas.MetricasService;
 import org.slf4j.Logger;
@@ -25,8 +26,9 @@ public class OrganicService {
 	public OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
 
-		if(!organicResult.getEncontrado())
-			logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
+		if(organicResult.getEncontrado())
+			addMolecularMassIfMissing(organicResult);
+		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
 		metricasService.contarFormularOrganico(organicResult.getEncontrado(), picture);
 
@@ -36,9 +38,21 @@ public class OrganicService {
 	public OrganicResult getFromStructure(int[] inputSequence) {
 		OrganicResult organicResult = OrganicFactory.getFromStructure(inputSequence);
 
+		addMolecularMassIfMissing(organicResult);
+
 		metricasService.contarNombrarOrganicoSimpleBuscado();
 
 		return organicResult;
+	}
+
+	// PRIVATE -----------------------------------------------------------------------
+
+	private void addMolecularMassIfMissing(OrganicResult organicResult) {
+		if(organicResult.getMasa() == null) {
+			MasaMolecularResultado masaMolecular = masaMolecularService.tryMasaMolecularDe(organicResult.getFormula());
+			if(masaMolecular.getEncontrado())
+				organicResult.setMasa(masaMolecular.getMasa());
+		}
 	}
 
 }

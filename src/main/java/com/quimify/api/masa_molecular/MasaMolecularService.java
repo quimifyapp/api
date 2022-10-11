@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // Esta clase procesa las masas moleculares.
 
@@ -60,8 +62,9 @@ public class MasaMolecularService {
                     int moles;
                     if(i < formula.length()) {
                         String digitos = formula.substring(i);
-                        if(digitos.matches("^\\d+.*")) {
-                            digitos = digitos.replaceAll("^(\\d+)", "$1");
+                        Matcher matcher = Pattern.compile("^(\\d+)").matcher(digitos);
+                        if (matcher.find()) {
+                            digitos = matcher.group(1);
                             moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
                         }
                         else moles = 1;
@@ -72,7 +75,8 @@ public class MasaMolecularService {
 
                     // Finalmente:
 
-                    formula = formula.replace("(" + anidada + ")" + (moles != 1 ? moles : ""), "");
+                    String closedNested = "(" + anidada + ")" + (moles != 1 ? moles : "");
+                    formula = formula.replaceFirst(Pattern.quote(closedNested), "");
                     i = parentesis - 1; // Continúa donde estaba el primer paréntesis (luego se incrementa en 1)
                 }
                 else if(balance < 0)

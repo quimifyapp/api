@@ -19,7 +19,7 @@ public class OrganicFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganicFactory.class);
 
-    public static final OrganicResult notFound = new OrganicResult(false); // Constante auxiliar
+    public static final OrganicResult organicNotFound = new OrganicResult(false); // Constante auxiliar
     public static final int carbonInputCode = -1;
 
     // PUBLIC ------------------------------------------------------------------------
@@ -53,7 +53,7 @@ public class OrganicFactory {
                 logger.error("Excepción al generar la fórmula de \"" + name + "\": " + exception);
             }
         }
-        else organicResult = notFound;
+        else organicResult = organicNotFound;
 
         return organicResult;
     }
@@ -112,8 +112,8 @@ public class OrganicFactory {
     private static void complementViaPubChem(OrganicResult organicResult, String smiles) {
         PubChemResult pubChemResult = new PubChem(smiles).procesar();
 
-        if(pubChemResult.getMasa().isPresent())
-            organicResult.setMasa(pubChemResult.getMasa().get());
+        if(pubChemResult.getMasa() != null)
+            organicResult.setMasa(Float.valueOf(pubChemResult.getMasa()));
 
         organicResult.setUrl_2d(pubChemResult.getUrl_2d());
     }

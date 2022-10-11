@@ -5,7 +5,7 @@ public class OrganicResult {
     private Boolean encontrado;
     private String nombre;
     private String formula;
-    private String masa;
+    private Float masa;
     private String url_2d;
 
     // Si 'encontrado' = false:
@@ -47,11 +47,11 @@ public class OrganicResult {
         this.nombre = nombre;
     }
 
-    public String getMasa() {
+    public Float getMasa() {
         return masa;
     }
 
-    public void setMasa(String masa) {
+    public void setMasa(Float masa) {
         this.masa = masa;
     }
 
