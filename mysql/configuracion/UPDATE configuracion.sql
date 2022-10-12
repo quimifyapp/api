@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET actualizacion_disponible = false
+SET bing_gratis_on = true
 WHERE version = 0

@@ -66,9 +66,8 @@ public class InorganicoService {
     // BÚSQUEDAS ---------------------------------------------------------------------
 
     public InorganicoResultado buscar(String input, Boolean foto) {
-        escanearFQ("https://www.formulacionquimica.com/HClO2/"); // TODO
-
-
+        escanearFQ("https://www.formulacionquimica.com/FeO2/");
+        
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(input); // Flowchart #0

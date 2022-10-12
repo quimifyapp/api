@@ -159,10 +159,10 @@ public class PaginaFQ {
 
         // Ej.: óxido de hierro (II) -> óxido de hierro(II)
 
-        nombre = nombre.replaceAll(" \\(", " (");
+        nombre = nombre.replaceAll(" \\(", "(");
 
         if(alternativo != null)
-            alternativo = alternativo.replaceAll(" \\(", " (");
+            alternativo = alternativo.replaceAll(" \\(", "(");
 
         // Fin:
 
