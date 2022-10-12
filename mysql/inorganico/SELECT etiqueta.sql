@@ -3,6 +3,6 @@ FROM etiqueta
 INNER JOIN inorganico
 ON etiqueta.inorganico_id = inorganico.id
 
-# WHERE texto_normalizado = "marihuana"
+# WHERE texto_normalizado LIKE "%selen%"
 # WHERE inorganico_id = 1906
 ORDER BY busquedas DESC

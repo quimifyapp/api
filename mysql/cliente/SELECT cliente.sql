@@ -8,4 +8,5 @@ mensaje_detalles AS "Mensaje detalles",
 mensaje_enlace_presente AS "Mensaje enlace presente",
 mensaje_enlace_nombre AS "Mensaje enlace nombre",
 mensaje_enlace AS "Mensaje enlace"
-FROM cliente
+FROM cliente 
+ORDER BY version DESC

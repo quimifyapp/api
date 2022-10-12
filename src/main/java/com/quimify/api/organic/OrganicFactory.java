@@ -19,8 +19,6 @@ public class OrganicFactory {
 
     // PUBLIC ------------------------------------------------------------------------
 
-    // TODO: LAS MAPSAS
-
     public static OrganicResult getFromName(String name) {
         OrganicResult organicResult;
 

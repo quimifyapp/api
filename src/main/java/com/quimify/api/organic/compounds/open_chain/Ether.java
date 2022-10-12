@@ -5,7 +5,9 @@ import com.quimify.api.organic.components.Chain;
 import com.quimify.api.organic.components.FunctionalGroup;
 import com.quimify.api.organic.components.Substituent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 // Esta clase representa éteres: dos cadenas con funciones de prioridad menor a la función éter unidas por un oxígeno.
 

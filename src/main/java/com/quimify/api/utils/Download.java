@@ -1,4 +1,4 @@
-package com.quimify.api.descarga;
+package com.quimify.api.utils;
 
 // Esta clase procesa las conexiones con otros servidores.
 
@@ -8,33 +8,33 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
-public class Descarga {
+public class Download {
 
-	private HttpURLConnection conexion;
+	private HttpURLConnection httpURLConnection;
 
 	// Constructores:
 
 	private void construir(String url) throws IOException {
-		conexion = (HttpURLConnection) new URL(url).openConnection();
-		conexion.setRequestMethod("GET");
+		httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+		httpURLConnection.setRequestMethod("GET");
 	}
 
-	public Descarga(String url, String parametro) throws IOException {
+	public Download(String url, String parametro) throws IOException {
 		construir(url + formatearHTTP(parametro));
 	}
 
-	public Descarga(String url) throws IOException {
+	public Download(String url) throws IOException {
 		construir(url);
 	}
 
 	// Públicos:
 
 	public void setPropiedad(String key, String valor) {
-		conexion.setRequestProperty(key, valor);
+		httpURLConnection.setRequestProperty(key, valor);
 	}
 
 	public String getTexto() throws IOException {
-		BufferedReader descarga = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+		BufferedReader descarga = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 
 		String linea;
 		StringBuilder texto = new StringBuilder();
@@ -42,7 +42,7 @@ public class Descarga {
 			texto.append(linea);
 
 		descarga.close();
-		conexion.disconnect();
+		httpURLConnection.disconnect();
 
 		return texto.toString();
 	}

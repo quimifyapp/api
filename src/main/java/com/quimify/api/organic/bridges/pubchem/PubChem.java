@@ -1,6 +1,6 @@
 package com.quimify.api.organic.bridges.pubchem;
 
-import com.quimify.api.descarga.Descarga;
+import com.quimify.api.utils.Download;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,25 +30,25 @@ public class PubChem {
 	public PubChemResult procesar() {
 		PubChemResult resultado = new PubChemResult();
 
-		smiles = Descarga.formatearHTTP(smiles);
+		smiles = Download.formatearHTTP(smiles);
 
 		String url = REST + SMILES + smiles + "/cids/TXT";
 		try {
-			String cid = new Descarga(url).getTexto();
+			String cid = new Download(url).getTexto();
 
 			if(!cid.equals("0")) {
 				resultado.setUrl_2d(PNG_2D + cid); // Este es de buena calidad (500 x 500 px) :)
 
 				String base = REST + "cid/" + cid + "/property/";
 				try {
-					resultado.setMasa(new Descarga(base + "molecularweight/TXT").getTexto());
+					resultado.setMasa(new Download(base + "molecularweight/TXT").getTexto());
 				}
 				catch(IOException exception) {
 					logger.error("Excepción al descargar \"" + base + "molecularweight/TXT" + "\": " + exception);
 				}
 
 				try {
-					resultado.setNombre_ingles(new Descarga(base + "iupacname/TXT").getTexto());
+					resultado.setNombre_ingles(new Download(base + "iupacname/TXT").getTexto());
 				}
 				catch(IOException exception) {
 					logger.error("Excepción al descargar \"" + base + "iupacname/TXT" + "\": " + exception);

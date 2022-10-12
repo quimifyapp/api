@@ -1,8 +1,8 @@
 package com.quimify.api.organic.compounds.open_chain;
 
 import com.quimify.api.organic.Organic;
-import com.quimify.api.organic.components.Chain;
 import com.quimify.api.organic.components.Carbon;
+import com.quimify.api.organic.components.Chain;
 import com.quimify.api.organic.components.FunctionalGroup;
 import com.quimify.api.organic.components.Substituent;
 

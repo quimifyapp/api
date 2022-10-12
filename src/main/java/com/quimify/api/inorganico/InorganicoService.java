@@ -1,7 +1,7 @@
 package com.quimify.api.inorganico;
 
 import com.quimify.api.Normalizado;
-import com.quimify.api.descarga.Descarga;
+import com.quimify.api.utils.Download;
 import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.metricas.MetricasService;
 import org.json.JSONObject;
@@ -66,6 +66,9 @@ public class InorganicoService {
     // BÚSQUEDAS ---------------------------------------------------------------------
 
     public InorganicoResultado buscar(String input, Boolean foto) {
+        escanearFQ("https://www.formulacionquimica.com/HClO2/"); // TODO
+
+
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(input); // Flowchart #0
@@ -235,7 +238,7 @@ public class InorganicoService {
     private BusquedaWeb buscarGoogle(String input) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        Descarga conexion = new Descarga(configuracionService.getGoogleURL(), input);
+        Download conexion = new Download(configuracionService.getGoogleURL(), input);
         conexion.setPropiedad("Accept", "application/json");
         JSONObject respuesta = new JSONObject(conexion.getTexto());
 
@@ -300,7 +303,7 @@ public class InorganicoService {
     private BusquedaWeb buscarBing(String input, String key) throws Exception {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
-        Descarga conexion = new Descarga(configuracionService.getBingURL(), input);
+        Download conexion = new Download(configuracionService.getBingURL(), input);
         conexion.setPropiedad("Ocp-Apim-Subscription-Key", key);
         JSONObject respuesta = new JSONObject(conexion.getTexto());
 
@@ -325,7 +328,7 @@ public class InorganicoService {
         Optional<InorganicoModel> resultado;
 
         try {
-            Descarga conexion = new Descarga(direccion);
+            Download conexion = new Download(direccion);
             conexion.setPropiedad("User-Agent", configuracionService.getUserAgent());
 
             PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());

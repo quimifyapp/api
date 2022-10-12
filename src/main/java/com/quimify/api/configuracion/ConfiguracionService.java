@@ -11,48 +11,48 @@ public class ConfiguracionService {
     @Autowired
     ConfiguracionRepository configuracionRepository; // Conexión con la DB
 
-    private static final Integer VERSION = 0;
+    private static final Integer apiVersion = 1;
 
     // --------------------------------------------------------------------------------
 
     public Boolean getGoogleON() {
-        return configuracionRepository.findByVersion(VERSION).getGoogle_on();
+        return configuracionRepository.findByVersion(apiVersion).getGoogle_on();
     }
 
     public Integer getGoogleLimite() {
-        return configuracionRepository.findByVersion(VERSION).getGoogle_limite();
+        return configuracionRepository.findByVersion(apiVersion).getGoogle_limite();
     }
 
     public String getGoogleURL() {
-        return configuracionRepository.findByVersion(VERSION).getGoogle_url();
+        return configuracionRepository.findByVersion(apiVersion).getGoogle_url();
     }
 
     public String getBingURL() {
-        return configuracionRepository.findByVersion(VERSION).getBing_url();
+        return configuracionRepository.findByVersion(apiVersion).getBing_url();
     }
 
     public Boolean getBingGratisON() {
-        return configuracionRepository.findByVersion(VERSION).getBing_gratis_on();
+        return configuracionRepository.findByVersion(apiVersion).getBing_gratis_on();
     }
 
     public Integer getBingPagoLimite() {
-        return configuracionRepository.findByVersion(VERSION).getBing_pago_limite();
+        return configuracionRepository.findByVersion(apiVersion).getBing_pago_limite();
     }
 
     public String getBingGratisKey() {
-        return configuracionRepository.findByVersion(VERSION).getBing_gratis_key();
+        return configuracionRepository.findByVersion(apiVersion).getBing_gratis_key();
     }
 
     public Boolean getBingPagoON() {
-        return configuracionRepository.findByVersion(VERSION).getBing_pago_on();
+        return configuracionRepository.findByVersion(apiVersion).getBing_pago_on();
     }
 
     public String getBingPagoKey() {
-        return configuracionRepository.findByVersion(VERSION).getBing_pago_key();
+        return configuracionRepository.findByVersion(apiVersion).getBing_pago_key();
     }
 
     public String getUserAgent() {
-        return configuracionRepository.findByVersion(VERSION).getUser_agent();
+        return configuracionRepository.findByVersion(apiVersion).getUser_agent();
     }
 
 }

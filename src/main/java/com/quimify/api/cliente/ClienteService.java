@@ -19,8 +19,8 @@ public class ClienteService {
 	public static final short IOS = 1;
 	public static final short WEB = 2;
 
-	public ClienteResultado acceso(Integer version, Short plataforma) {
-		ClienteModel cliente = clienteRepository.findByVersion(version);
+	public ClienteResultado getClient(Integer clientVersion, Short plataforma) {
+		ClienteModel cliente = clienteRepository.findByVersion(clientVersion);
 
 		ClienteResultado resultado = plataforma != WEB
 			? new ClienteResultado(

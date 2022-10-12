@@ -157,6 +157,13 @@ public class PaginaFQ {
                 resultado.get().nuevaEtiqueta(new EtiquetaModel(Normalizado.of(etiqueta)));
         }
 
+        // Ej.: óxido de hierro (II) -> óxido de hierro(II)
+
+        nombre = nombre.replaceAll(" \\(", " (");
+
+        if(alternativo != null)
+            alternativo = alternativo.replaceAll(" \\(", " (");
+
         // Fin:
 
         resultado.get().setFormula(formula);

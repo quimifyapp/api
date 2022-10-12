@@ -1,3 +1,3 @@
 UPDATE cliente
-SET mensaje_presente = false
+SET actualizacion_disponible = false
 WHERE version = 0

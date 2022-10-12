@@ -9,13 +9,13 @@ mensaje_enlace_presente,
 mensaje_enlace_nombre,
 mensaje_enlace)
 
-VALUES(0,
-true,
+VALUES(1,
 false,
-"Ahora se pueden nombrar compuestos de tipo éster.",
+false,
+null,
 true,
-"Título del mensaje",
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget lectus id elit iaculis facilisis.",
-true,
-"Acceder al sorteo",
-"quimify.com/web")
+"Bienvenido, tester!",
+"Tenemos especial interés en probar la funciones de nombrar éteres y calcular masas moleculares.",
+false,
+null,
+null)

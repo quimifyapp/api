@@ -11,7 +11,7 @@
 
 	<groupId>com.quimify</groupId>
 	<artifactId>quimify-api</artifactId>
-	<version>0</version>
+	<version>1</version>
 	<description>Quimify API</description>
 
 	<properties>
@@ -29,6 +29,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -44,7 +45,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20220320</version>
+			<version>20220924</version>
 		</dependency>
 
 		<dependency>
@@ -58,7 +59,7 @@
 			<artifactId>opsin-es</artifactId>
 			<scope>system</scope>
 			<version>2.6.0</version>
-			<systemPath>${basedir}/lib/opsin-es.jar</systemPath>
+			<systemPath>${project.basedir}/lib/opsin-es.jar</systemPath>
 		</dependency>
 
 	</dependencies>

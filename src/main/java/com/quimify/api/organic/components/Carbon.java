@@ -1,6 +1,5 @@
 package com.quimify.api.organic.components;
 
-
 import com.quimify.api.organic.Organic;
 
 import java.util.*;
@@ -10,16 +9,6 @@ public class Carbon extends Organic {
 
     private final List<Substituent> substituents;
     private int enlaces_libres;
-
-    // NUEVOS:
-
-    public Set<FunctionalGroup> getBondedFunctions() {
-        Set<FunctionalGroup> bondedFunctions = new HashSet<>();
-
-        substituents.forEach(sustituyente -> bondedFunctions.add(sustituyente.getGroup()));
-
-        return bondedFunctions;
-    }
 
     // Constructor:
 

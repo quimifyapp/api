@@ -17,7 +17,7 @@ public class ClienteController {
 	@GetMapping()
 	public ClienteResultado acceso(@RequestParam("version") Integer version,
 								   @RequestParam("plataforma") Short plataforma) {
-		return clienteService.acceso(version, plataforma);
+		return clienteService.getClient(version, plataforma);
 	}
 
 }
