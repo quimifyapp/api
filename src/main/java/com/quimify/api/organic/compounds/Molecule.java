@@ -136,7 +136,7 @@ public class Molecule extends Organic {
 		Atom firstCarbon = bondedToTheOxygen.get(0); // [C] - O - C'
 		firstCarbon.removeEther(); // Ether class will bond it
 
-		Simple firstChain = new Simple(1);
+		Simple firstChain = new Simple(0);
 		buildOpenChainStartingFrom(firstChain, firstCarbon); // - O - R
 
 		Ether ether = new Ether(firstChain.getReversed()); // R - O - C ≡

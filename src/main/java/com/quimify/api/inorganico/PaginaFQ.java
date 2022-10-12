@@ -54,12 +54,13 @@ public class PaginaFQ {
                     .replace("</sub>", "").replace(" ", "");
         }
 
-            /* Escanea el nombre alternativo siguiendo este esquema:
+        /* Escanea el nombre alternativo siguiendo este esquema:
             Ácidos:
                 nombre = tradicional > stock > sistemática
                 alternativo = nombre actual
             Otros:
-                alternativo = stock > sistemática > tradicional */
+                alternativo = stock > sistemática > tradicional
+        */
 
         String alternativo = null;
 
@@ -93,23 +94,25 @@ public class PaginaFQ {
                     }
                 }
             }
-        } else { // Pone "ácido" en el título o en tradicional si lo tuviera
-            if(indice_tradicional != -1) { // Hay tradicional
+        }
+        else { // Pone "ácido" en el título o en tradicional si lo tuviera
+            if (indice_tradicional != -1) { // Hay tradicional
                 alternativo = nombre;
                 String dato = pagina.substring(indice_tradicional + 1);
                 nombre = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
             }
-            if(indice_tradicional == -1 || nombre.contentEquals(alternativo)) {
+            if (indice_tradicional == -1 || nombre.contentEquals(alternativo)) {
                 // No había tradicional o había pero es igual
-                if(indice_stock != -1) { // Hay nomenclatura stock en la página
+                if (indice_stock != -1) { // Hay nomenclatura stock en la página
                     String dato = pagina.substring(indice_stock + 1);
                     alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
                 }
-                if(indice_stock == -1 || nombre.contentEquals(alternativo)) {
+                if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
                     // No había stock o había pero es igual
-                    if(indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
+                    if (indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
                         // Hay sistemática
-                        String dato = pagina.substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
+                        String dato = pagina
+                                .substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
                         alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
                     }
                 }
@@ -157,7 +160,7 @@ public class PaginaFQ {
                 resultado.get().nuevaEtiqueta(new EtiquetaModel(Normalizado.of(etiqueta)));
         }
 
-        // Ej.: óxido de hierro (II) -> óxido de hierro(II)
+        // Ej.: óxido de hierro (II) -> óxido de hierro(II):
 
         nombre = nombre.replaceAll(" \\(", "(");
 
