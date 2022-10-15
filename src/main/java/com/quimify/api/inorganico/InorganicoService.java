@@ -66,15 +66,13 @@ public class InorganicoService {
     // BÚSQUEDAS ---------------------------------------------------------------------
 
     public InorganicoResultado buscar(String input, Boolean foto) {
-        escanearFQ("https://www.formulacionquimica.com/FeO2/");
-        
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(input); // Flowchart #0
 
         // Flowchart #1
         if (buscado.isEmpty()) { // No se encuentra en la DB
-            Optional<BusquedaWeb> busqueda_web;
+            Optional<BusquedaWeb> busqueda_web = Optional.empty();
 
             // Flowchart #2
             if (disponibleGoogle()) {
@@ -83,20 +81,18 @@ public class InorganicoService {
                 metricasService.contarGoogle(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
             // Flowchart #3
-            else if (disponibleBingGratis()) {
+            if (busqueda_web.isEmpty() && disponibleBingGratis()) { // Hubo con Google o no está disponible
                 busqueda_web = tryBuscarBingGratis(input);
 
                 metricasService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
             // Flowchart #4
-            else if (disponibleBingPago()) {
+            if (busqueda_web.isEmpty() && disponibleBingPago()) { // Hubo con Bing gratis o no está disponible
                 busqueda_web = tryBuscarBingPago(input);
 
                 metricasService.contarBingPago();
                 metricasService.contarBing(busqueda_web.isPresent() && busqueda_web.get().encontrado, foto);
             }
-            // Flowchart #7
-            else busqueda_web = Optional.empty();
 
             // Flowchart #0 ó #5
             if (busqueda_web.isPresent() && busqueda_web.get().encontrado) { // Se ha podido encontrar con Google o Bing
@@ -111,27 +107,27 @@ public class InorganicoService {
 
                 // Flowchart #5
                 if (buscado.isEmpty()) { // Parece no estar en la DB
-                    Optional<InorganicoModel> escaneado = escanearFQ(busqueda_web.get().direccion);
+                    Optional<InorganicoModel> parsed = parseFQ(busqueda_web.get().direccion);
 
-                    if (escaneado.isPresent()) { // Escaneado correctamente
-                        buscado = buscarMemoriaPrincipal(escaneado.get().getNombre());
+                    if (parsed.isPresent()) { // Escaneado correctamente
+                        buscado = buscarMemoriaPrincipal(parsed.get().getNombre());
 
                         if (buscado.isEmpty()) { // En efecto, no estaba en la DB
-                            resultado = new InorganicoResultado(escaneado.get());
-                            inorganicoRepository.save(escaneado.get());
+                            resultado = new InorganicoResultado(parsed.get());
+                            inorganicoRepository.save(parsed.get());
                             metricasService.contarInorganicoNuevo();
                         } else { // Realmente sí estaba en la DB
                             resultado = new InorganicoResultado(buscado.get());
 
-                            logger.warn("El inorgánico buscado en la web \"" + input + "\", una vez escaneado, era " +
-                                    "id = " + buscado.get() + ".");
+                            logger.info("El inorgánico buscado en la web \"" + input + "\", una vez escaneado, era " +
+                                    "id = " + buscado.get().getId());
                         }
                     } else resultado = NO_ENCONTRADO;
                 }
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     resultado = new InorganicoResultado(buscado.get());
-                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era id = " + buscado.get() + ".");
+                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era id = " + buscado.get().getId());
                 }
             }
             // Flowchart #7
@@ -227,7 +223,9 @@ public class InorganicoService {
         } catch (Exception exception) {
             busqueda_web = Optional.empty();
 
-            logger.error("IOException al buscar \"" + input + "\" en Google: " + exception);
+            if (exception.toString().contains("Server returned HTTP response code: 429"))
+                logger.warn("Google ha devuelto HTTP 429.");
+            else logger.error("IOException al buscar \"" + input + "\" en Google: " + exception);
         }
 
         return busqueda_web;
@@ -323,7 +321,7 @@ public class InorganicoService {
     }
 
     // Flowchart #5
-    private Optional<InorganicoModel> escanearFQ(String direccion) {
+    private Optional<InorganicoModel> parseFQ(String direccion) {
         Optional<InorganicoModel> resultado;
 
         try {
