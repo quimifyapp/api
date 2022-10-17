@@ -270,25 +270,21 @@ public final class Simple extends Organic implements OpenChain {
     
     // Text: TODO: poner en común en Cadena
 
-    private boolean isRedundantInName(FunctionalGroup bond) {
-        boolean es_redundante;
+    private boolean isRedundantInName(FunctionalGroup group) {
+        boolean isRedundant;
 
-        // Sustituyentes terminales:
-        if(bond != FunctionalGroup.radical && !(esAlquenoOAlquino(bond))) // Por: new Sustituyente(functionalGroup)
-            es_redundante = new Substituent(bond).getEnlaces() == 3; // Solo puede ir en el primero y/o último
-            // Derivados del propeno:
-        else if(chain.getSize() == 3)
-            es_redundante = bond == FunctionalGroup.alkene && chain.getNumberOf(FunctionalGroup.alkene) == 2; // Es propadieno
-            // Derivados del etano:
-        else if(chain.getSize() == 2) {
-            if(esAlquenoOAlquino(bond) || chain.hasFunctionalGroup(FunctionalGroup.alkyne)) // Solo hay una posición posible
-                es_redundante = true;
-            else es_redundante = chain.getSubstituentsWithoutHydrogen().size() == 1; // Solo hay uno, como cloroetino o etanol
+        if (group != FunctionalGroup.radical && !(esAlquenoOAlquino(group)) && new Substituent(group).getEnlaces() == 3)
+            isRedundant = true; // Sustituyente terminal: solo puede ir en el primero y/o último
+        else if (chain.getSize() == 3) // Derivados del propeno
+            isRedundant = group == FunctionalGroup.alkene && chain.getNumberOf(FunctionalGroup.alkene) == 2; // Propadieno
+        else if (chain.getSize() == 2) { // Derivados del etano
+            if (esAlquenoOAlquino(group) || chain.hasFunctionalGroup(FunctionalGroup.alkyne)) // Hay una posición posible
+                isRedundant = true;
+            else isRedundant = chain.getSubstituentsWithoutHydrogen().size() == 1; // Hay uno, como cloroetino o etanol
         }
-        // Derivados del metano:
-        else es_redundante = chain.getSize() == 1;
+        else isRedundant = chain.getSize() == 1; // Derivados del metano
 
-        return es_redundante;
+        return isRedundant;
     }
 
     private Localizador getPrefixFor(FunctionalGroup functionalGroup) {

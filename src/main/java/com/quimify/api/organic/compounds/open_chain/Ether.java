@@ -140,18 +140,18 @@ public final class Ether extends Organic implements OpenChain {
 	// Text: TODO: poner en común en Cadena
 
 	private boolean isRedundantInName(FunctionalGroup functionalGroup, Chain chain) {
-		boolean es_redundante;
+		boolean isRedundant;
 
 		// Derivados del propil:
 		if (chain.getSize() == 3)
-			es_redundante = functionalGroup == FunctionalGroup.alkene && chain.getNumberOf(FunctionalGroup.alkene) == 2; // Es propadienil
+			isRedundant = functionalGroup == FunctionalGroup.alkene && chain.getNumberOf(FunctionalGroup.alkene) == 2; // Es propadienil
 			// Derivados del etil:
 		else if (chain.getSize() == 2)
-			es_redundante = esAlquenoOAlquino(functionalGroup); // Solo hay una posición posible para el enlace
+			isRedundant = esAlquenoOAlquino(functionalGroup); // Solo hay una posición posible para el enlace
 			// Derivados del metil:
-		else es_redundante = chain.getSize() == 1;
+		else isRedundant = chain.getSize() == 1;
 
-		return es_redundante;
+		return isRedundant;
 	}
 
 	private Localizador getPrefixFor(FunctionalGroup functionalGroup, Chain chain) {

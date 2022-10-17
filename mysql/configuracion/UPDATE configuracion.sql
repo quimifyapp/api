@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET bing_gratis_on = true
-WHERE version = 0
+SET google_url = 
+WHERE version = 1
