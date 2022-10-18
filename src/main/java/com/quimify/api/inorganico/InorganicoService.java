@@ -1,6 +1,8 @@
 package com.quimify.api.inorganico;
 
 import com.quimify.api.Normalizado;
+import com.quimify.api.masa_molecular.MasaMolecularResultado;
+import com.quimify.api.masa_molecular.MasaMolecularService;
 import com.quimify.api.utils.Download;
 import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.metricas.MetricasService;
@@ -25,6 +27,9 @@ public class InorganicoService {
 
     @Autowired
     InorganicoRepository inorganicoRepository; // Conexión con la DB
+
+    @Autowired
+    MasaMolecularService masaMolecularService; // Procesos de la masa molecular
 
     @Autowired
     ConfiguracionService configuracionService; // Procesos de la configuración
@@ -113,7 +118,16 @@ public class InorganicoService {
                         buscado = buscarMemoriaPrincipal(parsed.get().getNombre());
 
                         if (buscado.isEmpty()) { // En efecto, no estaba en la DB
+                            if(parsed.get().getMasa() == null) {
+                                MasaMolecularResultado masaMolecularResultado =
+                                        masaMolecularService.tryMasaMolecularDe(parsed.get().getFormula());
+
+                                if (masaMolecularResultado.getEncontrado())
+                                    parsed.get().setMasa(masaMolecularResultado.getMasa().toString());
+                            }
+
                             resultado = new InorganicoResultado(parsed.get());
+
                             inorganicoRepository.save(parsed.get());
                             metricasService.contarInorganicoNuevo();
                         } else { // Realmente sí estaba en la DB

@@ -22,17 +22,17 @@ public final class Ether extends Organic implements OpenChain {
 	);
 
 	public Ether(Simple firstChain) {
-		this.firstChain = firstChain.getChain(); // R -
-		this.firstChain.enlazar(FunctionalGroup.ether); // R - O -
+		this.firstChain = firstChain.getChain(); // R - O
 
 		if(firstChain.isDone())
-			startSecondChain(); // - C
+			startSecondChain(); // R - O - C≡
 		else currentChain = this.firstChain;
 	}
 
 	private Ether(Chain firstChain, Chain secondChain) {
-		this.firstChain = firstChain; // R - O -
-		this.secondChain = secondChain; // - C
+		this.firstChain = firstChain; // [R - O] - R'
+		this.secondChain = secondChain; // R - O [- R']
+		currentChain = this.firstChain;
 	}
 
 	// OPEN CHAIN --------------------------------------------------------------------
@@ -57,11 +57,9 @@ public final class Ether extends Organic implements OpenChain {
 		if (orderedBondableGroups.contains(substituent.getGroup())) {
 			currentChain.enlazar(substituent);
 
-			if (currentChain == firstChain && firstChain.isDone()) {
-				if (currentChain.isDone()) {
+			if (currentChain == firstChain && firstChain.isDone())
+				if (currentChain.isDone())
 					startSecondChain();
-				}
-			}
 		}
 		else throw new IllegalArgumentException("No se puede enlazar [" + substituent.getGroup() + "] a un Ether.");
 	}

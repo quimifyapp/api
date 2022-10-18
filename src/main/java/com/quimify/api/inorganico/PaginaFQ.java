@@ -184,8 +184,6 @@ public class PaginaFQ {
         return indice;
     }
 
-
-
     private String masaFQ() {
         String masa;
 

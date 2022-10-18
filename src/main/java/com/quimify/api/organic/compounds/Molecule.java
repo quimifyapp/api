@@ -133,16 +133,15 @@ public class Molecule extends Organic {
 
 	private Ether buildEther(List<Atom> bondedToTheOxygen) {
 		// First chain: [R - O -] R'
-		Atom firstCarbon = bondedToTheOxygen.get(0); // [C] - O - C'
-		firstCarbon.removeEther(); // Ether class will bond it
+		Atom firstCarbon = bondedToTheOxygen.get(0); // [C - O] - C'
 
 		Simple firstChain = new Simple(0);
-		buildOpenChainStartingFrom(firstChain, firstCarbon); // - O - R
+		buildOpenChainStartingFrom(firstChain, firstCarbon); // R - O -
 
 		Ether ether = new Ether(firstChain.getReversed()); // R - O - C ≡
 
-		// Second chain: R - O - [R']
-		firstCarbon = bondedToTheOxygen.get(1); // C - O - [C']
+		// Second chain: R - O [- R']
+		firstCarbon = bondedToTheOxygen.get(1); // C - O [- C']
 		firstCarbon.removeEther(); // It's already bonded
 		buildOpenChainStartingFrom(ether, firstCarbon); // R - O - R'
 

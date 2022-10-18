@@ -65,9 +65,9 @@ public class OrganicService {
 				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
 
 				if (groupElection != FunctionalGroup.radical) {
-					if (groupElection != FunctionalGroup.ether)
-						openChain.bond(groupElection);
-					else { // Ether
+					openChain.bond(groupElection);
+
+					if (groupElection == FunctionalGroup.ether) {
 						assert openChain instanceof Simple; // Yes, it is...
 						openChain = new Ether((Simple) openChain);
 					}

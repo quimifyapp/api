@@ -20,9 +20,9 @@ public final class Simple extends Organic implements OpenChain {
 
     private static final Set<FunctionalGroup> bondableGroups = Set.of(
             FunctionalGroup.acid, FunctionalGroup.amide, FunctionalGroup.nitrile, FunctionalGroup.aldehyde,
-            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.nitro,
-            FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine, FunctionalGroup.iodine,
-            FunctionalGroup.radical, FunctionalGroup.hydrogen
+            FunctionalGroup.ketone, FunctionalGroup.alcohol, FunctionalGroup.amine, FunctionalGroup.ether,
+            FunctionalGroup.nitro, FunctionalGroup.bromine, FunctionalGroup.chlorine, FunctionalGroup.fluorine,
+            FunctionalGroup.iodine, FunctionalGroup.radical, FunctionalGroup.hydrogen
     );
 
     public Simple() {
