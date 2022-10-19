@@ -180,8 +180,9 @@ public class MasaMolecularService {
         try {
             resultado = masaMolecularDe(formula);
 
-            if(!resultado.getEncontrado())
-                logger.warn("No se ha podido calcular la masa de \"" + formula + "\"");
+            if (!resultado.getEncontrado())
+                logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
+                        "Error: " + (resultado.getError() != null ? "\"" + resultado.getError() + "\"." : "ninguno."));
         }
         catch(Exception exception) {
             resultado = new MasaMolecularResultado("");

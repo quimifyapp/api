@@ -1,5 +1,7 @@
 package com.quimify.api.inorganico;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/inorganico")
 public class InorganicoController {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
@@ -24,6 +28,7 @@ public class InorganicoController {
     @GetMapping()
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
                                                 @RequestParam("foto") Boolean foto) {
+        logger.info("GET inorganico: \"" + input + "\" (" + (foto ? "foto" : "teclado") + ").");
         return inorganicoService.buscar(input, foto);
     }
 
@@ -34,6 +39,7 @@ public class InorganicoController {
 
     @GetMapping("/autocompletar/buscar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion) {
+        logger.info("GET inorganico: \"" + complecion + "\" (compleción).");
         return inorganicoService.buscarPorComplecion(complecion);
     }
 

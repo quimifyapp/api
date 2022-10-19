@@ -1,5 +1,7 @@
 package com.quimify.api.masa_molecular;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/masamolecular")
 public class MasaMolecularController {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     MasaMolecularService masaMolecularService; // Procesos de masas moleculares
 
@@ -16,7 +20,13 @@ public class MasaMolecularController {
 
     @GetMapping()
     public MasaMolecularResultado masaMolecular(@RequestParam("formula") String formula) {
-        return masaMolecularService.tryMasaMolecularDe(formula);
+        MasaMolecularResultado masaMolecularResultado = masaMolecularService.tryMasaMolecularDe(formula);
+
+        if(masaMolecularResultado.getEncontrado())
+            logger.info("GET masa molecular: \"" + formula + "\". " +
+                    "RETURN: \"" + masaMolecularResultado.getMasa() + "\".");
+
+        return masaMolecularResultado;
     }
 
 }

@@ -35,9 +35,7 @@ public class OrganicFactory {
                 Molecule molecule = new Molecule(opsinResult.get().getCml(), opsinResult.get().getSmiles());
 
                 Optional<String> formula = molecule.getStructure();
-                if(formula.isPresent())
-                    organicResult.setFormula(formula.get());
-                else logger.info("No se pudo generar la fórmula para \"" + name + "\".");
+                formula.ifPresent(organicResult::setFormula);
             }
             catch(IllegalArgumentException exception) {
                 logger.warn("Excepción al generar la fórmula de \"" + name + "\": " + exception); // It happens often

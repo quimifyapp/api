@@ -33,8 +33,10 @@ public class OrganicService {
 	public OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
 
-		if(organicResult.getEncontrado() && organicResult.getFormula() != null)
-			addMolecularMassIfMissing(organicResult);
+		if(organicResult.getEncontrado()) {
+			if(organicResult.getFormula() != null)
+				addMolecularMassIfMissing(organicResult);
+		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
 		metricasService.contarFormularOrganico(organicResult.getEncontrado(), picture);

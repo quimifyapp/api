@@ -1,8 +1,6 @@
 package com.quimify.api.reporte;
 
 import com.quimify.api.metricas.MetricasService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ReporteService {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     ReporteRepository reporteRepository; // Conexión con la DB
@@ -31,7 +27,6 @@ public class ReporteService {
         reporteRepository.save(reporte);
 
         metricasService.contarReporte();
-        logger.warn("Reporte de la versión " + version + " - " + titulo + " - \"" + detalles + "\".");
     }
 
 }

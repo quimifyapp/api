@@ -1,5 +1,7 @@
 package com.quimify.api.organic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/organic")
 public class OrganicController {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	OrganicService organicService; // Procesos de los compuestos orgánicos
 
@@ -17,12 +21,23 @@ public class OrganicController {
 	@GetMapping("name")
 	public OrganicResult name(@RequestParam("name") String name,
 							  @RequestParam("picture") Boolean picture) {
-		return organicService.getFromName(name, picture);
+		OrganicResult organicResult = organicService.getFromName(name, picture);
+
+		if (organicResult.getEncontrado())
+			logger.info("GET formular: \"" + name + "\". RETURN: " +
+					(organicResult.getFormula() != null ? "\"" + organicResult.getFormula() + "\"." : "sin fórmula."));
+
+		return organicResult;
 	}
 
 	@GetMapping("structure")
 	public OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
-		return organicService.getFromStructure(structureSequence);
+		OrganicResult organicResult = organicService.getFromStructure(structureSequence);
+
+		logger.info("GET nombrar: \"" + organicResult.getFormula() + "\". " +
+				"RETURN: \"" + organicResult.getNombre() + "\".");
+
+		return organicResult;
 	}
 
 }
