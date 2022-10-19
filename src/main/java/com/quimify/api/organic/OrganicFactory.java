@@ -37,7 +37,7 @@ public class OrganicFactory {
                 Optional<String> formula = molecule.getStructure();
                 if(formula.isPresent())
                     organicResult.setFormula(formula.get());
-                else logger.warn("No se pudo generar la fórmula para \"" + name + "\".");
+                else logger.info("No se pudo generar la fórmula para \"" + name + "\".");
             }
             catch(IllegalArgumentException exception) {
                 logger.warn("Excepción al generar la fórmula de \"" + name + "\": " + exception); // It happens often

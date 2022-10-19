@@ -154,9 +154,9 @@ public class Carbon extends Organic {
 
         // Se escribe los hidrógenos:
         Substituent hidrogeno = new Substituent(FunctionalGroup.hydrogen);
-        int cantidad = getCantidadDe(hidrogeno);
-        if(cantidad > 0) {
-            resultado.append(hidrogeno).append(getMolecularQuantifier(cantidad));
+        final int hydrogenCount = getCantidadDe(hidrogeno);
+        if(hydrogenCount > 0) {
+            resultado.append(hidrogeno).append(getMolecularQuantifier(hydrogenCount));
             unicos.remove(unicos.size() - 1); // Se borra el hidrógeno de la lista
         }
 
@@ -167,17 +167,19 @@ public class Carbon extends Organic {
             Substituent unique = unicos.get(0);
             String text = unique.toString();
 
-            if(!unique.esTipo(FunctionalGroup.aldehyde) // CH(HO)
-                    && (unique.esTipo(FunctionalGroup.ketone) || unique.esHalogeno() || unique.getEnlaces() == 3))
-                resultado.append(text); // "CO", "CCl", "COOH"
-            else resultado.append("(").append(text).append(")"); // "CH(OH)3", "CH3(CH2CH3)"...
+            if (unique.getEnlaces() == 3 && !(unique.esTipo(FunctionalGroup.aldehyde) && hydrogenCount > 0))
+                resultado.append(text); // COOH, CHO...
+            else if (unique.esTipo(FunctionalGroup.ketone) || unique.esHalogeno())
+                resultado.append(text); // CO, CCl...
+            else resultado.append("(").append(text).append(")"); // CH(HO), CH(OH)3, CH3(CH2CH3)...
 
             resultado.append((getMolecularQuantifier(getCantidadDe(unique))));
         }
-        else if(unicos.size() > 1) // Hay más de un tipo además del hidrógeno y éter
-            for(Substituent substituent : unicos)
-                resultado.append("(").append(substituent).append(")") // Como en "C(OH)3(Cl)", "CH2(NO2)(CH3)"...
+        else if(unicos.size() > 1) { // Hay más de un tipo además del hidrógeno y éter
+            for (Substituent substituent : unicos)
+                resultado.append("(").append(substituent).append(")") // C(OH)3(Cl), CH2(NO2)(CH3)...
                         .append(getMolecularQuantifier(getCantidadDe(substituent)));
+        }
 
         // Se escribe el éter:
         if(contiene(FunctionalGroup.ether))

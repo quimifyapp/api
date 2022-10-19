@@ -124,8 +124,6 @@ public class PaginaFQ {
         if(indiceDespuesDeEn("br/>", nombre) != -1) { // Error con algunos orgánicos
             nombre = nombre.substring(4);
             resultado.get().setPremium(true);
-
-            logger.warn("Se ha encontrado el error br/> en la página FQ: " + pagina);
         }
         if(alternativo != null) {
             if(indiceDespuesDeEn("oxo", alternativo) != -1) // Nomenclatura obsoleta
@@ -133,8 +131,6 @@ public class PaginaFQ {
             else if(indiceDespuesDeEn("br/>", alternativo) != -1) { // Error con algunos orgánicos
                 alternativo = alternativo.substring(4);
                 resultado.get().setPremium(true);
-
-                logger.warn("Se ha encontrado el error br/> en la página FQ: " + pagina);
             }
 
             if(alternativo != null && nombre.contentEquals(alternativo)) // Duplicado
