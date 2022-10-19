@@ -2,6 +2,9 @@ package com.quimify.api.inorganico;
 
 // Esta clase representa las entregas al cliente de un compuesto inorgánico.
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InorganicoResultado {
 
     private Boolean encontrado;
@@ -46,6 +49,21 @@ public class InorganicoResultado {
         this.densidad = inorganico.getDensidad();
         this.fusion = inorganico.getFusion();
         this.ebullicion = inorganico.getEbullicion();
+    }
+
+    // Texto:
+
+    @Override
+    public String toString() {
+        List<String> words = new ArrayList<>();
+
+        words.add(formula);
+        words.add(nombre);
+
+        if(alternativo != null)
+            words.add(alternativo);
+
+        return words.toString();
     }
 
     // Getters y setters:

@@ -118,7 +118,7 @@ public class InorganicoService {
                         buscado = buscarMemoriaPrincipal(parsed.get().getNombre());
 
                         if (buscado.isEmpty()) { // En efecto, no estaba en la DB
-                            if(parsed.get().getMasa() == null) {
+                            if (parsed.get().getMasa() == null) {
                                 MasaMolecularResultado masaMolecularResultado =
                                         masaMolecularService.tryMasaMolecularDe(parsed.get().getFormula());
 
@@ -129,25 +129,26 @@ public class InorganicoService {
                             resultado = new InorganicoResultado(parsed.get());
 
                             inorganicoRepository.save(parsed.get());
+
+                            logger.info("Nuevo inorgánico: " + parsed.get());
                             metricasService.contarInorganicoNuevo();
                         } else { // Realmente sí estaba en la DB
                             resultado = new InorganicoResultado(buscado.get());
 
-                            logger.info("El inorgánico buscado en la web \"" + input + "\", una vez escaneado, era " +
-                                    "id = " + buscado.get().getId());
+                            logger.info("El inorgánico parseado \"" + input + "\" era: " + buscado.get().getId());
                         }
                     } else resultado = NO_ENCONTRADO;
                 }
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     resultado = new InorganicoResultado(buscado.get());
-                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era id = " + buscado.get().getId());
+                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era: " + buscado.get());
                 }
             }
             // Flowchart #7
             else { // No se ha podido encontrar ni con Google ni con Bing
                 resultado = NO_ENCONTRADO; // Temporal
-                // Sugerencia...
+                // Sugerencia... TODO
 
                 logger.warn("No se ha encontrado el inorgánico \"" + input + "\".");
             }

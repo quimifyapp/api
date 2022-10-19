@@ -1,7 +1,9 @@
 package com.quimify.api.inorganico;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,6 +61,21 @@ public class InorganicoModel {
 
     public void nuevaEtiqueta(EtiquetaModel nueva) {
         etiquetas.add(nueva);
+    }
+
+    @Override
+    public String toString() {
+        List<String> words = new ArrayList<>();
+
+        words.add(String.valueOf(id));
+
+        words.add(formula);
+        words.add(nombre);
+
+        if(alternativo != null)
+            words.add(alternativo);
+
+        return words.toString();
     }
 
     // Getters y setters:

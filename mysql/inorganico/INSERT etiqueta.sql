@@ -1,1 +1,1 @@
-INSERT INTO etiqueta (texto_normalizado, inorganico_id) VALUES ("pollasucia", 327)
+INSERT INTO etiqueta (texto_normalizado, inorganico_id) VALUES ("", )
