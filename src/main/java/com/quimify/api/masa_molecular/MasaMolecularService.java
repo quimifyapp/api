@@ -130,20 +130,18 @@ public class MasaMolecularService {
     private MasaMolecularResultado masaMolecularDe(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
 
-        String adaptada = formula.replaceAll("[\\s#≡=-]", ""); // También sin espacios
-
-        if(!adaptada.matches("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"))
+        if(!formula.matches("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"))
             return new MasaMolecularResultado("La fórmula \"" + formula + "\" no es válida.");
-        else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
+        else if(StringUtils.countOccurrencesOf(formula, "(") != StringUtils.countOccurrencesOf(formula, ")"))
             return new MasaMolecularResultado("Los paréntesis no están balanceados.");
-        else if(adaptada.contains("()"))
+        else if(formula.contains("()"))
             return new MasaMolecularResultado("Los paréntesis huecos \"()\" no son válidos.");
 
         // Parece que sí:
 
         MasaMolecularResultado resultado;
 
-        Optional<Map<String, Integer>> elemento_a_moles = getMolesDeElementosEn(adaptada); // Se analiza la fórmula
+        Optional<Map<String, Integer>> elemento_a_moles = getMolesDeElementosEn(formula); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 
