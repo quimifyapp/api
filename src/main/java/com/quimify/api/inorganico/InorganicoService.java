@@ -112,7 +112,7 @@ public class InorganicoService {
 
                 // Flowchart #5
                 if (buscado.isEmpty()) { // Parece no estar en la DB
-                    Optional<InorganicoModel> parsed = parseFQ(busqueda_web.get().direccion);
+                    Optional<InorganicoModel> parsed = tryParseFQ(busqueda_web.get().direccion);
 
                     if (parsed.isPresent()) { // Escaneado correctamente
                         buscado = buscarMemoriaPrincipal(parsed.get().getNombre());
@@ -142,7 +142,7 @@ public class InorganicoService {
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     resultado = new InorganicoResultado(buscado.get());
-                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era: " + buscado.get());
+                    logger.info("El inorgánico buscado en la web \"" + input + "\" era: " + buscado.get());
                 }
             }
             // Flowchart #7
@@ -336,7 +336,15 @@ public class InorganicoService {
     }
 
     // Flowchart #5
-    private Optional<InorganicoModel> parseFQ(String direccion) {
+    private Optional<InorganicoModel> tryParseFQ(String direccion) {
+        // FQ subdirectories that are NOT compounds:
+        if(direccion.matches("^.*?(acidos-carboxilicos|alcanos|alcoholes|aldehidos|alquenos|alquinos|amidas|" +
+                "aminas|anhidridos|anhidridos-organicos|aromaticos|buscador|cetonas|cicloalquenos|ejemplos|" +
+                "ejercicios|eteres|halogenuros|hidracidos|hidroxidos|hidruros|hidruros-volatiles|inorganica|" +
+                "nitrilos|organica|oxidos|oxisales|oxoacidos|peroxidos|politica-privacidad|sales-neutras|" +
+                "sales-volatiles).*$") || direccion.matches("^.*?(.com)/?$"))
+            return Optional.empty();
+
         Optional<InorganicoModel> resultado;
 
         try {
