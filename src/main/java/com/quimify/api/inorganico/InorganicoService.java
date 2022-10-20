@@ -70,6 +70,24 @@ public class InorganicoService {
 
     // BÚSQUEDAS ---------------------------------------------------------------------
 
+    public InorganicoResultado buscarPorComplecion(String complecion) {
+        InorganicoResultado resultado;
+
+        Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(complecion);
+        if (buscado.isPresent()) {
+            resultado = new InorganicoResultado(buscado.get());
+            nuevaBusqueda(buscado.get());
+        } else {
+            logger.error("La compleción: \"" + complecion + "\" no se encuentra.");
+            resultado = NO_ENCONTRADO;
+        }
+
+        metricasService.contarInorganicoAutocompletado();
+        metricasService.contarInorganicoBuscado(resultado.getEncontrado(), false);
+
+        return resultado;
+    }
+
     public InorganicoResultado buscar(String input, Boolean foto) {
         InorganicoResultado resultado;
 
@@ -135,14 +153,14 @@ public class InorganicoService {
                         } else { // Realmente sí estaba en la DB
                             resultado = new InorganicoResultado(buscado.get());
 
-                            logger.info("El inorgánico parseado \"" + input + "\" era: " + buscado.get().getId());
+                            logger.warn("El inorgánico parseado \"" + input + "\" era: " + buscado.get().getId());
                         }
                     } else resultado = NO_ENCONTRADO;
                 }
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     resultado = new InorganicoResultado(buscado.get());
-                    logger.info("El inorgánico buscado en la web \"" + input + "\" era: " + buscado.get());
+                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era: " + buscado.get());
                 }
             }
             // Flowchart #7
@@ -159,24 +177,6 @@ public class InorganicoService {
         }
 
         metricasService.contarInorganicoBuscado(resultado.getEncontrado(), foto);
-
-        return resultado;
-    }
-
-    public InorganicoResultado buscarPorComplecion(String complecion) {
-        InorganicoResultado resultado;
-
-        Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(complecion);
-        if (buscado.isPresent()) {
-            resultado = new InorganicoResultado(buscado.get());
-            nuevaBusqueda(buscado.get());
-        } else {
-            logger.error("La compleción: \"" + complecion + "\" no se encuentra.");
-            resultado = NO_ENCONTRADO;
-        }
-
-        metricasService.contarInorganicoAutocompletado();
-        metricasService.contarInorganicoBuscado(resultado.getEncontrado(), false);
 
         return resultado;
     }

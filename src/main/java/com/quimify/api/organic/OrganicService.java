@@ -89,6 +89,7 @@ public class OrganicService {
 	private void addMolecularMassIfMissing(OrganicResult organicResult) {
 		if(organicResult.getMasa() == null) {
 			MasaMolecularResultado masaMolecular = masaMolecularService.tryMasaMolecularDe(organicResult.getFormula());
+
 			if(masaMolecular.getEncontrado())
 				organicResult.setMasa(masaMolecular.getMasa());
 		}

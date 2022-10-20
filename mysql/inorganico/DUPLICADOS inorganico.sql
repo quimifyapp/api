@@ -1,4 +1,4 @@
-SELECT formula, COUNT(formula) # Hay 53 aceptables
+SELECT formula, COUNT(formula) # Hay 56 aceptables
 FROM inorganico
 GROUP BY formula
 HAVING COUNT(formula) > 1;
