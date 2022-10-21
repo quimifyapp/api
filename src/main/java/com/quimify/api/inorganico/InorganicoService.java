@@ -203,7 +203,7 @@ public class InorganicoService {
         boolean superadas = metricasService.getBusquedasGoogle() >= configuracionService.getGoogleLimite();
 
         if (superadas && configuracionService.getGoogleON())
-            logger.warn("Búsquedas de Google superadas");
+            logger.warn("Búsquedas de Google superadas.");
 
         return !superadas && configuracionService.getGoogleON();
     }
@@ -217,7 +217,7 @@ public class InorganicoService {
         boolean superadas = metricasService.getBusquedasBingPago() >= configuracionService.getBingPagoLimite();
 
         if (superadas && configuracionService.getBingPagoON())
-            logger.warn("Búsquedas de Bing de pago superadas");
+            logger.warn("Búsquedas de Bing de pago superadas.");
 
         return !superadas && configuracionService.getBingPagoON();
     }

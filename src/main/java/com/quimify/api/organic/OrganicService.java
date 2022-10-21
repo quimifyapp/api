@@ -52,7 +52,7 @@ public class OrganicService {
 		if(organicResult.getEncontrado())
 			addMolecularMassIfMissing(organicResult);
 
-		metricasService.contarNombrarOrganicoSimpleBuscado();
+		metricasService.contarNombrarOrganicoAbiertoBuscado();
 
 		return organicResult;
 	}

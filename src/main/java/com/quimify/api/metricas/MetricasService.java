@@ -135,13 +135,8 @@ public class MetricasService {
     }
 
     @Transactional
-    public void contarNombrarOrganicoSimpleBuscado() {
-        metricasDeHoy().nuevoNombrarOrganicoSimpleBuscado();
-    }
-
-    @Transactional
-    public void contarNombrarOrganicoEterBuscado() {
-        metricasDeHoy().nuevoNombrarOrganicoEterBuscado();
+    public void contarNombrarOrganicoAbiertoBuscado() {
+        metricasDeHoy().nuevoNombrarOrganicoAbiertoBuscado();
     }
 
     @Transactional

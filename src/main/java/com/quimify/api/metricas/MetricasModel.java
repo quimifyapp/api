@@ -81,9 +81,7 @@ public class MetricasModel {
     // Su suma equivale al total de peticiones de nombrar orgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer nombrar_organico_simple_buscados = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer nombrar_organico_eter_buscados = 0;
+    private Integer nombrar_organico_abierto_buscados = 0;
 
     // Su suma equivale al total de peticiones de calcular masas moleculares:
 
@@ -93,6 +91,7 @@ public class MetricasModel {
     private Integer masa_molecular_no_encontrados = 0;
 
     // Reportes de errores:
+
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer reportes = 0;
 
@@ -196,12 +195,8 @@ public class MetricasModel {
         formular_organico_foto_no_encontrados += 1;
     }
 
-    public void nuevoNombrarOrganicoSimpleBuscado() {
-        nombrar_organico_simple_buscados += 1;
-    }
-
-    public void nuevoNombrarOrganicoEterBuscado() {
-        nombrar_organico_eter_buscados += 1;
+    public void nuevoNombrarOrganicoAbiertoBuscado() {
+        nombrar_organico_abierto_buscados += 1;
     }
 
     public void nuevoMasaMolecularEncontrado() {
@@ -402,20 +397,12 @@ public class MetricasModel {
         this.formular_organico_foto_no_encontrados = formular_organico_foto_no_encontrados;
     }
 
-    public Integer getNombrar_organico_simple_buscados() {
-        return nombrar_organico_simple_buscados;
+    public Integer getNombrar_organico_abierto_buscados() {
+        return nombrar_organico_abierto_buscados;
     }
 
-    public void setNombrar_organico_simple_buscados(Integer nombrar_organico_simple_buscados) {
-        this.nombrar_organico_simple_buscados = nombrar_organico_simple_buscados;
-    }
-
-    public Integer getNombrar_organico_eter_buscados() {
-        return nombrar_organico_eter_buscados;
-    }
-
-    public void setNombrar_organico_eter_buscados(Integer nombrar_organico_eter_buscados) {
-        this.nombrar_organico_eter_buscados = nombrar_organico_eter_buscados;
+    public void setNombrar_organico_abierto_buscados(Integer nombrar_organico_simple_buscados) {
+        this.nombrar_organico_abierto_buscados = nombrar_organico_simple_buscados;
     }
 
     public Integer getMasa_molecular_encontrados() {
