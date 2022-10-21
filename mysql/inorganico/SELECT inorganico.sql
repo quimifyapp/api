@@ -4,7 +4,7 @@ FROM inorganico
 
 # WHERE id = 1002
 # WHERE inorganico.id = 2995
-# WHERE formula = "NaClO"
+ WHERE formula = "H2O"
 # WHERE alternativo LIKE "ácido%"
 # WHERE formula = "HCl"
 # WHERE nombre = "metanol"

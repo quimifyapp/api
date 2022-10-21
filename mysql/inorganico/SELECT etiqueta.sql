@@ -4,5 +4,5 @@ INNER JOIN inorganico
 ON etiqueta.inorganico_id = inorganico.id
 
 # WHERE texto_normalizado LIKE "%selen%"
-# WHERE inorganico_id = 68
+ WHERE inorganico_id = 1
 ORDER BY busquedas DESC

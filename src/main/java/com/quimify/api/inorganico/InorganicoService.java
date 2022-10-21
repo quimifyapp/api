@@ -74,10 +74,9 @@ public class InorganicoService {
         InorganicoResultado resultado;
 
         Optional<InorganicoModel> buscado = buscarMemoriaPrincipal(complecion);
-        if (buscado.isPresent()) {
+        if (buscado.isPresent())
             resultado = new InorganicoResultado(buscado.get());
-            nuevaBusqueda(buscado.get());
-        } else {
+        else {
             logger.error("La compleción: \"" + complecion + "\" no se encuentra.");
             resultado = NO_ENCONTRADO;
         }
@@ -200,12 +199,15 @@ public class InorganicoService {
     }
 
     private Boolean disponibleGoogle() {
-        boolean superadas = metricasService.getBusquedasGoogle() >= configuracionService.getGoogleLimite();
+        if(!configuracionService.getGoogleON())
+            return false;
 
-        if (superadas && configuracionService.getGoogleON())
+        int busquedas = metricasService.getBusquedasGoogle();
+
+        if (busquedas == configuracionService.getBingPagoLimite())
             logger.warn("Búsquedas de Google superadas.");
 
-        return !superadas && configuracionService.getGoogleON();
+        return busquedas < configuracionService.getGoogleLimite();
     }
 
     private Boolean disponibleBingGratis() {
@@ -214,12 +216,15 @@ public class InorganicoService {
     }
 
     private Boolean disponibleBingPago() {
-        boolean superadas = metricasService.getBusquedasBingPago() >= configuracionService.getBingPagoLimite();
+        if(!configuracionService.getBingPagoON())
+            return false;
 
-        if (superadas && configuracionService.getBingPagoON())
+        int busquedas = metricasService.getBusquedasBingPago();
+
+        if (busquedas == configuracionService.getBingPagoLimite())
             logger.warn("Búsquedas de Bing de pago superadas.");
 
-        return !superadas && configuracionService.getBingPagoON();
+        return busquedas < configuracionService.getBingPagoLimite();
     }
 
     private static class BusquedaWeb {
