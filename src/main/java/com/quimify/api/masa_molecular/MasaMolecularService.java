@@ -185,9 +185,12 @@ public class MasaMolecularService {
                 logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
                         "Error: " + (resultado.getError() != null ? "\"" + resultado.getError() + "\"." : "ninguno."));
         }
+        catch (StackOverflowError error) {
+            resultado = new MasaMolecularResultado("La fórmula es demasiado larga.");
+            logger.warn("Stack overflow al calcular la masa de: \"" + formula + "\".");
+        }
         catch(Exception exception) {
             resultado = new MasaMolecularResultado("");
-
             logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
         }
 
