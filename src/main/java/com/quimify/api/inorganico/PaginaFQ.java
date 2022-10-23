@@ -21,7 +21,7 @@ public class PaginaFQ {
     public Optional<InorganicoModel> escanearInorganico() {
         Optional<InorganicoModel> resultado = Optional.of(new InorganicoModel());
 
-        int indice = indiceDespuesDeEn("<h1>", pagina);
+        int indice = indexAfterIn("<h1>", pagina);
 
         if(indice == -1) {
             logger.error("La siguiente página de FQ no tiene <h1>: " + pagina);
@@ -34,8 +34,8 @@ public class PaginaFQ {
 
         String nombre, formula;
 
-        indice = indiceDespuesDeEn("/", pagina);
-        int etiqueta_cerrada = indiceDespuesDeEn("</", pagina);
+        indice = indexAfterIn("/", pagina);
+        int etiqueta_cerrada = indexAfterIn("</", pagina);
 
         if(indice != etiqueta_cerrada) { // Como en "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
             nombre = pagina.substring(indice + 1, etiqueta_cerrada - 2);
@@ -43,12 +43,12 @@ public class PaginaFQ {
         } else { // Como en "metano</h1>..."
             nombre = pagina.substring(0, etiqueta_cerrada - 2);
 
-            indice = indiceDespuesDeEn(">Fórmula:", pagina);
+            indice = indexAfterIn(">Fórmula:", pagina);
             if(indice == -1)
-                indice = indiceDespuesDeEn("\"frm\">", pagina);
+                indice = indexAfterIn("\"frm\">", pagina);
 
             formula = pagina.substring(indice);
-            formula = formula.substring(0, indiceDespuesDeEn("</p>", formula) - 4);
+            formula = formula.substring(0, indexAfterIn("</p>", formula) - 4);
 
             formula = formula.replace("</b>", "").replace("<sub>", "")
                     .replace("</sub>", "").replace(" ", "");
@@ -64,33 +64,33 @@ public class PaginaFQ {
 
         String alternativo = null;
 
-        int indice_tradicional = indiceDespuesDeEn("tradicional:</b>", pagina);
-        int indice_stock = indiceDespuesDeEn("stock:</b>", pagina);
+        int indice_tradicional = indexAfterIn("tradicional:</b>", pagina);
+        int indice_stock = indexAfterIn("stock:</b>", pagina);
 
         // Si no pone "ácido" ni en el título ni en tradicional, si tuviera
-        if(!((indiceDespuesDeEn("ácido", nombre) != -1) ||
-                (indice_tradicional != -1 && indiceDespuesDeEn("ácido",
+        if(!((indexAfterIn("ácido", nombre) != -1) ||
+                (indice_tradicional != -1 && indexAfterIn("ácido",
                         pagina.substring(indice_tradicional, indice_tradicional + 6)) != -1))) {
 
             if(indice_stock != -1) {
                 // Hay nomenclatura stock en la página
                 String dato = pagina.substring(indice_stock + 1);
-                alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                alternativo = dato.substring(0, indexAfterIn("</p>", dato) - 4);
             }
             if(indice_stock == -1 || nombre.contentEquals(alternativo)) {
                 // No había stock o había pero es igual
-                int indice_sistematica = indiceDespuesDeEn("sistemática:</b>", pagina);
+                int indice_sistematica = indexAfterIn("sistemática:</b>", pagina);
 
                 if(indice_sistematica != -1) {
                     // Hay sistemática
                     String dato = pagina.substring(indice_sistematica + 1);
-                    alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                    alternativo = dato.substring(0, indexAfterIn("</p>", dato) - 4);
                 }
                 if(indice_sistematica == -1 || nombre.contentEquals(alternativo)) {
                     // No había sistemática o había pero es igual
                     if(indice_tradicional != -1) {
                         String dato = pagina.substring(indice_tradicional + 1);
-                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                        alternativo = dato.substring(0, indexAfterIn("</p>", dato) - 4);
                     }
                 }
             }
@@ -99,20 +99,20 @@ public class PaginaFQ {
             if (indice_tradicional != -1) { // Hay tradicional
                 alternativo = nombre;
                 String dato = pagina.substring(indice_tradicional + 1);
-                nombre = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                nombre = dato.substring(0, indexAfterIn("</p>", dato) - 4);
             }
             if (indice_tradicional == -1 || nombre.contentEquals(alternativo)) {
                 // No había tradicional o había pero es igual
                 if (indice_stock != -1) { // Hay nomenclatura stock en la página
                     String dato = pagina.substring(indice_stock + 1);
-                    alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                    alternativo = dato.substring(0, indexAfterIn("</p>", dato) - 4);
                 }
                 if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
                     // No había stock o había pero es igual
                     if (pagina.contains("sistemática:</b>")) { // Hay sistemática
                         String dato = pagina
-                                .substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
-                        alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
+                                .substring(indexAfterIn("sistemática:</b>", pagina) + 1);
+                        alternativo = dato.substring(0, indexAfterIn("</p>", dato) - 4);
                     }
                 }
             }
@@ -124,6 +124,7 @@ public class PaginaFQ {
             nombre = nombre.substring(4);
             resultado.get().setPremium(true);
         }
+
         if(alternativo != null) {
             if(alternativo.contains("oxo")) // Nomenclatura obsoleta
                 alternativo = null;
@@ -136,9 +137,7 @@ public class PaginaFQ {
                 alternativo = null;
         }
 
-        // Ej.: óxido de hierro (II) -> óxido de hierro(II):
-
-        nombre = nombre.replaceAll(" \\(", "(");
+        nombre = nombre.replaceAll(" \\(", "("); // Ej.: óxido de hierro (II) -> óxido de hierro(II)
 
         if(alternativo != null)
             alternativo = alternativo.replaceAll(" \\(", "(");
@@ -171,27 +170,24 @@ public class PaginaFQ {
         return resultado;
     }
 
-    private int indiceDespuesDeEn(String fragmento, String texto) {
-        int indice = texto.indexOf(fragmento);
-        if(indice != -1)
-            indice += fragmento.length();
-
-        return indice;
+    private int indexAfterIn(String substring, String string) {
+        int index = string.indexOf(substring);
+        return (index != -1) ? index + substring.length() : index;
     }
 
     private String masaFQ() {
         String masa;
 
-        int indice = indiceDespuesDeEn("Masa molar:", pagina);
+        int indice = indexAfterIn("Masa molar:", pagina);
         if(indice == -1)
-            indice = indiceDespuesDeEn("Masa Molar:", pagina);
+            indice = indexAfterIn("Masa Molar:", pagina);
         if(indice == -1)
-            indice = indiceDespuesDeEn("Peso Molecular:", pagina);
+            indice = indexAfterIn("Peso Molecular:", pagina);
         if(indice != -1) { // Aparece la masa molecular
             masa = pagina.substring(indice + 1);
-            masa = masa.substring(0, indiceDespuesDeEn("</", masa) - 2);
+            masa = masa.substring(0, indexAfterIn("</", masa) - 2);
 
-            indice = indiceDespuesDeEn("g", masa);
+            indice = indexAfterIn("g", masa);
             if(indice != -1) { // Aparece la unidad
                 masa = masa.substring(0, indice - 1);
 
@@ -212,16 +208,16 @@ public class PaginaFQ {
     private String temperaturaFQ(String tipo) {
         String temperatura;
 
-        int indice = indiceDespuesDeEn("Punto de " + tipo + ":", pagina);
+        int indice = indexAfterIn("Punto de " + tipo + ":", pagina);
         if(indice == -1)
-            indice = indiceDespuesDeEn("Temperatura de " + tipo + ":", pagina);
+            indice = indexAfterIn("Temperatura de " + tipo + ":", pagina);
         if(indice != -1) {
             temperatura = pagina.substring(indice + 1);
-            temperatura = temperatura.substring(0, indiceDespuesDeEn("</", temperatura) - 2);
+            temperatura = temperatura.substring(0, indexAfterIn("</", temperatura) - 2);
 
-            indice = indiceDespuesDeEn("°", temperatura);
+            indice = indexAfterIn("°", temperatura);
             if(indice == -1)
-                indice = indiceDespuesDeEn("º", temperatura); // Es distinto al anterior
+                indice = indexAfterIn("º", temperatura); // Es distinto al anterior
             if(indice != -1) { // Aparece el símbolo de grado
                 temperatura = temperatura.substring(0, indice - 1);
 
@@ -244,12 +240,12 @@ public class PaginaFQ {
     private String densidadFQ() {
         String densidad;
 
-        int indice = indiceDespuesDeEn("Densidad:", pagina);
+        int indice = indexAfterIn("Densidad:", pagina);
         if (indice != -1) { // Aparece la densidad
             densidad = pagina.substring(indice + 1);
-            densidad = densidad.substring(0, indiceDespuesDeEn("</", densidad) - 2);
+            densidad = densidad.substring(0, indexAfterIn("</", densidad) - 2);
 
-            indice = indiceDespuesDeEn("g", densidad);
+            indice = indexAfterIn("g", densidad);
             if (indice != -1) { // Aparece la unidad ("g", "Kg", "kg")
                 boolean en_kilogramos;
                 if (densidad.charAt(indice - 2) == 'k' || densidad.charAt(indice - 2) == 'K') {
@@ -308,7 +304,7 @@ public class PaginaFQ {
         String resultado;
 
         dato = dato.trim();
-        if(indiceDespuesDeEn("-", dato.substring(1)) != -1) // Por si es el signo negativo
+        if(indexAfterIn("-", dato.substring(1)) != -1) // Por si es el signo negativo
             resultado = dato.split("-", 2)[0];
         else resultado = dato;
 
@@ -318,7 +314,7 @@ public class PaginaFQ {
     // Ej.: "13.450" -> "13.45"
     // Ej.: "6.000" -> "6"
     private String quitarCerosDecimalesALaDerecha(String numero) {
-        if(indiceDespuesDeEn(".", numero) != -1)
+        if(indexAfterIn(".", numero) != -1)
             while (numero.charAt(numero.length() - 1) == '0')
                 numero = numero.substring(0, numero.length() - 1);
 
@@ -330,7 +326,7 @@ public class PaginaFQ {
 
     // Ej.: "14.457 -> 14.45"
     private String truncarDosDecimales(String numero) {
-        int punto = indiceDespuesDeEn(".", numero);
+        int punto = indexAfterIn(".", numero);
         if(punto != -1) {
             punto += 2;
             if(numero.length() > punto) // Hay más de dos decimales
@@ -342,7 +338,7 @@ public class PaginaFQ {
 
     // Ej.: "X.000ABCD" -> "X.000ABC"
     private String tresDecimalesSignificativos(String numero) {
-        int punto = indiceDespuesDeEn(".", numero);
+        int punto = indexAfterIn(".", numero);
         if(punto != -1)
             for(int i = punto, decimales_significativos = 0; i < numero.length() && decimales_significativos < 3; i++)
                 if(numero.charAt(i) != '0')
