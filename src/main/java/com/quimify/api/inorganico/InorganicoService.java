@@ -3,9 +3,9 @@ package com.quimify.api.inorganico;
 import com.quimify.api.Normalizado;
 import com.quimify.api.masa_molecular.MasaMolecularResultado;
 import com.quimify.api.masa_molecular.MasaMolecularService;
-import com.quimify.api.utils.Download;
 import com.quimify.api.configuracion.ConfiguracionService;
 import com.quimify.api.metricas.MetricasService;
+import com.quimify.utils.Download;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,8 +256,8 @@ public class InorganicoService {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
         Download conexion = new Download(configuracionService.getGoogleURL(), input);
-        conexion.setPropiedad("Accept", "application/json");
-        JSONObject respuesta = new JSONObject(conexion.getTexto());
+        conexion.setProperty("Accept", "application/json");
+        JSONObject respuesta = new JSONObject(conexion.getText());
 
         if (respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
             JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
@@ -321,8 +321,8 @@ public class InorganicoService {
         BusquedaWeb busqueda_web = new BusquedaWeb();
 
         Download conexion = new Download(configuracionService.getBingURL(), input);
-        conexion.setPropiedad("Ocp-Apim-Subscription-Key", key);
-        JSONObject respuesta = new JSONObject(conexion.getTexto());
+        conexion.setProperty("Ocp-Apim-Subscription-Key", key);
+        JSONObject respuesta = new JSONObject(conexion.getText());
 
         if (respuesta.has("webPages")) {
             JSONObject resultado = respuesta.getJSONObject("webPages")
@@ -341,30 +341,30 @@ public class InorganicoService {
     }
 
     // Flowchart #5
-    private Optional<InorganicoModel> tryParseFQ(String direccion) {
+    private Optional<InorganicoModel> tryParseFQ(String address) {
         // FQ subdirectories that are NOT compounds:
-        if(direccion.matches("^.*?(acidos-carboxilicos|alcanos|alcoholes|aldehidos|alquenos|alquinos|amidas|" +
+        if(address.matches("^.*?(acidos-carboxilicos|alcanos|alcoholes|aldehidos|alquenos|alquinos|amidas|" +
                 "aminas|anhidridos|anhidridos-organicos|aromaticos|buscador|cetonas|cicloalquenos|ejemplos|" +
                 "ejercicios|eteres|halogenuros|hidracidos|hidroxidos|hidruros|hidruros-volatiles|inorganica|" +
                 "nitrilos|organica|oxidos|oxisales|oxoacidos|peroxidos|politica-privacidad|sales-neutras|" +
-                "sales-volatiles).*$") || direccion.matches("^.*?(.com)/?$"))
+                "sales-volatiles).*$") || address.matches("^.*?(.com)/?$"))
             return Optional.empty();
 
         Optional<InorganicoModel> resultado;
 
         try {
-            Download conexion = new Download(direccion);
-            conexion.setPropiedad("User-Agent", configuracionService.getUserAgent());
+            Download conexion = new Download(address);
+            conexion.setProperty("User-Agent", configuracionService.getUserAgent());
 
-            PaginaFQ pagina_fq = new PaginaFQ(conexion.getTexto());
+            FormulacionQuimicaPage pagina_fq = new FormulacionQuimicaPage(conexion.getText());
             resultado = pagina_fq.escanearInorganico();
 
             if(resultado.isEmpty())
-                logger.error("No se pudo escanear la dirección \"" + direccion + "\".");
+                logger.error("No se pudo escanear la dirección \"" + address + "\".");
         } catch (Exception exception) {
             resultado = Optional.empty();
 
-            logger.error("Excepción al escanear la dirección \"" + direccion + "\": " + exception);
+            logger.error("Excepción al escanear la dirección \"" + address + "\": " + exception);
         }
 
         return resultado;

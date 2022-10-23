@@ -52,9 +52,17 @@
 		<dependency>
 			<groupId>quimify-organic</groupId>
 			<artifactId>quimify-organic</artifactId>
-			<scope>system</scope>
 			<version>1.0.0</version>
-			<systemPath>${project.basedir}/lib/organic.jar</systemPath>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/quimify-organic.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>quimify-download</groupId>
+			<artifactId>quimify-download</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/quimify-download.jar</systemPath>
 		</dependency>
 
 	</dependencies>
