@@ -109,8 +109,7 @@ public class PaginaFQ {
                 }
                 if (indice_stock == -1 || nombre.contentEquals(alternativo)) {
                     // No había stock o había pero es igual
-                    if (indiceDespuesDeEn("sistemática:</b>", pagina) != -1) {
-                        // Hay sistemática
+                    if (pagina.contains("sistemática:</b>")) { // Hay sistemática
                         String dato = pagina
                                 .substring(indiceDespuesDeEn("sistemática:</b>", pagina) + 1);
                         alternativo = dato.substring(0, indiceDespuesDeEn("</p>", dato) - 4);
@@ -121,14 +120,14 @@ public class PaginaFQ {
 
         // Correcciones:
 
-        if(indiceDespuesDeEn("br/>", nombre) != -1) { // Error con algunos orgánicos
+        if(nombre.contains("br/>")) { // Error con algunos orgánicos
             nombre = nombre.substring(4);
             resultado.get().setPremium(true);
         }
         if(alternativo != null) {
-            if(indiceDespuesDeEn("oxo", alternativo) != -1) // Nomenclatura obsoleta
+            if(alternativo.contains("oxo")) // Nomenclatura obsoleta
                 alternativo = null;
-            else if(indiceDespuesDeEn("br/>", alternativo) != -1) { // Error con algunos orgánicos
+            else if(alternativo.contains("br/>")) { // Error con algunos orgánicos
                 alternativo = alternativo.substring(4);
                 resultado.get().setPremium(true);
             }
@@ -137,12 +136,12 @@ public class PaginaFQ {
                 alternativo = null;
         }
 
-        // Características numéricas:
+        // Ej.: óxido de hierro (II) -> óxido de hierro(II):
 
-        resultado.get().setMasa(masaFQ());
-        resultado.get().setFusion(temperaturaFQ("fusión"));
-        resultado.get().setEbullicion(temperaturaFQ("ebullición"));
-        resultado.get().setDensidad(densidadFQ());
+        nombre = nombre.replaceAll(" \\(", "(");
+
+        if(alternativo != null)
+            alternativo = alternativo.replaceAll(" \\(", "(");
 
         // Etiquetas:
 
@@ -156,18 +155,18 @@ public class PaginaFQ {
                 resultado.get().nuevaEtiqueta(new EtiquetaModel(Normalizado.of(etiqueta)));
         }
 
-        // Ej.: óxido de hierro (II) -> óxido de hierro(II):
-
-        nombre = nombre.replaceAll(" \\(", "(");
-
-        if(alternativo != null)
-            alternativo = alternativo.replaceAll(" \\(", "(");
-
         // Fin:
 
         resultado.get().setFormula(formula);
         resultado.get().setNombre(nombre);
         resultado.get().setAlternativo(alternativo);
+
+        // Características numéricas:
+
+        resultado.get().setMasa(masaFQ());
+        resultado.get().setFusion(temperaturaFQ("fusión"));
+        resultado.get().setEbullicion(temperaturaFQ("ebullición"));
+        resultado.get().setDensidad(densidadFQ());
 
         return resultado;
     }
