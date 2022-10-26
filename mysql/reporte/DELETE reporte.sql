@@ -1,2 +1,2 @@
 DELETE FROM reporte 
-WHERE id < 
+WHERE id <= 224
