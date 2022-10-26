@@ -28,7 +28,7 @@ public class InorganicoController {
     @GetMapping()
     public InorganicoResultado buscarInorganico(@RequestParam("input") String input,
                                                 @RequestParam("foto") Boolean foto) {
-        InorganicoResultado inorganicoResultado = inorganicoService.buscar(input, foto);
+        InorganicoResultado inorganicoResultado = inorganicoService.search(input, foto);
 
         if(inorganicoResultado.getEncontrado())
             logger.info("GET inorganico: \"" + input + "\" (" + (foto ? "foto" : "teclado") + "). " +
@@ -39,12 +39,12 @@ public class InorganicoController {
 
     @GetMapping("/autocompletar")
     public String autoCompletarInorganico(@RequestParam("input") String input) {
-        return inorganicoService.autoCompletar(input);
+        return inorganicoService.autoComplete(input);
     }
 
     @GetMapping("/autocompletar/buscar")
     public InorganicoResultado buscarComplecionInorganico(@RequestParam("complecion") String complecion) {
-        InorganicoResultado inorganicoResultado = inorganicoService.buscarPorComplecion(complecion);
+        InorganicoResultado inorganicoResultado = inorganicoService.searchFromCompletion(complecion);
 
         if(inorganicoResultado.getEncontrado())
             logger.info("GET inorganico: \"" + complecion + "\" (compleción). RETURN :" + inorganicoResultado);
