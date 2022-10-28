@@ -1,4 +1,16 @@
-
+public void foo() {
+        int i = 1;
+        for(InorganicModel inorganic : inorganicRepository.findAllByOrderBySearchCountDesc()) {
+            for(SearchTagModel eti : inorganic.getSearchTags())
+                if(eti.getNormalizedText().equals(Normalized.of(inorganic.getName())) || eti.getNormalizedText().equals(Normalized.of(inorganic.getAlternativeName()))) {
+                    logger.error(i++ + "");
+                    Set<SearchTagModel> tags = inorganic.getSearchTags();
+                    tags.remove(eti);
+                    inorganic.setSearchTags(tags);
+                    break;
+                }
+        }
+    }
 
     protected Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
         Optional<InorganicoModel> resultado;

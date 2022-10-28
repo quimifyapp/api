@@ -20,4 +20,5 @@ class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
     public void onApplicationEvent(ApplicationReadyEvent event) {
         inorganicService.loadNormalizedInorganics();
     }
+
 }

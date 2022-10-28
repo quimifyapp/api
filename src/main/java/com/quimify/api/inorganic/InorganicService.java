@@ -72,20 +72,20 @@ class InorganicService {
     // BÚSQUEDAS ---------------------------------------------------------------------
 
     protected InorganicResult searchFromCompletion(String completion) {
-        InorganicResult resultado;
+        InorganicResult inorganicResult;
 
         Optional<InorganicModel> buscado = searchInDatabase(completion);
         if (buscado.isPresent())
-            resultado = new InorganicResult(buscado.get());
+            inorganicResult = new InorganicResult(buscado.get());
         else {
             logger.error("La compleción: \"" + completion + "\" no se encuentra.");
-            resultado = notFoundInorganic;
+            inorganicResult = notFoundInorganic;
         }
 
         metricsService.contarInorganicoAutocompletado();
-        metricsService.contarInorganicoBuscado(resultado.getPresent(), false);
+        metricsService.contarInorganicoBuscado(inorganicResult.getPresent(), false);
 
-        return resultado;
+        return inorganicResult;
     }
 
     protected InorganicResult search(String input, Boolean isPicture) {
@@ -136,12 +136,13 @@ class InorganicService {
                         searchedInMemory = searchInDatabase(parsed.get().getName());
 
                         if (searchedInMemory.isEmpty()) { // En efecto, no estaba en la DB
-                            if (parsed.get().getMolecularMass() == null) 
-                                parsed.get().setMolecularMass(
-                                        molecularMassService.tryCalculateMolecularMassOf(parsed.get().getFormula()));
+                            Float molecularMass =  molecularMassService.tryCalculateMolecularMassOf(
+                                    parsed.get().getFormula());
+
+                            if(molecularMass != null)
+                                parsed.get().setMolecularMass(molecularMass);
 
                             inorganicResult = new InorganicResult(parsed.get());
-
                             inorganicRepository.save(parsed.get());
 
                             logger.info("Nuevo inorgánico: " + parsed.get());
@@ -149,7 +150,8 @@ class InorganicService {
                         } else { // Realmente sí estaba en la DB
                             inorganicResult = new InorganicResult(searchedInMemory.get());
 
-                            logger.warn("El inorgánico parseado \"" + input + "\" era: " + searchedInMemory.get().getId());
+                            logger.warn("El inorgánico parseado \"" + input + "\" era: " +
+                                    searchedInMemory.get().getId());
                         }
                     } else inorganicResult = notFoundInorganic;
                 }

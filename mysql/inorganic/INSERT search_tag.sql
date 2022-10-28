@@ -1,4 +1,4 @@
-INSERT INTO etiqueta (inorganico_id, texto_normalizado)
+INSERT INTO search_tag (inorganic_id, normalized_text)
 VALUES (
 , # ID DEL INORGÁNICO
  # TEXTO NORMALIZADO: MINÚSCULAS Y SOLO ALFANUMÉRICO
