@@ -14,8 +14,8 @@ class ClientController {
 
 	// CLIENTE ------------------------------------------------------------------------
 
-	@GetMapping("{version}/access-data")
-	protected ClientResult getAccessData(@PathVariable("version") Integer version,
+	@GetMapping("access-data")
+	protected ClientResult getAccessData(@RequestParam("version") Integer version,
 										 @RequestParam("platform") Short platform) {
 		return clienteService.getAccessData(version, platform);
 	}

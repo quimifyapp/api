@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 // Esta clase implementa los métodos HTTP de la dirección "/masamolecular".
 
 @RestController
-@RequestMapping("/molecularmass")
+@RequestMapping("/molecular-mass")
 class MolecularMassController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

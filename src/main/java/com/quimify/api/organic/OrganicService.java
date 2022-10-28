@@ -36,13 +36,14 @@ class OrganicService {
 	protected OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
 
-		if(organicResult.getEncontrado()) {
-			if(organicResult.getFormula() != null)
-				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
+		if(organicResult.getPresent()) {
+			if(organicResult.getStructure() != null)
+				organicResult.setMolecularMass(
+						molecularMassService.tryCalculateMolecularMassOf(organicResult.getStructure()));
 		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
-		metricsService.contarFormularOrganico(organicResult.getEncontrado(), picture);
+		metricsService.contarFormularOrganico(organicResult.getPresent(), picture);
 
 		return organicResult;
 	}
@@ -53,8 +54,9 @@ class OrganicService {
 
 			OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
 
-			if(organicResult.getEncontrado())
-				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
+			if(organicResult.getPresent())
+				organicResult.setMolecularMass(
+						molecularMassService.tryCalculateMolecularMassOf(organicResult.getStructure()));
 
 			metricsService.contarNombrarOrganicoAbiertoBuscado();
 

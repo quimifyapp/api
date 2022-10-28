@@ -24,9 +24,8 @@ class OrganicController {
 							  @RequestParam("picture") Boolean picture) {
 		OrganicResult organicResult = organicService.getFromName(name, picture);
 
-		if (organicResult.getEncontrado())
-			logger.info("GET formular: \"" + name + "\". RETURN: " +
-					(organicResult.getFormula() != null ? "\"" + organicResult.getFormula() + "\"." : "sin fórmula."));
+		if (organicResult.getPresent())
+			logger.info("GET formular: \"" + name + "\". RETURN: " + organicResult.getStructure() + ".");
 
 		return organicResult;
 	}
@@ -35,8 +34,8 @@ class OrganicController {
 	protected OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult organicResult = organicService.getFromStructure(structureSequence);
 
-		logger.info("GET nombrar: \"" + organicResult.getFormula() + "\". " +
-				"RETURN: \"" + organicResult.getNombre() + "\".");
+		logger.info("GET nombrar: \"" + organicResult.getStructure() + "\". " +
+				"RETURN: \"" + organicResult.getName() + "\".");
 
 		return organicResult;
 	}
