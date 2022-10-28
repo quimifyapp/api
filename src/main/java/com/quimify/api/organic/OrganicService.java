@@ -1,8 +1,8 @@
 package com.quimify.api.organic;
 
-import com.quimify.api.masa_molecular.MasaMolecularResultado;
-import com.quimify.api.masa_molecular.MasaMolecularService;
-import com.quimify.api.metricas.MetricasService;
+import com.quimify.api.molecular_mass.MolecularMassResult;
+import com.quimify.api.molecular_mass.MolecularMassService;
+import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
 import com.quimify.organic.OrganicResult;
 import com.quimify.organic.components.FunctionalGroup;
@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 // Esta clase procesa los compuestos orgánicos.
 
 @Service
@@ -23,10 +25,10 @@ public class OrganicService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	MasaMolecularService masaMolecularService; // Procesos de las masas moleculares
+	MolecularMassService molecularMassService; // Procesos de las masas moleculares
 
 	@Autowired
-	MetricasService metricasService; // Procesos de las metricas diarias
+	MetricsService metricsService; // Procesos de las metricas diarias
 
 	public static final int carbonInputCode = -1;
 
@@ -41,22 +43,30 @@ public class OrganicService {
 		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
-		metricasService.contarFormularOrganico(organicResult.getEncontrado(), picture);
+		metricsService.contarFormularOrganico(organicResult.getEncontrado(), picture);
 
 		return organicResult;
 	}
 
 	public OrganicResult getFromStructure(int[] inputSequence) {
-		OpenChain openChain = getOpenChainFromStructure(inputSequence);
+		try {
+			OpenChain openChain = getOpenChainFromStructure(inputSequence);
 
-		OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
+			OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
 
-		if(organicResult.getEncontrado())
-			addMolecularMassIfMissing(organicResult);
+			if(organicResult.getEncontrado())
+				addMolecularMassIfMissing(organicResult);
 
-		metricasService.contarNombrarOrganicoAbiertoBuscado();
+			metricsService.contarNombrarOrganicoAbiertoBuscado();
 
-		return organicResult;
+			return organicResult;
+		}
+		catch (Exception exception) {
+			metricsService.countOrganicsFailedFromStructure();
+			logger.error("Excepción al nombrar [" + Arrays.toString(inputSequence) + "]: " + exception + ".");
+			return OrganicFactory.organicNotFound;
+		}
+
 	}
 
 	// PRIVATE -----------------------------------------------------------------------
@@ -90,10 +100,11 @@ public class OrganicService {
 
 	private void addMolecularMassIfMissing(OrganicResult organicResult) {
 		if(organicResult.getMasa() == null) {
-			MasaMolecularResultado masaMolecular = masaMolecularService.tryMasaMolecularDe(organicResult.getFormula());
+			MolecularMassResult molecularMassResult =
+					molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula());
 
-			if(masaMolecular.getEncontrado())
-				organicResult.setMasa(masaMolecular.getMasa());
+			if(molecularMassResult.getPresent())
+				organicResult.setMasa(molecularMassResult.getMolecularMass());
 		}
 	}
 

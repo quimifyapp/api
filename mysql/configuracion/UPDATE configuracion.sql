@@ -1,3 +1,3 @@
 UPDATE configuracion
-SET bing_gratis_on = true
+SET bing_pago_on = true
 WHERE version = 1

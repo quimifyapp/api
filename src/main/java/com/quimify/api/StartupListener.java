@@ -1,6 +1,6 @@
 package com.quimify.api;
 
-import com.quimify.api.inorganico.InorganicoService;
+import com.quimify.api.inorganic.InorganicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
-    InorganicoService inorganicoService; // Procesos de los compuestos inorgánicos
+    InorganicService inorganicService; // Procesos de los compuestos inorgánicos
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        inorganicoService.cargarNormalizados();
+        inorganicService.loadNormalizedInorganics();
     }
 }

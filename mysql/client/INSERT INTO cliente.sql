@@ -1,0 +1,21 @@
+INSERT INTO cliente(version,
+actualizacion_disponible,
+actualizacion_obligatoria,
+actualizacion_detalles,
+mensaje_presente,
+mensaje_titulo,
+mensaje_detalles,
+mensaje_enlace_presente,
+mensaje_enlace_nombre,
+mensaje_enlace)
+
+VALUES(1,
+false,
+false,
+null,
+true,
+"Bienvenido, tester!",
+"Tenemos especial interés en probar la funciones de nombrar éteres y calcular masas moleculares.",
+false,
+null,
+null)
