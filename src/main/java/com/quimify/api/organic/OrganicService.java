@@ -31,7 +31,7 @@ class OrganicService {
 
 	protected static final int carbonInputCode = -1;
 
-	// CLIENTE -----------------------------------------------------------------------
+	// CLIENT ------------------------------------------------------------------------
 
 	protected OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
@@ -39,7 +39,6 @@ class OrganicService {
 		if(organicResult.getEncontrado()) {
 			if(organicResult.getFormula() != null)
 				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
-
 		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
@@ -57,7 +56,6 @@ class OrganicService {
 			if(organicResult.getEncontrado())
 				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
 
-
 			metricsService.contarNombrarOrganicoAbiertoBuscado();
 
 			return organicResult;
@@ -70,12 +68,12 @@ class OrganicService {
 
 	}
 
-	// PRIVATE -----------------------------------------------------------------------
+	// -------------------------------------------------------------------------------
 
 	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
 		OpenChain openChain = new Simple();
 
-		for(int i = 0; i < inputSequence.length; i++) {
+		for(int i = 0; i < inputSequence.length; i++)
 			if(inputSequence[i] != carbonInputCode) {
 				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
 
@@ -94,7 +92,6 @@ class OrganicService {
 				}
 			}
 			else openChain.bondCarbon();
-		}
 
 		return openChain;
 	}

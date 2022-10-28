@@ -35,43 +35,43 @@ class MolecularMassResult {
 
 	// Getters y setters:
 
-	protected Boolean getPresent() {
+	public Boolean getPresent() {
 		return present;
 	}
 
-	protected void setPresent(Boolean present) {
+	public void setPresent(Boolean present) {
 		this.present = present;
 	}
 
-	protected Float getMolecularMass() {
+	public Float getMolecularMass() {
 		return molecularMass;
 	}
 
-	protected void setMolecularMass(Float molecularMass) {
+	public void setMolecularMass(Float molecularMass) {
 		this.molecularMass = molecularMass;
 	}
 
-	protected Map<String, Float> getElementToGrams() {
+	public Map<String, Float> getElementToGrams() {
 		return elementToGrams;
 	}
 
-	protected void setElementToGrams(Map<String, Float> elementToGrams) {
+	public void setElementToGrams(Map<String, Float> elementToGrams) {
 		this.elementToGrams = elementToGrams;
 	}
 
-	protected Map<String, Integer> getElementToMoles() {
+	public Map<String, Integer> getElementToMoles() {
 		return elementToMoles;
 	}
 
-	protected void setElementToMoles(Map<String, Integer> elementToMoles) {
+	public void setElementToMoles(Map<String, Integer> elementToMoles) {
 		this.elementToMoles = elementToMoles;
 	}
 
-	protected String getError() {
+	public String getError() {
 		return error;
 	}
 
-	protected void setError(String error) {
+	public void setError(String error) {
 		this.error = error;
 	}
 

@@ -19,7 +19,7 @@ class ReportController {
     // CLIENTE ------------------------------------------------------------------------
 
     @PostMapping()
-    protected void postReport(@RequestParam("clientVersion") Integer clientVersion, @RequestParam("title") String title,
+    protected void postReport(@RequestParam("client-version") Integer clientVersion, @RequestParam("title") String title,
                               @RequestParam("details") String details) {
         logger.warn("Reporte de la versión " + clientVersion + " - " + title + " - \"" + details + "\".");
         reportService.postReport(clientVersion, title, details);

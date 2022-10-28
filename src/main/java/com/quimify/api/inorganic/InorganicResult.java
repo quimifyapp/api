@@ -11,13 +11,13 @@ class InorganicResult {
 
     // Si 'encontrado' = true:
 
-    private String formula;     // "MgH2"
-    private String name;      // "hidruro de magnesio
+    private String formula; // "MgH2"
+    private String name; // "hidruro de magnesio
     private String alternativeName; // "dihidruro de magnesio"
-    private Float molecularMass;        // (g)
-    private String density;    // (g/cm³)
-    private String meltingPoint;      // (K)
-    private String boilingPoint;  // (K)
+    private Float molecularMass; // (g)
+    private String density; // (g/cm³)
+    private String meltingPoint; // (K)
+    private String boilingPoint; // (K)
 
     // --------------------------------------------------------------------------------
 
@@ -59,67 +59,68 @@ class InorganicResult {
 
     // Getters y setters:
 
-    protected Boolean getPresent() {
+    public Boolean getPresent() {
         return present;
     }
 
-    protected void setPresent(Boolean present) {
+    public void setPresent(Boolean present) {
         this.present = present;
     }
 
-    protected String getFormula() {
+    public String getFormula() {
         return formula;
     }
 
-    protected void setFormula(String formula) {
+    public void setFormula(String formula) {
         this.formula = formula;
     }
 
-    protected String getName() {
+    public String getName() {
         return name;
     }
 
-    protected void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    protected String getAlternativeName() {
+    public String getAlternativeName() {
         return alternativeName;
     }
 
-    protected void setAlternativeName(String alternativeName) {
+    public void setAlternativeName(String alternativeName) {
         this.alternativeName = alternativeName;
     }
 
-    protected Float getMolecularMass() {
+    public Float getMolecularMass() {
         return molecularMass;
     }
 
-    protected void setMolecularMass(Float molecularMass) {
+    public void setMolecularMass(Float molecularMass) {
         this.molecularMass = molecularMass;
     }
 
-    protected String getDensity() {
+    public String getDensity() {
         return density;
     }
 
-    protected void setDensity(String density) {
+    public void setDensity(String density) {
         this.density = density;
     }
 
-    protected String getMeltingPoint() {
+    public String getMeltingPoint() {
         return meltingPoint;
     }
 
-    protected void setMeltingPoint(String meltingPoint) {
+    public void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
-    protected String getBoilingPoint() {
+    public String getBoilingPoint() {
         return boilingPoint;
     }
 
-    protected void setBoilingPoint(String boilingPoint) {
+    public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }
+
 }

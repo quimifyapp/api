@@ -5,9 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.*;
+import java.time.temporal.TemporalAmount;
+import java.util.Calendar;
 import java.util.Date;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Optional;
 
 // Esta clase procesa las métricas diarias.
@@ -19,12 +20,16 @@ class MetricsService {
     @Autowired
     MetricsRepository metricsRepository; // Conexión con la DB
 
+    // Day starts at 13:00 of Spain and 07:00 of Bolivia
+    private static final Duration offSet = Duration.ofHours(-13);
+
     // PRIVADOS ----------------------------------------------------------------------
 
     private MetricsModel getTodayMetrics() {
         MetricsModel todayMetrics;
 
-        Date today = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        // Day starts at 13:00 of Spain and 07:00 of Bolivia
+        Date today = Date.from(Instant.now().plus(offSet));
         Optional<MetricsModel> latestMetrics = metricsRepository.findById(today);
 
         if(latestMetrics.isEmpty())

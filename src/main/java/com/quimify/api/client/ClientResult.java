@@ -36,77 +36,76 @@ class ClientResult {
 
 	// Getters y setters:
 
-
-	protected Boolean getUpdateAvailable() {
+	public Boolean getUpdateAvailable() {
 		return updateAvailable;
 	}
 
-	protected void setUpdateAvailable(Boolean updateAvailable) {
+	public void setUpdateAvailable(Boolean updateAvailable) {
 		this.updateAvailable = updateAvailable;
 	}
 
-	protected Boolean getUpdateNeeded() {
+	public Boolean getUpdateNeeded() {
 		return updateNeeded;
 	}
 
-	protected void setUpdateNeeded(Boolean updateNeeded) {
+	public void setUpdateNeeded(Boolean updateNeeded) {
 		this.updateNeeded = updateNeeded;
 	}
 
-	protected String getUpdateDetails() {
+	public String getUpdateDetails() {
 		return updateDetails;
 	}
 
-	protected void setUpdateDetails(String updateDetails) {
+	public void setUpdateDetails(String updateDetails) {
 		this.updateDetails = updateDetails;
 	}
 
-	protected Boolean getMessagePresent() {
+	public Boolean getMessagePresent() {
 		return messagePresent;
 	}
 
-	protected void setMessagePresent(Boolean messagePresent) {
+	public void setMessagePresent(Boolean messagePresent) {
 		this.messagePresent = messagePresent;
 	}
 
-	protected String getMessageTitle() {
+	public String getMessageTitle() {
 		return messageTitle;
 	}
 
-	protected void setMessageTitle(String messageTitle) {
+	public void setMessageTitle(String messageTitle) {
 		this.messageTitle = messageTitle;
 	}
 
-	protected String getMessageDetails() {
+	public String getMessageDetails() {
 		return messageDetails;
 	}
 
-	protected void setMessageDetails(String messageDetails) {
+	public void setMessageDetails(String messageDetails) {
 		this.messageDetails = messageDetails;
 	}
 
-	protected Boolean getMessageLinkPresent() {
+	public Boolean getMessageLinkPresent() {
 		return messageLinkPresent;
 	}
 
-	protected void setMessageLinkPresent(Boolean messageLinkPresent) {
+	public void setMessageLinkPresent(Boolean messageLinkPresent) {
 		this.messageLinkPresent = messageLinkPresent;
 	}
 
-	protected String getMessageLinkLabel() {
+	public String getMessageLinkLabel() {
 		return messageLinkLabel;
 	}
 
-	protected void setMessageLinkLabel(String messageLinkLabel) {
+	public void setMessageLinkLabel(String messageLinkLabel) {
 		this.messageLinkLabel = messageLinkLabel;
 	}
 
-	protected String getMessageLink() {
+	public String getMessageLink() {
 		return messageLink;
 	}
 
-	protected void setMessageLink(String messageLink) {
+	public void setMessageLink(String messageLink) {
 		this.messageLink = messageLink;
 	}
-
+	
 }
