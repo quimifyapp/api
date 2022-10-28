@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/client")
-public class ClientController {
+class ClientController {
 
 	@Autowired
 	ClientService clienteService; // Procesos de los clientes
@@ -15,7 +15,7 @@ public class ClientController {
 	// CLIENTE ------------------------------------------------------------------------
 
 	@GetMapping()
-	public ClientResult getAccessData(@RequestParam("version") Integer version,
+	protected ClientResult getAccessData(@RequestParam("version") Integer version,
 									  @RequestParam("platform") Short platform) {
 		return clienteService.getAccessData(version, platform);
 	}

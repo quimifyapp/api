@@ -5,7 +5,7 @@ package com.quimify.api.inorganic;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InorganicResult {
+class InorganicResult {
 
     private Boolean present;
 
@@ -23,12 +23,12 @@ public class InorganicResult {
 
     // Constructores:
 
-    public InorganicResult(InorganicModel inorganico) {
+    protected InorganicResult(InorganicModel inorganico) {
         this.present = true;
         copiar(inorganico);
     }
 
-    public InorganicResult() {
+    protected InorganicResult() {
         this.present = false;
     }
 
@@ -59,67 +59,67 @@ public class InorganicResult {
 
     // Getters y setters:
 
-    public Boolean getPresent() {
+    protected Boolean getPresent() {
         return present;
     }
 
-    public void setPresent(Boolean present) {
+    protected void setPresent(Boolean present) {
         this.present = present;
     }
 
-    public String getFormula() {
+    protected String getFormula() {
         return formula;
     }
 
-    public void setFormula(String formula) {
+    protected void setFormula(String formula) {
         this.formula = formula;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
 
-    public String getAlternativeName() {
+    protected String getAlternativeName() {
         return alternativeName;
     }
 
-    public void setAlternativeName(String alternativeName) {
+    protected void setAlternativeName(String alternativeName) {
         this.alternativeName = alternativeName;
     }
 
-    public Float getMolecularMass() {
+    protected Float getMolecularMass() {
         return molecularMass;
     }
 
-    public void setMolecularMass(Float molecularMass) {
+    protected void setMolecularMass(Float molecularMass) {
         this.molecularMass = molecularMass;
     }
 
-    public String getDensity() {
+    protected String getDensity() {
         return density;
     }
 
-    public void setDensity(String density) {
+    protected void setDensity(String density) {
         this.density = density;
     }
 
-    public String getMeltingPoint() {
+    protected String getMeltingPoint() {
         return meltingPoint;
     }
 
-    public void setMeltingPoint(String meltingPoint) {
+    protected void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
-    public String getBoilingPoint() {
+    protected String getBoilingPoint() {
         return boilingPoint;
     }
 
-    public void setBoilingPoint(String boilingPoint) {
+    protected void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }
 }

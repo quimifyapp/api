@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity // Es un modelo real
 @Table(name = "settings") // En la tabla 'settings' de la DB
-public class SettingsModel {
+class SettingsModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,91 +52,91 @@ public class SettingsModel {
 
     // Getters y setters:
 
-    public Integer getVersion() {
+    protected Integer getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    protected void setVersion(Integer version) {
         this.version = version;
     }
 
-    public Boolean getUseGoogle() {
+    protected Boolean getUseGoogle() {
         return useGoogle;
     }
 
-    public void setUseGoogle(Boolean useGoogle) {
+    protected void setUseGoogle(Boolean useGoogle) {
         this.useGoogle = useGoogle;
     }
 
-    public Integer getGoogleDailyLimit() {
+    protected Integer getGoogleDailyLimit() {
         return googleDailyLimit;
     }
 
-    public void setGoogleDailyLimit(Integer googleDailyLimit) {
+    protected void setGoogleDailyLimit(Integer googleDailyLimit) {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    public String getGoogleUrl() {
+    protected String getGoogleUrl() {
         return googleUrl;
     }
 
-    public void setGoogleUrl(String googleUrl) {
+    protected void setGoogleUrl(String googleUrl) {
         this.googleUrl = googleUrl;
     }
 
-    public Boolean getUseFreeBing() {
+    protected Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
-    public void setUseFreeBing(Boolean useFreeBing) {
+    protected void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
     }
 
-    public String getFreeBingKey() {
+    protected String getFreeBingKey() {
         return freeBingKey;
     }
 
-    public void setFreeBingKey(String freeBingKey) {
+    protected void setFreeBingKey(String freeBingKey) {
         this.freeBingKey = freeBingKey;
     }
 
-    public Boolean getUsePaidBing() {
+    protected Boolean getUsePaidBing() {
         return usePaidBing;
     }
 
-    public void setUsePaidBing(Boolean usePaidBing) {
+    protected void setUsePaidBing(Boolean usePaidBing) {
         this.usePaidBing = usePaidBing;
     }
 
-    public Integer getPaidBingDailyLimit() {
+    protected Integer getPaidBingDailyLimit() {
         return paidBingDailyLimit;
     }
 
-    public void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
+    protected void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
         this.paidBingDailyLimit = paidBingDailyLimit;
     }
 
-    public String getPaidBingKey() {
+    protected String getPaidBingKey() {
         return paidBingKey;
     }
 
-    public void setPaidBingKey(String paidBingKey) {
+    protected void setPaidBingKey(String paidBingKey) {
         this.paidBingKey = paidBingKey;
     }
 
-    public String getBingUrl() {
+    protected String getBingUrl() {
         return bingUrl;
     }
 
-    public void setBingUrl(String bingUrl) {
+    protected void setBingUrl(String bingUrl) {
         this.bingUrl = bingUrl;
     }
 
-    public String getUserAgent() {
+    protected String getUserAgent() {
         return userAgent;
     }
 
-    public void setUserAgent(String userAgent) {
+    protected void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 

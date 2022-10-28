@@ -13,7 +13,8 @@ import java.util.Optional;
 // Esta clase procesa las métricas diarias.
 
 @Service
-public class MetricsService {
+public
+class MetricsService {
 
     @Autowired
     MetricsRepository metricsRepository; // Conexión con la DB
@@ -49,8 +50,8 @@ public class MetricsService {
     // Contadores:
 
     @Transactional
-    public void contarAcceso(Short plataforma) {
-        switch(plataforma) {
+    public void contarAcceso(Short platform) {
+        switch(platform) {
             case ClientService.androidPlatform:
                 getTodayMetrics().nuevoAccesoAndroid();
                 break;

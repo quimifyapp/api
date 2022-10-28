@@ -5,13 +5,13 @@ import java.util.Set;
 
 // Esta clase representa los compuestos inorgánicos en memoria y simplificados para autocompletar rápido.
 
-public class NormalizedInorganic {
+class NormalizedInorganic {
 
     private final String originalFormula, originalName, originalAlternativeName;
     private final String formula, name, alternativeName;
     private final Set<String> searchTags; // Modificable, no re-atribuible
 
-    public NormalizedInorganic(InorganicModel inorganic) {
+    protected NormalizedInorganic(InorganicModel inorganic) {
         originalFormula = inorganic.getFormula();
         originalName = inorganic.getName();
         originalAlternativeName = inorganic.getAlternativeName();
@@ -29,19 +29,19 @@ public class NormalizedInorganic {
 
     // Consultas:
 
-    public boolean formulaCanComplete(String input) {
+    protected boolean formulaCanComplete(String input) {
         return canComplete(formula, input);
     }
 
-    public boolean alternativeNameCanComplete(String input) {
+    protected boolean alternativeNameCanComplete(String input) {
         return alternativeName != null && canComplete(alternativeName, input);
     }
 
-    public boolean nameCanComplete(String input) {
+    protected boolean nameCanComplete(String input) {
         return canComplete(name, input);
     }
 
-    public boolean searchTagsCanComplete(String input) {
+    protected boolean searchTagsCanComplete(String input) {
         for (String searchTag : searchTags)
             if (canComplete(searchTag, input))
                 return true;
@@ -51,15 +51,15 @@ public class NormalizedInorganic {
 
     // Getters:
 
-    public String getOriginalFormula() {
+    protected String getOriginalFormula() {
         return originalFormula;
     }
 
-    public String getOriginalName() {
+    protected String getOriginalName() {
         return originalName;
     }
 
-    public String getOriginalAlternativeName() {
+    protected String getOriginalAlternativeName() {
         return originalAlternativeName;
     }
 

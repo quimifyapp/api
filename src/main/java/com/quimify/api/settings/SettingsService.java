@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 // Esta clase procesa la configuración.
 
 @Service
-public class SettingsService {
+public
+class SettingsService {
 
     @Autowired
     SettingsRepository settingsRepository; // Conexión con la DB

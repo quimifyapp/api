@@ -4,7 +4,7 @@ package com.quimify.api.molecular_mass;
 
 import java.util.Map;
 
-public class MolecularMassResult {
+class MolecularMassResult {
 
 	private Boolean present;
 	private Float molecularMass;
@@ -16,12 +16,12 @@ public class MolecularMassResult {
 
 	// Constructores:
 
-	public MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams,
+	protected MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams,
 							   Map<String, Integer> elementToMoles) {
 		construir(molecularMass, elementToGrams, elementToMoles);
 	}
 
-	public MolecularMassResult(String error) {
+	protected MolecularMassResult(String error) {
 		this.present = Boolean.FALSE;
 		this.error = error;
 	}
@@ -35,43 +35,43 @@ public class MolecularMassResult {
 
 	// Getters y setters:
 
-	public Boolean getPresent() {
+	protected Boolean getPresent() {
 		return present;
 	}
 
-	public void setPresent(Boolean present) {
+	protected void setPresent(Boolean present) {
 		this.present = present;
 	}
 
-	public Float getMolecularMass() {
+	protected Float getMolecularMass() {
 		return molecularMass;
 	}
 
-	public void setMolecularMass(Float molecularMass) {
+	protected void setMolecularMass(Float molecularMass) {
 		this.molecularMass = molecularMass;
 	}
 
-	public Map<String, Float> getElementToGrams() {
+	protected Map<String, Float> getElementToGrams() {
 		return elementToGrams;
 	}
 
-	public void setElementToGrams(Map<String, Float> elementToGrams) {
+	protected void setElementToGrams(Map<String, Float> elementToGrams) {
 		this.elementToGrams = elementToGrams;
 	}
 
-	public Map<String, Integer> getElementToMoles() {
+	protected Map<String, Integer> getElementToMoles() {
 		return elementToMoles;
 	}
 
-	public void setElementToMoles(Map<String, Integer> elementToMoles) {
+	protected void setElementToMoles(Map<String, Integer> elementToMoles) {
 		this.elementToMoles = elementToMoles;
 	}
 
-	public String getError() {
+	protected String getError() {
 		return error;
 	}
 
-	public void setError(String error) {
+	protected void setError(String error) {
 		this.error = error;
 	}
 

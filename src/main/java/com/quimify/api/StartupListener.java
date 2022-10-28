@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
-public class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
+class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
     InorganicService inorganicService; // Procesos de los compuestos inorgánicos

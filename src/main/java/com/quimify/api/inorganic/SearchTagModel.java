@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity // Es un modelo real
 @Table(name = "search_tag") // En la tabla 'etiqueta' de la DB
-public class SearchTagModel {
+class SearchTagModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,27 +21,27 @@ public class SearchTagModel {
 
     // Constructor:
 
-    public SearchTagModel(String text) {
+    protected SearchTagModel(String text) {
         this.normalizedText = Normalized.of(text);
     }
 
-    public SearchTagModel() {}
+    protected SearchTagModel() {}
 
     // Getters y setters:
 
-    public Integer getId() {
+    protected Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    protected void setId(Integer id) {
         this.id = id;
     }
 
-    public String getNormalizedText() {
+    protected String getNormalizedText() {
         return normalizedText;
     }
 
-    public void setNormalizedText(String etiqueta) {
+    protected void setNormalizedText(String etiqueta) {
         this.normalizedText = etiqueta;
     }
 }

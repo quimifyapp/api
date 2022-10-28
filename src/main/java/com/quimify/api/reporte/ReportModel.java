@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity // Es un modelo real
 @Table(name = "report") // En la tabla 'report' de la DB
-public class ReportModel {
+class ReportModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,35 +24,35 @@ public class ReportModel {
 
     // Getters y setters:
 
-    public Integer getId() {
+    protected Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    protected void setId(Integer id) {
         this.id = id;
     }
 
-    public Integer getClientVersion() {
+    protected Integer getClientVersion() {
         return clientVersion;
     }
 
-    public void setClientVersion(Integer clientVersion) {
+    protected void setClientVersion(Integer clientVersion) {
         this.clientVersion = clientVersion;
     }
 
-    public String getTitle() {
+    protected String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    protected void setTitle(String title) {
         this.title = title;
     }
 
-    public String getDetails() {
+    protected String getDetails() {
         return details;
     }
 
-    public void setDetails(String details) {
+    protected void setDetails(String details) {
         this.details = details;
     }
     

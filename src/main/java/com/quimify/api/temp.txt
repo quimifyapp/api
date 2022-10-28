@@ -1,6 +1,6 @@
 
 
-    public Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
+    protected Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
         Optional<InorganicoModel> resultado;
 
         try {
@@ -20,11 +20,11 @@
 
 
     @GetMapping("/probarfq") // TEST
-    public Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
+    protected Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
         return inorganicoService.probarPaginaFQ(direccion);
     }
 
-    public boolean igualA(InorganicoModel igual) {
+    protected boolean igualA(InorganicoModel igual) {
         if(!formula.contentEquals(igual.getFormula()))
             return false;
         if(!nombre.contentEquals(igual.getNombre()))

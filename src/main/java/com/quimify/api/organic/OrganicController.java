@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/organic")
-public class OrganicController {
+class OrganicController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -19,8 +19,8 @@ public class OrganicController {
 
 	// CLIENTE ------------------------------------------------------------------------
 
-	@GetMapping("name")
-	public OrganicResult name(@RequestParam("name") String name,
+	@GetMapping("from-name")
+	protected OrganicResult name(@RequestParam("name") String name,
 							  @RequestParam("picture") Boolean picture) {
 		OrganicResult organicResult = organicService.getFromName(name, picture);
 
@@ -31,8 +31,8 @@ public class OrganicController {
 		return organicResult;
 	}
 
-	@GetMapping("structure")
-	public OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
+	@GetMapping("from-structure")
+	protected OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult organicResult = organicService.getFromStructure(structureSequence);
 
 		logger.info("GET nombrar: \"" + organicResult.getFormula() + "\". " +

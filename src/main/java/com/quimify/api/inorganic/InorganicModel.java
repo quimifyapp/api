@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Entity // Es un modelo real
 @Table(name = "inorganic") // En la tabla 'inorganico' de la DB
-public class InorganicModel {
+class InorganicModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,15 +49,15 @@ public class InorganicModel {
 
     // --------------------------------------------------------------------------------
 
-    public void registrarBusqueda() {
+    protected void registrarBusqueda() {
         searchCount++;
     }
 
-    public Set<String> getEtiquetasString() {
+    protected Set<String> getEtiquetasString() {
         return searchTags.stream().map(SearchTagModel::getNormalizedText).collect(Collectors.toSet());
     }
 
-    public void addTagOf(String tag) {
+    protected void addTagOf(String tag) {
         searchTags.add(new SearchTagModel(tag));
     }
 
@@ -78,83 +78,83 @@ public class InorganicModel {
 
     // Getters y setters:
 
-    public Integer getId() {
+    protected Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    protected void setId(Integer id) {
         this.id = id;
     }
 
-    public String getFormula() {
+    protected String getFormula() {
         return formula;
     }
 
-    public void setFormula(String formula) {
+    protected void setFormula(String formula) {
         this.formula = formula;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
 
-    public void setName(String nombre) {
+    protected void setName(String nombre) {
         this.name = nombre;
     }
 
-    public Integer getSearchCount() {
+    protected Integer getSearchCount() {
         return searchCount;
     }
 
-    public void setSearchCount(Integer busquedas) {
+    protected void setSearchCount(Integer busquedas) {
         this.searchCount = busquedas;
     }
 
-    public String getAlternativeName() {
+    protected String getAlternativeName() {
         return alternativeName;
     }
 
-    public void setAlternativeName(String alternativo) {
+    protected void setAlternativeName(String alternativo) {
         this.alternativeName = alternativo;
     }
 
-    public Float getMolecularMass() {
+    protected Float getMolecularMass() {
         return molecularMass;
     }
 
-    public void setMolecularMass(Float molecularMass) {
+    protected void setMolecularMass(Float molecularMass) {
         this.molecularMass = molecularMass;
     }
 
-    public String getDensity() {
+    protected String getDensity() {
         return density;
     }
 
-    public void setDensity(String densidad) {
+    protected void setDensity(String densidad) {
         this.density = densidad;
     }
 
-    public String getMeltingPoint() {
+    protected String getMeltingPoint() {
         return meltingPoint;
     }
 
-    public void setMeltingPoint(String fusion) {
+    protected void setMeltingPoint(String fusion) {
         this.meltingPoint = fusion;
     }
 
-    public String getBoilingPoint() {
+    protected String getBoilingPoint() {
         return boilingPoint;
     }
 
-    public void setBoilingPoint(String ebullicion) {
+    protected void setBoilingPoint(String ebullicion) {
         this.boilingPoint = ebullicion;
     }
 
-    public Set<SearchTagModel> getSearchTags() {
+    protected Set<SearchTagModel> getSearchTags() {
         return searchTags;
     }
 
-    public void setSearchTags(Set<SearchTagModel> etiquetas) {
+    protected void setSearchTags(Set<SearchTagModel> etiquetas) {
         this.searchTags = etiquetas;
     }
 }

@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 // Esta clase procesa la bienvenida.
 
 @Service
-public class ClientService {
+public
+class ClientService {
 
 	@Autowired
 	ClientRepository clientRepository; // Conexión con la DB
@@ -19,7 +20,7 @@ public class ClientService {
 	public static final short iOSPlatform = 1;
 	public static final short webPlatform = 2;
 
-	public ClientResult getAccessData(Integer version, Short platform) {
+	protected ClientResult getAccessData(Integer version, Short platform) {
 		ClientModel client = clientRepository.findByVersion(version);
 
 		ClientResult clientResult = platform != webPlatform

@@ -8,7 +8,7 @@ import java.util.List;
 // Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
 
 @Repository
-public interface InorganicRepository extends CrudRepository<InorganicModel, Integer> {
+interface InorganicRepository extends CrudRepository<InorganicModel, Integer> {
 
     List<InorganicModel> findAllByOrderBySearchCountDesc();
 

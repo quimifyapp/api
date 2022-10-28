@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/report")
-public class ReportController {
+class ReportController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -19,10 +19,10 @@ public class ReportController {
     // CLIENTE ------------------------------------------------------------------------
 
     @PostMapping()
-    public void nuevoReporte(@RequestParam("clientVersion") Integer clientVersion, @RequestParam("title") String title,
-                             @RequestParam("details") String details) {
+    protected void postReport(@RequestParam("clientVersion") Integer clientVersion, @RequestParam("title") String title,
+                              @RequestParam("details") String details) {
         logger.warn("Reporte de la versión " + clientVersion + " - " + title + " - \"" + details + "\".");
-        reportService.newReport(clientVersion, title, details);
+        reportService.postReport(clientVersion, title, details);
     }
 
 }

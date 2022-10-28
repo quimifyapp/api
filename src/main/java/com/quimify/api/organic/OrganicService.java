@@ -1,6 +1,5 @@
 package com.quimify.api.organic;
 
-import com.quimify.api.molecular_mass.MolecularMassResult;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
@@ -20,7 +19,7 @@ import java.util.Arrays;
 // Esta clase procesa los compuestos orgánicos.
 
 @Service
-public class OrganicService {
+class OrganicService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -30,16 +29,17 @@ public class OrganicService {
 	@Autowired
 	MetricsService metricsService; // Procesos de las metricas diarias
 
-	public static final int carbonInputCode = -1;
+	protected static final int carbonInputCode = -1;
 
 	// CLIENTE -----------------------------------------------------------------------
 
-	public OrganicResult getFromName(String name, Boolean picture) {
+	protected OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
 
 		if(organicResult.getEncontrado()) {
 			if(organicResult.getFormula() != null)
-				addMolecularMassIfMissing(organicResult);
+				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
+
 		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
@@ -48,14 +48,15 @@ public class OrganicService {
 		return organicResult;
 	}
 
-	public OrganicResult getFromStructure(int[] inputSequence) {
+	protected OrganicResult getFromStructure(int[] inputSequence) {
 		try {
 			OpenChain openChain = getOpenChainFromStructure(inputSequence);
 
 			OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
 
 			if(organicResult.getEncontrado())
-				addMolecularMassIfMissing(organicResult);
+				organicResult.setMasa(molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula()));
+
 
 			metricsService.contarNombrarOrganicoAbiertoBuscado();
 
@@ -96,16 +97,6 @@ public class OrganicService {
 		}
 
 		return openChain;
-	}
-
-	private void addMolecularMassIfMissing(OrganicResult organicResult) {
-		if(organicResult.getMasa() == null) {
-			MolecularMassResult molecularMassResult =
-					molecularMassService.tryCalculateMolecularMassOf(organicResult.getFormula());
-
-			if(molecularMassResult.getPresent())
-				organicResult.setMasa(molecularMassResult.getMolecularMass());
-		}
 	}
 
 }

@@ -8,7 +8,8 @@ import java.util.Optional;
 // Esta clase procesa los elementos químicos.
 
 @Service
-public class ElementService {
+public
+class ElementService {
 
     @Autowired
     ElementRepository elementRepository; // Conexión con la DB

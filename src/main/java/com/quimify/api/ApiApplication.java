@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // Esta clase viene generada por el entorno Spring Boot y contiene el main.
 
 @SpringBootApplication
-public class ApiApplication {
+class ApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiApplication.class, args);

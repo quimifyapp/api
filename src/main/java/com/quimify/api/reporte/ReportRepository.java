@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 // Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
 
 @Repository
-public interface ReportRepository extends CrudRepository<ReportModel, Integer> {
+interface ReportRepository extends CrudRepository<ReportModel, Integer> {
 
 }

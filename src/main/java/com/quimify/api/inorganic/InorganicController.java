@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/inorganic")
-public class InorganicController {
+class InorganicController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -18,15 +18,15 @@ public class InorganicController {
 
     // ADMIN --------------------------------------------------------------------------
 
-    @GetMapping("autocomplete/update")
-    public void updateNormalizedInorganics() {
+    @PutMapping("update-completions")
+    protected void updateNormalizedInorganics() {
         inorganicService.loadNormalizedInorganics();
     }
 
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
-    public InorganicResult searchInorganic(@RequestParam("input") String input,
+    protected InorganicResult searchInorganic(@RequestParam("input") String input,
                                            @RequestParam("picture") Boolean picture) {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
@@ -37,13 +37,13 @@ public class InorganicController {
         return inorganicResult;
     }
 
-    @GetMapping("/autocomplete")
-    public String autoCompleteInorganic(@RequestParam("input") String input) {
+    @GetMapping("/completion")
+    protected String autoCompleteInorganic(@RequestParam("input") String input) {
         return inorganicService.autoComplete(input);
     }
 
-    @GetMapping("/autocompletar/buscar")
-    public InorganicResult searchInorganicByCompletion(@RequestParam("completion") String completion) {
+    @GetMapping("/from-completion")
+    protected InorganicResult searchInorganicByCompletion(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if(inorganicResult.getPresent())

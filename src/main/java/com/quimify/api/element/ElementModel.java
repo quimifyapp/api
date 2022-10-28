@@ -5,8 +5,9 @@ import javax.persistence.*;
 // Esta clase representa los elementos químicos de la tabla periódica.
 
 @Entity // Es un modelo real
-@Table(name = "element") // En la tabla 'elemento' de la DB
-public class ElementModel {
+@Table(name = "element")
+public // En la tabla 'elemento' de la DB
+class ElementModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,19 +24,19 @@ public class ElementModel {
 
     // Getters y setters:
 
-    public Integer getId() {
+    protected Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    protected void setId(Integer id) {
         this.id = id;
     }
 
-    public String getSymbol() {
+    protected String getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(String simbolo) {
+    protected void setSymbol(String simbolo) {
         this.symbol = simbolo;
     }
 
@@ -43,7 +44,7 @@ public class ElementModel {
         return molecularMass;
     }
 
-    public void setMolecularMass(float masa) {
+    protected void setMolecularMass(float masa) {
         this.molecularMass = masa;
     }
 }

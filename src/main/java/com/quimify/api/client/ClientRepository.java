@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 // Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
 
 @Repository
-public interface ClientRepository extends CrudRepository<ClientModel, Integer> {
+interface ClientRepository extends CrudRepository<ClientModel, Integer> {
 
     ClientModel findByVersion(Integer version);
 

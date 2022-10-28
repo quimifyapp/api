@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 // Esta clase procesa las masas moleculares.
 
 @Service
-public class MolecularMassService {
+public
+class MolecularMassService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,18 +27,84 @@ public class MolecularMassService {
     @Autowired
     MetricsService metricsService; // Procesos de las metricas diarias
 
-    // INTERNOS ----------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
 
-    private Optional<Float> getMolecularMassOf(String symbol) {
-        return elementService.searchBySymbol(symbol).map(ElementModel::getMolecularMass);
+    public Float tryCalculateMolecularMassOf(String formula) {
+        return tryMolecularMassResultOf(formula).getMolecularMass();
     }
 
-    private void sumIntoMap(String key, Integer value, Map<String, Integer> map) {
-        Integer found = map.get(key);
+    protected MolecularMassResult tryMolecularMassResultOf(String formula) {
+        MolecularMassResult molecularMassResult;
 
-        if(found != null)
-            map.replace(key, found + value); // Ya estaba, se suma
-        else map.put(key, value); // Nuevo
+        try {
+            molecularMassResult = calculateMolecularMassOf(formula);
+
+            if (!molecularMassResult.getPresent())
+                logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
+                        "Error: " + (molecularMassResult.getError() != null ? "\"" + molecularMassResult.getError() + "\"." : "ninguno."));
+        }
+        catch (StackOverflowError error) {
+            molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
+            logger.warn("Stack overflow al calcular la masa de: \"" + formula + "\".");
+        }
+        catch(Exception exception) {
+            molecularMassResult = new MolecularMassResult("");
+            logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
+        }
+
+        metricsService.contarMasaMolecular(molecularMassResult.getPresent());
+
+        return molecularMassResult;
+    }
+    
+    // INTERNOS ----------------------------------------------------------------------
+    
+    private MolecularMassResult calculateMolecularMassOf(String formula) {
+        // Se comprueba si tiene aspecto de fórmula:
+        String adaptada = formula.replaceAll("[≡=-]", ""); // Allowed bonds
+
+        Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
+
+        if(!structurePattern.matcher(adaptada).matches())
+            return new MolecularMassResult("La fórmula \"" + formula + "\" no es válida.");
+        else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
+            return new MolecularMassResult("Los paréntesis no están balanceados.");
+        else if(adaptada.contains("()"))
+            return new MolecularMassResult("Los paréntesis huecos \"()\" no son válidos.");
+
+        // Parece que sí:
+
+        MolecularMassResult resultado;
+
+        Optional<Map<String, Integer>> elemento_a_moles = getElementToMolesIn(adaptada); // Se analiza la fórmula
+
+        // Se calcula la masa molecular:
+
+        if(elemento_a_moles.isPresent()) {
+            float masa_molecular = 0;
+            Map<String, Float> elemento_a_gramos = new HashMap<>();
+
+            // Se calculan los gramos de cada elemento, siendo el total la masa molecular:
+
+            for(Map.Entry<String, Integer> elemento : elemento_a_moles.get().entrySet()) {
+                String simbolo = elemento.getKey();
+
+                Optional<Float> masa_elemento = getMolecularMassOf(simbolo);
+
+                if(masa_elemento.isPresent()) {
+                    float gramos = elemento.getValue() * masa_elemento.get();
+                    elemento_a_gramos.put(simbolo, gramos);
+
+                    masa_molecular += gramos;
+                }
+                else return new MolecularMassResult("No se reconoce el elemento \"" + simbolo + "\".");
+            }
+
+            resultado = new MolecularMassResult(masa_molecular, elemento_a_gramos, elemento_a_moles.get());
+        }
+        else return new MolecularMassResult("No se ha podido calcular la masa molecular.");
+
+        return resultado;
     }
 
     private Optional<Map<String, Integer>> getElementToMolesIn(String formula) {
@@ -127,76 +194,16 @@ public class MolecularMassService {
         return resultado;
     }
 
-    private MolecularMassResult calculateMolecularMassOf(String formula) {
-        // Se comprueba si tiene aspecto de fórmula:
-        String adaptada = formula.replaceAll("[≡=-]", ""); // Allowed bonds
+    private void sumIntoMap(String key, Integer value, Map<String, Integer> map) {
+        Integer found = map.get(key);
 
-        Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
-
-        if(!structurePattern.matcher(adaptada).matches())
-            return new MolecularMassResult("La fórmula \"" + formula + "\" no es válida.");
-        else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
-            return new MolecularMassResult("Los paréntesis no están balanceados.");
-        else if(adaptada.contains("()"))
-            return new MolecularMassResult("Los paréntesis huecos \"()\" no son válidos.");
-
-        // Parece que sí:
-
-        MolecularMassResult resultado;
-
-        Optional<Map<String, Integer>> elemento_a_moles = getElementToMolesIn(adaptada); // Se analiza la fórmula
-
-        // Se calcula la masa molecular:
-
-        if(elemento_a_moles.isPresent()) {
-            float masa_molecular = 0;
-            Map<String, Float> elemento_a_gramos = new HashMap<>();
-
-            // Se calculan los gramos de cada elemento, siendo el total la masa molecular:
-
-            for(Map.Entry<String, Integer> elemento : elemento_a_moles.get().entrySet()) {
-                String simbolo = elemento.getKey();
-
-                Optional<Float> masa_elemento = getMolecularMassOf(simbolo);
-
-                if(masa_elemento.isPresent()) {
-                    float gramos = elemento.getValue() * masa_elemento.get();
-                    elemento_a_gramos.put(simbolo, gramos);
-
-                    masa_molecular += gramos;
-                }
-                 else return new MolecularMassResult("No se reconoce el elemento \"" + simbolo + "\".");
-            }
-
-            resultado = new MolecularMassResult(masa_molecular, elemento_a_gramos, elemento_a_moles.get());
-        }
-        else return new MolecularMassResult("No se ha podido calcular la masa molecular.");
-
-        return resultado;
+        if(found != null)
+            map.replace(key, found + value); // Ya estaba, se suma
+        else map.put(key, value); // Nuevo
     }
-
-    public MolecularMassResult tryCalculateMolecularMassOf(String formula) {
-        MolecularMassResult molecularMassResult;
-
-        try {
-            molecularMassResult = calculateMolecularMassOf(formula);
-
-            if (!molecularMassResult.getPresent())
-                logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
-                        "Error: " + (molecularMassResult.getError() != null ? "\"" + molecularMassResult.getError() + "\"." : "ninguno."));
-        }
-        catch (StackOverflowError error) {
-            molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
-            logger.warn("Stack overflow al calcular la masa de: \"" + formula + "\".");
-        }
-        catch(Exception exception) {
-            molecularMassResult = new MolecularMassResult("");
-            logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
-        }
-
-        metricsService.contarMasaMolecular(molecularMassResult.getPresent());
-
-        return molecularMassResult;
+    
+    private Optional<Float> getMolecularMassOf(String symbol) {
+        return elementService.searchBySymbol(symbol).map(ElementModel::getMolecularMass);
     }
-
+    
 }

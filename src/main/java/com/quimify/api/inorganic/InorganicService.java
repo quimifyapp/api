@@ -1,7 +1,6 @@
 package com.quimify.api.inorganic;
 
 import com.quimify.api.Normalized;
-import com.quimify.api.molecular_mass.MolecularMassResult;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.metrics.MetricsService;
@@ -21,7 +20,8 @@ import java.util.stream.Collectors;
 // Esta clase procesa los compuestos inorgánicos.
 
 @Service
-public class InorganicService {
+public
+class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -37,7 +37,7 @@ public class InorganicService {
     @Autowired
     MetricsService metricsService; // Procesos de las metricas diarias
 
-    public static final InorganicResult notFoundInorganic = new InorganicResult(); // Constante auxiliar
+    protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Constante auxiliar
 
     // AUTOCOMPLECIÓN ----------------------------------------------------------------
 
@@ -50,7 +50,7 @@ public class InorganicService {
         logger.info("Normalizados cargados");
     }
 
-    public String autoComplete(String input) {
+    protected String autoComplete(String input) {
         String completion = "";
 
         input = Normalized.of(input); // Para poder hacer la búsqueda
@@ -71,7 +71,7 @@ public class InorganicService {
 
     // BÚSQUEDAS ---------------------------------------------------------------------
 
-    public InorganicResult searchFromCompletion(String completion) {
+    protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult resultado;
 
         Optional<InorganicModel> buscado = searchInDatabase(completion);
@@ -88,7 +88,7 @@ public class InorganicService {
         return resultado;
     }
 
-    public InorganicResult search(String input, Boolean isPicture) {
+    protected InorganicResult search(String input, Boolean isPicture) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = searchInDatabase(input); // Flowchart #0
@@ -136,13 +136,9 @@ public class InorganicService {
                         searchedInMemory = searchInDatabase(parsed.get().getName());
 
                         if (searchedInMemory.isEmpty()) { // En efecto, no estaba en la DB
-                            if (parsed.get().getMolecularMass() == null) {
-                                MolecularMassResult molecularMassResult =
-                                        molecularMassService.tryCalculateMolecularMassOf(parsed.get().getFormula());
-
-                                if (molecularMassResult.getPresent())
-                                    parsed.get().setMolecularMass(molecularMassResult.getMolecularMass());
-                            }
+                            if (parsed.get().getMolecularMass() == null) 
+                                parsed.get().setMolecularMass(
+                                        molecularMassService.tryCalculateMolecularMassOf(parsed.get().getFormula()));
 
                             inorganicResult = new InorganicResult(parsed.get());
 
@@ -254,7 +250,7 @@ public class InorganicService {
 
     // Flowchart #2
     private SearchResult googleSearch(String input) throws Exception {
-        SearchResult busqueda_web = new SearchResult();
+        SearchResult searchResult = new SearchResult();
 
         Download conexion = new Download(settingsService.getGoogleURL(), input);
         conexion.setProperty("Accept", "application/json");
@@ -263,16 +259,16 @@ public class InorganicService {
         if (respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
             JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
 
-            busqueda_web.found = true;
-            busqueda_web.title = resultado.getString("title");
-            busqueda_web.address = resultado.getString("formattedUrl"); // "www.fq.com/..."
+            searchResult.found = true;
+            searchResult.title = resultado.getString("title");
+            searchResult.address = resultado.getString("formattedUrl"); // "www.fq.com/..."
         } else {
-            busqueda_web.found = false;
+            searchResult.found = false;
 
             logger.warn("No se ha encontrado \"" + input + "\" en Google.");
         }
 
-        return busqueda_web;
+        return searchResult;
     }
     
     // Flowchart #3

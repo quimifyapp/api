@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 // Esta clase procesa los compuestos reportes del cliente.
 
 @Service
-public class ReportService {
+class ReportService {
 
     @Autowired
     ReportRepository reportRepository; // Conexión con la DB
@@ -17,7 +17,7 @@ public class ReportService {
 
     // CLIENTE -----------------------------------------------------------------------
 
-    public void newReport(Integer version, String titulo, String detalles) {
+    protected void postReport(Integer version, String titulo, String detalles) {
         ReportModel reporte = new ReportModel();
 
         reporte.setClientVersion(version);

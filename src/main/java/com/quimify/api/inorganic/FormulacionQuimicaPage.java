@@ -7,7 +7,7 @@ import java.text.NumberFormat;
 
 // Esta clase contiene el código para analizar una página de FQ.com.
 
-public class FormulacionQuimicaPage {
+class FormulacionQuimicaPage {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -22,7 +22,7 @@ public class FormulacionQuimicaPage {
     // Constructor:
 
     // Flowchart #5
-    public FormulacionQuimicaPage(String htmlDocument) {
+    protected FormulacionQuimicaPage(String htmlDocument) {
         this.htmlDocument = htmlDocument;
 
         int index = indexAfterIn("<h1>", htmlDocument);
@@ -341,7 +341,7 @@ public class FormulacionQuimicaPage {
 
     // Getter:
 
-    public InorganicModel getParsedInorganic() {
+    protected InorganicModel getParsedInorganic() {
         return parsedInorganic;
     }
 

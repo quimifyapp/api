@@ -2,7 +2,7 @@ package com.quimify.api.client;
 
 // Esta clase representa las entregas al cliente de la configuración.
 
-public class ClientResult {
+class ClientResult {
 
 	private Boolean updateAvailable;
 	private Boolean updateNeeded;
@@ -19,7 +19,7 @@ public class ClientResult {
 
 	// Constructor:
 
-	public ClientResult(Boolean updateAvailable, Boolean updateNeeded,
+	protected ClientResult(Boolean updateAvailable, Boolean updateNeeded,
 						String updateDetails, Boolean messagePresent, String messageTitle,
 						String messageDetails, Boolean messageLinkPresent, String messageLinkLabel,
 						String messageLink) {
@@ -37,75 +37,75 @@ public class ClientResult {
 	// Getters y setters:
 
 
-	public Boolean getUpdateAvailable() {
+	protected Boolean getUpdateAvailable() {
 		return updateAvailable;
 	}
 
-	public void setUpdateAvailable(Boolean updateAvailable) {
+	protected void setUpdateAvailable(Boolean updateAvailable) {
 		this.updateAvailable = updateAvailable;
 	}
 
-	public Boolean getUpdateNeeded() {
+	protected Boolean getUpdateNeeded() {
 		return updateNeeded;
 	}
 
-	public void setUpdateNeeded(Boolean updateNeeded) {
+	protected void setUpdateNeeded(Boolean updateNeeded) {
 		this.updateNeeded = updateNeeded;
 	}
 
-	public String getUpdateDetails() {
+	protected String getUpdateDetails() {
 		return updateDetails;
 	}
 
-	public void setUpdateDetails(String updateDetails) {
+	protected void setUpdateDetails(String updateDetails) {
 		this.updateDetails = updateDetails;
 	}
 
-	public Boolean getMessagePresent() {
+	protected Boolean getMessagePresent() {
 		return messagePresent;
 	}
 
-	public void setMessagePresent(Boolean messagePresent) {
+	protected void setMessagePresent(Boolean messagePresent) {
 		this.messagePresent = messagePresent;
 	}
 
-	public String getMessageTitle() {
+	protected String getMessageTitle() {
 		return messageTitle;
 	}
 
-	public void setMessageTitle(String messageTitle) {
+	protected void setMessageTitle(String messageTitle) {
 		this.messageTitle = messageTitle;
 	}
 
-	public String getMessageDetails() {
+	protected String getMessageDetails() {
 		return messageDetails;
 	}
 
-	public void setMessageDetails(String messageDetails) {
+	protected void setMessageDetails(String messageDetails) {
 		this.messageDetails = messageDetails;
 	}
 
-	public Boolean getMessageLinkPresent() {
+	protected Boolean getMessageLinkPresent() {
 		return messageLinkPresent;
 	}
 
-	public void setMessageLinkPresent(Boolean messageLinkPresent) {
+	protected void setMessageLinkPresent(Boolean messageLinkPresent) {
 		this.messageLinkPresent = messageLinkPresent;
 	}
 
-	public String getMessageLinkLabel() {
+	protected String getMessageLinkLabel() {
 		return messageLinkLabel;
 	}
 
-	public void setMessageLinkLabel(String messageLinkLabel) {
+	protected void setMessageLinkLabel(String messageLinkLabel) {
 		this.messageLinkLabel = messageLinkLabel;
 	}
 
-	public String getMessageLink() {
+	protected String getMessageLink() {
 		return messageLink;
 	}
 
-	public void setMessageLink(String messageLink) {
+	protected void setMessageLink(String messageLink) {
 		this.messageLink = messageLink;
 	}
 

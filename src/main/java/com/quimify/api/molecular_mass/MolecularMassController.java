@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/molecularmass")
-public class MolecularMassController {
+class MolecularMassController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -19,8 +19,8 @@ public class MolecularMassController {
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
-    public MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
-        MolecularMassResult molecularMassResult = molecularMassService.tryCalculateMolecularMassOf(formula);
+    protected MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
+        MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResultOf(formula);
 
         if(molecularMassResult.getPresent())
             logger.info("GET masa molecular: \"" + formula + "\". " +
