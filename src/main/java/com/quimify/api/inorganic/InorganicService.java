@@ -44,8 +44,8 @@ class InorganicService {
     private static List<NormalizedInorganic> normalizedInorganics = new ArrayList<>();
 
     public void loadNormalizedInorganics() {
-        normalizedInorganics = inorganicRepository.findAllByOrderBySearchCountDesc()
-                .stream().map(NormalizedInorganic::new).collect(Collectors.toList());
+        normalizedInorganics = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
+                .map(NormalizedInorganic::new).collect(Collectors.toList());
 
         logger.info("Normalizados cargados");
     }
