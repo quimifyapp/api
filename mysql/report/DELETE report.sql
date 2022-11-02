@@ -1,0 +1,2 @@
+DELETE FROM report
+WHERE id <= 33

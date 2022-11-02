@@ -25,7 +25,8 @@ class OrganicController {
 		OrganicResult organicResult = organicService.getFromName(name, picture);
 
 		if (organicResult.getPresent())
-			logger.info("GET formular: \"" + name + "\". RETURN: " + organicResult.getStructure() + ".");
+			logger.info("GET formular: \"" + name + "\". " +
+					"RETURN encontrado, fórmula: " + organicResult.getStructure() + ".");
 
 		return organicResult;
 	}
