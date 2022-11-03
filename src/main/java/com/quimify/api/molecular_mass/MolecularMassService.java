@@ -41,11 +41,11 @@ class MolecularMassService {
 
             if (!molecularMassResult.getPresent())
                 logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
-                        "Error: " + (molecularMassResult.getError() != null ? "\"" + molecularMassResult.getError() + "\"." : "ninguno."));
+                        "Error: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
-            logger.warn("Stack overflow al calcular la masa de: \"" + formula + "\".");
+            logger.warn("StackOverflow error al calcular la masa de: \"" + formula + "\".");
         }
         catch(Exception exception) {
             molecularMassResult = new MolecularMassResult("");
@@ -138,7 +138,7 @@ class MolecularMassService {
                     }
                     else moles = 1;
 
-                    sumIntoMap(anidada.toString(), moles, anidada_a_moles); // Registra la fórmula anidada
+                    addInMap(anidada.toString(), moles, anidada_a_moles); // Registra la fórmula anidada
 
                     // Finalmente:
 
@@ -166,7 +166,7 @@ class MolecularMassService {
 
             if(anidados.isPresent())
                 for(Map.Entry<String, Integer> elemento : anidados.get().entrySet())
-                    sumIntoMap(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
+                    addInMap(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
             else return Optional.empty();
         }
 
@@ -183,7 +183,7 @@ class MolecularMassService {
                     String digitos = parte.replaceAll("[A-Za-z]", "");
                     int moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
 
-                    sumIntoMap(simbolo, moles, elemento_a_moles); // Registra el elemento
+                    addInMap(simbolo, moles, elemento_a_moles); // Registra el elemento
                 }
             }
 
@@ -194,12 +194,12 @@ class MolecularMassService {
         return resultado;
     }
 
-    private void sumIntoMap(String key, Integer value, Map<String, Integer> map) {
+    private void addInMap(String key, Integer value, Map<String, Integer> map) {
         Integer found = map.get(key);
 
         if(found != null)
-            map.replace(key, found + value); // Ya estaba, se suma
-        else map.put(key, value); // Nuevo
+            map.replace(key, found + value); // It was present, values are added
+        else map.put(key, value); // New element
     }
     
     private Optional<Float> getMolecularMassOf(String symbol) {
