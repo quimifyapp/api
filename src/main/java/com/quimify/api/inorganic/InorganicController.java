@@ -47,7 +47,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if(inorganicResult.getPresent())
-            logger.info("GET inorganico: \"" + completion + "\" (compleción). RETURN :" + inorganicResult);
+            logger.info("GET inorganico: \"" + completion + "\" (compleción). RETURN: " + inorganicResult);
 
         return inorganicResult;
     }

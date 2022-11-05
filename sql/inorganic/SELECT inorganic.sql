@@ -1,4 +1,3 @@
-SELECT (SUM(search_count)) / 1000 FROM inorganic;
 SELECT * FROM inorganic
 
 # WHERE formula REGEXP '.*C[0-9]*[\-]?H.*'

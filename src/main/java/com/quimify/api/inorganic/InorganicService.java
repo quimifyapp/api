@@ -104,13 +104,13 @@ class InorganicService {
                 metricsService.contarGoogle(searchResult.isPresent() && searchResult.get().found, isPicture);
             }
             // Flowchart #3
-            if (searchResult.isEmpty() && canFreeBingSearch()) { // Hubo con Google o no está disponible
+            if (searchResult.isEmpty() && canFreeBingSearch()) { // Hubo un error con Google o no está disponible
                 searchResult = tryFreeBingSearch(input);
 
                 metricsService.contarBing(searchResult.isPresent() && searchResult.get().found, isPicture);
             }
             // Flowchart #4
-            if (searchResult.isEmpty() && canPaidBingSearch()) { // Hubo con Bing gratis o no está disponible
+            if (searchResult.isEmpty() && canPaidBingSearch()) { // Hubo un error con Bing gratis o no está disponible
                 searchResult = tryPaidBingSearch(input);
 
                 metricsService.contarBingPago();
@@ -136,17 +136,20 @@ class InorganicService {
                         searchedInMemory = searchInDatabase(parsed.get().getName());
 
                         if (searchedInMemory.isEmpty()) { // En efecto, no estaba en la DB
-                            Float molecularMass =  molecularMassService.tryCalculateMolecularMassOf(
-                                    parsed.get().getFormula());
+                            // Molecular mass:
+                            parsed.get().setMolecularMass(
+                                    molecularMassService.tryCalculateMolecularMassOf(parsed.get().getFormula()));
 
-                            if(molecularMass != null)
-                                parsed.get().setMolecularMass(molecularMass);
-
+                            // Result:
                             inorganicResult = new InorganicResult(parsed.get());
-                            inorganicRepository.save(parsed.get());
 
-                            logger.info("Nuevo inorgánico: " + parsed.get());
+                            // Stored:
+                            inorganicRepository.save(parsed.get()); // In DB
+                            normalizedInorganics.add(new NormalizedInorganic(parsed.get())); // For autocompletion
+
+                            // Metrics:
                             metricsService.contarInorganicoNuevo();
+                            logger.info("Nuevo inorgánico: " + parsed.get());
                         } else { // Realmente sí estaba en la DB
                             inorganicResult = new InorganicResult(searchedInMemory.get());
 
@@ -190,7 +193,10 @@ class InorganicService {
                     || input.equals(Normalized.of(inorganico.getName()))
                     || input.equals(Normalized.of(inorganico.getAlternativeName()))
                     || inorganico.getEtiquetasString().contains(input)) {
-                nuevaBusqueda(inorganico);
+                // Updates search counter:
+                inorganico.registrarBusqueda();
+                inorganicRepository.save(inorganico);
+
                 return Optional.of(inorganico);
             }
 
@@ -355,12 +361,6 @@ class InorganicService {
             logger.error("Excepción al escanear la dirección \"" + address + "\": " + exception);
             return Optional.empty();
         }
-    }
-
-    // Incrementa el contador de búsquedas de un inorgánico porque ha sido buscado
-    private void nuevaBusqueda(InorganicModel buscado) {
-        buscado.registrarBusqueda();
-        inorganicRepository.save(buscado);
     }
 
 }
