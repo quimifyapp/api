@@ -6,8 +6,8 @@ import javax.persistence.*;
 // Esta clase representa una de las etiquetas de un elemento inorgánico.
 
 @Entity // Es un modelo real
-@Table(name = "search_tag") // En la tabla 'etiqueta' de la DB
-class SearchTagModel {
+@Table(name = "inorganic_search_tag") // En la tabla 'inorganic_search_tag' de la DB
+class InorganicSearchTagModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,17 +15,17 @@ class SearchTagModel {
     private Integer id;
 
     @Column(nullable = false)
-    private String normalizedText; // "hidruromagnesico" | "aguaoxigenada" | ...
+    private String normalizedTag; // "hidruromagnesico" | "aguaoxigenada" | ...
 
     // --------------------------------------------------------------------------------
 
     // Constructor:
 
-    protected SearchTagModel(String text) {
-        this.normalizedText = Normalized.of(text);
+    protected InorganicSearchTagModel(String tag) {
+        this.normalizedTag = Normalized.of(tag);
     }
 
-    protected SearchTagModel() {}
+    protected InorganicSearchTagModel() {}
 
     // Getters y setters:
 
@@ -37,11 +37,12 @@ class SearchTagModel {
         this.id = id;
     }
 
-    protected String getNormalizedText() {
-        return normalizedText;
+    protected String getNormalizedTag() {
+        return normalizedTag;
     }
 
-    protected void setNormalizedText(String etiqueta) {
-        this.normalizedText = etiqueta;
+    protected void setNormalizedTag(String normalizedTag) {
+        this.normalizedTag = normalizedTag;
     }
+
 }

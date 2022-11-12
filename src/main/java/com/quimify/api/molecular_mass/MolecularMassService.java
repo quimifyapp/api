@@ -29,7 +29,7 @@ class MolecularMassService {
 
     // -------------------------------------------------------------------------------
 
-    public Float tryCalculateMolecularMassOf(String formula) {
+    public Float tryMolecularMassOf(String formula) {
         return tryMolecularMassResultOf(formula).getMolecularMass();
     }
 
@@ -61,22 +61,23 @@ class MolecularMassService {
     
     private MolecularMassResult calculateMolecularMassOf(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
-        String adaptada = formula.replaceAll("[≡=-]", ""); // Allowed bonds
+        String adapted = formula.replaceAll("[≡=-]", ""); // Allowed bonds
 
-        Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
+        Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?" +
+                "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
 
-        if(!structurePattern.matcher(adaptada).matches())
+        if(!structurePattern.matcher(adapted).matches())
             return new MolecularMassResult("La fórmula \"" + formula + "\" no es válida.");
-        else if(StringUtils.countOccurrencesOf(adaptada, "(") != StringUtils.countOccurrencesOf(adaptada, ")"))
+        else if(StringUtils.countOccurrencesOf(adapted, "(") != StringUtils.countOccurrencesOf(adapted, ")"))
             return new MolecularMassResult("Los paréntesis no están balanceados.");
-        else if(adaptada.contains("()"))
+        else if(adapted.contains("()"))
             return new MolecularMassResult("Los paréntesis huecos \"()\" no son válidos.");
 
         // Parece que sí:
 
         MolecularMassResult resultado;
 
-        Optional<Map<String, Integer>> elemento_a_moles = getElementToMolesIn(adaptada); // Se analiza la fórmula
+        Optional<Map<String, Integer>> elemento_a_moles = getElementToMolesIn(adapted); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 

@@ -39,7 +39,7 @@ class OrganicService {
 		if(organicResult.getPresent()) {
 			if(organicResult.getStructure() != null)
 				organicResult.setMolecularMass(
-						molecularMassService.tryCalculateMolecularMassOf(organicResult.getStructure()));
+						molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
 		}
 		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
 
@@ -56,7 +56,7 @@ class OrganicService {
 
 			if(organicResult.getPresent())
 				organicResult.setMolecularMass(
-						molecularMassService.tryCalculateMolecularMassOf(organicResult.getStructure()));
+						molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
 
 			metricsService.contarNombrarOrganicoAbiertoBuscado();
 

@@ -12,8 +12,6 @@ class FormulacionQuimicaPage {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private String htmlDocument;
-    private String formula, name, alternativeName;
-    private String stockName, systematicName, traditionalName;
 
     private InorganicModel parsedInorganic;
 
@@ -28,26 +26,21 @@ class FormulacionQuimicaPage {
         int index = indexAfterIn("<h1>", htmlDocument);
 
         if(index != -1) {
-            parsedInorganic = new InorganicModel();
-
             this.htmlDocument = htmlDocument.substring(index); // Removes metadata
 
-            // Text:
+            parsedInorganic = new InorganicModel();
 
-            parseFormulaAndName();
-            parseOtherNames();
-            decideNameAndAlternativeName();
+            // Formula:
 
-            if(alternativeName != null && name.contentEquals(alternativeName))
-                alternativeName = null; // It's duplicated
+            parsedInorganic.setFormula(parseFormula());
 
-            addNameTag(stockName);
-            addNameTag(systematicName);
-            addNameTag(traditionalName);
+            // Names:
 
-            parsedInorganic.setFormula(formula);
-            parsedInorganic.setName(name);
-            parsedInorganic.setAlternativeName(alternativeName);
+            parseAndSetNames();
+
+            // Search tags:
+
+            setSearchTags();
 
             // Properties:
 
@@ -61,16 +54,13 @@ class FormulacionQuimicaPage {
 
     // Steps:
 
-    private void parseFormulaAndName() {
+    private String parseFormula() {
+        String formula;
+
         int index = indexAfterIn("/", htmlDocument);
         int closingTagIndex = indexAfterIn("</", htmlDocument);
 
-        if(index != closingTagIndex) { // Como en "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
-            name = htmlDocument.substring(index + 1, closingTagIndex - 2);
-            formula = htmlDocument.substring(0, index - 2);
-        } else { // Como en "metano</h1>..."
-            name = htmlDocument.substring(0, closingTagIndex - 2);
-
+        if(index == closingTagIndex) { // "metano</h1>..."
             index = indexAfterIn(">Fórmula:", htmlDocument);
 
             if(index == -1)
@@ -79,42 +69,35 @@ class FormulacionQuimicaPage {
             formula = htmlDocument.substring(index);
             formula = formula.substring(0, indexAfterIn("</p>", formula) - 4);
 
-            formula = formula.replace("</b>", "").replace("<sub>", "")
-                    .replace("</sub>", "").replace(" ", "");
-        }
+            formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
+        } else formula = htmlDocument.substring(0, index - 2); // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
 
-        name = correctName(name);
+        return formula;
     }
 
-    private void parseOtherNames() {
+    private void parseAndSetNames() {
         int index = indexAfterIn("sistemática:</b>", htmlDocument);
-        if(index != -1) {
-            String text = htmlDocument.substring(index + 1);
-            systematicName = text.substring(0, indexAfterIn("</p>", text) - 4);
-
-            systematicName = correctName(systematicName);
-        }
+        if (index != -1)
+            parsedInorganic.setSystematicName(parseName(index));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
-        if(index != -1) {
-            String text = htmlDocument.substring(index + 1);
-            stockName = text.substring(0, indexAfterIn("</p>", text) - 4);
-
-            stockName = correctName(stockName);
-        }
+        if (index != -1)
+            parsedInorganic.setStockName(parseName(index));
 
         index = indexAfterIn("tradicional:</b>", htmlDocument);
-        if(index != -1) {
-            String text = htmlDocument.substring(index + 1);
-            traditionalName = text.substring(0, indexAfterIn("</p>", text) - 4);
+        if (index != -1)
+            parsedInorganic.setTraditionalName(parseName(index));
+    }
 
-            traditionalName = correctName(traditionalName);
-        }
+    private String parseName(int index) {
+        String name = htmlDocument.substring(index + 1);
+        name = name.substring(0, indexAfterIn("</p>", name) - 4);
+        return correctName(name);
     }
 
     private String correctName(String name) {
         // Parenthesis:
-        name = name.replaceAll(" \\(", "("); // "...hierro (II)" -> "...hierro(II)"
+        name = name.replaceAll(" \\(", "("); // " (II)" -> "(II)"
 
         // It happens with some organic compounds:
         if(name.contains("br/>")) {
@@ -125,46 +108,26 @@ class FormulacionQuimicaPage {
         return name;
     }
 
-    private void decideNameAndAlternativeName() {
-        if (!name.contains("ácido") && (traditionalName == null || !traditionalName.contains("ácido"))) {
-            // Not an acid:
-            alternativeName = stockName;
+    private void setSearchTags() {
+        parsedInorganic.addSearchTagOf(parsedInorganic.getFormula());
 
-            if (alternativeName == null || name.equals(alternativeName)) {
-                alternativeName = systematicName;
-
-                if (alternativeName == null || alternativeName.equals(name) || systematicName.contains("oxo"))
-                    if(traditionalName != null)
-                        alternativeName = traditionalName;
-            }
-        }
-        else {
-            // Acid:
-            if (traditionalName != null) {
-                alternativeName = name;
-                name = traditionalName;
-            }
-
-            if (traditionalName == null || name.equals(alternativeName)) {
-                alternativeName = stockName;
-
-                if (alternativeName == null || name.equals(alternativeName))
-                    alternativeName = systematicName;
-            }
-        }
+        setNameSearchTag(parsedInorganic.getStockName());
+        setNameSearchTag(parsedInorganic.getSystematicName());
+        setNameSearchTag(parsedInorganic.getTraditionalName());
     }
 
-    private void addNameTag(String name) {
+    private void setNameSearchTag(String name) {
         if(name != null) {
-            if (!name.equals(this.name) && !name.equals(parsedInorganic.getAlternativeName()))
-                parsedInorganic.addTagOf(name);
+            parsedInorganic.addSearchTagOf(name);
 
             if (name.contains("ácido"))
-                parsedInorganic.addTagOf(name.replace("ácido ", ""));
+                parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
         }
     }
 
-    private Float parseMolecularMass() {
+    private String parseMolecularMass() {
+        String molecularMass;
+
         int index = indexAfterIn("Masa molar:", htmlDocument);
         if (index == -1)
             index = indexAfterIn("Masa Molar:", htmlDocument);
@@ -174,7 +137,7 @@ class FormulacionQuimicaPage {
         if (index == -1)
             return null; // No molecular mass
 
-        String molecularMass = htmlDocument.substring(index + 1);
+        molecularMass = htmlDocument.substring(index + 1);
         molecularMass = molecularMass.substring(0, indexAfterIn("</", molecularMass) - 2);
 
         index = indexAfterIn("g", molecularMass);
@@ -189,10 +152,14 @@ class FormulacionQuimicaPage {
         molecularMass = soloNumeros(molecularMass);
         molecularMass = primeroDelIntervalo(molecularMass);
 
-        return Float.valueOf(molecularMass);
+        molecularMass = truncarDosDecimales(molecularMass);
+
+        return molecularMass;
     }
 
     private String parseTemperature(String temperatureName) {
+        String temperature;
+
         int index = indexAfterIn("Punto de " + temperatureName + ":", htmlDocument);
         if (index == -1)
             index = indexAfterIn("Temperatura de " + temperatureName + ":", htmlDocument);
@@ -200,7 +167,7 @@ class FormulacionQuimicaPage {
         if (index == -1)
             return null; // No temperature of that kind
 
-        String temperature = htmlDocument.substring(index + 1);
+        temperature = htmlDocument.substring(index + 1);
         temperature = temperature.substring(0, indexAfterIn("</", temperature) - 2);
 
         index = indexAfterIn("°", temperature);
@@ -225,11 +192,13 @@ class FormulacionQuimicaPage {
     }
 
     private String parseDensity() {
+        String density;
+
         int indice = indexAfterIn("Densidad:", htmlDocument);
         if (indice == -1) // TODO code repeat
             return null; // No density
 
-        String density = htmlDocument.substring(indice + 1);
+        density = htmlDocument.substring(indice + 1);
         density = density.substring(0, indexAfterIn("</", density) - 2);
 
         indice = indexAfterIn("g", density);

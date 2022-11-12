@@ -13,52 +13,54 @@ import java.util.stream.Collectors;
 @Table(name = "inorganic") // En la tabla 'inorganico' de la DB
 class InorganicModel {
 
+    // Non-nullable:
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Integer id;
 
-    // Necesarias:
-
     @Column(nullable = false)
-    private String formula; // "MgH2"
-    @Column(nullable = false)
-    private String name;  // "hidruro de magnesio"
+    private String formula; // "Ni2O3"
 
-    // Con valor predeterminado:
+    // With 'null' default value:
+
+    private String stockName; // "óxido de níquel (III)"
+    private String systematicName; // "trióxido de diníquel"
+    private String traditionalName; // "óxido niquélico"
+
+    private String otherName; // "potasio"
+
+    // Foreign key (one to many):
+
+    @OneToMany(cascade = CascadeType.ALL) // Se crean de la mano y se borran de la mano
+    @JoinColumn(name = "inorganic_id") // Cada etiqueta lleva asociado el inorgánico al que pertenece
+    private Set<InorganicSearchTagModel> searchTags = new HashSet<>(); // "hidruromagnesico" | "aguaoxigenada" | ...
+
+    // With default value:
 
     @Column(columnDefinition = "INT default 1", nullable = false)
     private Integer searchCount = 1;
 
-    // Con valor predeterminado 'null':
+    // Typed 'String' because no calculations will be performed:
 
-    private String alternativeName; // "dihidruro de magnesio"
-
-    // De tipo 'String' porque no se realizan cálculos con ellos:
-
-    private Float molecularMass;        // (g)
-    private String density;    // (g/cm3)
-    private String meltingPoint;      // (K)
-    private String boilingPoint;  // (K)
-
-    // Referencia externa (one to many):
-
-    @OneToMany(cascade = CascadeType.ALL) // Se crean de la mano y se borran de la mano
-    @JoinColumn(name = "inorganic_id") // Cada etiqueta lleva asociado el inorgánico al que pertenece
-    private Set<SearchTagModel> searchTags = new HashSet<>(); // "hidruromagnesico" | "aguaoxigenada" | ...
+    private String molecularMass;    // (g)
+    private String density;         // (g/cm3)
+    private String meltingPoint;    // (K)
+    private String boilingPoint;    // (K)
 
     // --------------------------------------------------------------------------------
 
-    protected void registrarBusqueda() {
+    protected void addSearchTagOf(String tag) {
+        searchTags.add(new InorganicSearchTagModel(tag));
+    }
+
+    protected Set<String> getSearchTagsAsStrings() {
+        return searchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
+    }
+
+    protected void countSearch() {
         searchCount++;
-    }
-
-    protected Set<String> getEtiquetasString() {
-        return searchTags.stream().map(SearchTagModel::getNormalizedText).collect(Collectors.toSet());
-    }
-
-    protected void addTagOf(String tag) {
-        searchTags.add(new SearchTagModel(tag));
     }
 
     @Override
@@ -68,93 +70,118 @@ class InorganicModel {
         words.add(String.valueOf(id));
 
         words.add(formula);
-        words.add(name);
 
-        if(alternativeName != null)
-            words.add(alternativeName);
+        if(stockName != null)
+            words.add(stockName);
+
+        if(systematicName != null)
+            words.add(systematicName);
+
+        if(traditionalName != null)
+            words.add(traditionalName);
+
+        if(otherName != null)
+            words.add(otherName);
 
         return words.toString();
     }
 
     // Getters y setters:
 
-    protected Integer getId() {
+    public Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    protected String getFormula() {
+    public String getFormula() {
         return formula;
     }
 
-    protected void setFormula(String formula) {
+    public void setFormula(String formula) {
         this.formula = formula;
     }
 
-    protected String getName() {
-        return name;
+    public String getStockName() {
+        return stockName;
     }
 
-    protected void setName(String nombre) {
-        this.name = nombre;
+    public void setStockName(String stockName) {
+        this.stockName = stockName;
     }
 
-    protected Integer getSearchCount() {
-        return searchCount;
+    public String getSystematicName() {
+        return systematicName;
     }
 
-    protected void setSearchCount(Integer busquedas) {
-        this.searchCount = busquedas;
+    public void setSystematicName(String systematicName) {
+        this.systematicName = systematicName;
     }
 
-    protected String getAlternativeName() {
-        return alternativeName;
+    public String getTraditionalName() {
+        return traditionalName;
     }
 
-    protected void setAlternativeName(String alternativo) {
-        this.alternativeName = alternativo;
+    public void setTraditionalName(String traditionalName) {
+        this.traditionalName = traditionalName;
     }
 
-    protected Float getMolecularMass() {
-        return molecularMass;
+    public String getOtherName() {
+        return otherName;
     }
 
-    protected void setMolecularMass(Float molecularMass) {
-        this.molecularMass = molecularMass;
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
     }
 
-    protected String getDensity() {
-        return density;
-    }
-
-    protected void setDensity(String densidad) {
-        this.density = densidad;
-    }
-
-    protected String getMeltingPoint() {
-        return meltingPoint;
-    }
-
-    protected void setMeltingPoint(String fusion) {
-        this.meltingPoint = fusion;
-    }
-
-    protected String getBoilingPoint() {
-        return boilingPoint;
-    }
-
-    protected void setBoilingPoint(String ebullicion) {
-        this.boilingPoint = ebullicion;
-    }
-
-    protected Set<SearchTagModel> getSearchTags() {
+    public Set<InorganicSearchTagModel> getSearchTags() {
         return searchTags;
     }
 
-    protected void setSearchTags(Set<SearchTagModel> etiquetas) {
-        this.searchTags = etiquetas;
+    public void setSearchTags(Set<InorganicSearchTagModel> searchTags) {
+        this.searchTags = searchTags;
     }
+
+    public Integer getSearchCount() {
+        return searchCount;
+    }
+
+    public void setSearchCount(Integer searchCount) {
+        this.searchCount = searchCount;
+    }
+
+    public String getMolecularMass() {
+        return molecularMass;
+    }
+
+    public void setMolecularMass(String molecularMass) {
+        this.molecularMass = molecularMass;
+    }
+
+    public String getDensity() {
+        return density;
+    }
+
+    public void setDensity(String density) {
+        this.density = density;
+    }
+
+    public String getMeltingPoint() {
+        return meltingPoint;
+    }
+
+    public void setMeltingPoint(String meltingPoint) {
+        this.meltingPoint = meltingPoint;
+    }
+
+    public String getBoilingPoint() {
+        return boilingPoint;
+    }
+
+    public void setBoilingPoint(String boilingPoint) {
+        this.boilingPoint = boilingPoint;
+    }
+
 }

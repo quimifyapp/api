@@ -18,9 +18,9 @@ class InorganicController {
 
     // ADMIN --------------------------------------------------------------------------
 
-    @PutMapping("update-completions")
-    protected void updateNormalizedInorganics() {
-        inorganicService.loadNormalizedInorganics();
+    @PutMapping("refresh-autocompletion")
+    protected void refreshAutocompletion() {
+        inorganicService.refreshAutocompletion();
     }
 
     // CLIENTE ------------------------------------------------------------------------

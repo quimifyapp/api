@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // Esta clase procesa los compuestos inorgánicos.
@@ -39,32 +37,48 @@ class InorganicService {
 
     protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Constante auxiliar
 
-    // AUTOCOMPLECIÓN ----------------------------------------------------------------
+    // AUTOCOMPLETE ------------------------------------------------------------------
 
-    private static List<NormalizedInorganic> normalizedInorganics = new ArrayList<>();
+    private static List<InorganicSearchTagModel> searchTags;
 
-    public void loadNormalizedInorganics() {
-        normalizedInorganics = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
-                .map(NormalizedInorganic::new).collect(Collectors.toList());
+    public void refreshAutocompletion() {
+        searchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
+                .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream())
+                .collect(Collectors.toList());
 
-        logger.info("Normalizados cargados");
+        logger.info("Etiquetas actualizadas en memoria.");
     }
 
     protected String autoComplete(String input) {
         String completion = "";
 
-        input = Normalized.of(input); // Para poder hacer la búsqueda
+        String normalizedInput = Normalized.of(input); // Para poder hacer la búsqueda
 
-        if (!input.equals("")) {
-            for (NormalizedInorganic normalizedInorganic : normalizedInorganics) {
-                if (normalizedInorganic.formulaCanComplete(input))
-                    return normalizedInorganic.getOriginalFormula(); // Fórmula puede autocompletar
-                if (normalizedInorganic.alternativeNameCanComplete(input))
-                    return normalizedInorganic.getOriginalAlternativeName(); // Alternativo puede autocompletar
-                if (normalizedInorganic.nameCanComplete(input) || normalizedInorganic.searchTagsCanComplete(input))
-                    return normalizedInorganic.getOriginalName(); // Nombre o una etiqueta puede autocompletar
+        for(InorganicSearchTagModel searchTag : searchTags)
+            if(searchTag.getNormalizedTag().startsWith(normalizedInput)) {
+                Optional<InorganicModel> inorganicModel = inorganicRepository.findBySearchTagsContaining(searchTag);
+
+                if(inorganicModel.isPresent()) {
+                    completion = inorganicModel.get().getStockName();
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                        return completion;
+
+                    completion = inorganicModel.get().getSystematicName();
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                        return completion;
+
+                    completion = inorganicModel.get().getTraditionalName();
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                        return completion;
+
+                    completion = inorganicModel.get().getOtherName();
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                        return completion;
+
+                    completion = inorganicModel.get().getFormula();
+                }
+                else logger.error("La etiqueta en caché: \"" + searchTag.getNormalizedTag() + "\" no se encuentra.");
             }
-        }
 
         return completion;
     }
@@ -74,9 +88,9 @@ class InorganicService {
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
-        Optional<InorganicModel> buscado = searchInDatabase(completion);
-        if (buscado.isPresent())
-            inorganicResult = new InorganicResult(buscado.get());
+        Optional<InorganicModel> searchedInorganic = searchInDatabase(completion);
+        if (searchedInorganic.isPresent())
+            inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
             logger.error("La compleción: \"" + completion + "\" no se encuentra.");
             inorganicResult = notFoundInorganic;
@@ -130,38 +144,37 @@ class InorganicService {
 
                 // Flowchart #5
                 if (searchedInMemory.isEmpty()) { // Parece no estar en la DB
-                    Optional<InorganicModel> parsed = tryParseFQ(searchResult.get().address);
+                    Optional<InorganicModel> parsedInorganic = tryParseFQ(searchResult.get().address);
 
-                    if (parsed.isPresent()) { // Escaneado correctamente
-                        searchedInMemory = searchInDatabase(parsed.get().getName());
+                    if (parsedInorganic.isPresent()) { // Escaneado correctamente
+                        InorganicModel parsed = parsedInorganic.get();
 
+                        searchedInMemory = searchInDatabase(parsed.getFormula()); // DB lookup
                         if (searchedInMemory.isEmpty()) { // En efecto, no estaba en la DB
                             // Molecular mass:
-                            parsed.get().setMolecularMass(
-                                    molecularMassService.tryCalculateMolecularMassOf(parsed.get().getFormula()));
+                            Float molecularMass =  molecularMassService.tryMolecularMassOf(parsed.getFormula());
+                            parsed.setMolecularMass(String.format("%.2f", molecularMass).replace(",", "."));
 
                             // Result:
-                            inorganicResult = new InorganicResult(parsed.get());
+                            inorganicResult = new InorganicResult(parsed);
 
                             // Stored:
-                            inorganicRepository.save(parsed.get()); // In DB
-                            normalizedInorganics.add(new NormalizedInorganic(parsed.get())); // For autocompletion
+                            inorganicRepository.save(parsed); // In database
+                            searchTags.addAll(parsed.getSearchTags()); // Cached in memory
 
                             // Metrics:
                             metricsService.contarInorganicoNuevo();
-                            logger.info("Nuevo inorgánico: " + parsed.get());
+                            logger.info("Nuevo inorgánico: " + parsed);
                         } else { // Realmente sí estaba en la DB
                             inorganicResult = new InorganicResult(searchedInMemory.get());
-
-                            logger.warn("El inorgánico parseado \"" + input + "\" era: " +
-                                    searchedInMemory.get().getId());
+                            logger.warn("El parseado \"" + input + "\" era: " + searchedInMemory.get().getId());
                         }
                     } else inorganicResult = notFoundInorganic;
                 }
                 // Flowchart #6
                 else { // Ya estaba en la DB
                     inorganicResult = new InorganicResult(searchedInMemory.get());
-                    logger.warn("El inorgánico buscado en la web \"" + input + "\" era: " + searchedInMemory.get());
+                    logger.warn("El buscado en la web \"" + input + "\" era: " + searchedInMemory.get());
                 }
             }
             // Flowchart #7
@@ -186,18 +199,16 @@ class InorganicService {
 
     // Flowchart #0
     private Optional<InorganicModel> searchInDatabase(String input) {
-        input = Normalized.of(input);
+        String normalizedInput = Normalized.of(input);
 
-        for (InorganicModel inorganico : inorganicRepository.findAllByOrderBySearchCountDesc())
-            if (input.equals(Normalized.of(inorganico.getFormula()))
-                    || input.equals(Normalized.of(inorganico.getName()))
-                    || input.equals(Normalized.of(inorganico.getAlternativeName()))
-                    || inorganico.getEtiquetasString().contains(input)) {
+        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
+            if (inorganicModel.getSearchTagsAsStrings().contains(normalizedInput)) {
                 // Updates search counter:
-                inorganico.registrarBusqueda();
-                inorganicRepository.save(inorganico);
+                inorganicModel.countSearch();
+                inorganicRepository.save(inorganicModel);
 
-                return Optional.of(inorganico);
+                // Result:
+                return Optional.of(inorganicModel);
             }
 
         return Optional.empty();

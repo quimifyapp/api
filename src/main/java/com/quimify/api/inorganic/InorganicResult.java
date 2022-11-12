@@ -12,9 +12,13 @@ class InorganicResult {
     // Si 'encontrado' = true:
 
     private String formula; // "MgH2"
-    private String name; // "hidruro de magnesio
-    private String alternativeName; // "dihidruro de magnesio"
-    private Float molecularMass; // (g)
+
+    private String stockName; // "óxido de níquel (III)"
+    private String systematicName; // "trióxido de diníquel"
+    private String traditionalName; // "óxido niquélico"
+    private String otherName; // "potasio"
+
+    private String molecularMass; // (g)
     private String density; // (g/cm³)
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
@@ -25,21 +29,25 @@ class InorganicResult {
 
     protected InorganicResult(InorganicModel inorganico) {
         this.present = true;
-        copiar(inorganico);
+        build(inorganico);
     }
 
     protected InorganicResult() {
         this.present = false;
     }
 
-    private void copiar(InorganicModel inorganico) {
-        this.formula = inorganico.getFormula();
-        this.name = inorganico.getName();
-        this.alternativeName = inorganico.getAlternativeName();
-        this.molecularMass = inorganico.getMolecularMass();
-        this.density = inorganico.getDensity();
-        this.meltingPoint = inorganico.getMeltingPoint();
-        this.boilingPoint = inorganico.getBoilingPoint();
+    private void build(InorganicModel inorganicModel) {
+        this.formula = inorganicModel.getFormula();
+
+        this.stockName = inorganicModel.getStockName();
+        this.systematicName = inorganicModel.getSystematicName();
+        this.traditionalName = inorganicModel.getTraditionalName();
+        this.otherName = inorganicModel.getOtherName();
+
+        this.molecularMass = inorganicModel.getMolecularMass();
+        this.density = inorganicModel.getDensity();
+        this.meltingPoint = inorganicModel.getMeltingPoint();
+        this.boilingPoint = inorganicModel.getBoilingPoint();
     }
 
     // Texto:
@@ -49,10 +57,18 @@ class InorganicResult {
         List<String> words = new ArrayList<>();
 
         words.add(formula);
-        words.add(name);
 
-        if(alternativeName != null)
-            words.add(alternativeName);
+        if(stockName != null)
+            words.add(stockName);
+
+        if(systematicName != null)
+            words.add(systematicName);
+
+        if(traditionalName != null)
+            words.add(traditionalName);
+
+        if(otherName != null)
+            words.add(otherName);
 
         return words.toString();
     }
@@ -75,27 +91,43 @@ class InorganicResult {
         this.formula = formula;
     }
 
-    public String getName() {
-        return name;
+    public String getStockName() {
+        return stockName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStockName(String stockName) {
+        this.stockName = stockName;
     }
 
-    public String getAlternativeName() {
-        return alternativeName;
+    public String getSystematicName() {
+        return systematicName;
     }
 
-    public void setAlternativeName(String alternativeName) {
-        this.alternativeName = alternativeName;
+    public void setSystematicName(String systematicName) {
+        this.systematicName = systematicName;
     }
 
-    public Float getMolecularMass() {
+    public String getTraditionalName() {
+        return traditionalName;
+    }
+
+    public void setTraditionalName(String traditionalName) {
+        this.traditionalName = traditionalName;
+    }
+
+    public String getOtherName() {
+        return otherName;
+    }
+
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
+    }
+
+    public String getMolecularMass() {
         return molecularMass;
     }
 
-    public void setMolecularMass(Float molecularMass) {
+    public void setMolecularMass(String molecularMass) {
         this.molecularMass = molecularMass;
     }
 

@@ -1,4 +1,5 @@
-SELECT normalized_text, COUNT(normalized_text)
-FROM search_tag
-GROUP BY normalized_text
-HAVING COUNT(normalized_text) > 1
+SELECT normalized_tag, COUNT(normalized_tag)
+FROM inorganic_search_tag 
+WHERE normalized_tag NOT IN ("arsenico", "auno3", "cuclo2", "cuio2", "hgclo2", "co", "hf", "no", "cn", "ni", "cs")
+GROUP BY normalized_tag
+HAVING COUNT(normalized_tag) > 1
