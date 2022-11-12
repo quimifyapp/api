@@ -11,7 +11,7 @@
 
 	<groupId>com.quimify</groupId>
 	<artifactId>quimify-api</artifactId>
-	<version>2</version>
+	<version>3</version>
 	<description>Quimify API</description>
 
 	<properties>
