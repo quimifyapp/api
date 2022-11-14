@@ -60,19 +60,19 @@ class InorganicService {
 
                 if(inorganicModel.isPresent()) {
                     completion = inorganicModel.get().getStockName();
-                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getSystematicName();
-                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getTraditionalName();
-                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getOtherName();
-                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getFormula();
