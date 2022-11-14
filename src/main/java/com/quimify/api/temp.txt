@@ -1,16 +1,35 @@
-public void foo() {
-        int i = 1;
-        for(InorganicModel inorganic : inorganicRepository.findAllByOrderBySearchCountDesc()) {
-            for(SearchTagModel eti : inorganic.getSearchTags())
-                if(eti.getNormalizedText().equals(Normalized.of(inorganic.getName())) || eti.getNormalizedText().equals(Normalized.of(inorganic.getAlternativeName()))) {
-                    logger.error(i++ + "");
-                    Set<SearchTagModel> tags = inorganic.getSearchTags();
-                    tags.remove(eti);
-                    inorganic.setSearchTags(tags);
-                    break;
-                }
+for(InorganicModel inorganic : inorganicRepository.findAll()) {
+            String text = inorganic.getOtherName();
+
+            if(text != null && !inorganic.getSearchTagsAsStrings().contains(Normalized.of(text)))
+                inorganic.addSearchTagOf(text);
         }
-    }
+
+for(InorganicModel inorganic : inorganicRepository.findAll()) {
+            Set<String> nuevas = new HashSet<>();
+
+            for(InorganicSearchTagModel tag : inorganic.getSearchTags())
+                if(tag.getNormalizedTag().contains("selenuro"))
+                    nuevas.add(tag.getNormalizedTag().replace("selenuro", "seleniuro"));
+
+            for(String nueva : nuevas)
+                inorganic.addSearchTagOf(nueva);
+        }
+
+for(InorganicModel inorganic : inorganicRepository.findAll()) {
+            Set<String> textos = new HashSet<>();
+            Set<InorganicSearchTagModel> nuevas = new HashSet<>();
+
+            for(InorganicSearchTagModel tag : inorganic.getSearchTags()) {
+                if(!textos.contains(tag.getNormalizedTag())) {
+                    textos.add(tag.getNormalizedTag());
+                    nuevas.add(tag);
+                }
+            }
+
+            if(!(inorganic.getSearchTags().containsAll(nuevas) && nuevas.containsAll(inorganic.getSearchTags()) ))
+                inorganic.setSearchTags(nuevas);
+        }
 
     protected Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
         Optional<InorganicoModel> resultado;

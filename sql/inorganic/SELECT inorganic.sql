@@ -5,6 +5,6 @@ SELECT * FROM inorganic
 # WHERE inorganico.id = 2995
 # WHERE formula = "HClO"
 # WHERE alternativo LIKE "ácido%"
-# WHERE formula = "Bi2O3"
+# WHERE formula = "Cu(HCrO4)2"
 # WHERE name LIKE "%selenoso%"
 ORDER BY id DESC
