@@ -1,6 +1,7 @@
-package com.quimify.api.reporte;
+package com.quimify.api.report;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 // Esta clase representa los reportes del cliente.
 
@@ -14,11 +15,13 @@ class ReportModel {
     private Integer id;
 
     @Column(nullable = false)
-    private Integer clientVersion; // Se corresponde con la versión del cliente
+    private Timestamp dateAndTime;
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
     private String details;
+    @Column(nullable = false)
+    private Integer clientVersion;
 
     // --------------------------------------------------------------------------------
 
@@ -32,12 +35,12 @@ class ReportModel {
         this.id = id;
     }
 
-    protected Integer getClientVersion() {
-        return clientVersion;
+    public Timestamp getDateAndTime() {
+        return dateAndTime;
     }
 
-    protected void setClientVersion(Integer clientVersion) {
-        this.clientVersion = clientVersion;
+    public void setDateAndTime(Timestamp dateAndTime) {
+        this.dateAndTime = dateAndTime;
     }
 
     protected String getTitle() {
@@ -55,5 +58,13 @@ class ReportModel {
     protected void setDetails(String details) {
         this.details = details;
     }
-    
+
+    protected Integer getClientVersion() {
+        return clientVersion;
+    }
+
+    protected void setClientVersion(Integer clientVersion) {
+        this.clientVersion = clientVersion;
+    }
+
 }

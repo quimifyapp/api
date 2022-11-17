@@ -1,4 +1,4 @@
-package com.quimify.api.reporte;
+package com.quimify.api.report;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ class ReportController {
     // CLIENTE ------------------------------------------------------------------------
 
     @PostMapping()
-    protected void postReport(@RequestParam("client-version") Integer clientVersion, @RequestParam("title") String title,
-                              @RequestParam("details") String details) {
+    protected void postReport(@RequestParam("title") String title, @RequestParam("details") String details,
+                              @RequestParam("client-version") Integer clientVersion) {
         logger.warn("Reporte de la versión " + clientVersion + " - " + title + " - \"" + details + "\".");
-        reportService.postReport(clientVersion, title, details);
+        reportService.postReport(title, details, clientVersion);
     }
 
 }

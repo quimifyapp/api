@@ -1,4 +1,4 @@
-package com.quimify.api.reporte;
+package com.quimify.api.report;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

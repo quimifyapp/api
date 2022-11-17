@@ -1,8 +1,10 @@
-package com.quimify.api.reporte;
+package com.quimify.api.report;
 
 import com.quimify.api.metrics.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 // Esta clase procesa los compuestos reportes del cliente.
 
@@ -17,14 +19,15 @@ class ReportService {
 
     // CLIENTE -----------------------------------------------------------------------
 
-    protected void postReport(Integer version, String titulo, String detalles) {
-        ReportModel reporte = new ReportModel();
+    protected void postReport(String title, String details, Integer version) {
+        ReportModel reportModel = new ReportModel();
 
-        reporte.setClientVersion(version);
-        reporte.setTitle(titulo);
-        reporte.setDetails(detalles);
+        reportModel.setDateAndTime(new Timestamp(System.currentTimeMillis()));
+        reportModel.setTitle(title);
+        reportModel.setDetails(details);
+        reportModel.setClientVersion(version);
 
-        reportRepository.save(reporte);
+        reportRepository.save(reportModel);
 
         metricsService.contarReporte();
     }
