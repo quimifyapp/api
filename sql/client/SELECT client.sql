@@ -1,2 +1,2 @@
 SELECT * FROM client
-ORDER BY version DESC
+ORDER BY version DESC;

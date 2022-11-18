@@ -61,7 +61,7 @@ class MolecularMassService {
     
     private MolecularMassResult calculateMolecularMassOf(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
-        String adapted = formula.replaceAll("[≡=-]", ""); // Allowed bonds
+        String adapted = formula.replaceAll("[≡=-]", ""); // Bonds
 
         Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?" +
                 "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
