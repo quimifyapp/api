@@ -1,2 +1,2 @@
 SELECT * FROM report
-ORDER BY id DESC
+ORDER BY id DESC;
