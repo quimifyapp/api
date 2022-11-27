@@ -5,7 +5,7 @@ import javax.persistence.*;
 // Esta clase representa la configuración de cada cliente según su versión.
 
 @Entity // Es un modelo real
-@Table(name = "client") // En la tabla 'cliente' de la DB
+@Table(name = "client") // En la tabla 'client' de la DB
 class ClientModel {
 
 	@Id
@@ -31,9 +31,9 @@ class ClientModel {
 	@Column()
 	private String messageDetails;
 
-	@Column()
+	@Column() // If messagePresent = true
 	private Boolean messageLinkPresent;
-	// If messagePresent = true and messageLinkPresent = true:
+	// If messageLinkPresent = true:
 	@Column()
 	private String messageLinkLabel;
 	@Column()
