@@ -1,3 +1,3 @@
-UPDATE cliente
-SET mensaje_detalles = null
-WHERE version = 1
+UPDATE client
+SET update_needed = null
+WHERE version = 4
