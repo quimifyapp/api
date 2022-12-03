@@ -1,2 +1,2 @@
 SELECT * FROM metrics
-ORDER BY date DESC
+ORDER BY date DESC;

@@ -1,5 +1,5 @@
-INSERT INTO search_tag (inorganic_id, normalized_text)
+INSERT INTO inorganic_search_tag (inorganic_id, normalized_tag)
 VALUES (
-, # ID DEL INORGÁNICO
- # TEXTO NORMALIZADO: MINÚSCULAS Y SOLO ALFANUMÉRICO
+, # Inorganic id
+ # Lower case and alphanumeric
 );

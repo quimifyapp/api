@@ -1,11 +1,13 @@
-INSERT INTO inorganic (formula, name, alternative_name, molecular_mass, density, melting_point, boiling_point) 
+INSERT INTO inorganic (formula, stock_name, systematic_name, traditional_name, other_name, molecular_mass, density, melting_point, boiling_point) 
 VALUES (
-, # FÓRMULA
-, # NOMBRE
-, # ALTERNATIVO,
-# PUNTO DECIMAL, NO COMA:
-, # MASA MOLECULAR (g / mol)
-, # DENSIDAD (g / cm3)
-, # PUNTO DE FUSIÓN (K)
-# PUNTO DE EBULLICIÓN (K)
+, # Formula
+, # Stock name
+, # Systematic name
+, # Traditional name
+, # Other name
+# DECIMAL POINT, NOT COMMA:
+, # Molecular mass (g / mol)
+, # Density (g / cm3)
+, # Melting point (K)
+ # Boiling point (K)
 );
