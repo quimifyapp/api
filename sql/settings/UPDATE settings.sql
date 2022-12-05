@@ -1,3 +1,3 @@
 UPDATE settings
 SET use_free_bing = false
-WHERE version = 2
+WHERE version = 3

@@ -67,7 +67,6 @@ class OrganicService {
 			logger.error("Excepción al nombrar [" + Arrays.toString(inputSequence) + "]: " + exception + ".");
 			return OrganicFactory.organicNotFound;
 		}
-
 	}
 
 	// -------------------------------------------------------------------------------
@@ -80,12 +79,12 @@ class OrganicService {
 				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
 
 				if (groupElection != FunctionalGroup.radical) {
-					openChain.bond(groupElection);
-
 					if (groupElection == FunctionalGroup.ether) {
 						assert openChain instanceof Simple; // Yes, it is...
 						openChain = new Ether((Simple) openChain);
 					}
+
+					openChain.bond(groupElection);
 				}
 				else { // Radical
 					boolean isIso = inputSequence[++i] == 1;
