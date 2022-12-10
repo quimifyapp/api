@@ -6,7 +6,6 @@ import com.quimify.organic.OrganicFactory;
 import com.quimify.organic.OrganicResult;
 import com.quimify.organic.components.Group;
 import com.quimify.organic.components.Substituent;
-import com.quimify.organic.molecules.open_chain.Ether;
 import com.quimify.organic.molecules.open_chain.OpenChain;
 import com.quimify.organic.molecules.open_chain.Simple;
 import org.slf4j.Logger;
@@ -74,25 +73,22 @@ class OrganicService {
 	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
 		OpenChain openChain = new Simple();
 
-		for(int i = 0; i < inputSequence.length; i++)
-			if(inputSequence[i] != carbonInputCode) {
-				Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
-
-				if (groupElection != Group.radical) {
-					if (groupElection == Group.ether) {
-						assert openChain instanceof Simple; // Yes, it is...
-						openChain = new Ether((Simple) openChain);
-					}
-
-					openChain.bond(groupElection);
-				}
-				else { // Radical
-					boolean isIso = inputSequence[++i] == 1;
-					int carbonCount = inputSequence[++i];
-					openChain.bond(new Substituent(carbonCount, isIso));
-				}
+		for(int i = 0; i < inputSequence.length; i++) {
+			if (inputSequence[i] == carbonInputCode) {
+				openChain.bondCarbon();
+				continue;
 			}
-			else openChain.bondCarbon();
+
+			Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
+
+			if (groupElection != Group.radical)
+				openChain = openChain.bond(groupElection);
+			else {
+				boolean isIso = inputSequence[++i] == 1;
+				int carbonCount = inputSequence[++i];
+				openChain = openChain.bond(new Substituent(carbonCount, isIso));
+			}
+		}
 
 		return openChain;
 	}
