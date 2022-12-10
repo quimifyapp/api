@@ -4,11 +4,11 @@ import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
 import com.quimify.organic.OrganicResult;
-import com.quimify.organic.components.FunctionalGroup;
+import com.quimify.organic.components.Group;
 import com.quimify.organic.components.Substituent;
-import com.quimify.organic.compounds.open_chain.Ether;
-import com.quimify.organic.compounds.open_chain.OpenChain;
-import com.quimify.organic.compounds.open_chain.Simple;
+import com.quimify.organic.molecules.open_chain.Ether;
+import com.quimify.organic.molecules.open_chain.OpenChain;
+import com.quimify.organic.molecules.open_chain.Simple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +76,10 @@ class OrganicService {
 
 		for(int i = 0; i < inputSequence.length; i++)
 			if(inputSequence[i] != carbonInputCode) {
-				FunctionalGroup groupElection = openChain.getOrderedBondableGroups().get(inputSequence[i]);
+				Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
 
-				if (groupElection != FunctionalGroup.radical) {
-					if (groupElection == FunctionalGroup.ether) {
+				if (groupElection != Group.radical) {
+					if (groupElection == Group.ether) {
 						assert openChain instanceof Simple; // Yes, it is...
 						openChain = new Ether((Simple) openChain);
 					}
