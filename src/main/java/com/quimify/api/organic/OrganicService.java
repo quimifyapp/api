@@ -63,7 +63,7 @@ class OrganicService {
 		}
 		catch (Exception exception) {
 			metricsService.countOrganicsFailedFromStructure();
-			logger.error("Excepción al nombrar [" + Arrays.toString(inputSequence) + "]: " + exception + ".");
+			logger.error("Excepción al nombrar " + Arrays.toString(inputSequence) + ": " + exception + ".");
 			return OrganicFactory.organicNotFound;
 		}
 	}

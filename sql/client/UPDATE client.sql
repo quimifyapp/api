@@ -1,3 +1,3 @@
 UPDATE client
-SET update_needed = false
-WHERE version = 3
+SET message_present = true
+WHERE version = 4
