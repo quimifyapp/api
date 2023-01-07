@@ -49,10 +49,10 @@ class InorganicService {
         logger.info("Search tags updated in memory.");
     }
 
-    protected String autoComplete(String input) {
+    protected String autoComplete(String input) { // TODO clean code
         String completion = "";
 
-        String normalizedInput = Normalized.of(input); // Para poder hacer la búsqueda
+        String normalizedInput = Normalized.of(input);
 
         for(InorganicSearchTagModel searchTag : searchTags)
             if(searchTag.getNormalizedTag().startsWith(normalizedInput)) {
@@ -60,22 +60,22 @@ class InorganicService {
 
                 if(inorganicModel.isPresent()) {
                     completion = inorganicModel.get().getStockName();
-                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getSystematicName();
-                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getTraditionalName();
-                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
                         return completion;
 
                     completion = inorganicModel.get().getOtherName();
-                    if(completion != null && Normalized.of(completion).contains(normalizedInput))
+                    if(completion != null && Normalized.of(completion).startsWith(normalizedInput))
                         return completion;
 
-                    completion = inorganicModel.get().getFormula();
+                    return inorganicModel.get().getFormula(); // Formula or a search tag
                 }
                 else logger.error("La etiqueta en caché: \"" + searchTag.getNormalizedTag() + "\" no se encuentra.");
             }
