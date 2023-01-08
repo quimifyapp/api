@@ -3,8 +3,11 @@ package com.quimify.api.inorganic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 
 // Esta clase implementa los métodos HTTP de la dirección "/inorganico".
@@ -24,7 +27,6 @@ class InorganicController {
     protected void refreshAutocompletion() {
         inorganicService.refreshAutocompletion();
     }
-
     // CLIENTE ------------------------------------------------------------------------
 
     @GetMapping()
@@ -42,8 +44,9 @@ class InorganicController {
     @GetMapping("/completion")
     protected @ResponseBody ResponseEntity<String> autoCompleteInorganic(@RequestParam("input") String input) {
         String completion = inorganicService.autoComplete(input);
-        String cacheControl = "public, max-age=86400"; // A day in seconds
-        return ResponseEntity.ok().header("Cache-Control", cacheControl).body(completion); // Cache allowed
+        CacheControl cacheHeader = CacheControl.maxAge(1, TimeUnit.DAYS); // 86400 seconds
+        cacheHeader.cachePublic(); // It tells clients and CDN providers that they CAN cache it
+        return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header to the response
     }
 
     @GetMapping("/from-completion")
