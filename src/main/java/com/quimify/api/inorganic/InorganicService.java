@@ -24,22 +24,22 @@ class InorganicService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    InorganicRepository inorganicRepository; // Conexión con la DB
+    InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
-    MolecularMassService molecularMassService; // Procesos de la masa molecular
+    MolecularMassService molecularMassService;
 
     @Autowired
-    SettingsService settingsService; // Procesos de la configuración
+    SettingsService settingsService;
 
     @Autowired
-    MetricsService metricsService; // Procesos de las metricas diarias
+    MetricsService metricsService;
 
-    protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Constante auxiliar
+    private static List<InorganicSearchTagModel> searchTags; // For autocompletion
 
-    // AUTOCOMPLETE ------------------------------------------------------------------
+    protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Handy
 
-    private static List<InorganicSearchTagModel> searchTags;
+    // Administration ----------------------------------------------------------------
 
     public void refreshAutocompletion() {
         searchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
@@ -48,6 +48,8 @@ class InorganicService {
 
         logger.info("Inorganic search tags updated in memory.");
     }
+
+    // Client autocompletion ---------------------------------------------------------
 
     protected String autoComplete(String input) { // TODO clean code
         String completion = "";
@@ -83,7 +85,7 @@ class InorganicService {
         return completion;
     }
 
-    // BÚSQUEDAS ---------------------------------------------------------------------
+    // Client searching --------------------------------------------------------------
 
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
@@ -195,7 +197,7 @@ class InorganicService {
         return inorganicResult;
     }
 
-    // INTERNOS ----------------------------------------------------------------------
+    // Private methods ---------------------------------------------------------------
 
     // Flowchart #0
     private Optional<InorganicModel> searchInDatabase(String input) {
