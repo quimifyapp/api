@@ -46,7 +46,7 @@ class InorganicService {
                 .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream())
                 .collect(Collectors.toList());
 
-        logger.info("Search tags updated in memory.");
+        logger.info("Inorganic search tags updated in memory.");
     }
 
     protected String autoComplete(String input) { // TODO clean code
