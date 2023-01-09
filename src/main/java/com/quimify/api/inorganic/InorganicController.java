@@ -7,9 +7,6 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
-
-
 // Esta clase implementa los métodos HTTP de la dirección "/inorganico".
 
 @RestController
@@ -44,11 +41,8 @@ class InorganicController {
     @GetMapping("/completion")
     protected @ResponseBody ResponseEntity<String> autoCompleteInorganic(@RequestParam("input") String input) {
         String completion = inorganicService.autoComplete(input);
-
-        CacheControl cacheHeader = CacheControl.maxAge(Duration.ofDays(1)); // 86400 seconds
-        cacheHeader.cachePublic(); // It tells clients and CDN providers that they CAN cache it
-
-        return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header to the response
+        CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
+        return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header and body to the response
     }
 
     @GetMapping("/from-completion")
