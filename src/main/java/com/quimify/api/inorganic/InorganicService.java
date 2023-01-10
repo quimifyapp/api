@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Esta clase procesa los compuestos inorgánicos.
+// This class implements the logic behind HTTP methods in "/inorganic".
 
 @Service
 public
@@ -35,16 +35,19 @@ class InorganicService {
     @Autowired
     MetricsService metricsService;
 
-    private static List<InorganicSearchTagModel> searchTags; // For autocompletion
+    private static final List<InorganicSearchTagModel> searchTags = new ArrayList<>(); // For autocompletion
 
     protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Handy
 
     // Administration ----------------------------------------------------------------
 
     public void refreshAutocompletion() {
-        searchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
+        List<InorganicSearchTagModel> newSearchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
                 .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream())
                 .collect(Collectors.toList());
+
+        searchTags.clear();
+        searchTags.addAll(newSearchTags);
 
         logger.info("Inorganic search tags updated in memory.");
     }

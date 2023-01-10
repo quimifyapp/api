@@ -7,7 +7,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// Esta clase implementa los métodos HTTP de la dirección "/inorganico".
+// This class implements HTTP methods in "/inorganic".
 
 @RestController
 @RequestMapping("/inorganic")
@@ -18,13 +18,14 @@ class InorganicController {
     @Autowired
     InorganicService inorganicService; // Procesos de los compuestos inorgánicos
 
-    // ADMIN --------------------------------------------------------------------------
+    // Administration ----------------------------------------------------------------
 
     @PutMapping("refresh-autocompletion")
     protected void refreshAutocompletion() {
         inorganicService.refreshAutocompletion();
     }
-    // CLIENTE ------------------------------------------------------------------------
+
+    // Client ------------------------------------------------------------------------
 
     @GetMapping()
     protected InorganicResult searchInorganic(@RequestParam("input") String input,
