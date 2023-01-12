@@ -118,18 +118,18 @@ class InorganicService {
 
             // Flowchart #2
             if (canGoogleSearch()) {
-                searchResult = tryGoogleSeach(input);
+                searchResult = tryGoogleSearch(input);
 
                 metricsService.contarGoogle(searchResult.isPresent() && searchResult.get().found, isPicture);
             }
             // Flowchart #3
-            if (searchResult.isEmpty() && canFreeBingSearch()) { // Hubo un error con Google o no está disponible
+            if (searchResult.isEmpty() && canFreeBingSearch()) { // Google API not available or an error occurred
                 searchResult = tryFreeBingSearch(input);
 
                 metricsService.contarBing(searchResult.isPresent() && searchResult.get().found, isPicture);
             }
             // Flowchart #4
-            if (searchResult.isEmpty() && canPaidBingSearch()) { // Hubo un error con Bing gratis o no está disponible
+            if (searchResult.isEmpty() && canPaidBingSearch()) { // Free Bing API not available or an error occurred
                 searchResult = tryPaidBingSearch(input);
 
                 metricsService.contarBingPago();
@@ -137,7 +137,7 @@ class InorganicService {
             }
 
             // Flowchart #0 ó #5
-            if (searchResult.isPresent() && searchResult.get().found) { // Se ha podido encontrar con Google o Bing
+            if (searchResult.isPresent() && searchResult.get().found) { // Found using search engines
                 String[] words = searchResult.get().title.trim().split(" ");
 
                 String firstWord = words[0];
@@ -256,7 +256,7 @@ class InorganicService {
     }
 
     // Flowchart #2
-    private Optional<SearchResult> tryGoogleSeach(String input) {
+    private Optional<SearchResult> tryGoogleSearch(String input) {
         Optional<SearchResult> busqueda_web;
 
         try {
@@ -364,7 +364,7 @@ class InorganicService {
             Download conexion = new Download(address);
             conexion.setProperty("User-Agent", settingsService.getUserAgent());
 
-            FormulacionQuimicaPage fqPage = new FormulacionQuimicaPage(conexion.getText());
+            FQPage fqPage = new FQPage(conexion.getText());
             InorganicModel parsedInorganic = fqPage.getParsedInorganic();
 
             if (parsedInorganic != null)
