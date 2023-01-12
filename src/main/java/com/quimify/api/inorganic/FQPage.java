@@ -4,23 +4,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
+import java.util.Map;
 
-// Esta clase contiene el código para analizar una página de FQ.com.
+// This class parses inorganic compounds from FQ.com web pages.
 
-class FormulacionQuimicaPage {
+class FQPage {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private String htmlDocument;
+    private final static Map<String, String> namingMistakeToCorrection = Map.of(
+            "iuro", "uro", // I.e.: "antimoniuro", "arseniuro", "seleniuro" -> "antimonuro"...
+            "iato", "ato", // I.e.: "arseniato", "antimoniato" -> "arsenato"...
+            "teleruro", "telururo", // Common mistake
+            "teleluro", "telururo", // Weird mistake in FQ.com
+            "fosfonio", "fosfanio", // Common mistake
+            "arsonio", "arsanio", // Common mistake
+            "estibonio", "estibanio" // Common mistake
+    );
 
     private InorganicModel parsedInorganic;
 
-    // --------------------------------------------------------------------------------
+    private String htmlDocument;
 
     // Constructor:
 
     // Flowchart #5
-    protected FormulacionQuimicaPage(String htmlDocument) {
+    protected FQPage(String htmlDocument) {
         this.htmlDocument = htmlDocument;
 
         int index = indexAfterIn("<h1>", htmlDocument);
@@ -30,31 +39,19 @@ class FormulacionQuimicaPage {
 
             parsedInorganic = new InorganicModel();
 
-            // Formula:
-
-            parsedInorganic.setFormula(parseFormula());
-
-            // Names:
-
+            parseAndSetFormula();
             parseAndSetNames();
-
-            // Search tags:
-
             setSearchTags();
+            makeCorrections(); // Might update search tags
 
-            // Properties:
-
-            parsedInorganic.setMolecularMass(parseMolecularMass());
-            parsedInorganic.setDensity(parseDensity());
-            parsedInorganic.setMeltingPoint(parseTemperature("fusión"));
-            parsedInorganic.setBoilingPoint(parseTemperature("ebullición"));
+            parseAndSetProperties();
         }
         else logger.error("La siguiente página de FQ no tiene <h1>: " + htmlDocument);
     }
 
     // Steps:
 
-    private String parseFormula() {
+    private void parseAndSetFormula() {
         String formula;
 
         int index = indexAfterIn("/", htmlDocument);
@@ -70,9 +67,10 @@ class FormulacionQuimicaPage {
             formula = formula.substring(0, indexAfterIn("</p>", formula) - 4);
 
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
-        } else formula = htmlDocument.substring(0, index - 2); // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
+        }
+        else formula = htmlDocument.substring(0, index - 2); // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
 
-        return formula;
+        parsedInorganic.setFormula(formula);
     }
 
     private void parseAndSetNames() {
@@ -92,18 +90,10 @@ class FormulacionQuimicaPage {
     private String parseName(int index) {
         String name = htmlDocument.substring(index + 1);
         name = name.substring(0, indexAfterIn("</p>", name) - 4);
-        return correctName(name);
-    }
-
-    private String correctName(String name) {
-        // Parenthesis:
-        name = name.replaceAll(" \\(", "("); // " (II)" -> "(II)"
 
         // It happens with some organic compounds:
-        if(name.contains("br/>")) {
+        if(name.contains("br/>"))
             name = name.replace("br/>", "");
-            // isOrganic = true; TODO
-        }
 
         return name;
     }
@@ -123,6 +113,47 @@ class FormulacionQuimicaPage {
             if (name.contains("ácido"))
                 parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
         }
+    }
+
+    private void makeCorrections() {
+        correctPeroxide();
+        correctNames();
+    }
+
+    private void correctPeroxide() {
+        if (parsedInorganic.getSystematicName() != null && parsedInorganic.getSystematicName().contains("peróxido")) {
+            parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
+            parsedInorganic.setSystematicName(null); // Systematic names for peroxides NEVER include that word
+            // TODO flag manual correction needed
+        }
+    }
+
+    private void correctNames() {
+        parsedInorganic.setStockName(correctName(parsedInorganic.getStockName()));
+        parsedInorganic.setSystematicName(correctName(parsedInorganic.getSystematicName()));
+        parsedInorganic.setTraditionalName(correctName(parsedInorganic.getTraditionalName()));
+    }
+
+    private String correctName(String name) {
+        if(name == null)
+            return null;
+
+        name = name.replaceAll(" \\(", "("); // " (II)" -> "(II)", common mistake
+
+        for(String namingMistake : namingMistakeToCorrection.keySet())
+            if (name.contains(namingMistake)) {
+                name = name.replace(namingMistake, namingMistakeToCorrection.get(namingMistake));
+                setNameSearchTag(name);
+            }
+
+        return name;
+    }
+
+    private void parseAndSetProperties() {
+        parsedInorganic.setMolecularMass(parseMolecularMass());
+        parsedInorganic.setDensity(parseDensity());
+        parsedInorganic.setMeltingPoint(parseTemperature("fusión"));
+        parsedInorganic.setBoilingPoint(parseTemperature("ebullición"));
     }
 
     private String parseMolecularMass() {
@@ -157,12 +188,12 @@ class FormulacionQuimicaPage {
         return molecularMass;
     }
 
-    private String parseTemperature(String temperatureName) {
+    private String parseTemperature(String temperatureLabel) {
         String temperature;
 
-        int index = indexAfterIn("Punto de " + temperatureName + ":", htmlDocument);
+        int index = indexAfterIn("Punto de " + temperatureLabel + ":", htmlDocument);
         if (index == -1)
-            index = indexAfterIn("Temperatura de " + temperatureName + ":", htmlDocument);
+            index = indexAfterIn("Temperatura de " + temperatureLabel + ":", htmlDocument);
 
         if (index == -1)
             return null; // No temperature of that kind
@@ -236,11 +267,11 @@ class FormulacionQuimicaPage {
         return density;
     }
 
-    // Utilities:
+    // Utilities: // TODO use regex
 
     private int indexAfterIn(String substring, String string) {
         int index = string.indexOf(substring);
-        return (index != -1) ? index + substring.length() : index;
+        return index != -1 ? index + substring.length() : index;
     }
 
     // Ej.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
