@@ -83,7 +83,7 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicsSucceededFromStructure = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsFailedFromStructure = 0; // TODO
+    private Integer organicsFailedFromStructure = 0;
 
     // Su suma equivale al total de peticiones de calcular masas moleculares:
 
