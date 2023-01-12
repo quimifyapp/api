@@ -228,7 +228,8 @@ class FQPage {
         String density;
 
         int indice = indexAfterIn("Densidad:", htmlDocument);
-        if (indice == -1) // TODO code repeat
+
+        if (indice == -1)
             return null; // No density
 
         density = htmlDocument.substring(indice + 1);
