@@ -17,9 +17,9 @@ class ReportService {
     @Autowired
     MetricsService metricsService; // Procesos de las metricas diarias
 
-    // CLIENTE -----------------------------------------------------------------------
+    // Client:
 
-    protected void postReport(String title, String details, Integer version) {
+    protected void saveReport(String title, String details, Integer version) {
         ReportModel reportModel = new ReportModel();
 
         reportModel.setDateAndTime(new Timestamp(System.currentTimeMillis()));
@@ -29,7 +29,7 @@ class ReportService {
 
         reportRepository.save(reportModel);
 
-        metricsService.contarReporte();
+        metricsService.countReportSent();
     }
 
 }

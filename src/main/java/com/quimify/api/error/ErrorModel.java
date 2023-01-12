@@ -1,13 +1,13 @@
-package com.quimify.api.report;
+package com.quimify.api.error;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-// Esta clase representa los reportes del cliente.
+// This class represent errors that occur during the execution of this project.
 
-@Entity // Es un modelo real
-@Table(name = "report") // En la tabla 'report' de la DB
-class ReportModel {
+@Entity
+@Table(name = "error") // In table 'error' of DB
+class ErrorModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ class ReportModel {
     @Column(nullable = false)
     private String details;
     @Column(nullable = false)
-    private Integer clientVersion;
+    private String location;
 
     // Getters y setters:
 
@@ -57,12 +57,12 @@ class ReportModel {
         this.details = details;
     }
 
-    protected Integer getClientVersion() {
-        return clientVersion;
+    protected String getLocation() {
+        return location;
     }
 
-    protected void setClientVersion(Integer clientVersion) {
-        this.clientVersion = clientVersion;
+    protected void setLocation(String location) {
+        this.location = location;
     }
 
 }

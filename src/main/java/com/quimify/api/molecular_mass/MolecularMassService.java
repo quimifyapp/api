@@ -2,6 +2,7 @@ package com.quimify.api.molecular_mass;
 
 import com.quimify.api.element.ElementModel;
 import com.quimify.api.element.ElementService;
+import com.quimify.api.error.ErrorService;
 import com.quimify.api.metrics.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +23,15 @@ class MolecularMassService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    ElementService elementService; // Procesos de los elementos
+    ElementService elementService; // Elements logic
 
     @Autowired
-    MetricsService metricsService; // Procesos de las metricas diarias
+    ErrorService errorService; // API errors logic
 
-    // -------------------------------------------------------------------------------
+    @Autowired
+    MetricsService metricsService; // Daily metrics logic
+
+    // Client and internal:
 
     public Float tryMolecularMassOf(String formula) {
         return tryMolecularMassResultOf(formula).getMolecularMass();
@@ -40,24 +44,23 @@ class MolecularMassService {
             molecularMassResult = calculateMolecularMassOf(formula);
 
             if (!molecularMassResult.getPresent())
-                logger.warn("No se ha podido calcular la masa de \"" + formula + "\". " +
-                        "Error: " + molecularMassResult.getError());
+                logger.warn("Couldn't calculate \"" + formula + "\". " + "Error: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
-            logger.warn("StackOverflow error al calcular la masa de: \"" + formula + "\".");
+            errorService.saveError("StackOverflow error", formula, this.getClass());
         }
         catch(Exception exception) {
             molecularMassResult = new MolecularMassResult("");
-            logger.error("Excepción al calcular la masa de \"" + formula + "\": " + exception);
+            errorService.saveError("Exception calculating: " + formula, exception.toString(), this.getClass());
         }
 
-        metricsService.contarMasaMolecular(molecularMassResult.getPresent());
+        metricsService.countMolecularMass(molecularMassResult.getPresent());
 
         return molecularMassResult;
     }
     
-    // INTERNOS ----------------------------------------------------------------------
+    // Private:
     
     private MolecularMassResult calculateMolecularMassOf(String formula) {
         // Se comprueba si tiene aspecto de fórmula:
@@ -77,31 +80,31 @@ class MolecularMassService {
 
         MolecularMassResult resultado;
 
-        Optional<Map<String, Integer>> elemento_a_moles = getElementToMolesIn(adapted); // Se analiza la fórmula
+        Optional<Map<String, Integer>> elementToMoles = getElementToMolesIn(adapted); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 
-        if(elemento_a_moles.isPresent()) {
-            float masa_molecular = 0;
-            Map<String, Float> elemento_a_gramos = new HashMap<>();
+        if(elementToMoles.isPresent()) {
+            float molecularMass = 0;
+            Map<String, Float> elementToGrams = new HashMap<>();
 
             // Se calculan los gramos de cada elemento, siendo el total la masa molecular:
 
-            for(Map.Entry<String, Integer> elemento : elemento_a_moles.get().entrySet()) {
-                String simbolo = elemento.getKey();
+            for(Map.Entry<String, Integer> element : elementToMoles.get().entrySet()) {
+                String symbol = element.getKey();
 
-                Optional<Float> masa_elemento = getMolecularMassOf(simbolo);
+                Optional<Float> elementMolecularMass = getMolecularMassOf(symbol);
 
-                if(masa_elemento.isPresent()) {
-                    float gramos = elemento.getValue() * masa_elemento.get();
-                    elemento_a_gramos.put(simbolo, gramos);
+                if(elementMolecularMass.isPresent()) {
+                    float grams = element.getValue() * elementMolecularMass.get();
+                    elementToGrams.put(symbol, grams);
 
-                    masa_molecular += gramos;
+                    molecularMass += grams;
                 }
-                else return new MolecularMassResult("No se reconoce el elemento \"" + simbolo + "\".");
+                else return new MolecularMassResult("No se reconoce el elemento \"" + symbol + "\".");
             }
 
-            resultado = new MolecularMassResult(masa_molecular, elemento_a_gramos, elemento_a_moles.get());
+            resultado = new MolecularMassResult(molecularMass, elementToGrams, elementToMoles.get());
         }
         else return new MolecularMassResult("No se ha podido calcular la masa molecular.");
 

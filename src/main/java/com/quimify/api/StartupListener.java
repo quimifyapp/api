@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
-    InorganicService inorganicService; // Procesos de los compuestos inorgánicos
+    InorganicService inorganicService; // Inorganic compounds logic
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {

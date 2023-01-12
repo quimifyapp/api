@@ -1,0 +1,2 @@
+SELECT * FROM error
+ORDER BY id DESC;

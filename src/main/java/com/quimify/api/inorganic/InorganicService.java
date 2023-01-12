@@ -1,6 +1,7 @@
 package com.quimify.api.inorganic;
 
 import com.quimify.api.Normalized;
+import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.metrics.MetricsService;
@@ -27,19 +28,22 @@ class InorganicService {
     InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
-    MolecularMassService molecularMassService;
+    MolecularMassService molecularMassService; // Molecular masses logic
 
     @Autowired
-    SettingsService settingsService;
+    SettingsService settingsService; // Settings logic
 
     @Autowired
-    MetricsService metricsService;
+    ErrorService errorService; // API errors logic
+
+    @Autowired
+    MetricsService metricsService; // Daily metrics logic
 
     private static final List<InorganicSearchTagModel> searchTags = new ArrayList<>(); // For autocompletion
 
     protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Handy
 
-    // Administration ----------------------------------------------------------------
+    // Administration:
 
     public void refreshAutocompletion() {
         List<InorganicSearchTagModel> newSearchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
@@ -52,7 +56,7 @@ class InorganicService {
         logger.info("Inorganic search tags updated in memory.");
     }
 
-    // Client autocompletion ---------------------------------------------------------
+    // Client autocompletion:
 
     protected String autoComplete(String input) { // TODO clean code
         String completion = "";
@@ -82,7 +86,7 @@ class InorganicService {
 
                     return inorganicModel.get().getFormula(); // Formula or a search tag
                 }
-                else logger.error("La etiqueta en caché: \"" + searchTag.getNormalizedTag() + "\" no se encuentra.");
+                else errorService.saveError("Search tag not in DB", searchTag.getNormalizedTag(), this.getClass());
             }
 
         return completion;
@@ -97,7 +101,7 @@ class InorganicService {
         if (searchedInorganic.isPresent())
             inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
-            logger.error("La compleción: \"" + completion + "\" no se encuentra.");
+            errorService.saveError("Completion not in DB", completion, this.getClass());
             inorganicResult = notFoundInorganic;
         }
 
@@ -266,7 +270,7 @@ class InorganicService {
 
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Google ha devuelto HTTP 429.");
-            else logger.error("IOException al buscar \"" + input + "\" en Google: " + exception);
+            else errorService.saveError("IOException Google: " + input, exception.toString(), this.getClass());
         }
 
         return busqueda_web;
@@ -297,12 +301,12 @@ class InorganicService {
     
     // Flowchart #3
     private Optional<SearchResult> tryFreeBingSearch(String input) {
-        return tryBingSearch(input, settingsService.getBingGratisKey(), "gratis");
+        return tryBingSearch(input, settingsService.getBingGratisKey(), "free Bing");
     }
     
     // Flowchart #4
     private Optional<SearchResult> tryPaidBingSearch(String input) {
-        return tryBingSearch(input, settingsService.getBingPagoKey(), "pago");
+        return tryBingSearch(input, settingsService.getBingPagoKey(), "paid Bing");
     }
     
     // Flowchart #3, #4
@@ -315,12 +319,12 @@ class InorganicService {
             searchResult = Optional.empty();
 
             if (exception.toString().contains("HTTP response code: 403"))
-                logger.warn("Bing " + apiName + " ha devuelto HTTP 403.");
-            else logger.error("IOException al buscar \"" + input + "\" en Bing " + apiName + ": " + exception);
+                logger.warn(apiName + " ha devuelto HTTP 403.");
+            else errorService.saveError("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
         } catch (Exception exception) {
             searchResult = Optional.empty();
 
-            logger.error("Exception al buscar \"" + input + "\" en Bing " + apiName + ": " + exception);
+            errorService.saveError("Exception apiName: " + input, exception.toString(), this.getClass());
         }
 
         return searchResult;
@@ -361,20 +365,20 @@ class InorganicService {
             return Optional.empty();
 
         try {
-            Download conexion = new Download(address);
-            conexion.setProperty("User-Agent", settingsService.getUserAgent());
+            Download connection = new Download(address);
+            connection.setProperty("User-Agent", settingsService.getUserAgent());
 
-            FQPage fqPage = new FQPage(conexion.getText());
+            FQPage fqPage = new FQPage(connection.getText());
             InorganicModel parsedInorganic = fqPage.getParsedInorganic();
 
             if (parsedInorganic != null)
                 return Optional.of(parsedInorganic);
             else {
-                logger.error("No se pudo escanear la dirección \"" + address + "\".");
+                errorService.saveError("Couldn't parse FQ page", address, this.getClass());
                 return Optional.empty();
             }
         } catch (Exception exception) {
-            logger.error("Excepción al escanear la dirección \"" + address + "\": " + exception);
+            errorService.saveError("Exception parsing FQ page: " + address, exception.toString(), this.getClass());
             return Optional.empty();
         }
     }

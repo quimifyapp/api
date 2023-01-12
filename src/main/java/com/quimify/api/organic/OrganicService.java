@@ -1,5 +1,6 @@
 package com.quimify.api.organic;
 
+import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
@@ -23,10 +24,13 @@ class OrganicService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	MolecularMassService molecularMassService; // Procesos de las masas moleculares
+	MolecularMassService molecularMassService; // Molecular masses logic
 
 	@Autowired
-	MetricsService metricsService; // Procesos de las metricas diarias
+	ErrorService errorService; // API errors logic
+
+	@Autowired
+	MetricsService metricsService; // Daily metrics logic
 
 	protected static final int carbonInputCode = -1;
 
@@ -54,16 +58,18 @@ class OrganicService {
 			OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
 
 			if(organicResult.getPresent())
-				organicResult.setMolecularMass(
-						molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
+				organicResult.setMolecularMass(molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
 
 			metricsService.contarNombrarOrganicoAbiertoBuscado();
 
 			return organicResult;
 		}
 		catch (Exception exception) {
+			String sequenceToString = Arrays.toString(inputSequence);
+			errorService.saveError("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
+
 			metricsService.countOrganicsFailedFromStructure();
-			logger.error("Excepción al nombrar " + Arrays.toString(inputSequence) + ": " + exception + ".");
+
 			return OrganicFactory.organicNotFound;
 		}
 	}

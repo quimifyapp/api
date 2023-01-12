@@ -1,7 +1,6 @@
 package com.quimify.api.inorganic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.quimify.api.error.ErrorService;
 
 import java.text.NumberFormat;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
 
 class FQPage {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    ErrorService errorService; // API errors logic
 
     private final static Map<String, String> namingMistakeToCorrection = Map.of(
             " (", "(", // I.e.: "hierro (II)" -> "hierro(II)"
@@ -47,7 +46,7 @@ class FQPage {
 
             parseAndSetProperties();
         }
-        else logger.error("La siguiente página de FQ no tiene <h1>: " + htmlDocument);
+        else errorService.saveError("Couldn't find <h1> tag", htmlDocument, this.getClass());
     }
 
     // Steps:

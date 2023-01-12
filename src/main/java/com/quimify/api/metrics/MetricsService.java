@@ -6,16 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
-import java.time.temporal.TemporalAmount;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
 // Esta clase procesa las métricas diarias.
 
 @Service
-public
-class MetricsService {
+public class MetricsService {
 
     @Autowired
     MetricsRepository metricsRepository; // Conexión con la DB
@@ -23,7 +20,7 @@ class MetricsService {
     // Day starts at 13:00 of Spain and 07:00 of Bolivia
     private static final Duration offSet = Duration.ofHours(-13);
 
-    // PRIVADOS ----------------------------------------------------------------------
+    // Private:
 
     private MetricsModel getTodayMetrics() {
         MetricsModel todayMetrics;
@@ -39,7 +36,7 @@ class MetricsService {
         return todayMetrics;
     }
 
-    // PÚBLICOS ----------------------------------------------------------------------
+    // Queries:
 
     public Integer getBusquedasGoogle() {
         MetricsModel metricas = getTodayMetrics();
@@ -52,7 +49,7 @@ class MetricsService {
         return getTodayMetrics().getPaidBingQueries();
     }
 
-    // Contadores:
+    // Counters:
 
     @Transactional
     public void contarAcceso(Short platform) {
@@ -127,13 +124,13 @@ class MetricsService {
     }
 
     @Transactional
-    public void contarFormularOrganico(boolean encontrado, boolean foto) {
-        if (encontrado) {
-            if (foto)
+    public void contarFormularOrganico(boolean found, boolean picture) {
+        if (found) {
+            if (picture)
                 getTodayMetrics().nuevoFormularOrganicoFotoEncontrado();
             else getTodayMetrics().nuevoFormularOrganicoTecladoEncontrado();
         } else {
-            if (foto)
+            if (picture)
                 getTodayMetrics().nuevoFormularOrganicoFotoNoEncontrado();
             else getTodayMetrics().nuevoFormularOrganicoTecladoNoEncontrado();
         }
@@ -150,15 +147,20 @@ class MetricsService {
     }
 
     @Transactional
-    public void contarMasaMolecular(boolean encontrado) {
-        if(encontrado)
+    public void countMolecularMass(boolean found) {
+        if(found)
             getTodayMetrics().nuevoMasaMolecularEncontrado();
         else getTodayMetrics().nuevoMasaMolecularNoEncontrado();
     }
 
     @Transactional
-    public void contarReporte() {
-        getTodayMetrics().nuevoReporte();
+    public void countErrorOccurred() {
+        getTodayMetrics().countErrorOccurred();
+    }
+
+    @Transactional
+    public void countReportSent() {
+        getTodayMetrics().countReportSent();
     }
 
 }
