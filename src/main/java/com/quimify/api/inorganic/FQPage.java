@@ -76,19 +76,19 @@ class FQPage {
 
     private void parseAndSetNames() {
         int index = indexAfterIn("sistemática:</b>", htmlDocument);
-        if (index != -1)
-            parsedInorganic.setSystematicName(parseName(index));
+        parsedInorganic.setSystematicName(parseName(index));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
-        if (index != -1)
-            parsedInorganic.setStockName(parseName(index));
+        parsedInorganic.setStockName(parseName(index));
 
         index = indexAfterIn("tradicional:</b>", htmlDocument);
-        if (index != -1)
-            parsedInorganic.setTraditionalName(parseName(index));
+        parsedInorganic.setTraditionalName(parseName(index));
     }
 
     private String parseName(int index) {
+        if (index == -1)
+            return null;
+
         String name = htmlDocument.substring(index + 1);
         name = name.substring(0, indexAfterIn("</p>", name) - 4);
 
