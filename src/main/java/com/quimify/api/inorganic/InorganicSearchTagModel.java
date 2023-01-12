@@ -2,6 +2,7 @@ package com.quimify.api.inorganic;
 import com.quimify.api.Normalized;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 // Esta clase representa una de las etiquetas de un elemento inorgánico.
 
@@ -25,7 +26,27 @@ class InorganicSearchTagModel {
         this.normalizedTag = Normalized.of(tag);
     }
 
-    protected InorganicSearchTagModel() {}
+    protected InorganicSearchTagModel() {} // Needed by JPA
+
+    // Queries:
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || getClass() != other.getClass())
+            return false;
+
+        InorganicSearchTagModel otherInorganicSearchTag = (InorganicSearchTagModel) other;
+
+        if(!Objects.equals(id, otherInorganicSearchTag.id))
+            return false;
+
+        return normalizedTag.contentEquals(otherInorganicSearchTag.normalizedTag);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, normalizedTag);
+    }
 
     // Getters y setters:
 
