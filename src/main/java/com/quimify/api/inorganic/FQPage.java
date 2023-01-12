@@ -42,7 +42,7 @@ class FQPage {
             parseAndSetFormula();
             parseAndSetNames();
             setSearchTags();
-            makeCorrections(); // Might update search tags
+            fixNomenclatureMistakes(); // Might update search tags
 
             parseAndSetProperties();
         }
@@ -115,7 +115,7 @@ class FQPage {
         }
     }
 
-    private void makeCorrections() {
+    private void fixNomenclatureMistakes() {
         correctPeroxide();
         correctNames();
     }
@@ -174,16 +174,16 @@ class FQPage {
         index = indexAfterIn("g", molecularMass);
 
         if (index == -1)
-            return null; // No unit
+            return null; // Unit not found ("g")
 
-        molecularMass = molecularMass.substring(0, index - 1);
+        molecularMass = molecularMass.substring(0, index - 1); // TODO fix hardcoded 1
 
         molecularMass = molecularMass.replace(" ", "").replace(",", ".");
-        molecularMass = molecularMass.replace("a", "-"); // Otro formato de intervalo
-        molecularMass = soloNumeros(molecularMass);
-        molecularMass = primeroDelIntervalo(molecularMass);
+        molecularMass = molecularMass.replace("a", "-"); // Other interval format
+        molecularMass = onlyDigits(molecularMass);
+        molecularMass = firstInInterval(molecularMass);
 
-        molecularMass = truncarDosDecimales(molecularMass);
+        molecularMass = truncateToTwoDecimalPlaces(molecularMass); // Trailing zeros are kept
 
         return molecularMass;
     }
@@ -205,19 +205,19 @@ class FQPage {
         if (index == -1)
             index = indexAfterIn("º", temperature); // Similar yet different character
 
-        if (index == -1)
-            return null; // No degree symbol
+        if (index == -1) // TODO fix repeated code from here?
+            return null; // Unit not found ("°C" or "ºC" not identical)
 
-        temperature = temperature.substring(0, index - 1);
+        temperature = temperature.substring(0, index - 1); // TODO fix hardcoded 1
 
         temperature = temperature.replace(" ", "").replace(",", ".");
-        temperature = temperature.replace("a", "-"); // Otro formato de intervalo
-        temperature = soloNumeros(temperature);
-        temperature = primeroDelIntervalo(temperature);
+        temperature = temperature.replace("a", "-"); // Other interval format
+        temperature = onlyDigits(temperature);
+        temperature = firstInInterval(temperature);
         temperature = String.valueOf(273.15 + Float.parseFloat(temperature));
 
-        temperature = truncarDosDecimales(temperature);
-        temperature = quitarCerosDecimalesALaDerecha(temperature);
+        temperature = truncateToTwoDecimalPlaces(temperature);
+        temperature = removeTrailingZeros(temperature);
 
         return temperature;
     }
@@ -233,22 +233,23 @@ class FQPage {
         density = density.substring(0, indexAfterIn("</", density) - 2);
 
         indice = indexAfterIn("g", density);
+
         if (indice == -1)
-            return null; // No unit ("g", "Kg", "kg")
+            return null; // Unit not found ("g", "Kg", "kg")
 
         boolean inKilograms;
         if (density.charAt(indice - 2) == 'k' || density.charAt(indice - 2) == 'K') {
-            density = density.substring(0, indice - 2);
+            density = density.substring(0, indice - 2); // TODO fix hardcoded 2
             inKilograms = true;
         } else {
-            density = density.substring(0, indice - 1);
+            density = density.substring(0, indice - 1); // TODO fix hardcoded 1
             inKilograms = false;
         }
 
         density = density.replace(" ", "").replace(",", ".");
-        density = density.replace("a", "-"); // Otro formato de intervalo
-        density = soloNumeros(density);
-        density = primeroDelIntervalo(density);
+        density = density.replace("a", "-"); // Other interval format
+        density = onlyDigits(density);
+        density = firstInInterval(density);
 
         if (inKilograms) {
             float densityValue = Float.parseFloat(density);
@@ -259,84 +260,72 @@ class FQPage {
             numberFormat.setMaximumFractionDigits(6);
             density = numberFormat.format(densityValue).replace(",", ".");
 
-            density = tresDecimalesSignificativos(density);
+            density = truncateToThreeSignificantDecimalPlaces(density);
         }
 
-        density = quitarCerosDecimalesALaDerecha(density);
+        density = removeTrailingZeros(density);
 
         return density;
     }
 
-    // Utilities: // TODO use regex
+    // Utilities:
 
     private int indexAfterIn(String substring, String string) {
         int index = string.indexOf(substring);
         return index != -1 ? index + substring.length() : index;
     }
 
-    // Ej.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
-    private String soloNumeros(String dato) {
-        StringBuilder resultado = new StringBuilder();
-
-        for(int i = 0; i < dato.length(); i++)
-            if(esNumero(dato.charAt(i)))
-                resultado.append(dato.charAt(i));
-
-        return resultado.toString();
+    // I.e.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
+    private String onlyDigits(String data) {
+        // Dashes and decimal points too
+        return data.replaceAll("/[^\\d-.]", "");
     }
 
-    private static boolean esNumero(char c) {
-        return (c >= '0' && c <= '9') || c == '-' || c == '.'; // Signo negativo y punto decimal
+    // I.e.: "-12.104 - 13.27" -> "12.104"
+    // I.e.: "-12.104" -> "12.104"
+    private String firstInInterval(String interval) {
+        interval = interval.trim(); // Leading and trailing spaces removed
+
+        if(interval.substring(1).contains("-")) // First dash might be a negative symbol
+            interval = interval.split("-", 2)[0];
+
+        return interval;
     }
 
-    // Ej.: "12.104 - 13.2 ºC" -> "12.104"
-    // Ej.: "12.104 a 13.2 ºC" -> "12.104"
-    private String primeroDelIntervalo(String dato) {
-        String resultado;
+    // I.e.: "14.457 -> 14.45"
+    private String truncateToTwoDecimalPlaces(String number) {
+        int decimalPointIndex = indexAfterIn(".", number);
 
-        dato = dato.trim();
-        if(indexAfterIn("-", dato.substring(1)) != -1) // Por si es el signo negativo
-            resultado = dato.split("-", 2)[0];
-        else resultado = dato;
+        if (decimalPointIndex == -1)
+            return number;
 
-        return resultado;
+        decimalPointIndex += 2;
+
+        if(number.length() > decimalPointIndex) // There are more than two decimals places
+            number = number.substring(0, decimalPointIndex);
+
+        return number;
     }
 
-    // Ej.: "13.450" -> "13.45"
-    // Ej.: "6.000" -> "6"
-    private String quitarCerosDecimalesALaDerecha(String numero) {
-        if(indexAfterIn(".", numero) != -1)
-            while (numero.charAt(numero.length() - 1) == '0')
-                numero = numero.substring(0, numero.length() - 1);
-
-        if(numero.charAt(numero.length() - 1) == '.') // Por si se queda el punto suelto
-            numero = numero.substring(0, numero.length() - 1);
-
-        return numero;
+    // I.e.: "13.450" -> "13.45"
+    // I.e.: "6.0" -> "6"
+    private String removeTrailingZeros(String number) {
+        return number.replaceAll("\\.?0+$", ""); // Possible dangling point too
     }
 
-    // Ej.: "14.457 -> 14.45"
-    private String truncarDosDecimales(String numero) {
-        int punto = indexAfterIn(".", numero);
-        if(punto != -1) {
-            punto += 2;
-            if(numero.length() > punto) // Hay más de dos decimales
-                numero = numero.substring(0, punto);
-        }
+    // I.e.: "X.000ABCD" -> "X.000ABC"
+    private String truncateToThreeSignificantDecimalPlaces(String number) {
+        int decimalPointIndex = indexAfterIn(".", number);
 
-        return numero;
-    }
+        if (decimalPointIndex == -1)
+            return number;
+        
+        for(int i = decimalPointIndex, significantCount = 0; i < number.length() && significantCount < 3; i++)
+            if(number.charAt(i) != '0')
+                if(++significantCount == 3)
+                    number = number.substring(0, i + 1);
 
-    // Ej.: "X.000ABCD" -> "X.000ABC"
-    private String tresDecimalesSignificativos(String numero) {
-        int punto = indexAfterIn(".", numero);
-        if(punto != -1)
-            for(int i = punto, decimales_significativos = 0; i < numero.length() && decimales_significativos < 3; i++)
-                if(numero.charAt(i) != '0')
-                    if(++decimales_significativos == 3)
-                        numero = numero.substring(0, i + 1);
-
-        return numero;
+        return number;
     }
 
     // Getter:
