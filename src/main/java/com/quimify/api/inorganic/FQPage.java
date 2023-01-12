@@ -13,6 +13,7 @@ class FQPage {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final static Map<String, String> namingMistakeToCorrection = Map.of(
+            " (", "(", // I.e.: "hierro (II)" -> "hierro(II)"
             "iuro", "uro", // I.e.: "antimoniuro", "arseniuro", "seleniuro" -> "antimonuro"...
             "iato", "ato", // I.e.: "arseniato", "antimoniato" -> "arsenato"...
             "teleruro", "telururo", // Common mistake
@@ -95,8 +96,6 @@ class FQPage {
         if(name.contains("br/>"))
             name = name.replace("br/>", "");
 
-        name = name.toLowerCase(); // Needed sometimes
-
         return name;
     }
 
@@ -140,7 +139,7 @@ class FQPage {
         if(name == null)
             return null;
 
-        name = name.replaceAll(" \\(", "("); // " (II)" -> "(II)", common mistake
+        // TODO uppercase but not between parentheses
 
         for(String namingMistake : namingMistakeToCorrection.keySet())
             if (name.contains(namingMistake)) {
