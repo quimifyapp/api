@@ -95,6 +95,8 @@ class FQPage {
         if(name.contains("br/>"))
             name = name.replace("br/>", "");
 
+        name = name.toLowerCase(); // Needed sometimes
+
         return name;
     }
 

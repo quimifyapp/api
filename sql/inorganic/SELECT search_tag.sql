@@ -3,6 +3,6 @@ FROM inorganic_search_tag
 INNER JOIN inorganic
 ON inorganic_search_tag.inorganic_id = inorganic.id
 
-# WHERE normalized_tag = "pentano"
-# WHERE inorganic_id = 283
+# WHERE normalized_tag LIKE "%telururo%"
+# WHERE inorganic_id = 340
 ORDER BY id DESC
