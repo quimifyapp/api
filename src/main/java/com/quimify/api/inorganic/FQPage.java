@@ -206,7 +206,7 @@ class FQPage {
             index = indexAfterIn("º", temperature); // Similar yet different character
 
         if (index == -1) // TODO fix repeated code from here?
-            return null; // Unit not found ("°C" or "ºC" not identical)
+            return null; // Unit not found ("°C" or "ºC", not identical)
 
         temperature = temperature.substring(0, index - 1); // TODO fix hardcoded 1
 
@@ -218,6 +218,8 @@ class FQPage {
 
         temperature = truncateToTwoDecimalPlaces(temperature);
         temperature = removeTrailingZeros(temperature);
+
+        temperature = temperature.replaceAll("\\.15$", ""); // It didn't include decimals in Celsius
 
         return temperature;
     }
