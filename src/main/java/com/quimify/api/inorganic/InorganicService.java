@@ -360,7 +360,8 @@ class InorganicService {
     // Flowchart #5
     private Optional<InorganicModel> tryParseFQ(String url) {
         try {
-            return Optional.ofNullable(inorganicPageComponent.parseInorganic(url, settingsService.getUserAgent()));
+            InorganicModel parsedInorganic = inorganicPageComponent.parseInorganic(url);
+            return Optional.ofNullable(parsedInorganic);
         } catch (Exception exception) {
             errorService.saveError("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
             return Optional.empty();

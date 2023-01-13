@@ -1,6 +1,7 @@
 package com.quimify.api.inorganic;
 
 import com.quimify.api.error.ErrorService;
+import com.quimify.api.settings.SettingsService;
 import com.quimify.utils.Download;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,9 @@ import java.util.Set;
 
 @Component
 class InorganicPageComponent {
+
+    @Autowired
+    SettingsService settingsService; // Settings logic
 
     @Autowired
     ErrorService errorService; // API errors logic
@@ -43,7 +47,7 @@ class InorganicPageComponent {
 
     // Internal:
 
-    protected InorganicModel parseInorganic(String url, String userAgent) throws IOException {
+    protected InorganicModel parseInorganic(String url) throws IOException {
         if(!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 
@@ -51,7 +55,7 @@ class InorganicPageComponent {
             throw new IllegalArgumentException("Invalid subdirectory.");
 
         Download connection = new Download(url);
-        connection.setProperty("User-Agent", userAgent);
+        connection.setProperty("User-Agent", settingsService.getUserAgent());
 
         String htmlDocument = connection.getText();
 
