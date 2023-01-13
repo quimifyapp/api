@@ -1,2 +1,1 @@
-![organica.png](doc/organica.png?raw=true "Flowchart")
-![buscar.png](doc/buscar.png?raw=true "Flowchart")
+![inorganic.png](doc/inorganic.png?raw=true "Flowchart")
