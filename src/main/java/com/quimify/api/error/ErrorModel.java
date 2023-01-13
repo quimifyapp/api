@@ -18,8 +18,11 @@ class ErrorModel {
     private Timestamp dateAndTime;
     @Column(nullable = false)
     private String title;
+
+    @Lob // Large objects
     @Column(nullable = false)
     private String details;
+
     @Column(nullable = false)
     private String location;
 
