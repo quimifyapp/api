@@ -45,10 +45,7 @@ class InorganicService {
     private static final List<InorganicSearchTagModel> searchTags = new ArrayList<>(); // For autocompletion
 
     protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Handy
-public void foo() {
-    tryParseFQ("https://www.formulacionquimica.com/H2O2/");
-    tryParseFQ("https://www.formulacionquimica.com/BaO2/");
-}
+
     // Administration:
 
     public void refreshAutocompletion() {

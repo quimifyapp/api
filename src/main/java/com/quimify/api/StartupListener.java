@@ -19,7 +19,6 @@ class StartupListener implements ApplicationListener<ApplicationReadyEvent> {
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         inorganicService.refreshAutocompletion();
-        inorganicService.foo();
     }
 
 }
