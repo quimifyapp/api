@@ -18,6 +18,8 @@ class InorganicPageComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
+    // Constants:
+
     private final static String fqUrl = "https://www.formulacionquimica.com/";
 
     private final static Set<String> invalidSubdirectories = Set.of(
@@ -38,6 +40,8 @@ class InorganicPageComponent {
             "arsonio", "arsanio", // Common mistake
             "estibonio", "estibanio" // Common mistake
     );
+
+    // Internal:
 
     protected InorganicModel parseInorganic(String url, String userAgent) throws IOException {
         if(!url.contains(fqUrl))
