@@ -28,6 +28,9 @@ class InorganicService {
     InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
+    InorganicPageComponent inorganicPageComponent; // Inorganic web pages logic
+
+    @Autowired
     MolecularMassService molecularMassService; // Molecular masses logic
 
     @Autowired
@@ -42,7 +45,10 @@ class InorganicService {
     private static final List<InorganicSearchTagModel> searchTags = new ArrayList<>(); // For autocompletion
 
     protected static final InorganicResult notFoundInorganic = new InorganicResult(); // Handy
-
+public void foo() {
+    tryParseFQ("https://www.formulacionquimica.com/H2O2/");
+    tryParseFQ("https://www.formulacionquimica.com/BaO2/");
+}
     // Administration:
 
     public void refreshAutocompletion() {
@@ -261,35 +267,35 @@ class InorganicService {
 
     // Flowchart #2
     private Optional<SearchResult> tryGoogleSearch(String input) {
-        Optional<SearchResult> busqueda_web;
+        Optional<SearchResult> searchResult;
 
         try {
-            busqueda_web = Optional.of(googleSearch(input));
+            searchResult = Optional.of(googleSearch(input));
         } catch (Exception exception) {
-            busqueda_web = Optional.empty();
+            searchResult = Optional.empty();
 
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Google ha devuelto HTTP 429.");
             else errorService.saveError("IOException Google: " + input, exception.toString(), this.getClass());
         }
 
-        return busqueda_web;
+        return searchResult;
     }
 
     // Flowchart #2
     private SearchResult googleSearch(String input) throws Exception {
         SearchResult searchResult = new SearchResult();
 
-        Download conexion = new Download(settingsService.getGoogleURL(), input);
-        conexion.setProperty("Accept", "application/json");
-        JSONObject respuesta = new JSONObject(conexion.getText());
+        Download connection = new Download(settingsService.getGoogleURL(), input);
+        connection.setProperty("Accept", "application/json");
+        JSONObject response = new JSONObject(connection.getText());
 
-        if (respuesta.getJSONObject("searchInformation").getInt("totalResults") > 0) {
-            JSONObject resultado = respuesta.getJSONArray("items").getJSONObject(0);
+        if (response.getJSONObject("searchInformation").getInt("totalResults") > 0) {
+            JSONObject result = response.getJSONArray("items").getJSONObject(0);
 
             searchResult.found = true;
-            searchResult.title = resultado.getString("title");
-            searchResult.address = resultado.getString("formattedUrl"); // "www.fq.com/..."
+            searchResult.title = result.getString("title");
+            searchResult.address = result.getString("formattedUrl"); // "www.fq.com/..."
         } else {
             searchResult.found = false;
 
@@ -355,30 +361,11 @@ class InorganicService {
     }
 
     // Flowchart #5
-    private Optional<InorganicModel> tryParseFQ(String address) {
-        // FQ subdirectories that are NOT compounds:
-        if (address.matches("^.*?(acidos-carboxilicos|alcanos|alcoholes|aldehidos|alquenos|alquinos|amidas|" +
-                "aminas|anhidridos|anhidridos-organicos|aromaticos|buscador|cetonas|cicloalquenos|ejemplos|" +
-                "ejercicios|eteres|halogenuros|hidracidos|hidroxidos|hidruros|hidruros-volatiles|inorganica|" +
-                "nitrilos|organica|oxidos|oxisales|oxoacidos|peroxidos|politica-privacidad|sales-neutras|" +
-                "sales-volatiles).*$") || address.matches("^.*?(.com)/?$"))
-            return Optional.empty();
-
+    private Optional<InorganicModel> tryParseFQ(String url) {
         try {
-            Download connection = new Download(address);
-            connection.setProperty("User-Agent", settingsService.getUserAgent());
-
-            FQPage fqPage = new FQPage(connection.getText());
-            InorganicModel parsedInorganic = fqPage.getParsedInorganic();
-
-            if (parsedInorganic != null)
-                return Optional.of(parsedInorganic);
-            else {
-                errorService.saveError("Couldn't parse FQ page", address, this.getClass());
-                return Optional.empty();
-            }
+            return Optional.ofNullable(inorganicPageComponent.parseInorganic(url, settingsService.getUserAgent()));
         } catch (Exception exception) {
-            errorService.saveError("Exception parsing FQ page: " + address, exception.toString(), this.getClass());
+            errorService.saveError("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
             return Optional.empty();
         }
     }

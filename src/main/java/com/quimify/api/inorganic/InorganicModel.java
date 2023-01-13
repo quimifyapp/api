@@ -67,7 +67,8 @@ class InorganicModel {
     public String toString() {
         List<String> words = new ArrayList<>();
 
-        words.add(String.valueOf(id));
+        if(id != null)
+            words.add(id.toString());
 
         words.add(formula);
 

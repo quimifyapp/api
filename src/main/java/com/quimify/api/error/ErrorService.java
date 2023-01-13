@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 // This class implements API errors logic.
 
@@ -27,7 +28,7 @@ class ErrorService {
     public void saveError(String title, String details, Class<?> location) {
         ErrorModel errorModel = new ErrorModel();
 
-        errorModel.setDateAndTime(new Timestamp(System.currentTimeMillis()));
+        errorModel.setDateAndTime(Timestamp.from(Instant.now()));
         errorModel.setTitle(title);
         errorModel.setDetails(details);
         errorModel.setLocation(location.getName());
@@ -36,9 +37,8 @@ class ErrorService {
             errorRepository.save(errorModel);
             LoggerFactory.getLogger(location).error(title + ". Details saved in database.");
         } catch (Exception exception) {
-            logger.error("Exception saving error in DB. " + "Location: " + location + ". " +
-                    "Exception: \"" + exception + "\". " + "Title: \"" + title + "\". " +
-                    "Details: \"" + details + "\". ");
+            logger.error("Exception saving error in DB. " + "Location: " + location + ". " + "Exception: \"" +
+                    exception + "\". " + "Title: \"" + title + "\". " + "Details: \"" + details + "\". ");
         }
 
         metricsService.countErrorOccurred();

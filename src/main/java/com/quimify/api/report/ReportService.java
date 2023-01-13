@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 // Esta clase procesa los compuestos reportes del cliente.
 
@@ -22,7 +23,7 @@ class ReportService {
     protected void saveReport(String title, String details, Integer version) {
         ReportModel reportModel = new ReportModel();
 
-        reportModel.setDateAndTime(new Timestamp(System.currentTimeMillis()));
+        reportModel.setDateAndTime(Timestamp.from(Instant.now()));
         reportModel.setTitle(title);
         reportModel.setDetails(details);
         reportModel.setClientVersion(version);

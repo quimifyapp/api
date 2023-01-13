@@ -1,15 +1,32 @@
 package com.quimify.api.inorganic;
 
 import com.quimify.api.error.ErrorService;
+import com.quimify.utils.Download;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Map;
+import java.util.Set;
 
 // This class parses inorganic compounds from FQ.com web pages.
 
-class FQPage {
+@Component
+class InorganicPageComponent {
 
+    @Autowired
     ErrorService errorService; // API errors logic
+
+    private final static String fqUrl = "https://www.formulacionquimica.com/";
+
+    private final static Set<String> invalidSubdirectories = Set.of(
+            ".com/", "acidos-carboxilicos/", "alcanos/", "alcoholes/", "aldehidos/", "alquenos/", "alquinos/",
+            "amidas/", "aminas/", "anhidridos/", "anhidridos-organicos/", "aromaticos/", "buscador/", "cetonas/",
+            "cicloalquenos/", "ejemplos/", "ejercicios/", "esteres/", "eteres/", "halogenuros/", "hidracidos/",
+            "hidroxidos/", "hidruros/", "hidruros-volatiles/", "inorganica/", "nitrilos/", "organica/", "oxidos/",
+            "oxisales/", "oxoacidos/", "peroxidos/", "politica-privacidad/", "sales-neutras/", "sales-volatiles/"
+    );
 
     private final static Map<String, String> namingMistakeToCorrection = Map.of(
             " (", "(", // I.e.: "hierro (II)" -> "hierro(II)"
@@ -22,36 +39,40 @@ class FQPage {
             "estibonio", "estibanio" // Common mistake
     );
 
-    private InorganicModel parsedInorganic;
+    protected InorganicModel parseInorganic(String url, String userAgent) throws IOException {
+        if(!url.contains(fqUrl))
+            throw new IllegalArgumentException("Not a FQ address.");
 
-    private String htmlDocument;
+        if(invalidSubdirectories.stream().anyMatch(url::endsWith))
+            throw new IllegalArgumentException("Invalid subdirectory.");
 
-    // Constructor:
+        Download connection = new Download(url);
+        connection.setProperty("User-Agent", userAgent);
 
-    // Flowchart #5
-    protected FQPage(String htmlDocument) {
-        this.htmlDocument = htmlDocument;
+        String htmlDocument = connection.getText();
 
         int index = indexAfterIn("<h1>", htmlDocument);
 
-        if(index != -1) {
-            this.htmlDocument = htmlDocument.substring(index); // Removes metadata
+        if (index == -1)
+            throw new IllegalStateException("Couldn't find <h1> tag in HTML document.");
 
-            parsedInorganic = new InorganicModel();
+        htmlDocument = htmlDocument.substring(index); // Removes metadata
 
-            parseAndSetFormula();
-            parseAndSetNames();
-            setSearchTags();
-            fixNomenclatureMistakes(); // Might update search tags
+        InorganicModel parsedInorganic = new InorganicModel();
 
-            parseAndSetProperties();
-        }
-        else errorService.saveError("Couldn't find <h1> tag", htmlDocument, this.getClass());
+        parseAndSetFormula(parsedInorganic, htmlDocument);
+        parseAndSetNames(parsedInorganic, htmlDocument);
+        parseAndSetProperties(parsedInorganic, htmlDocument);
+
+        setSearchTags(parsedInorganic);
+        fixNomenclatureMistakes(parsedInorganic); // Might update search tags
+
+        return parsedInorganic;
     }
 
     // Steps:
 
-    private void parseAndSetFormula() {
+    private void parseAndSetFormula(InorganicModel inorganicModel, String htmlDocument) {
         String formula;
 
         int index = indexAfterIn("/", htmlDocument);
@@ -70,21 +91,21 @@ class FQPage {
         }
         else formula = htmlDocument.substring(0, index - 2); // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
 
-        parsedInorganic.setFormula(formula);
+        inorganicModel.setFormula(formula);
     }
 
-    private void parseAndSetNames() {
+    private void parseAndSetNames(InorganicModel inorganicModel, String htmlDocument) {
         int index = indexAfterIn("sistemática:</b>", htmlDocument);
-        parsedInorganic.setSystematicName(parseName(index));
+        inorganicModel.setSystematicName(parseName(htmlDocument, index));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
-        parsedInorganic.setStockName(parseName(index));
+        inorganicModel.setStockName(parseName(htmlDocument, index));
 
         index = indexAfterIn("tradicional:</b>", htmlDocument);
-        parsedInorganic.setTraditionalName(parseName(index));
+        inorganicModel.setTraditionalName(parseName(htmlDocument, index));
     }
 
-    private String parseName(int index) {
+    private String parseName(String htmlDocument, int index) {
         if (index == -1)
             return null;
 
@@ -98,43 +119,44 @@ class FQPage {
         return name;
     }
 
-    private void setSearchTags() {
-        parsedInorganic.addSearchTagOf(parsedInorganic.getFormula());
+    private void setSearchTags(InorganicModel inorganicModel) {
+        inorganicModel.addSearchTagOf(inorganicModel.getFormula());
 
-        setNameSearchTag(parsedInorganic.getStockName());
-        setNameSearchTag(parsedInorganic.getSystematicName());
-        setNameSearchTag(parsedInorganic.getTraditionalName());
+        setNameSearchTag(inorganicModel, inorganicModel.getStockName());
+        setNameSearchTag(inorganicModel, inorganicModel.getSystematicName());
+        setNameSearchTag(inorganicModel, inorganicModel.getTraditionalName());
     }
 
-    private void setNameSearchTag(String name) {
+    private void setNameSearchTag(InorganicModel inorganicModel, String name) {
         if(name != null) {
-            parsedInorganic.addSearchTagOf(name);
+            inorganicModel.addSearchTagOf(name);
 
             if (name.contains("ácido"))
-                parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
+                inorganicModel.addSearchTagOf(name.replace("ácido ", ""));
         }
     }
 
-    private void fixNomenclatureMistakes() {
-        correctPeroxide();
-        correctNames();
+    private void fixNomenclatureMistakes(InorganicModel inorganicModel) {
+        if (inorganicModel.toString().contains("peróxido")) // Any of its names
+            correctPeroxide(inorganicModel);
+
+        correctNames(inorganicModel);
     }
 
-    private void correctPeroxide() {
-        if (parsedInorganic.getSystematicName() != null && parsedInorganic.getSystematicName().contains("peróxido")) {
-            parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
-            parsedInorganic.setSystematicName(null); // Systematic names for peroxides NEVER include that word
-            // TODO flag manual correction needed
-        }
+    private void correctPeroxide(InorganicModel inorganicModel) {
+        inorganicModel.setFormula(inorganicModel.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
+        inorganicModel.setSystematicName(null); // Systematic names for peroxides NEVER include that word
+
+        errorService.saveError("Peroxide needs manual correction", inorganicModel.toString(), this.getClass());
     }
 
-    private void correctNames() {
-        parsedInorganic.setStockName(correctName(parsedInorganic.getStockName()));
-        parsedInorganic.setSystematicName(correctName(parsedInorganic.getSystematicName()));
-        parsedInorganic.setTraditionalName(correctName(parsedInorganic.getTraditionalName()));
+    private void correctNames(InorganicModel inorganicModel) {
+        inorganicModel.setStockName(correctName(inorganicModel, inorganicModel.getStockName()));
+        inorganicModel.setSystematicName(correctName(inorganicModel, inorganicModel.getSystematicName()));
+        inorganicModel.setTraditionalName(correctName(inorganicModel, inorganicModel.getTraditionalName()));
     }
 
-    private String correctName(String name) {
+    private String correctName(InorganicModel inorganicModel, String name) {
         if(name == null)
             return null;
 
@@ -143,20 +165,20 @@ class FQPage {
         for(String namingMistake : namingMistakeToCorrection.keySet())
             if (name.contains(namingMistake)) {
                 name = name.replace(namingMistake, namingMistakeToCorrection.get(namingMistake));
-                setNameSearchTag(name);
+                setNameSearchTag(inorganicModel, name);
             }
 
         return name;
     }
 
-    private void parseAndSetProperties() {
-        parsedInorganic.setMolecularMass(parseMolecularMass());
-        parsedInorganic.setDensity(parseDensity());
-        parsedInorganic.setMeltingPoint(parseTemperature("fusión"));
-        parsedInorganic.setBoilingPoint(parseTemperature("ebullición"));
+    private void parseAndSetProperties(InorganicModel inorganicModel, String htmlDocument) {
+        inorganicModel.setMolecularMass(parseMolecularMass(htmlDocument));
+        inorganicModel.setDensity(parseDensity(htmlDocument));
+        inorganicModel.setMeltingPoint(parseTemperature(htmlDocument, "fusión"));
+        inorganicModel.setBoilingPoint(parseTemperature(htmlDocument, "ebullición"));
     }
 
-    private String parseMolecularMass() {
+    private String parseMolecularMass(String htmlDocument) {
         String molecularMass;
 
         int index = indexAfterIn("Masa molar:", htmlDocument);
@@ -188,7 +210,7 @@ class FQPage {
         return molecularMass;
     }
 
-    private String parseTemperature(String temperatureLabel) {
+    private String parseTemperature(String htmlDocument, String temperatureLabel) {
         String temperature;
 
         int index = indexAfterIn("Punto de " + temperatureLabel + ":", htmlDocument);
@@ -224,7 +246,7 @@ class FQPage {
         return temperature;
     }
 
-    private String parseDensity() {
+    private String parseDensity(String htmlDocument) {
         String density;
 
         int indice = indexAfterIn("Densidad:", htmlDocument);
@@ -322,19 +344,13 @@ class FQPage {
 
         if (decimalPointIndex == -1)
             return number;
-        
+
         for(int i = decimalPointIndex, significantCount = 0; i < number.length() && significantCount < 3; i++)
             if(number.charAt(i) != '0')
                 if(++significantCount == 3)
                     number = number.substring(0, i + 1);
 
         return number;
-    }
-
-    // Getter:
-
-    protected InorganicModel getParsedInorganic() {
-        return parsedInorganic;
     }
 
 }
