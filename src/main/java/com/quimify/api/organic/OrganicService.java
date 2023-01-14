@@ -34,7 +34,7 @@ class OrganicService {
 
 	protected static final int carbonInputCode = -1;
 
-	// CLIENT ------------------------------------------------------------------------
+	// Client:
 
 	protected OrganicResult getFromName(String name, Boolean picture) {
 		OrganicResult organicResult = OrganicFactory.getFromName(name);
@@ -74,8 +74,6 @@ class OrganicService {
 		}
 	}
 
-	// -------------------------------------------------------------------------------
-
 	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
 		OpenChain openChain = new Simple();
 
@@ -87,13 +85,12 @@ class OrganicService {
 
 			Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
 
-			if (groupElection != Group.radical)
-				openChain = openChain.bond(groupElection);
-			else {
+			if (groupElection == Group.radical) {
 				boolean isIso = inputSequence[++i] == 1;
 				int carbonCount = inputSequence[++i];
 				openChain = openChain.bond(new Substituent(carbonCount, isIso));
 			}
+			else openChain = openChain.bond(groupElection);
 		}
 
 		return openChain;
