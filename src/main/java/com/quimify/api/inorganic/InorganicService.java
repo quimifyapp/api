@@ -362,7 +362,12 @@ class InorganicService {
         try {
             InorganicModel parsedInorganic = inorganicPageComponent.parseInorganic(url);
             return Optional.ofNullable(parsedInorganic);
-        } catch (Exception exception) {
+        }
+        catch (IllegalArgumentException illegalArgumentException) {
+            logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
+            return Optional.empty();
+        }
+        catch (Exception exception) {
             errorService.saveError("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
             return Optional.empty();
         }
