@@ -1,6 +1,6 @@
 package com.quimify.api.client;
 
-// Esta clase representa las entregas al cliente de la configuración.
+// This POJO class represents responses of accesses to the client.
 
 class ClientResult {
 
@@ -15,9 +15,7 @@ class ClientResult {
 	private String messageLinkLabel;
 	private String messageLink;
 
-	// --------------------------------------------------------------------------------
-
-	// Constructor:
+	// Constructors:
 
 	protected ClientResult(Boolean updateAvailable, Boolean updateNeeded,
 						String updateDetails, Boolean messagePresent, String messageTitle,
@@ -34,7 +32,7 @@ class ClientResult {
 		this.messageLink = messageLink;
 	}
 
-	// Getters y setters:
+	// Getters and setters:
 
 	public Boolean getUpdateAvailable() {
 		return updateAvailable;

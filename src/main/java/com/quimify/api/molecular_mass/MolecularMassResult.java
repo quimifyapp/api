@@ -1,39 +1,33 @@
 package com.quimify.api.molecular_mass;
 
-// Esta clase representa las entregas al cliente de una masa molecular.
+// This POJO class represents responses of molecular masses to the client.
 
 import java.util.Map;
 
 class MolecularMassResult {
 
-	private Boolean present;
+	private boolean present;
 	private Float molecularMass;
 	private Map<String, Float> elementToGrams;
 	private Map<String, Integer> elementToMoles;
 	private String error;
 
-	// --------------------------------------------------------------------------------
-
-	// Constructores:
+	// Constructors:
 
 	protected MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams,
-							   Map<String, Integer> elementToMoles) {
-		construir(molecularMass, elementToGrams, elementToMoles);
+								  Map<String, Integer> elementToMoles) {
+		this.present = true;
+		this.molecularMass = molecularMass;
+		this.elementToGrams = elementToGrams;
+		this.elementToMoles = elementToMoles;
 	}
 
 	protected MolecularMassResult(String error) {
-		this.present = Boolean.FALSE;
+		this.present = false;
 		this.error = error;
 	}
 
-	private void construir(Float masa, Map<String, Float> elemento_a_gramos, Map<String, Integer> elemento_a_moles) {
-		this.present = Boolean.TRUE;
-		this.molecularMass = masa;
-		this.elementToGrams = elemento_a_gramos;
-		this.elementToMoles = elemento_a_moles;
-	}
-
-	// Getters y setters:
+	// Getters and setters:
 
 	public Boolean getPresent() {
 		return present;
