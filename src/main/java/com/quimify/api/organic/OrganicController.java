@@ -22,7 +22,7 @@ class OrganicController {
 	protected OrganicResult name(@RequestParam("name") String name, @RequestParam("picture") Boolean picture) {
 		OrganicResult result = organicService.getFromName(name, picture);
 
-		if (result.getPresent())
+		if (result.isPresent())
 			logger.info("GET organic: \"" + name + "\". " + "RETURN: " + result.getStructure() + ".");
 
 		return result;

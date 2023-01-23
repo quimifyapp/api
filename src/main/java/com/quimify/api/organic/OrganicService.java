@@ -63,7 +63,7 @@ class OrganicService {
 			organicResult = OrganicResult.notFound;
 		}
 
-		metricsService.countOrganicFoundFromName(organicResult.getPresent(), picture);
+		metricsService.countOrganicFoundFromName(organicResult.isPresent(), picture);
 
 		return organicResult;
 	}
