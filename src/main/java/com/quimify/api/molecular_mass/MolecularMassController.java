@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-// Esta clase implementa los métodos HTTP de la dirección "/masamolecular".
+// This class implements HTTP methods in "/molecular-mass".
 
 @RestController
 @RequestMapping("/molecular-mass")
@@ -14,9 +14,9 @@ class MolecularMassController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    MolecularMassService molecularMassService; // Procesos de masas moleculares
+    MolecularMassService molecularMassService; // Molecular masses logic
 
-    // CLIENTE ------------------------------------------------------------------------
+    // Client:
 
     @GetMapping()
     protected MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
