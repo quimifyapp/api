@@ -12,7 +12,7 @@ class SettingsService {
     @Autowired
     SettingsRepository settingsRepository; // Conexión con la DB
 
-    private static final Integer apiVersion = 3;
+    private static final int apiVersion = 3;
 
     // --------------------------------------------------------------------------------
 
