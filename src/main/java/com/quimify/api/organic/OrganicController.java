@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-// Esta clase implementa los métodos HTTP de la dirección "/organic".
+// This class implements HTTP methods in "/organic".
 
 @RestController
 @RequestMapping("/organic")
@@ -17,7 +17,7 @@ class OrganicController {
 	@Autowired
 	OrganicService organicService; // Procesos de los compuestos orgánicos
 
-	// CLIENTE ------------------------------------------------------------------------
+	// Client:
 
 	@GetMapping("from-name")
 	protected OrganicResult name(@RequestParam("name") String name,
@@ -25,8 +25,7 @@ class OrganicController {
 		OrganicResult organicResult = organicService.getFromName(name, picture);
 
 		if (organicResult.getPresent())
-			logger.info("GET formular: \"" + name + "\". " +
-					"RETURN encontrado, fórmula: " + organicResult.getStructure() + ".");
+			logger.info("GET from name: \"" + name + "\". " + "RETURN: " + organicResult.getStructure() + ".");
 
 		return organicResult;
 	}
@@ -35,7 +34,7 @@ class OrganicController {
 	protected OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult organicResult = organicService.getFromStructure(structureSequence);
 
-		logger.info("GET nombrar: \"" + organicResult.getStructure() + "\". " +
+		logger.info("GET from structure: \"" + organicResult.getStructure() + "\". " +
 				"RETURN: \"" + organicResult.getName() + "\".");
 
 		return organicResult;

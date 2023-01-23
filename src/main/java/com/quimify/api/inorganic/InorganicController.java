@@ -18,14 +18,14 @@ class InorganicController {
     @Autowired
     InorganicService inorganicService; // Procesos de los compuestos inorgánicos
 
-    // Administration ----------------------------------------------------------------
+    // Administration:
 
     @PutMapping("refresh-autocompletion")
     protected void refreshAutocompletion() {
         inorganicService.refreshAutocompletion();
     }
 
-    // Client ------------------------------------------------------------------------
+    // Client:
 
     @GetMapping()
     protected InorganicResult searchInorganic(@RequestParam("input") String input,
