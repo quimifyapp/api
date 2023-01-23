@@ -55,7 +55,7 @@ class OrganicService {
 				organicResult = new OrganicResult(name, organic.get().getStructure(), molecularMass, url2D);
 			}
 			else {
-				logger.warn("Couldn't find organic \"" + name + "\".");
+				logger.warn("Couldn't solve organic \"" + name + "\".");
 				organicResult = OrganicResult.notFound;
 			}
 		} catch (Exception exception) { // TODO test
