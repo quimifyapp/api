@@ -1,8 +1,8 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.download.Download;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
-import com.quimify.utils.Download;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

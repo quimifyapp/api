@@ -2,7 +2,7 @@ package com.quimify.api.organic;
 
 // This class makes calls to the PubChem API.
 
-import com.quimify.utils.Download;
+import com.quimify.api.download.Download;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
