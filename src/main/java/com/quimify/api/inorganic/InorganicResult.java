@@ -8,7 +8,7 @@ import java.util.Objects;
 
 class InorganicResult {
 
-    private Boolean present;
+    private boolean present;
 
     // If present is true
 
@@ -45,7 +45,7 @@ class InorganicResult {
         this.boilingPoint = inorganicModel.getBoilingPoint();
     }
 
-    protected InorganicResult() {
+    private InorganicResult() {
         this.present = false;
     }
 
@@ -68,11 +68,11 @@ class InorganicResult {
 
     // Getters y setters:
 
-    public Boolean getPresent() {
+    public boolean getPresent() {
         return present;
     }
 
-    public void setPresent(Boolean present) {
+    public void setPresent(boolean present) {
         this.present = present;
     }
 

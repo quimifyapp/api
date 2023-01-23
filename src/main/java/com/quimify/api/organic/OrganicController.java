@@ -1,6 +1,5 @@
 package com.quimify.api.organic;
 
-import com.quimify.organic.OrganicResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +19,22 @@ class OrganicController {
 	// Client:
 
 	@GetMapping("from-name")
-	protected OrganicResult name(@RequestParam("name") String name,
-							  @RequestParam("picture") Boolean picture) {
-		OrganicResult organicResult = organicService.getFromName(name, picture);
+	protected OrganicResult name(@RequestParam("name") String name, @RequestParam("picture") Boolean picture) {
+		OrganicResult result = organicService.getFromName(name, picture);
 
-		if (organicResult.getPresent())
-			logger.info("GET from name: \"" + name + "\". " + "RETURN: " + organicResult.getStructure() + ".");
+		if (result.getPresent())
+			logger.info("GET organic: \"" + name + "\". " + "RETURN: " + result.getStructure() + ".");
 
-		return organicResult;
+		return result;
 	}
 
 	@GetMapping("from-structure")
 	protected OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
-		OrganicResult organicResult = organicService.getFromStructure(structureSequence);
+		OrganicResult result = organicService.getFromStructure(structureSequence);
 
-		logger.info("GET from structure: \"" + organicResult.getStructure() + "\". " +
-				"RETURN: \"" + organicResult.getName() + "\".");
+		logger.info("GET organic: \"" + result.getStructure() + "\". " + "RETURN: \"" + result.getName() + "\".");
 
-		return organicResult;
+		return result;
 	}
 
 }

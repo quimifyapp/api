@@ -4,7 +4,7 @@ import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
-import com.quimify.organic.OrganicResult;
+import com.quimify.organic.Organic;
 import com.quimify.organic.components.Group;
 import com.quimify.organic.components.Substituent;
 import com.quimify.organic.molecules.open_chain.OpenChain;
@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Optional;
 
-// Esta clase procesa los compuestos orgánicos.
+// This class implements the logic behind HTTP methods in "/organic".
 
 @Service
 class OrganicService {
@@ -25,6 +26,9 @@ class OrganicService {
 
 	@Autowired
 	MolecularMassService molecularMassService; // Molecular masses logic
+
+	@Autowired
+	PubChemComponent pubChemComponent; // PubChem API logic
 
 	@Autowired
 	ErrorService errorService; // API errors logic
@@ -39,14 +43,25 @@ class OrganicService {
 	// Client:
 
 	protected OrganicResult getFromName(String name, Boolean picture) {
-		OrganicResult organicResult = OrganicFactory.getFromName(name);
+		OrganicResult organicResult;
 
-		if(organicResult.getPresent()) {
-			if(organicResult.getStructure() != null)
-				organicResult.setMolecularMass(
-						molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
+		try {
+			Optional<Organic> organic = OrganicFactory.getFromName(name);
+
+			if(organic.isPresent()) {
+				Float molecularMass = molecularMassService.tryMolecularMassOf(organic.get().getStructure());
+				String url2D = pubChemComponent.getUrl2D(organic.get().getSmiles());
+
+				organicResult = new OrganicResult(name, organic.get().getStructure(), molecularMass, url2D);
+			}
+			else {
+				logger.warn("Couldn't find organic \"" + name + "\".");
+				organicResult = OrganicResult.notFound;
+			}
+		} catch (Exception exception) { // TODO test
+			errorService.saveError("Exception solving name: " + name, exception.toString(), this.getClass());
+			organicResult = OrganicResult.notFound;
 		}
-		else logger.warn("Couldn't find organic \"" + name + "\".");
 
 		metricsService.countOrganicFoundFromName(organicResult.getPresent(), picture);
 
@@ -54,17 +69,18 @@ class OrganicService {
 	}
 
 	protected OrganicResult getFromStructure(int[] inputSequence) {
+		OrganicResult organicResult;
+
 		try {
 			OpenChain openChain = getOpenChainFromStructure(inputSequence);
+			Organic organic = OrganicFactory.getFromOpenChain(openChain);
 
-			OrganicResult organicResult = OrganicFactory.getFromOpenChain(openChain);
-
-			if(organicResult.getPresent())
-				organicResult.setMolecularMass(molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
+			Float molecularMass = molecularMassService.tryMolecularMassOf(organic.getStructure());
+			String url2D = pubChemComponent.getUrl2D(organic.getSmiles());
 
 			metricsService.countOrganicSearchedFromStructure();
 
-			return organicResult;
+			organicResult = new OrganicResult(organic.getName(), organic.getStructure(), molecularMass, url2D);
 		}
 		catch (Exception exception) {
 			String sequenceToString = Arrays.toString(inputSequence);
@@ -72,9 +88,13 @@ class OrganicService {
 
 			metricsService.countOrganicsFailedFromStructure();
 
-			return OrganicFactory.organicNotFound;
+			organicResult = OrganicResult.notFound;
 		}
+
+		return organicResult;
 	}
+
+	// Private:
 
 	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
 		OpenChain openChain = new Simple();
@@ -87,12 +107,14 @@ class OrganicService {
 
 			Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
 
-			if (groupElection == Group.radical) {
-				boolean isIso = inputSequence[++i] == 1;
+			if (groupElection != Group.radical)
+				openChain = openChain.bond(groupElection);
+			else {
+				boolean iso = inputSequence[++i] == 1;
 				int carbonCount = inputSequence[++i];
-				openChain = openChain.bond(new Substituent(carbonCount, isIso));
+
+				openChain = openChain.bond(new Substituent(carbonCount, iso));
 			}
-			else openChain = openChain.bond(groupElection);
 		}
 
 		return openChain;
