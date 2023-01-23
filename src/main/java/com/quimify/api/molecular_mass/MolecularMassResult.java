@@ -7,6 +7,9 @@ import java.util.Map;
 class MolecularMassResult {
 
 	private boolean present;
+
+	// If present is true:
+
 	private Float molecularMass;
 	private Map<String, Float> elementToGrams;
 	private Map<String, Integer> elementToMoles;
@@ -29,11 +32,11 @@ class MolecularMassResult {
 
 	// Getters and setters:
 
-	public Boolean getPresent() {
+	public boolean isPresent() {
 		return present;
 	}
 
-	public void setPresent(Boolean present) {
+	public void setPresent(boolean present) {
 		this.present = present;
 	}
 

@@ -4,11 +4,11 @@ package com.quimify.api.client;
 
 class ClientResult {
 
-	private Boolean updateAvailable;
+	private boolean updateAvailable;
 	private Boolean updateNeeded;
 	private String updateDetails;
 
-	private Boolean messagePresent;
+	private boolean messagePresent;
 	private String messageTitle;
 	private String messageDetails;
 	private Boolean messageLinkPresent;
@@ -17,8 +17,8 @@ class ClientResult {
 
 	// Constructors:
 
-	protected ClientResult(Boolean updateAvailable, Boolean updateNeeded,
-						String updateDetails, Boolean messagePresent, String messageTitle,
+	protected ClientResult(boolean updateAvailable, Boolean updateNeeded,
+						String updateDetails, boolean messagePresent, String messageTitle,
 						String messageDetails, Boolean messageLinkPresent, String messageLinkLabel,
 						String messageLink) {
 		this.updateAvailable = updateAvailable;
@@ -34,11 +34,11 @@ class ClientResult {
 
 	// Getters and setters:
 
-	public Boolean getUpdateAvailable() {
+	public boolean getUpdateAvailable() {
 		return updateAvailable;
 	}
 
-	public void setUpdateAvailable(Boolean updateAvailable) {
+	public void setUpdateAvailable(boolean updateAvailable) {
 		this.updateAvailable = updateAvailable;
 	}
 
@@ -58,11 +58,11 @@ class ClientResult {
 		this.updateDetails = updateDetails;
 	}
 
-	public Boolean getMessagePresent() {
+	public boolean getMessagePresent() {
 		return messagePresent;
 	}
 
-	public void setMessagePresent(Boolean messagePresent) {
+	public void setMessagePresent(boolean messagePresent) {
 		this.messagePresent = messagePresent;
 	}
 
@@ -105,5 +105,5 @@ class ClientResult {
 	public void setMessageLink(String messageLink) {
 		this.messageLink = messageLink;
 	}
-	
+
 }

@@ -33,11 +33,11 @@ class ReportModel {
         this.id = id;
     }
 
-    public Timestamp getDateAndTime() {
+    protected Timestamp getDateAndTime() {
         return dateAndTime;
     }
 
-    public void setDateAndTime(Timestamp dateAndTime) {
+    protected void setDateAndTime(Timestamp dateAndTime) {
         this.dateAndTime = dateAndTime;
     }
 

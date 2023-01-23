@@ -14,7 +14,7 @@ class PubChemComponent {
     private static final String PNG_2D = DIR + "image/imagefly.cgi?width=500&height=500&cid=";
     private static final String REST = DIR + "rest/pug/compound/";
 
-    public String getUrl2D(String smiles) throws IOException {
+    protected String getUrl2D(String smiles) throws IOException {
         String url2D;
 
         smiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical

@@ -110,7 +110,7 @@ class InorganicService {
         }
 
         metricsService.countInorganicAutocompleted();
-        metricsService.countSearchedInorganic(inorganicResult.getPresent(), false);
+        metricsService.countSearchedInorganic(inorganicResult.isPresent(), false);
 
         return inorganicResult;
     }
@@ -122,7 +122,7 @@ class InorganicService {
 
         inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
 
-        metricsService.countSearchedInorganic(inorganicResult.getPresent(), isPicture);
+        metricsService.countSearchedInorganic(inorganicResult.isPresent(), isPicture);
 
         return inorganicResult;
     }
@@ -174,7 +174,7 @@ class InorganicService {
         inorganicRepository.save(parsedInorganic.get());
         searchTagsCache.addAll(parsedInorganic.get().getSearchTags());
 
-        metricsService.countNewInorganic();
+        metricsService.countInorganicLearned();
         logger.info("New inorganic: " + parsedInorganic.get());
 
         return inorganicResult;

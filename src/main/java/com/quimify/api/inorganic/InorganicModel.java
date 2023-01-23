@@ -84,99 +84,99 @@ class InorganicModel {
 
     // Getters and setters:
 
-    public Integer getId() {
+    protected Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    protected void setId(Integer id) {
         this.id = id;
     }
 
-    public String getFormula() {
+    protected String getFormula() {
         return formula;
     }
 
-    public void setFormula(String formula) {
+    protected void setFormula(String formula) {
         this.formula = formula;
     }
 
-    public String getStockName() {
+    protected String getStockName() {
         return stockName;
     }
 
-    public void setStockName(String stockName) {
+    protected void setStockName(String stockName) {
         this.stockName = stockName;
     }
 
-    public String getSystematicName() {
+    protected String getSystematicName() {
         return systematicName;
     }
 
-    public void setSystematicName(String systematicName) {
+    protected void setSystematicName(String systematicName) {
         this.systematicName = systematicName;
     }
 
-    public String getTraditionalName() {
+    protected String getTraditionalName() {
         return traditionalName;
     }
 
-    public void setTraditionalName(String traditionalName) {
+    protected void setTraditionalName(String traditionalName) {
         this.traditionalName = traditionalName;
     }
 
-    public String getOtherName() {
+    protected String getOtherName() {
         return otherName;
     }
 
-    public void setOtherName(String otherName) {
+    protected void setOtherName(String otherName) {
         this.otherName = otherName;
     }
 
-    public Set<InorganicSearchTagModel> getSearchTags() {
+    protected Set<InorganicSearchTagModel> getSearchTags() {
         return searchTags;
     }
 
-    public void setSearchTags(Set<InorganicSearchTagModel> searchTags) {
+    protected void setSearchTags(Set<InorganicSearchTagModel> searchTags) {
         this.searchTags = searchTags;
     }
 
-    public Integer getSearchCount() {
+    protected Integer getSearchCount() {
         return searchCount;
     }
 
-    public void setSearchCount(Integer searchCount) {
+    protected void setSearchCount(Integer searchCount) {
         this.searchCount = searchCount;
     }
 
-    public String getMolecularMass() {
+    protected String getMolecularMass() {
         return molecularMass;
     }
 
-    public void setMolecularMass(String molecularMass) {
+    protected void setMolecularMass(String molecularMass) {
         this.molecularMass = molecularMass;
     }
 
-    public String getDensity() {
+    protected String getDensity() {
         return density;
     }
 
-    public void setDensity(String density) {
+    protected void setDensity(String density) {
         this.density = density;
     }
 
-    public String getMeltingPoint() {
+    protected String getMeltingPoint() {
         return meltingPoint;
     }
 
-    public void setMeltingPoint(String meltingPoint) {
+    protected void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
-    public String getBoilingPoint() {
+    protected String getBoilingPoint() {
         return boilingPoint;
     }
 
-    public void setBoilingPoint(String boilingPoint) {
+    protected void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }
 

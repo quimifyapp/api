@@ -16,7 +16,7 @@ import java.util.Optional;
 // This class runs Bing searches through their API.
 
 @Component
-public class BingComponent {
+class BingComponent {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

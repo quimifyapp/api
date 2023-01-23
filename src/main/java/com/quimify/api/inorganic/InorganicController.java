@@ -16,7 +16,7 @@ class InorganicController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    InorganicService inorganicService; // Procesos de los compuestos inorgánicos
+    InorganicService inorganicService; // Inorganic compounds logic
 
     // Administration:
 
@@ -32,7 +32,7 @@ class InorganicController {
                                               @RequestParam("picture") Boolean picture) {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
-        if(inorganicResult.getPresent())
+        if(inorganicResult.isPresent())
             logger.info("GET inorganico: \"" + input + "\". " + "RETURN: " + inorganicResult);
 
         return inorganicResult;
@@ -49,7 +49,7 @@ class InorganicController {
     protected InorganicResult searchInorganicByCompletion(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
-        if(inorganicResult.getPresent())
+        if(inorganicResult.isPresent())
             logger.info("GET inorganico: \"" + completion + "\" (autocompleted). RETURN: " + inorganicResult);
 
         return inorganicResult;

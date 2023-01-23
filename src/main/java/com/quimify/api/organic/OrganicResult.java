@@ -4,7 +4,7 @@ package com.quimify.api.organic;
 
 class OrganicResult {
 
-    private Boolean present;
+    private boolean present;
 
     // If present is true:
 
@@ -19,7 +19,7 @@ class OrganicResult {
 
     // Constructors:
 
-    public OrganicResult(String name, String structure, Float molecularMass, String url2D) {
+    protected OrganicResult(String name, String structure, Float molecularMass, String url2D) {
         this.present = true;
         this.name = name;
         this.structure = structure;
@@ -33,20 +33,12 @@ class OrganicResult {
 
     // Getters and setters:
 
-    public Boolean isPresent() {
+    public boolean isPresent() {
         return present;
     }
 
     public void setPresent(Boolean present) {
         this.present = present;
-    }
-
-    public String getStructure() {
-        return structure;
-    }
-
-    public void setStructure(String structure) {
-        this.structure = structure;
     }
 
     public String getName() {
@@ -55,6 +47,14 @@ class OrganicResult {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getStructure() {
+        return structure;
+    }
+
+    public void setStructure(String structure) {
+        this.structure = structure;
     }
 
     public Float getMolecularMass() {

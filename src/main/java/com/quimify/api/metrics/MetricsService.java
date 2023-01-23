@@ -12,7 +12,8 @@ import java.util.Optional;
 // Esta clase procesa las métricas diarias.
 
 @Service
-public class MetricsService {
+public
+class MetricsService {
 
     @Autowired
     MetricsRepository metricsRepository; // Conexión con la DB
@@ -114,7 +115,7 @@ public class MetricsService {
     }
 
     @Transactional
-    public void countNewInorganic() {
+    public void countInorganicLearned() {
         getTodayMetrics().nuevoInorganicoNuevo();
     }
 

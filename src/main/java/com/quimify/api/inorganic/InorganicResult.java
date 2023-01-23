@@ -68,7 +68,7 @@ class InorganicResult {
 
     // Getters y setters:
 
-    public boolean getPresent() {
+    public boolean isPresent() {
         return present;
     }
 

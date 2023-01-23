@@ -22,7 +22,7 @@ class MolecularMassController {
     protected MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
         MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResultOf(formula);
 
-        if(molecularMassResult.getPresent())
+        if(molecularMassResult.isPresent())
             logger.info("GET masa molecular: \"" + formula + "\". " +
                     "RETURN: \"" + molecularMassResult.getMolecularMass() + "\".");
 

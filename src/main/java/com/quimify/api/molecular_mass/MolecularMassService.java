@@ -43,7 +43,7 @@ class MolecularMassService {
         try {
             molecularMassResult = calculateMolecularMassOf(formula);
 
-            if (!molecularMassResult.getPresent())
+            if (!molecularMassResult.isPresent())
                 logger.warn("Couldn't calculate \"" + formula + "\". " + "Error: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
@@ -55,7 +55,7 @@ class MolecularMassService {
             errorService.saveError("Exception calculating: " + formula, exception.toString(), this.getClass());
         }
 
-        metricsService.countMolecularMass(molecularMassResult.getPresent());
+        metricsService.countMolecularMass(molecularMassResult.isPresent());
 
         return molecularMassResult;
     }
