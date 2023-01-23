@@ -33,7 +33,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
         if(inorganicResult.getPresent())
-            logger.info("GET inorganico: \"" + input + "\"). " + "RETURN: " + inorganicResult);
+            logger.info("GET inorganico: \"" + input + "\". " + "RETURN: " + inorganicResult);
 
         return inorganicResult;
     }
