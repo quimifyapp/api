@@ -1,6 +1,6 @@
 package com.quimify.api.metrics;
 
-// Esta clase representa un día de métricas.
+// Esta clase representa un día de métricas. TODO: translate
 
 import javax.persistence.*;
 import java.util.Date;
@@ -102,8 +102,6 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer reportsSent = 0;
 
-    // --------------------------------------------------------------------------------
-
     // Constructores:
 
     protected MetricsModel() {} // Lo pide JPA
@@ -202,7 +200,7 @@ class MetricsModel {
         organicsNotFoundFromNameFromPicture += 1;
     }
 
-    protected void nuevoNombrarOrganicoAbiertoBuscado() {
+    protected void countOrganicSearchedFromStructure() {
         organicsSucceededFromStructure += 1;
     }
 

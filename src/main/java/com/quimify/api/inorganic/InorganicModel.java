@@ -1,5 +1,7 @@
 package com.quimify.api.inorganic;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,19 +51,24 @@ class InorganicModel {
     private String meltingPoint;    // (K)
     private String boilingPoint;    // (K)
 
-    // --------------------------------------------------------------------------------
+    // Modifiers:
 
+    @Transactional // TODO test
+    protected void countSearch() {
+        searchCount++;
+    }
+
+    // TODO Transactional?
     protected void addSearchTagOf(String tag) {
         searchTags.add(new InorganicSearchTagModel(tag));
     }
 
+    // TODO Transactional?
     protected Set<String> getSearchTagsAsStrings() {
         return searchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
     }
 
-    protected void countSearch() {
-        searchCount++;
-    }
+    // Queries:
 
     @Override
     public String toString() {
@@ -87,7 +94,7 @@ class InorganicModel {
         return words.toString();
     }
 
-    // Getters y setters:
+    // Getters and setters:
 
     public Integer getId() {
         return id;

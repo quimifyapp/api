@@ -23,20 +23,14 @@ class InorganicResult {
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
 
-    // --------------------------------------------------------------------------------
+    // Constants:
 
-    // Constructores:
+    protected static final InorganicResult notFound = new InorganicResult();
 
-    protected InorganicResult(InorganicModel inorganico) {
+    // Constructors:
+
+    protected InorganicResult(InorganicModel inorganicModel) {
         this.present = true;
-        build(inorganico);
-    }
-
-    protected InorganicResult() {
-        this.present = false;
-    }
-
-    private void build(InorganicModel inorganicModel) {
         this.formula = inorganicModel.getFormula();
 
         this.stockName = inorganicModel.getStockName();
@@ -48,6 +42,10 @@ class InorganicResult {
         this.density = inorganicModel.getDensity();
         this.meltingPoint = inorganicModel.getMeltingPoint();
         this.boilingPoint = inorganicModel.getBoilingPoint();
+    }
+
+    protected InorganicResult() {
+        this.present = false;
     }
 
     // Texto:

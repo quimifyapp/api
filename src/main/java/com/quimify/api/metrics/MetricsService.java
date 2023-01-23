@@ -38,21 +38,21 @@ public class MetricsService {
 
     // Queries:
 
-    public Integer getBusquedasGoogle() {
-        MetricsModel metricas = getTodayMetrics();
+    public Integer getGoogleQueries() {
+        MetricsModel todayMetrics = getTodayMetrics();
 
-        return metricas.getGoogleFoundFromPicture() + metricas.getGoogleNotFoundFromPicture() +
-                metricas.getGoogleFoundFromText() + metricas.getGoogleNotFoundFromText();
+        return todayMetrics.getGoogleFoundFromPicture() + todayMetrics.getGoogleNotFoundFromPicture() +
+                todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
     }
 
-    public Integer getBusquedasBingPago() {
+    public Integer getPaidBingQueries() {
         return getTodayMetrics().getPaidBingQueries();
     }
 
     // Counters:
 
     @Transactional
-    public void contarAcceso(Short platform) {
+    public void countAccess(Short platform) {
         switch(platform) {
             case ClientService.androidPlatform:
                 getTodayMetrics().nuevoAccesoAndroid();
@@ -67,7 +67,7 @@ public class MetricsService {
     }
 
     @Transactional
-    public void contarInorganicoBuscado(boolean encontrado, boolean foto) {
+    public void countSearchedInorganic(boolean encontrado, boolean foto) {
         if(encontrado) {
             if(foto)
                 getTodayMetrics().nuevoInorganicoFotoEncontrado();
@@ -81,7 +81,7 @@ public class MetricsService {
     }
 
     @Transactional
-    public void contarGoogle(boolean encontrado, boolean foto) {
+    public void countGoogleSearch(boolean encontrado, boolean foto) {
         if(encontrado) {
             if(foto)
                 getTodayMetrics().nuevoGoogleFotoEncontrado();
@@ -95,7 +95,7 @@ public class MetricsService {
     }
 
     @Transactional
-    public void contarBing(boolean encontrado, boolean foto) {
+    public void countBingSearch(boolean encontrado, boolean foto) {
         if(encontrado) {
             if(foto)
                 getTodayMetrics().nuevoBingFotoEncontrado();
@@ -109,22 +109,22 @@ public class MetricsService {
     }
 
     @Transactional
-    public void contarBingPago() {
+    public void countPaidBingSearch() {
         getTodayMetrics().nuevoBingPagoBuscado();
     }
 
     @Transactional
-    public void contarInorganicoNuevo() {
+    public void countNewInorganic() {
         getTodayMetrics().nuevoInorganicoNuevo();
     }
 
     @Transactional
-    public void contarInorganicoAutocompletado() {
+    public void countInorganicAutocompleted() {
         getTodayMetrics().nuevoInorganicoAutocompletado();
     }
 
     @Transactional
-    public void contarFormularOrganico(boolean found, boolean picture) {
+    public void countOrganicFoundFromName(boolean found, boolean picture) {
         if (found) {
             if (picture)
                 getTodayMetrics().nuevoFormularOrganicoFotoEncontrado();
@@ -137,8 +137,8 @@ public class MetricsService {
     }
 
     @Transactional
-    public void contarNombrarOrganicoAbiertoBuscado() {
-        getTodayMetrics().nuevoNombrarOrganicoAbiertoBuscado();
+    public void countOrganicSearchedFromStructure() {
+        getTodayMetrics().countOrganicSearchedFromStructure();
     }
 
     @Transactional

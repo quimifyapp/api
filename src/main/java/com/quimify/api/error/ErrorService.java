@@ -23,7 +23,7 @@ class ErrorService {
     @Autowired
     MetricsService metricsService; // Daily metrics logic
 
-    // Internal:
+    // Protected:
 
     public void saveError(String title, String details, Class<?> location) {
         ErrorModel errorModel = new ErrorModel();

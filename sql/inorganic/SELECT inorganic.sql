@@ -1,5 +1,5 @@
 SELECT * FROM inorganic
-#WHERE formula LIKE "%Tc%"
+# WHERE formula LIKE "C%"
 
 # WHERE systematic_name LIKE "%teleruro%"
 # WHERE stock_name LIKE "peróxido de%"

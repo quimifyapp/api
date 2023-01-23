@@ -46,7 +46,7 @@ class ClientService {
 				client.getMessageLink()
 		);
 
-		metricsService.contarAcceso(platform);
+		metricsService.countAccess(platform);
 
 		return clientResult;
 	}

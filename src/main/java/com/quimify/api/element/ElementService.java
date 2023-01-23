@@ -14,7 +14,7 @@ class ElementService {
     @Autowired
     ElementRepository elementRepository; // Conexión con la DB
 
-    // INTERNOS ----------------------------------------------------------------------
+    // Public:
 
     public Optional<ElementModel> searchBySymbol(String symbol) {
         return elementRepository.findBySymbol(symbol);

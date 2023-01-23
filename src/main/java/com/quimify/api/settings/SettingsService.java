@@ -20,7 +20,7 @@ class SettingsService {
         return settingsRepository.findByVersion(apiVersion).getUseGoogle();
     }
 
-    public Integer getGoogleLimite() {
+    public Integer getGoogleLimit() {
         return settingsRepository.findByVersion(apiVersion).getGoogleDailyLimit();
     }
 
@@ -32,23 +32,23 @@ class SettingsService {
         return settingsRepository.findByVersion(apiVersion).getBingUrl();
     }
 
-    public Boolean getBingGratisON() {
+    public Boolean getFreeBingON() {
         return settingsRepository.findByVersion(apiVersion).getUseFreeBing();
     }
 
-    public Integer getBingPagoLimite() {
+    public Integer getPaidBingLimit() {
         return settingsRepository.findByVersion(apiVersion).getPaidBingDailyLimit();
     }
 
-    public String getBingGratisKey() {
+    public String getFreeBingKey() {
         return settingsRepository.findByVersion(apiVersion).getFreeBingKey();
     }
 
-    public Boolean getBingPagoON() {
+    public Boolean getPaidBingON() {
         return settingsRepository.findByVersion(apiVersion).getUsePaidBing();
     }
 
-    public String getBingPagoKey() {
+    public String getPaidBingKey() {
         return settingsRepository.findByVersion(apiVersion).getPaidBingKey();
     }
 

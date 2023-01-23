@@ -29,12 +29,11 @@ class InorganicController {
 
     @GetMapping()
     protected InorganicResult searchInorganic(@RequestParam("input") String input,
-                                           @RequestParam("picture") Boolean picture) {
+                                              @RequestParam("picture") Boolean picture) {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
         if(inorganicResult.getPresent())
-            logger.info("GET inorganico: \"" + input + "\" (" + (picture ? "foto" : "teclado") + "). " +
-                    "RETURN: " + inorganicResult);
+            logger.info("GET inorganico: \"" + input + "\"). " + "RETURN: " + inorganicResult);
 
         return inorganicResult;
     }
@@ -51,7 +50,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if(inorganicResult.getPresent())
-            logger.info("GET inorganico: \"" + completion + "\" (compleción). RETURN: " + inorganicResult);
+            logger.info("GET inorganico: \"" + completion + "\" (autocompleted). RETURN: " + inorganicResult);
 
         return inorganicResult;
     }

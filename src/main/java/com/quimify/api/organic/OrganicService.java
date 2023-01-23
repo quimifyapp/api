@@ -32,6 +32,8 @@ class OrganicService {
 	@Autowired
 	MetricsService metricsService; // Daily metrics logic
 
+	// Constants:
+
 	protected static final int carbonInputCode = -1;
 
 	// Client:
@@ -44,9 +46,9 @@ class OrganicService {
 				organicResult.setMolecularMass(
 						molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
 		}
-		else logger.warn("No se ha encontrado el orgánico \"" + name + "\".");
+		else logger.warn("Couldn't find organic \"" + name + "\".");
 
-		metricsService.contarFormularOrganico(organicResult.getPresent(), picture);
+		metricsService.countOrganicFoundFromName(organicResult.getPresent(), picture);
 
 		return organicResult;
 	}
@@ -60,7 +62,7 @@ class OrganicService {
 			if(organicResult.getPresent())
 				organicResult.setMolecularMass(molecularMassService.tryMolecularMassOf(organicResult.getStructure()));
 
-			metricsService.contarNombrarOrganicoAbiertoBuscado();
+			metricsService.countOrganicSearchedFromStructure();
 
 			return organicResult;
 		}

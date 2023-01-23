@@ -8,13 +8,15 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 // This class parses inorganic compounds from FQ.com web pages.
 
 @Component
-class InorganicPageComponent {
+class FQPageComponent {
 
     @Autowired
     SettingsService settingsService; // Settings logic
@@ -45,26 +47,19 @@ class InorganicPageComponent {
             "estibonio", "estibanio" // Common mistake
     );
 
-    // Internal:
+    // Protected:
 
     protected InorganicModel parseInorganic(String url) throws IOException {
-        if(!url.contains(fqUrl))
+        if (!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 
-        if(invalidSubdirectories.stream().anyMatch(url::endsWith))
+        if (invalidSubdirectories.stream().anyMatch(url::endsWith))
             throw new IllegalArgumentException("Invalid subdirectory.");
 
         Download connection = new Download(url);
         connection.setProperty("User-Agent", settingsService.getUserAgent());
 
         String htmlDocument = connection.getText();
-
-        int index = indexAfterIn("<h1>", htmlDocument);
-
-        if (index == -1)
-            throw new IllegalStateException("Couldn't find <h1> tag in HTML document.");
-
-        htmlDocument = htmlDocument.substring(index); // Removes metadata
 
         InorganicModel parsedInorganic = new InorganicModel();
 
@@ -83,27 +78,34 @@ class InorganicPageComponent {
     private void parseAndSetFormula(InorganicModel inorganicModel, String htmlDocument) {
         String formula;
 
-        int index = indexAfterIn("/", htmlDocument);
-        int closingTagIndex = indexAfterIn("</", htmlDocument);
+        Optional<Integer> headerIndex = indexAfterIn("<h1>", htmlDocument);
 
-        if(index == closingTagIndex) { // "metano</h1>..."
-            index = indexAfterIn(">Fórmula:", htmlDocument);
+        if (headerIndex.isEmpty())
+            throw new IllegalStateException("Couldn't find header in HTML document.");
 
-            if(index == -1)
-                index = indexAfterIn("\"frm\">", htmlDocument);
+        String header = htmlDocument.substring(headerIndex.get());
 
-            formula = htmlDocument.substring(index);
-            formula = formula.substring(0, indexAfterIn("</p>", formula) - 4);
+        Optional<Integer> slashIndex = indexAfterIn("/", header);
+        Optional<Integer> closingTagIndex = indexAfterIn("</", header);
+
+        if (slashIndex.equals(closingTagIndex)) { // "metano</h1>..."
+            slashIndex = indexAfterIn(">Fórmula:", header);
+
+            if (slashIndex.isEmpty())
+                slashIndex = indexAfterIn("\"frm\">", header);
+
+            formula = header.substring(slashIndex.get()); // TODO optional get check
+            formula = formula.substring(0, formula.indexOf("</p>"));
 
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
         }
-        else formula = htmlDocument.substring(0, index - 2); // "Co2(CO3)3 / carbonato de cobalto (III)</h1>..."
-
+        else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
+        // TODO optional get check
         inorganicModel.setFormula(formula);
     }
 
     private void parseAndSetNames(InorganicModel inorganicModel, String htmlDocument) {
-        int index = indexAfterIn("sistemática:</b>", htmlDocument);
+        Optional<Integer> index = indexAfterIn("sistemática:</b>", htmlDocument);
         inorganicModel.setSystematicName(parseName(htmlDocument, index));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
@@ -113,15 +115,15 @@ class InorganicPageComponent {
         inorganicModel.setTraditionalName(parseName(htmlDocument, index));
     }
 
-    private String parseName(String htmlDocument, int index) {
-        if (index == -1)
+    private String parseName(String htmlDocument, Optional<Integer> index) {
+        if (index.isEmpty())
             return null;
 
-        String name = htmlDocument.substring(index + 1);
-        name = name.substring(0, indexAfterIn("</p>", name) - 4);
+        String name = htmlDocument.substring(index.get() + 1);
+        name = name.substring(0, name.indexOf("</p>"));
 
         // It happens with some organic compounds:
-        if(name.contains("br/>"))
+        if (name.contains("br/>"))
             name = name.replace("br/>", "");
 
         return name;
@@ -136,7 +138,7 @@ class InorganicPageComponent {
     }
 
     private void setNameSearchTag(InorganicModel inorganicModel, String name) {
-        if(name != null) {
+        if (name != null) {
             inorganicModel.addSearchTagOf(name);
 
             if (name.contains("ácido"))
@@ -155,7 +157,7 @@ class InorganicPageComponent {
         inorganicModel.setFormula(inorganicModel.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
         inorganicModel.setSystematicName(null); // Systematic names for peroxides NEVER include that word
 
-        errorService.saveError("Peroxide needs manual correction", inorganicModel.toString(), this.getClass());
+        errorService.saveError("New peroxide needs manual correction", inorganicModel.toString(), this.getClass());
     }
 
     private void correctNames(InorganicModel inorganicModel) {
@@ -165,12 +167,12 @@ class InorganicPageComponent {
     }
 
     private String correctName(InorganicModel inorganicModel, String name) {
-        if(name == null)
+        if (name == null)
             return null;
 
         // TODO uppercase but not between parentheses
 
-        for(String namingMistake : namingMistakeToCorrection.keySet())
+        for (String namingMistake : namingMistakeToCorrection.keySet())
             if (name.contains(namingMistake)) {
                 name = name.replace(namingMistake, namingMistakeToCorrection.get(namingMistake));
                 setNameSearchTag(inorganicModel, name);
@@ -182,69 +184,34 @@ class InorganicPageComponent {
     private void parseAndSetProperties(InorganicModel inorganicModel, String htmlDocument) {
         inorganicModel.setMolecularMass(parseMolecularMass(htmlDocument));
         inorganicModel.setDensity(parseDensity(htmlDocument));
-        inorganicModel.setMeltingPoint(parseTemperature(htmlDocument, "fusión"));
-        inorganicModel.setBoilingPoint(parseTemperature(htmlDocument, "ebullición"));
+        inorganicModel.setMeltingPoint(parseTemperature("fusión", htmlDocument));
+        inorganicModel.setBoilingPoint(parseTemperature("ebullición", htmlDocument));
     }
 
     private String parseMolecularMass(String htmlDocument) {
-        String molecularMass;
+        Optional<String> characteristic = parseCharacteristic(
+                List.of("Masa molar", "Masa Molar", "Peso Molecular"),
+                List.of("g"),
+                htmlDocument
+        );
 
-        int index = indexAfterIn("Masa molar:", htmlDocument);
-        if (index == -1)
-            index = indexAfterIn("Masa Molar:", htmlDocument);
-        if (index == -1)
-            index = indexAfterIn("Peso Molecular:", htmlDocument);
+        if (characteristic.isEmpty())
+            return null;
 
-        if (index == -1)
-            return null; // No molecular mass
-
-        molecularMass = htmlDocument.substring(index + 1);
-        molecularMass = molecularMass.substring(0, indexAfterIn("</", molecularMass) - 2);
-
-        index = indexAfterIn("g", molecularMass);
-
-        if (index == -1)
-            return null; // Unit not found ("g")
-
-        molecularMass = molecularMass.substring(0, index - 1); // TODO fix hardcoded 1
-
-        molecularMass = molecularMass.replace(" ", "").replace(",", ".");
-        molecularMass = molecularMass.replace("a", "-"); // Other interval format
-        molecularMass = onlyDigits(molecularMass);
-        molecularMass = firstInInterval(molecularMass);
-
-        molecularMass = truncateToTwoDecimalPlaces(molecularMass); // Trailing zeros are kept
-
-        return molecularMass;
+        return truncateToTwoDecimalPlaces(characteristic.get()); // Trailing zeros are kept
     }
 
-    private String parseTemperature(String htmlDocument, String temperatureLabel) {
-        String temperature;
+    private String parseTemperature(String temperatureLabel, String htmlDocument) {
+        Optional<String> parsedCharacteristic = parseCharacteristic(
+                List.of("Punto de " + temperatureLabel, "Temperatura de " + temperatureLabel),
+                List.of("°", "º"),  // Similar yet different character
+                htmlDocument
+        );
 
-        int index = indexAfterIn("Punto de " + temperatureLabel + ":", htmlDocument);
-        if (index == -1)
-            index = indexAfterIn("Temperatura de " + temperatureLabel + ":", htmlDocument);
+        if (parsedCharacteristic.isEmpty())
+            return null;
 
-        if (index == -1)
-            return null; // No temperature of that kind
-
-        temperature = htmlDocument.substring(index + 1);
-        temperature = temperature.substring(0, indexAfterIn("</", temperature) - 2);
-
-        index = indexAfterIn("°", temperature);
-        if (index == -1)
-            index = indexAfterIn("º", temperature); // Similar yet different character
-
-        if (index == -1) // TODO fix repeated code from here?
-            return null; // Unit not found ("°C" or "ºC", not identical)
-
-        temperature = temperature.substring(0, index - 1); // TODO fix hardcoded 1
-
-        temperature = temperature.replace(" ", "").replace(",", ".");
-        temperature = temperature.replace("a", "-"); // Other interval format
-        temperature = onlyDigits(temperature);
-        temperature = firstInInterval(temperature);
-        temperature = String.valueOf(273.15 + Float.parseFloat(temperature));
+        String temperature = String.valueOf(273.15 + Float.parseFloat(parsedCharacteristic.get()));
 
         temperature = truncateToTwoDecimalPlaces(temperature);
         temperature = removeTrailingZeros(temperature);
@@ -254,39 +221,73 @@ class InorganicPageComponent {
         return temperature;
     }
 
+    private Optional<String> parseCharacteristic(List<String> labels, List<String> units, String htmlDocument) {
+        String characteristic;
+
+        Optional<Integer> indexAfterLabel = Optional.empty();
+
+        for (String label : labels) {
+            indexAfterLabel = indexAfterIn(label + ":", htmlDocument);
+
+            if (indexAfterLabel.isPresent())
+                break;
+        }
+
+        if (indexAfterLabel.isEmpty())
+            return Optional.empty();
+
+        characteristic = htmlDocument.substring(indexAfterLabel.get() + 1);
+        characteristic = characteristic.substring(0, characteristic.indexOf("</"));
+
+        int unitIndex = -1;
+
+        for (String unit : units) {
+            unitIndex = characteristic.indexOf(unit);
+
+            if (unitIndex != -1)
+                break;
+        }
+
+        if (unitIndex == -1)
+            return Optional.empty();
+
+        characteristic = characteristic.substring(0, unitIndex);
+        characteristic = formatCharacteristic(characteristic);
+
+        return Optional.of(characteristic);
+    }
+
     private String parseDensity(String htmlDocument) {
         String density;
 
-        int indice = indexAfterIn("Densidad:", htmlDocument);
+        Optional<Integer> index = indexAfterIn("Densidad:", htmlDocument);
 
-        if (indice == -1)
+        if (index.isEmpty())
             return null; // No density
 
-        density = htmlDocument.substring(indice + 1);
-        density = density.substring(0, indexAfterIn("</", density) - 2);
+        density = htmlDocument.substring(index.get() + 1);
+        density = density.substring(0, density.indexOf("</"));
 
-        indice = indexAfterIn("g", density);
+        int unitIndex = density.indexOf("kg");
 
-        if (indice == -1)
-            return null; // Unit not found ("g", "Kg", "kg")
+        if (unitIndex == -1)
+            unitIndex = density.indexOf("Kg");
 
-        boolean inKilograms;
-        if (density.charAt(indice - 2) == 'k' || density.charAt(indice - 2) == 'K') {
-            density = density.substring(0, indice - 2); // TODO fix hardcoded 2
-            inKilograms = true;
-        } else {
-            density = density.substring(0, indice - 1); // TODO fix hardcoded 1
-            inKilograms = false;
+        boolean inKilograms = unitIndex != -1;
+
+        if (!inKilograms) {
+            unitIndex = density.indexOf("g");
+
+            if (unitIndex == -1)
+                return null; // Unit not found ("g", "Kg", "kg")
         }
 
-        density = density.replace(" ", "").replace(",", ".");
-        density = density.replace("a", "-"); // Other interval format
-        density = onlyDigits(density);
-        density = firstInInterval(density);
+        density = density.substring(0, unitIndex);
+        density = formatCharacteristic(density);
 
         if (inKilograms) {
             float densityValue = Float.parseFloat(density);
-            densityValue /= 1000; // From kg/m3 to g/cm3
+            densityValue /= 1000; // kg/m3 -> g/cm3
 
             NumberFormat numberFormat = NumberFormat.getInstance();
             numberFormat.setGroupingUsed(false);
@@ -301,41 +302,43 @@ class InorganicPageComponent {
         return density;
     }
 
-    // Utilities:
-
-    private int indexAfterIn(String substring, String string) {
-        int index = string.indexOf(substring);
-        return index != -1 ? index + substring.length() : index;
+    private String formatCharacteristic(String characteristic) {
+        characteristic = characteristic.replace(" ", "");
+        characteristic = characteristic.replace(",", ".");
+        characteristic = characteristic.replace("a", "-"); // Other interval format
+        characteristic = onlyDigits(characteristic);
+        return firstInInterval(characteristic);
     }
+
+    // Utilities:
 
     // I.e.: "-1,104 ºC - 0.34 " -> "-1,104-0.34"
     private String onlyDigits(String data) {
-        // Dashes and decimal points too
-        return data.replaceAll("/[^\\d-.]", "");
+        return data.replaceAll("/[^\\d-.]", ""); // Dashes and decimal points too
     }
 
     // I.e.: "-12.104 - 13.27" -> "12.104"
     // I.e.: "-12.104" -> "12.104"
-    private String firstInInterval(String interval) {
+    private String firstInInterval(String interval) { // TODO Regexp?
         interval = interval.trim(); // Leading and trailing spaces removed
 
-        if(interval.substring(1).contains("-")) // First dash might be a negative symbol
+        if (interval.substring(1).contains("-")) // First dash might be a negative symbol
             interval = interval.split("-", 2)[0];
 
         return interval;
     }
 
     // I.e.: "14.457 -> 14.45"
-    private String truncateToTwoDecimalPlaces(String number) {
-        int decimalPointIndex = indexAfterIn(".", number);
+    private String truncateToTwoDecimalPlaces(String number) { // TODO Regexp?
+        Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
-        if (decimalPointIndex == -1)
+        if (decimalPointIndex.isEmpty())
             return number;
 
-        decimalPointIndex += 2;
+        int afterDecimalsIndex = decimalPointIndex.get() + 2;
 
-        if(number.length() > decimalPointIndex) // There are more than two decimals places
-            number = number.substring(0, decimalPointIndex);
+        if (number.length() > afterDecimalsIndex) // There are more than two decimals places
+            number = number.substring(0, afterDecimalsIndex);
 
         return number;
     }
@@ -348,17 +351,25 @@ class InorganicPageComponent {
 
     // I.e.: "X.000ABCD" -> "X.000ABC"
     private String truncateToThreeSignificantDecimalPlaces(String number) {
-        int decimalPointIndex = indexAfterIn(".", number);
+        Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
-        if (decimalPointIndex == -1)
+        if (decimalPointIndex.isEmpty())
             return number;
 
-        for(int i = decimalPointIndex, significantCount = 0; i < number.length() && significantCount < 3; i++)
-            if(number.charAt(i) != '0')
-                if(++significantCount == 3)
+        for (int i = decimalPointIndex.get(), significantCount = 0; i < number.length() && significantCount < 3; i++)
+            if (number.charAt(i) != '0')
+                if (++significantCount == 3)
                     number = number.substring(0, i + 1);
 
         return number;
+    }
+
+    private Optional<Integer> indexAfterIn(String substring, String string) {
+        int index = string.indexOf(substring);
+
+        return index != -1
+                ? Optional.of(index + substring.length())
+                : Optional.empty();
     }
 
 }
