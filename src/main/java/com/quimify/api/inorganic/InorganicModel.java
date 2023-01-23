@@ -50,22 +50,20 @@ class InorganicModel {
 
     // Modifiers:
 
-    @Transactional // TODO test
+    @Transactional
     protected void countSearch() {
         searchCount++;
     }
 
-    // TODO Transactional?
     protected void addSearchTagOf(String tag) {
         searchTags.add(new InorganicSearchTagModel(tag));
     }
 
-    // TODO Transactional?
+    // Queries:
+
     protected Set<String> getSearchTagsAsStrings() {
         return searchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
     }
-
-    // Queries:
 
     @Override
     public String toString() {

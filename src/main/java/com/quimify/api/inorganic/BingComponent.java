@@ -1,9 +1,9 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.download.Download;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.settings.SettingsService;
-import com.quimify.utils.Download;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
