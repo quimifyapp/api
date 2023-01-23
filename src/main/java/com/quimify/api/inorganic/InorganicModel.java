@@ -3,10 +3,7 @@ package com.quimify.api.inorganic;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // Esta clase representa los compuestos inorgánicos.
@@ -74,22 +71,15 @@ class InorganicModel {
     public String toString() {
         List<String> words = new ArrayList<>();
 
-        if(id != null)
-            words.add(id.toString());
+        words.add(id.toString());
 
         words.add(formula);
+        words.add(stockName);
+        words.add(systematicName);
+        words.add(traditionalName);
+        words.add(otherName);
 
-        if(stockName != null)
-            words.add(stockName);
-
-        if(systematicName != null)
-            words.add(systematicName);
-
-        if(traditionalName != null)
-            words.add(traditionalName);
-
-        if(otherName != null)
-            words.add(otherName);
+        words.removeIf(Objects::isNull);
 
         return words.toString();
     }

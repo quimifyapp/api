@@ -1,15 +1,16 @@
 package com.quimify.api.inorganic;
 
-// Esta clase representa las entregas al cliente de un compuesto inorgánico.
+// This POJO class represents responses of inorganic compounds to the client.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class InorganicResult {
 
     private Boolean present;
 
-    // Si 'encontrado' = true:
+    // If present is true
 
     private String formula; // "MgH2"
 
@@ -55,18 +56,12 @@ class InorganicResult {
         List<String> words = new ArrayList<>();
 
         words.add(formula);
+        words.add(stockName);
+        words.add(systematicName);
+        words.add(traditionalName);
+        words.add(otherName);
 
-        if(stockName != null)
-            words.add(stockName);
-
-        if(systematicName != null)
-            words.add(systematicName);
-
-        if(traditionalName != null)
-            words.add(traditionalName);
-
-        if(otherName != null)
-            words.add(otherName);
+        words.removeIf(Objects::isNull);
 
         return words.toString();
     }

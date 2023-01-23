@@ -4,9 +4,9 @@ package com.quimify.api.inorganic;
 
 class WebSearchResult {
 
-    private boolean found;
-    private String title;
-    private String address;
+    private final boolean found;
+    private final String title;
+    private final String address;
 
     // Constants:
 
@@ -22,6 +22,8 @@ class WebSearchResult {
 
     private WebSearchResult() {
         this.found = false;
+        this.title = null;
+        this.address = null;
     }
 
     // Getters:
