@@ -14,7 +14,11 @@ class OrganicController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	OrganicService organicService; // Procesos de los compuestos orgánicos
+	OrganicService organicService; // Organic compounds logic
+
+	// Constants:
+
+	private static final String getOrganicMessage = "GET organic %s: \"%s\". RETURN: %s.";
 
 	// Client:
 
@@ -23,7 +27,7 @@ class OrganicController {
 		OrganicResult result = organicService.getFromName(name, picture);
 
 		if (result.isPresent())
-			logger.info("GET organic: \"" + name + "\". " + "RETURN: " + result.getStructure() + ".");
+			logger.info(String.format(getOrganicMessage, "from name", name, result.getStructure()));
 
 		return result;
 	}
@@ -32,7 +36,7 @@ class OrganicController {
 	protected OrganicResult structure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult result = organicService.getFromStructure(structureSequence);
 
-		logger.info("GET organic: \"" + result.getStructure() + "\". " + "RETURN: \"" + result.getName() + "\".");
+		logger.info(String.format(getOrganicMessage, "from structure", result.getStructure(), result.getName()));
 
 		return result;
 	}

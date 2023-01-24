@@ -18,6 +18,10 @@ class InorganicController {
     @Autowired
     InorganicService inorganicService; // Inorganic compounds logic
 
+    // Constants:
+
+    private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RETURN: %s.";
+
     // Administration:
 
     @PutMapping("refresh-autocompletion")
@@ -33,7 +37,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
         if(inorganicResult.isPresent())
-            logger.info("GET inorganic: \"" + input + "\". " + "RETURN: " + inorganicResult);
+            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
 
         return inorganicResult;
     }
@@ -50,7 +54,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if(inorganicResult.isPresent())
-            logger.info("GET inorganic: \"" + completion + "\" (autocompleted). RETURN: " + inorganicResult);
+            logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
 
         return inorganicResult;
     }

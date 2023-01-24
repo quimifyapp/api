@@ -16,6 +16,10 @@ class MolecularMassController {
     @Autowired
     MolecularMassService molecularMassService; // Molecular masses logic
 
+    // Constants:
+
+    private static final String getMolecularMassMessage = "GET molecular mass: \"%s\". RETURN: %s.";
+
     // Client:
 
     @GetMapping()
@@ -23,8 +27,7 @@ class MolecularMassController {
         MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResultOf(formula);
 
         if(molecularMassResult.isPresent())
-            logger.info("GET masa molecular: \"" + formula + "\". " +
-                    "RETURN: \"" + molecularMassResult.getMolecularMass() + "\".");
+            logger.info(String.format(getMolecularMassMessage, formula, molecularMassResult.getMolecularMass()));
 
         return molecularMassResult;
     }
