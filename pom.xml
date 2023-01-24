@@ -57,14 +57,6 @@
 			<systemPath>${project.basedir}/lib/quimify-organic.jar</systemPath>
 		</dependency>
 
-		<dependency>
-			<groupId>quimify-download</groupId>
-			<artifactId>quimify-download</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/quimify-download.jar</systemPath>
-		</dependency>
-
 	</dependencies>
 
 	<build>
