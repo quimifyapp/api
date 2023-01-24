@@ -33,7 +33,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.search(input, picture);
 
         if(inorganicResult.isPresent())
-            logger.info("GET inorganico: \"" + input + "\". " + "RETURN: " + inorganicResult);
+            logger.info("GET inorganic: \"" + input + "\". " + "RETURN: " + inorganicResult);
 
         return inorganicResult;
     }
@@ -50,7 +50,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if(inorganicResult.isPresent())
-            logger.info("GET inorganico: \"" + completion + "\" (autocompleted). RETURN: " + inorganicResult);
+            logger.info("GET inorganic: \"" + completion + "\" (autocompleted). RETURN: " + inorganicResult);
 
         return inorganicResult;
     }
