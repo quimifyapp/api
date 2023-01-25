@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-// Esta clase contiene las órdenes se ejecutarán cuando Spring Boot indique que el servidor está listo.
+// This class contains the code that Spring Boot will run after the server has fully started.
 
 @Component
 @Transactional
