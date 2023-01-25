@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 // This class implements the logic behind HTTP methods in "/inorganic".
 
 @Service
-public
-class InorganicService {
+public class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
