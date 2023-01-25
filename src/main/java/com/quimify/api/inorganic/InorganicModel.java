@@ -69,7 +69,7 @@ class InorganicModel {
     public String toString() {
         List<String> words = new ArrayList<>();
 
-        words.add(id.toString());
+        words.add(Objects.toString(id));
 
         words.add(formula);
         words.add(stockName);
