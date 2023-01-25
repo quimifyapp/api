@@ -28,16 +28,18 @@ class ErrorService {
     public void saveError(String title, String details, Class<?> location) {
         ErrorModel errorModel = new ErrorModel();
 
+        String locationName = location.getName().replaceAll(".*\\.", "");
+
         errorModel.setDateAndTime(Timestamp.from(Instant.now()));
         errorModel.setTitle(title);
         errorModel.setDetails(details);
-        errorModel.setLocation(location.getName());
+        errorModel.setLocation(locationName);
 
         try {
             errorRepository.save(errorModel);
             LoggerFactory.getLogger(location).error(title + ". Details saved in database.");
         } catch (Exception exception) {
-            logger.error("Exception saving error in DB. " + "Location: " + location + ". " + "Exception: \"" +
+            logger.error("Exception saving error in DB. " + "Location: " + locationName + ". " + "Exception: \"" +
                     exception + "\". " + "Title: \"" + title + "\". " + "Details: \"" + details + "\". ");
         }
 
