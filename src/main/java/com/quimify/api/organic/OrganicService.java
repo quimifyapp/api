@@ -58,7 +58,7 @@ class OrganicService {
 				logger.warn("Couldn't solve organic \"" + name + "\".");
 				organicResult = OrganicResult.notFound;
 			}
-		} catch (Exception exception) { // TODO test
+		} catch (Exception exception) {
 			errorService.saveError("Exception solving name: " + name, exception.toString(), this.getClass());
 			organicResult = OrganicResult.notFound;
 		}
