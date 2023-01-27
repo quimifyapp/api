@@ -2,6 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<properties>
+		<java.version>11</java.version>
+		<!-- Needs to be manually updated: -->
+		<version>3</version>
+		<organic.version>3.0.0</organic.version>
+	</properties>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -11,14 +19,19 @@
 
 	<groupId>com.quimify</groupId>
 	<artifactId>quimify-api</artifactId>
-	<version>3</version>
+	<version>${version}</version>
 	<description>Quimify API</description>
 
-	<properties>
-		<java.version>11</java.version>
-	</properties>
-
 	<dependencies>
+
+		<dependency>
+			<groupId>quimify-organic</groupId>
+			<artifactId>quimify-organic</artifactId>
+			<version>${organic.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/quimify-organic-${organic.version}.jar</systemPath>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -47,14 +60,6 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20220924</version>
-		</dependency>
-
-		<dependency>
-			<groupId>quimify-organic</groupId>
-			<artifactId>quimify-organic</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/quimify-organic.jar</systemPath>
 		</dependency>
 
 	</dependencies>
