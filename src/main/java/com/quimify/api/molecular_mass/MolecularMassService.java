@@ -44,7 +44,7 @@ class MolecularMassService {
             molecularMassResult = calculateMolecularMassOf(formula);
 
             if (!molecularMassResult.isPresent())
-                logger.warn("Couldn't calculate \"" + formula + "\". " + "Error: " + molecularMassResult.getError());
+                logger.warn("Couldn't calculate \"" + formula + "\". " + "RETURN: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
