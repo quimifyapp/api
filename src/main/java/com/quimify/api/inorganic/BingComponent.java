@@ -32,17 +32,19 @@ class BingComponent {
     // Protected:
 
     protected Optional<WebSearchResult> freeSearch(String input) {
-        return canFreeSearch()
-                ? search(input, settingsService.getFreeBingKey(), "free Bing")
-                : Optional.empty();
+        if(!canFreeSearch())
+            return Optional.empty();
+
+        return search(input, settingsService.getFreeBingKey(), "free Bing");
     }
 
     protected Optional<WebSearchResult> paidSearch(String input) {
-        metricsService.countPaidBingSearch();
+        if(!canPaidSearch())
+            return Optional.empty();
 
-        return canPaidSearch()
-                ? search(input, settingsService.getPaidBingKey(), "paid Bing")
-                : Optional.empty();
+        metricsService.countPaidBingQuery();
+
+        return search(input, settingsService.getPaidBingKey(), "paid Bing");
     }
 
     // Private:

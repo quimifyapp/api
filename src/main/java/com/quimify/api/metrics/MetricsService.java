@@ -113,7 +113,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void countPaidBingSearch() {
+    public void countPaidBingQuery() {
         getTodayMetrics().nuevoBingPagoBuscado();
     }
 
