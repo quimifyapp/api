@@ -32,7 +32,8 @@ class PubChemComponent {
     // Queries:
 
     protected void resolveCompound(String smiles) {
-        this.smiles = formatSmilesForUrl(smiles);
+        smiles = formatSmilesForUrl(smiles);
+        this.smiles = smiles;
 
         try {
             compoundId = new Download(String.format(compoundIdUrl, smiles)).getText();
