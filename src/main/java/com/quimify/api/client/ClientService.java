@@ -4,21 +4,25 @@ import com.quimify.api.metrics.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// Esta clase procesa la bienvenida.
+// This class implements the logic behind HTTP methods in "/access-data".
 
 @Service
 public
 class ClientService {
 
 	@Autowired
-	ClientRepository clientRepository; // Conexión con la DB
+	ClientRepository clientRepository; // DB connection
 
 	@Autowired
-    MetricsService metricsService; // Procesos de las métricas diarias
+    MetricsService metricsService; // Daily metrics logic
+
+	// Constants:
 
 	public static final short androidPlatform = 0;
 	public static final short iOSPlatform = 1;
 	public static final short webPlatform = 2;
+
+	// Client:
 
 	protected ClientResult getAccessData(Integer version, Short platform) {
 		ClientModel client = clientRepository.findByVersion(version);
