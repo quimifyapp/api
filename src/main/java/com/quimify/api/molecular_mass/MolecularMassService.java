@@ -43,14 +43,14 @@ class MolecularMassService {
                 molecularMass = Optional.ofNullable(molecularMassResult.getMolecularMass());
             else {
                 String errorMessage = molecularMassResult.getError();
-                errorService.saveError("Couldn't calculate: " + formula, errorMessage, this.getClass());
+                errorService.log("Couldn't calculate: " + formula, errorMessage, this.getClass());
                 molecularMass = Optional.empty();
             }
         } catch (StackOverflowError error) {
-            errorService.saveError("StackOverflow error", formula, this.getClass());
+            errorService.log("StackOverflow error", formula, this.getClass());
             molecularMass = Optional.empty();
         } catch (Exception exception) {
-            errorService.saveError("Exception calculating: " + formula, exception.toString(), this.getClass());
+            errorService.log("Exception calculating: " + formula, exception.toString(), this.getClass());
             molecularMass = Optional.empty();
         }
 
@@ -69,15 +69,15 @@ class MolecularMassService {
                 logger.warn("Couldn't calculate \"" + formula + "\". " + "RETURN: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
-            errorService.saveError("StackOverflow error", formula, this.getClass());
+            errorService.log("StackOverflow error", formula, this.getClass());
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
         }
         catch(Exception exception) {
-            errorService.saveError("Exception calculating: " + formula, exception.toString(), this.getClass());
+            errorService.log("Exception calculating: " + formula, exception.toString(), this.getClass());
             molecularMassResult = new MolecularMassResult("");
         }
 
-        metricsService.countMolecularMassSearched(molecularMassResult.isPresent());
+        metricsService.molecularMassSearched(molecularMassResult.isPresent());
 
         return molecularMassResult;
     }

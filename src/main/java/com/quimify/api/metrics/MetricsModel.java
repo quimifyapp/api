@@ -1,20 +1,22 @@
 package com.quimify.api.metrics;
 
-// Esta clase representa un día de métricas. TODO: translate
+// This class represents a day's worth of metrics.
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity // Es un modelo real
-@Table(name = "metrics") // En la tabla 'metrics' de la DB
+@Entity
+@Table(name = "metrics")
 class MetricsModel {
 
     @Id
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    // Su suma equivale al total de accesos al cliente:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer errorsOccurred = 0;
 
+    // Their sum is equivalent to the total number of client accesses:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer androidAccesses = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
@@ -22,209 +24,145 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer webAccesses = 0;
 
-    // Su suma equivale al total de peticiones de inorgánicos:
-
+    // Their sum is equivalent to the total number of client inorganics searched:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicsFoundFromText = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicsNotFoundFromText = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsFoundFromPicture = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsNotFoundFromPicture = 0;
 
-    // Su suma equivale al total de búsquedas web de inorgánicos:
-
+    // Their sum is equivalent to the total number of client inorganic searches that required a web search:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer googleFoundFromText = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer googleNotFoundFromText = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleFoundFromPicture = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleNotFoundFromPicture = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer bingFoundFromText = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer bingNotFoundFromText = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer bingFoundFromPicture = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer bingNotFoundFromPicture = 0;
 
-    // Aparte, las búsquedas en Bing *de pago* para poder limitarlas:
-
+    // Paid Bing queries are recorded explicitly so a daily limit can be set:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer paidBingQueries = 0;
 
-    // Inorgánicos añadidos a la base de datos:
-
+    // New inorganics from the web incorporated to the DB:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicsLearned = 0;
-
-    // Compleciones correctas de inorgánicos:
 
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicsAutocompleted = 0;
 
-    // Su suma equivale al total de peticiones de formular orgánicos:
-
+    // Their sum is equivalent to the total number of client organics queried from name:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicsFoundFromNameFromText = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicsNotFoundFromNameFromText = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsFoundFromNameFromPicture = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsNotFoundFromNameFromPicture = 0;
 
-    // Su suma equivale al total de peticiones de nombrar orgánicos:
-
+    // Their sum is equivalent to the total number of client organics queried from structure:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicsSucceededFromStructure = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicsFailedFromStructure = 0;
 
-    // Su suma equivale al total de peticiones de calcular masas moleculares:
-
+    // Their sum is equivalent to the total number of client molecular masses queried:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer molecularMassesSucceeded = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer molecularMassesFailed = 0;
 
-    // API errors:
-
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer errorsOccurred = 0;
-
-    // Client reports:
-
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer reportsSent = 0;
 
-    // Constructores:
+    // Constructors:
 
-    protected MetricsModel() {} // Lo pide JPA
+    protected MetricsModel() {} // JPA needs it
 
     protected MetricsModel(Date date) {
         setDate(date);
     }
 
-    // Incrementadores:
+    // Incrementers:
 
-    protected void nuevoAccesoAndroid() {
+    protected void incrementAndroidAccesses() {
         androidAccesses += 1;
     }
 
-    protected void nuevoAccesoIOS() {
+    protected void incrementIOSAccesses() {
         iosAccesses += 1;
     }
 
-    protected void nuevoAccesoWeb() {
+    protected void incrementWebAccesses() {
         webAccesses += 1;
     }
 
-    protected void nuevoInorganicoTecladoEncontrado() {
+    protected void incrementInorganicsFoundFromText() {
         inorganicsFoundFromText += 1;
     }
 
-    protected void nuevoInorganicoTecladoNoEncontrado() {
+    protected void incrementInorganicsNotFoundFromText() {
         inorganicsNotFoundFromText += 1;
     }
 
-    protected void nuevoInorganicoFotoEncontrado() {
-        inorganicsFoundFromPicture += 1;
-    }
-
-    protected void nuevoInorganicoFotoNoEncontrado() {
-        inorganicsNotFoundFromPicture += 1;
-    }
-
-    protected void nuevoGoogleTecladoEncontrado() {
+    protected void incrementGoogleFoundFromText() {
         googleFoundFromText += 1;
     }
 
-    protected void nuevoGoogleTecladoNoEncontrado() {
+    protected void incrementGoogleNotFoundFromText() {
         googleNotFoundFromText += 1;
     }
 
-    protected void nuevoGoogleFotoEncontrado() {
-        googleFoundFromPicture += 1;
-    }
-
-    protected void nuevoGoogleFotoNoEncontrado() {
-        googleNotFoundFromPicture += 1;
-    }
-
-    protected void nuevoBingTecladoEncontrado() {
+    protected void incrementBingFoundFromText() {
         bingFoundFromText += 1;
     }
 
-    protected void nuevoBingTecladoNoEncontrado() {
+    protected void incrementBingNotFoundFromText() {
         bingNotFoundFromText += 1;
     }
 
-    protected void nuevoBingFotoEncontrado() {
-        bingFoundFromPicture += 1;
-    }
-
-    protected void nuevoBingFotoNoEncontrado() {
-        bingNotFoundFromPicture += 1;
-    }
-
-    protected void nuevoBingPagoBuscado() {
+    protected void incrementPaidBingQueries() {
         paidBingQueries += 1;
     }
 
-    protected void nuevoInorganicoNuevo() {
+    protected void incrementInorganicsLearned() {
         inorganicsLearned += 1;
     }
 
-    protected void nuevoInorganicoAutocompletado() {
+    protected void incrementInorganicsAutocompleted() {
         inorganicsAutocompleted += 1;
     }
 
-    protected void nuevoFormularOrganicoTecladoEncontrado() {
+    protected void incrementOrganicsFoundFromNameFromText() {
         organicsFoundFromNameFromText += 1;
     }
 
-    protected void nuevoFormularOrganicoTecladoNoEncontrado() {
+    protected void incrementOrganicsNotFoundFromNameFromText() {
         organicsNotFoundFromNameFromText += 1;
     }
 
-    protected void nuevoFormularOrganicoFotoEncontrado() {
-        organicsFoundFromNameFromPicture += 1;
-    }
-
-    protected void nuevoFormularOrganicoFotoNoEncontrado() {
-        organicsNotFoundFromNameFromPicture += 1;
-    }
-
-    protected void countOrganicSucceededFromStructure() {
+    protected void incrementOrganicsSucceededFromStructure() {
         organicsSucceededFromStructure += 1;
     }
 
-    protected void countOrganicFailedFromStructure() {
+    protected void incrementOrganicsFailedFromStructure() {
         organicsFailedFromStructure += 1;
     }
 
-    protected void nuevoMasaMolecularEncontrado() {
+    protected void incrementMolecularMassesSucceeded() {
         molecularMassesSucceeded += 1;
     }
 
-    protected void nuevoMasaMolecularNoEncontrado() {
+    protected void incrementMolecularMassesFailed() {
         molecularMassesFailed += 1;
     }
 
-    protected void countErrorOccurred() {
+    protected void incrementErrorsOccurred() {
         errorsOccurred += 1;
     }
 
-    protected void countReportSent() {
+    protected void incrementReportsSent() {
         reportsSent += 1;
     }
 
-    // Getters y setters:
+    // Getters and setters:
 
     protected Date getDate() {
         return date;
@@ -232,6 +170,14 @@ class MetricsModel {
 
     protected void setDate(Date date) {
         this.date = date;
+    }
+
+    protected Integer getErrorsOccurred() {
+        return errorsOccurred;
+    }
+
+    protected void setErrorsOccurred(Integer errorsOccurred) {
+        this.errorsOccurred = errorsOccurred;
     }
 
     protected Integer getAndroidAccesses() {
@@ -274,22 +220,6 @@ class MetricsModel {
         this.inorganicsNotFoundFromText = inorganicsNotFoundFromText;
     }
 
-    protected Integer getInorganicsFoundFromPicture() {
-        return inorganicsFoundFromPicture;
-    }
-
-    protected void setInorganicsFoundFromPicture(Integer inorganicsFoundFromPicture) {
-        this.inorganicsFoundFromPicture = inorganicsFoundFromPicture;
-    }
-
-    protected Integer getInorganicsNotFoundFromPicture() {
-        return inorganicsNotFoundFromPicture;
-    }
-
-    protected void setInorganicsNotFoundFromPicture(Integer inorganicsNotFoundFromPicture) {
-        this.inorganicsNotFoundFromPicture = inorganicsNotFoundFromPicture;
-    }
-
     protected Integer getGoogleFoundFromText() {
         return googleFoundFromText;
     }
@@ -306,22 +236,6 @@ class MetricsModel {
         this.googleNotFoundFromText = googleNotFoundFromText;
     }
 
-    protected Integer getGoogleFoundFromPicture() {
-        return googleFoundFromPicture;
-    }
-
-    protected void setGoogleFoundFromPicture(Integer googleFoundFromPicture) {
-        this.googleFoundFromPicture = googleFoundFromPicture;
-    }
-
-    protected Integer getGoogleNotFoundFromPicture() {
-        return googleNotFoundFromPicture;
-    }
-
-    protected void setGoogleNotFoundFromPicture(Integer googleNotFoundFromPicture) {
-        this.googleNotFoundFromPicture = googleNotFoundFromPicture;
-    }
-
     protected Integer getBingFoundFromText() {
         return bingFoundFromText;
     }
@@ -336,22 +250,6 @@ class MetricsModel {
 
     protected void setBingNotFoundFromText(Integer bingNotFoundFromText) {
         this.bingNotFoundFromText = bingNotFoundFromText;
-    }
-
-    protected Integer getBingFoundFromPicture() {
-        return bingFoundFromPicture;
-    }
-
-    protected void setBingFoundFromPicture(Integer bingFoundFromPicture) {
-        this.bingFoundFromPicture = bingFoundFromPicture;
-    }
-
-    protected Integer getBingNotFoundFromPicture() {
-        return bingNotFoundFromPicture;
-    }
-
-    protected void setBingNotFoundFromPicture(Integer bingNotFoundFromPicture) {
-        this.bingNotFoundFromPicture = bingNotFoundFromPicture;
     }
 
     protected Integer getPaidBingQueries() {
@@ -394,22 +292,6 @@ class MetricsModel {
         this.organicsNotFoundFromNameFromText = organicsNotFoundFromNameFromText;
     }
 
-    protected Integer getOrganicsFoundFromNameFromPicture() {
-        return organicsFoundFromNameFromPicture;
-    }
-
-    protected void setOrganicsFoundFromNameFromPicture(Integer organicsFoundFromNameFromPicture) {
-        this.organicsFoundFromNameFromPicture = organicsFoundFromNameFromPicture;
-    }
-
-    protected Integer getOrganicsNotFoundFromNameFromPicture() {
-        return organicsNotFoundFromNameFromPicture;
-    }
-
-    protected void setOrganicsNotFoundFromNameFromPicture(Integer organicsNotFoundFromNameFromPicture) {
-        this.organicsNotFoundFromNameFromPicture = organicsNotFoundFromNameFromPicture;
-    }
-
     protected Integer getOrganicsSucceededFromStructure() {
         return organicsSucceededFromStructure;
     }
@@ -440,14 +322,6 @@ class MetricsModel {
 
     protected void setMolecularMassesFailed(Integer molecularMassesFailed) {
         this.molecularMassesFailed = molecularMassesFailed;
-    }
-
-    protected Integer getErrorsOccurred() {
-        return errorsOccurred;
-    }
-
-    protected void setErrorsOccurred(Integer errorsOccurred) {
-        this.errorsOccurred = errorsOccurred;
     }
 
     protected Integer getReportsSent() {

@@ -9,20 +9,17 @@ import java.time.*;
 import java.util.Date;
 import java.util.Optional;
 
-// Esta clase procesa las métricas diarias.
+// This class handles daily metrics.
 
 @Service
 public
 class MetricsService {
 
     @Autowired
-    MetricsRepository metricsRepository; // Conexión con la DB
+    MetricsRepository metricsRepository; // DB connection
 
     // Day starts at 13:00 of Spain and 07:00 of Bolivia
     private static final Duration offSet = Duration.ofHours(-13);
-
-    // TODO remove picture parameters
-    // TODO translate
 
     // Private:
 
@@ -33,7 +30,7 @@ class MetricsService {
         Date today = Date.from(Instant.now().plus(offSet));
         Optional<MetricsModel> latestMetrics = metricsRepository.findById(today);
 
-        if(latestMetrics.isEmpty())
+        if (latestMetrics.isEmpty())
             todayMetrics = metricsRepository.save(new MetricsModel(today));
         else todayMetrics = latestMetrics.get();
 
@@ -45,8 +42,7 @@ class MetricsService {
     public Integer getGoogleQueries() {
         MetricsModel todayMetrics = getTodayMetrics();
 
-        return todayMetrics.getGoogleFoundFromPicture() + todayMetrics.getGoogleNotFoundFromPicture() +
-                todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
+        return todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
     }
 
     public Integer getPaidBingQueries() {
@@ -57,111 +53,84 @@ class MetricsService {
 
     @Transactional
     public void countAccess(Short platform) {
-        switch(platform) {
+        switch (platform) {
             case ClientService.androidPlatform:
-                getTodayMetrics().nuevoAccesoAndroid();
+                getTodayMetrics().incrementAndroidAccesses();
                 break;
             case ClientService.iOSPlatform:
-                getTodayMetrics().nuevoAccesoIOS();
+                getTodayMetrics().incrementIOSAccesses();
                 break;
             case ClientService.webPlatform:
-                getTodayMetrics().nuevoAccesoWeb();
+                getTodayMetrics().incrementWebAccesses();
                 break;
         }
     }
 
     @Transactional
-    public void countInorganicSearched(boolean encontrado, boolean foto) {
-        if(encontrado) {
-            if(foto)
-                getTodayMetrics().nuevoInorganicoFotoEncontrado();
-            else getTodayMetrics().nuevoInorganicoTecladoEncontrado();
-        }
-        else {
-            if(foto)
-                getTodayMetrics().nuevoInorganicoFotoNoEncontrado();
-            else getTodayMetrics().nuevoInorganicoTecladoNoEncontrado();
-        }
+    public void inorganicSearched(boolean found) {
+        if (found)
+            getTodayMetrics().incrementInorganicsFoundFromText();
+        else getTodayMetrics().incrementInorganicsNotFoundFromText();
     }
 
     @Transactional
-    public void countGoogleSearch(boolean encontrado, boolean foto) {
-        if(encontrado) {
-            if(foto)
-                getTodayMetrics().nuevoGoogleFotoEncontrado();
-            else getTodayMetrics().nuevoGoogleTecladoEncontrado();
-        }
-        else {
-            if(foto)
-                getTodayMetrics().nuevoGoogleFotoNoEncontrado();
-            else getTodayMetrics().nuevoGoogleTecladoNoEncontrado();
-        }
+    public void googleSearch(boolean found) {
+        if (found)
+            getTodayMetrics().incrementGoogleFoundFromText();
+        else getTodayMetrics().incrementGoogleNotFoundFromText();
     }
 
     @Transactional
-    public void countBingSearch(boolean encontrado, boolean foto) {
-        if(encontrado) {
-            if(foto)
-                getTodayMetrics().nuevoBingFotoEncontrado();
-            else getTodayMetrics().nuevoBingTecladoEncontrado();
-        }
-        else {
-            if(foto)
-                getTodayMetrics().nuevoBingFotoNoEncontrado();
-            else getTodayMetrics().nuevoBingTecladoNoEncontrado();
-        }
+    public void bingSearch(boolean found) {
+        if (found)
+            getTodayMetrics().incrementBingFoundFromText();
+        else getTodayMetrics().incrementBingNotFoundFromText();
     }
 
     @Transactional
-    public void countPaidBingQuery() {
-        getTodayMetrics().nuevoBingPagoBuscado();
+    public void paidBingQuery() {
+        getTodayMetrics().incrementPaidBingQueries();
     }
 
     @Transactional
-    public void countInorganicLearned() {
-        getTodayMetrics().nuevoInorganicoNuevo();
+    public void inorganicLearned() {
+        getTodayMetrics().incrementInorganicsLearned();
     }
 
     @Transactional
-    public void countInorganicAutocompleted() {
-        getTodayMetrics().nuevoInorganicoAutocompletado();
+    public void inorganicAutocompleted() {
+        getTodayMetrics().incrementInorganicsAutocompleted();
     }
 
     @Transactional
-    public void countOrganicSearchedFromName(boolean found, boolean picture) {
-        if (found) {
-            if (picture)
-                getTodayMetrics().nuevoFormularOrganicoFotoEncontrado();
-            else getTodayMetrics().nuevoFormularOrganicoTecladoEncontrado();
-        } else {
-            if (picture)
-                getTodayMetrics().nuevoFormularOrganicoFotoNoEncontrado();
-            else getTodayMetrics().nuevoFormularOrganicoTecladoNoEncontrado();
-        }
+    public void organicSearchedFromName(boolean found) {
+        if (found)
+            getTodayMetrics().incrementOrganicsFoundFromNameFromText();
+        else getTodayMetrics().incrementOrganicsNotFoundFromNameFromText();
     }
 
     @Transactional
-    public void countOrganicSearchedFromStructure(boolean found) {
-        if(found)
-            getTodayMetrics().countOrganicSucceededFromStructure();
-        else getTodayMetrics().countOrganicFailedFromStructure();
+    public void organicSearchedFromStructure(boolean found) {
+        if (found)
+            getTodayMetrics().incrementOrganicsSucceededFromStructure();
+        else getTodayMetrics().incrementOrganicsFailedFromStructure();
     }
 
     @Transactional
-    public void countMolecularMassSearched(boolean found) {
-        if(found)
-            getTodayMetrics().nuevoMasaMolecularEncontrado();
-        else getTodayMetrics().nuevoMasaMolecularNoEncontrado();
+    public void molecularMassSearched(boolean found) {
+        if (found)
+            getTodayMetrics().incrementMolecularMassesSucceeded();
+        else getTodayMetrics().incrementMolecularMassesFailed();
     }
 
     @Transactional
-    public void countErrorOccurred() {
-        getTodayMetrics().countErrorOccurred();
+    public void errorOccurred() {
+        getTodayMetrics().incrementErrorsOccurred();
     }
 
     @Transactional
-    public void countReportSent() {
-        getTodayMetrics().countReportSent();
+    public void reportSent() {
+        getTodayMetrics().incrementReportsSent();
     }
 
 }

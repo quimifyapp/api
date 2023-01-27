@@ -42,7 +42,7 @@ class BingComponent {
         if(!canPaidSearch())
             return Optional.empty();
 
-        metricsService.countPaidBingQuery();
+        metricsService.paidBingQuery();
 
         return search(input, settingsService.getPaidBingKey(), "paid Bing");
     }
@@ -87,15 +87,15 @@ class BingComponent {
         } catch (IOException exception) {
             if (exception.toString().contains("HTTP response code: 403"))
                 logger.warn(apiName + " returned HTTP code 403.");
-            else errorService.saveError("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
+            else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
 
             webSearchResult = Optional.empty();
         } catch (Exception exception) {
-            errorService.saveError("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
+            errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
             webSearchResult = Optional.empty();
         }
 
-        metricsService.countBingSearch(webSearchResult.isPresent() && webSearchResult.get().isFound(), false);
+        metricsService.bingSearch(webSearchResult.isPresent() && webSearchResult.get().isFound());
 
         return webSearchResult;
     }

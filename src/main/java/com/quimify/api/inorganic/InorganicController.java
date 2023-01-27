@@ -32,9 +32,8 @@ class InorganicController {
     // Client:
 
     @GetMapping()
-    protected InorganicResult searchInorganic(@RequestParam("input") String input,
-                                              @RequestParam("picture") Boolean picture) {
-        InorganicResult inorganicResult = inorganicService.search(input, picture);
+    protected InorganicResult searchInorganic(@RequestParam("input") String input, @RequestParam("picture") Boolean p) {
+        InorganicResult inorganicResult = inorganicService.search(input);
 
         if(inorganicResult.isPresent())
             logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));

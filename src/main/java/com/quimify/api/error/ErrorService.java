@@ -25,7 +25,7 @@ class ErrorService {
 
     // Protected:
 
-    public void saveError(String title, String details, Class<?> location) {
+    public void log(String title, String details, Class<?> location) {
         ErrorModel errorModel = new ErrorModel();
 
         String locationName = location.getName().replaceAll(".*\\.", "");
@@ -43,7 +43,7 @@ class ErrorService {
                     exception + "\". " + "Title: \"" + title + "\". " + "Details: \"" + details + "\". ");
         }
 
-        metricsService.countErrorOccurred();
+        metricsService.errorOccurred();
     }
 
 }

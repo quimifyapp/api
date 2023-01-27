@@ -68,7 +68,7 @@ public class InorganicService {
                 Optional<InorganicModel> inorganicModel = inorganicRepository.findBySearchTagsContaining(searchTag);
 
                 if (inorganicModel.isEmpty()) {
-                    errorService.saveError("Search tag not in DB", searchTag.getNormalizedTag(), this.getClass());
+                    errorService.log("Search tag not in DB", searchTag.getNormalizedTag(), this.getClass());
                     return "";
                 }
 
@@ -103,24 +103,24 @@ public class InorganicService {
         if (searchedInorganic.isPresent())
             inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
-            errorService.saveError("Completion not in DB", completion, this.getClass());
+            errorService.log("Completion not in DB", completion, this.getClass());
             inorganicResult = InorganicResult.notFound;
         }
 
-        metricsService.countInorganicAutocompleted();
-        metricsService.countInorganicSearched(inorganicResult.isPresent(), false);
+        metricsService.inorganicAutocompleted();
+        metricsService.inorganicSearched(inorganicResult.isPresent());
 
         return inorganicResult;
     }
 
-    protected InorganicResult search(String input, Boolean isPicture) {
+    protected InorganicResult search(String input) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = searchInDatabase(input);
 
         inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
 
-        metricsService.countInorganicSearched(inorganicResult.isPresent(), isPicture);
+        metricsService.inorganicSearched(inorganicResult.isPresent());
 
         return inorganicResult;
     }
@@ -176,7 +176,7 @@ public class InorganicService {
         inorganicRepository.save(parsedInorganic.get());
         searchTagsCache.addAll(parsedInorganic.get().getSearchTags());
 
-        metricsService.countInorganicLearned();
+        metricsService.inorganicLearned();
         logger.info("New inorganic: " + parsedInorganic.get());
 
         return inorganicResult;
@@ -204,7 +204,7 @@ public class InorganicService {
             return Optional.empty();
         }
         catch (Exception exception) {
-            errorService.saveError("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
+            errorService.log("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
             return Optional.empty();
         }
     }

@@ -37,7 +37,7 @@ class PubChemComponent {
         try {
             compoundId = new Download(String.format(compoundIdUrl, smiles)).getText();
         } catch (IOException ioException) {
-            errorService.saveError("Exception getting cId for: " + smiles, ioException.toString(), this.getClass());
+            errorService.log("Exception getting cId for: " + smiles, ioException.toString(), this.getClass());
             compoundId = null;
         }
     }
@@ -59,7 +59,7 @@ class PubChemComponent {
             String text = new Download(String.format(molecularMassUrl, compoundId)).getText();
             molecularMass = Optional.of(Float.valueOf(text));
         } catch (Exception exception) {
-            errorService.saveError("Exception getting mass for: " + smiles, exception.toString(), this.getClass());
+            errorService.log("Exception getting mass for: " + smiles, exception.toString(), this.getClass());
             molecularMass = Optional.empty();
         }
 

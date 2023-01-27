@@ -55,12 +55,12 @@ class GoogleComponent {
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Google returned HTTP code 429.");
-            else errorService.saveError("IOException Google: " + input, exception.toString(), this.getClass());
+            else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
 
             webSearchResult = Optional.empty();
         }
 
-        metricsService.countGoogleSearch(webSearchResult.isPresent() && webSearchResult.get().isFound(), false);
+        metricsService.googleSearch(webSearchResult.isPresent() && webSearchResult.get().isFound());
 
         return webSearchResult;
     }

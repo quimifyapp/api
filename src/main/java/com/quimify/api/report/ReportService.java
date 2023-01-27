@@ -30,7 +30,7 @@ class ReportService {
 
         reportRepository.save(reportModel);
 
-        metricsService.countReportSent();
+        metricsService.reportSent();
     }
 
 }

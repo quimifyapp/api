@@ -23,8 +23,8 @@ class OrganicController {
 	// Client:
 
 	@GetMapping("from-name")
-	protected OrganicResult name(@RequestParam("name") String name, @RequestParam("picture") Boolean picture) {
-		OrganicResult result = organicService.getFromName(name, picture);
+	protected OrganicResult name(@RequestParam("name") String name, @RequestParam("picture") Boolean p) {
+		OrganicResult result = organicService.getFromName(name);
 
 		if (result.isPresent())
 			logger.info(String.format(getOrganicMessage, "name", name, result.getStructure()));

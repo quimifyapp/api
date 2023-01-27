@@ -42,7 +42,7 @@ class OrganicService {
 
 	// Client:
 
-	protected OrganicResult getFromName(String name, Boolean picture) {
+	protected OrganicResult getFromName(String name) {
 		OrganicResult organicResult;
 
 		try {
@@ -55,11 +55,11 @@ class OrganicService {
 				organicResult = OrganicResult.notFound;
 			}
 		} catch (Exception exception) {
-			errorService.saveError("Exception solving name: " + name, exception.toString(), this.getClass());
+			errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
 			organicResult = OrganicResult.notFound;
 		}
 
-		metricsService.countOrganicSearchedFromName(organicResult.isPresent(), picture);
+		metricsService.organicSearchedFromName(organicResult.isPresent());
 
 		return organicResult;
 	}
@@ -75,12 +75,12 @@ class OrganicService {
 		}
 		catch (Exception exception) {
 			String sequenceToString = Arrays.toString(inputSequence);
-			errorService.saveError("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
+			errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
 
 			organicResult = OrganicResult.notFound;
 		}
 
-		metricsService.countOrganicSearchedFromStructure(organicResult.isPresent());
+		metricsService.organicSearchedFromStructure(organicResult.isPresent());
 
 		return organicResult;
 	}

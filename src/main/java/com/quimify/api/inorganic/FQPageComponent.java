@@ -157,7 +157,7 @@ class FQPageComponent {
         inorganicModel.setFormula(inorganicModel.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
         inorganicModel.setSystematicName(null); // Systematic names for peroxides NEVER include that word
 
-        errorService.saveError("New peroxide needs manual correction", inorganicModel.toString(), this.getClass());
+        errorService.log("New peroxide needs manual correction", inorganicModel.toString(), this.getClass());
     }
 
     private void correctNames(InorganicModel inorganicModel) {
