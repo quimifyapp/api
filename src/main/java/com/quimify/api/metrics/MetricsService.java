@@ -21,6 +21,9 @@ class MetricsService {
     // Day starts at 13:00 of Spain and 07:00 of Bolivia
     private static final Duration offSet = Duration.ofHours(-13);
 
+    // TODO remove picture parameters
+    // TODO translate
+
     // Private:
 
     private MetricsModel getTodayMetrics() {
@@ -68,7 +71,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void countSearchedInorganic(boolean encontrado, boolean foto) {
+    public void countInorganicSearched(boolean encontrado, boolean foto) {
         if(encontrado) {
             if(foto)
                 getTodayMetrics().nuevoInorganicoFotoEncontrado();
@@ -125,7 +128,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void countOrganicFoundFromName(boolean found, boolean picture) {
+    public void countOrganicSearchedFromName(boolean found, boolean picture) {
         if (found) {
             if (picture)
                 getTodayMetrics().nuevoFormularOrganicoFotoEncontrado();
@@ -138,17 +141,14 @@ class MetricsService {
     }
 
     @Transactional
-    public void countOrganicSearchedFromStructure() {
-        getTodayMetrics().countOrganicSearchedFromStructure();
+    public void countOrganicSearchedFromStructure(boolean found) {
+        if(found)
+            getTodayMetrics().countOrganicSucceededFromStructure();
+        else getTodayMetrics().countOrganicFailedFromStructure();
     }
 
     @Transactional
-    public void countOrganicsFailedFromStructure() {
-        getTodayMetrics().countOrganicsFailedFromStructure();
-    }
-
-    @Transactional
-    public void countMolecularMass(boolean found) {
+    public void countMolecularMassSearched(boolean found) {
         if(found)
             getTodayMetrics().nuevoMasaMolecularEncontrado();
         else getTodayMetrics().nuevoMasaMolecularNoEncontrado();

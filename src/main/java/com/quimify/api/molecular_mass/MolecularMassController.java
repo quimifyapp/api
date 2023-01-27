@@ -24,7 +24,7 @@ class MolecularMassController {
 
     @GetMapping()
     protected MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
-        MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResultOf(formula);
+        MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResult(formula);
 
         if(molecularMassResult.isPresent())
             logger.info(String.format(getMolecularMassMessage, formula, molecularMassResult.getMolecularMass()));

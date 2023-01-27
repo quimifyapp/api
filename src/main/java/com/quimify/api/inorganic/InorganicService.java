@@ -50,8 +50,7 @@ public class InorganicService {
 
     public void refreshAutocompletion() {
         List<InorganicSearchTagModel> newSearchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
-                .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream())
-                .collect(Collectors.toList());
+                .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream()).collect(Collectors.toList());
 
         searchTagsCache.clear();
         searchTagsCache.addAll(newSearchTags);
@@ -109,7 +108,7 @@ public class InorganicService {
         }
 
         metricsService.countInorganicAutocompleted();
-        metricsService.countSearchedInorganic(inorganicResult.isPresent(), false);
+        metricsService.countInorganicSearched(inorganicResult.isPresent(), false);
 
         return inorganicResult;
     }
@@ -121,7 +120,7 @@ public class InorganicService {
 
         inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
 
-        metricsService.countSearchedInorganic(inorganicResult.isPresent(), isPicture);
+        metricsService.countInorganicSearched(inorganicResult.isPresent(), isPicture);
 
         return inorganicResult;
     }
@@ -165,8 +164,12 @@ public class InorganicService {
             return new InorganicResult(searchedInDatabase.get());
         }
 
-        Float molecularMass = molecularMassService.tryMolecularMassOf(parsedInorganic.get().getFormula());
-        parsedInorganic.get().setMolecularMass(String.format("%.2f", molecularMass).replace(",", "."));
+        Optional<Float> molecularMass = molecularMassService.get(parsedInorganic.get().getFormula());
+
+        if(molecularMass.isPresent()) {
+            String molecularMassToString = String.format("%.2f", molecularMass.get()).replace(",", ".");
+            parsedInorganic.get().setMolecularMass(molecularMassToString);
+        }
 
         InorganicResult inorganicResult = new InorganicResult(parsedInorganic.get());
 

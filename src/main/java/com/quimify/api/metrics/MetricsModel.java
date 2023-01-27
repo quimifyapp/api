@@ -200,11 +200,11 @@ class MetricsModel {
         organicsNotFoundFromNameFromPicture += 1;
     }
 
-    protected void countOrganicSearchedFromStructure() {
+    protected void countOrganicSucceededFromStructure() {
         organicsSucceededFromStructure += 1;
     }
 
-    protected void countOrganicsFailedFromStructure() {
+    protected void countOrganicFailedFromStructure() {
         organicsFailedFromStructure += 1;
     }
 

@@ -25,10 +25,10 @@ class OrganicService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	MolecularMassService molecularMassService; // Molecular masses logic
+	PubChemComponent pubChemComponent; // PubChem API logic
 
 	@Autowired
-	PubChemComponent pubChemComponent; // PubChem API logic
+	MolecularMassService molecularMassService; // Molecular masses logic
 
 	@Autowired
 	ErrorService errorService; // API errors logic
@@ -48,12 +48,8 @@ class OrganicService {
 		try {
 			Optional<Organic> organic = OrganicFactory.getFromName(name);
 
-			if(organic.isPresent()) {
-				Float molecularMass = molecularMassService.tryMolecularMassOf(organic.get().getStructure());
-				String url2D = pubChemComponent.getUrl2D(organic.get().getSmiles());
-
-				organicResult = new OrganicResult(name, organic.get().getStructure(), molecularMass, url2D);
-			}
+			if(organic.isPresent())
+				organicResult = resolvePropertiesOf(organic.get());
 			else {
 				logger.warn("Couldn't solve organic \"" + name + "\".");
 				organicResult = OrganicResult.notFound;
@@ -63,7 +59,7 @@ class OrganicService {
 			organicResult = OrganicResult.notFound;
 		}
 
-		metricsService.countOrganicFoundFromName(organicResult.isPresent(), picture);
+		metricsService.countOrganicSearchedFromName(organicResult.isPresent(), picture);
 
 		return organicResult;
 	}
@@ -74,22 +70,17 @@ class OrganicService {
 		try {
 			OpenChain openChain = getOpenChainFromStructure(inputSequence);
 			Organic organic = OrganicFactory.getFromOpenChain(openChain);
-
-			Float molecularMass = molecularMassService.tryMolecularMassOf(organic.getStructure());
-			String url2D = pubChemComponent.getUrl2D(organic.getSmiles());
-
-			metricsService.countOrganicSearchedFromStructure();
-
-			organicResult = new OrganicResult(organic.getName(), organic.getStructure(), molecularMass, url2D);
+			
+			organicResult = resolvePropertiesOf(organic);
 		}
 		catch (Exception exception) {
 			String sequenceToString = Arrays.toString(inputSequence);
 			errorService.saveError("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
 
-			metricsService.countOrganicsFailedFromStructure();
-
 			organicResult = OrganicResult.notFound;
 		}
+
+		metricsService.countOrganicSearchedFromStructure(organicResult.isPresent());
 
 		return organicResult;
 	}
@@ -118,6 +109,25 @@ class OrganicService {
 		}
 
 		return openChain;
+	}
+
+	private OrganicResult resolvePropertiesOf(Organic organic) {
+		if(organic.getSmiles() == null)
+			return new OrganicResult(organic.getName(), organic.getStructure(), null, null);
+
+		pubChemComponent.resolveCompound(organic.getSmiles());
+
+		String url2D = pubChemComponent.getUrl2D();
+
+		Optional<Float> molecularMass = Optional.empty();
+
+		if(organic.getStructure() != null)
+			molecularMass = molecularMassService.get(organic.getStructure());
+
+		if(molecularMass.isEmpty())
+			molecularMass = pubChemComponent.getMolecularMass();
+
+		return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D);
 	}
 
 }
