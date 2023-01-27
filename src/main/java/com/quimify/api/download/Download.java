@@ -12,22 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Download {
 
-    private HttpURLConnection httpURLConnection;
-
-    // Constructors:
-
-    public Download(String url, String parameter) throws IOException {
-        this.setConnection(url + formatForUrl(parameter));
-    }
-
-    public Download(String url) throws IOException {
-        this.setConnection(url);
-    }
-
-    private void setConnection(String url) throws IOException {
-        this.httpURLConnection = (HttpURLConnection)(new URL(url)).openConnection();
-        this.httpURLConnection.setRequestMethod("GET");
-    }
+    private final HttpURLConnection httpURLConnection;
 
     // Static:
 
@@ -35,10 +20,22 @@ public class Download {
         return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
-    // Public:
+    // Constructors:
+
+    public Download(String url) throws IOException {
+        httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+        httpURLConnection.setRequestMethod("GET");
+    }
+
+    public Download(String url, String parameter) throws IOException {
+        httpURLConnection = (HttpURLConnection) new URL(url + formatForUrl(parameter)).openConnection();
+        httpURLConnection.setRequestMethod("GET");
+    }
+
+    // Queries:
 
     public void setProperty(String key, String value) {
-        this.httpURLConnection.setRequestProperty(key, value);
+        httpURLConnection.setRequestProperty(key, value);
     }
 
     public String getText() throws IOException {
