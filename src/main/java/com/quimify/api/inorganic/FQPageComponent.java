@@ -4,6 +4,7 @@ import com.quimify.api.utils.Connection;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -12,11 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // This class parses inorganic compounds from FQ.com web pages.
 
 @Component
-// TODO scoped prototype with fields
+@Scope("prototype") // New instance for each request, avoiding shared state
 class FQPageComponent {
 
     @Autowired
@@ -24,6 +27,9 @@ class FQPageComponent {
 
     @Autowired
     ErrorService errorService; // API errors logic
+
+    String htmlDocument;
+    InorganicModel parsedInorganic;
 
     // Constants:
 
@@ -60,23 +66,23 @@ class FQPageComponent {
         Connection connection = new Connection(url);
         connection.setProperty("User-Agent", settingsService.getUserAgent());
 
-        String htmlDocument = connection.getText();
+        htmlDocument = connection.getText();
 
-        InorganicModel parsedInorganic = new InorganicModel();
+        parsedInorganic = new InorganicModel();
 
-        parseAndSetFormula(parsedInorganic, htmlDocument);
-        parseAndSetNames(parsedInorganic, htmlDocument);
-        parseAndSetProperties(parsedInorganic, htmlDocument);
+        parseAndSetFormula();
+        parseAndSetNames();
+        parseAndSetProperties();
 
-        setSearchTags(parsedInorganic);
-        fixNomenclatureMistakes(parsedInorganic); // Might update search tags
+        setSearchTags();
+        fixNomenclatureMistakes(); // Might update search tags
 
         return parsedInorganic;
     }
 
     // Steps:
 
-    private void parseAndSetFormula(InorganicModel inorganicModel, String htmlDocument) {
+    private void parseAndSetFormula() {
         String formula;
 
         Optional<Integer> headerIndex = indexAfterIn("<h1>", htmlDocument);
@@ -102,21 +108,21 @@ class FQPageComponent {
         }
         else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
         // TODO optional get check
-        inorganicModel.setFormula(formula);
+        parsedInorganic.setFormula(formula);
     }
 
-    private void parseAndSetNames(InorganicModel inorganicModel, String htmlDocument) {
+    private void parseAndSetNames() {
         Optional<Integer> index = indexAfterIn("sistemática:</b>", htmlDocument);
-        inorganicModel.setSystematicName(parseName(htmlDocument, index));
+        parsedInorganic.setSystematicName(parseName(index));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
-        inorganicModel.setStockName(parseName(htmlDocument, index));
+        parsedInorganic.setStockName(parseName(index));
 
         index = indexAfterIn("tradicional:</b>", htmlDocument);
-        inorganicModel.setTraditionalName(parseName(htmlDocument, index));
+        parsedInorganic.setTraditionalName(parseName(index));
     }
 
-    private String parseName(String htmlDocument, Optional<Integer> index) {
+    private String parseName(Optional<Integer> index) {
         if (index.isEmpty())
             return null;
 
@@ -130,70 +136,66 @@ class FQPageComponent {
         return name;
     }
 
-    private void setSearchTags(InorganicModel inorganicModel) {
-        inorganicModel.addSearchTagOf(inorganicModel.getFormula());
+    private void setSearchTags() {
+        parsedInorganic.addSearchTagOf(parsedInorganic.getFormula());
 
-        setNameSearchTag(inorganicModel, inorganicModel.getStockName());
-        setNameSearchTag(inorganicModel, inorganicModel.getSystematicName());
-        setNameSearchTag(inorganicModel, inorganicModel.getTraditionalName());
+        setNameSearchTag(parsedInorganic.getStockName());
+        setNameSearchTag(parsedInorganic.getSystematicName());
+        setNameSearchTag(parsedInorganic.getTraditionalName());
     }
 
-    private void setNameSearchTag(InorganicModel inorganicModel, String name) {
+    private void setNameSearchTag(String name) {
         if (name != null) {
-            inorganicModel.addSearchTagOf(name);
+            parsedInorganic.addSearchTagOf(name);
 
             if (name.contains("ácido"))
-                inorganicModel.addSearchTagOf(name.replace("ácido ", ""));
+                parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
         }
     }
 
-    private void fixNomenclatureMistakes(InorganicModel inorganicModel) {
-        if (inorganicModel.toString().contains("peróxido")) // Any of its names
-            correctPeroxide(inorganicModel);
+    private void fixNomenclatureMistakes() {
+        if (parsedInorganic.toString().contains("peróxido")) // Any of its names
+            correctPeroxide();
 
-        correctNames(inorganicModel);
+        parsedInorganic.setStockName(correctName(parsedInorganic.getStockName()));
+        parsedInorganic.setSystematicName(correctName(parsedInorganic.getSystematicName()));
+        parsedInorganic.setTraditionalName(correctName(parsedInorganic.getTraditionalName()));
     }
 
-    private void correctPeroxide(InorganicModel inorganicModel) {
-        inorganicModel.setFormula(inorganicModel.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
-        inorganicModel.setSystematicName(null); // Systematic names for peroxides NEVER include that word
+    private void correctPeroxide() {
+        parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
+        parsedInorganic.setSystematicName(null); // Systematic names for peroxides NEVER include that word
 
-        errorService.log("New peroxide needs manual correction", inorganicModel.toString(), this.getClass());
+        errorService.log("Learned peroxide needs manual correction", parsedInorganic.toString(), this.getClass());
     }
 
-    private void correctNames(InorganicModel inorganicModel) {
-        inorganicModel.setStockName(correctName(inorganicModel, inorganicModel.getStockName()));
-        inorganicModel.setSystematicName(correctName(inorganicModel, inorganicModel.getSystematicName()));
-        inorganicModel.setTraditionalName(correctName(inorganicModel, inorganicModel.getTraditionalName()));
-    }
-
-    private String correctName(InorganicModel inorganicModel, String name) {
+    private String correctName(String name) {
         if (name == null)
             return null;
 
-        // TODO uppercase but not between parentheses
+        // Uppercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
+        name = name.replaceAll("\\(([^)]+)\\)", "(\\U$1\\E)").toLowerCase(); // TODO test
 
         for (String namingMistake : namingMistakeToCorrection.keySet())
             if (name.contains(namingMistake)) {
                 name = name.replace(namingMistake, namingMistakeToCorrection.get(namingMistake));
-                setNameSearchTag(inorganicModel, name);
+                setNameSearchTag(name);
             }
 
         return name;
     }
 
-    private void parseAndSetProperties(InorganicModel inorganicModel, String htmlDocument) {
-        inorganicModel.setMolecularMass(parseMolecularMass(htmlDocument));
-        inorganicModel.setDensity(parseDensity(htmlDocument));
-        inorganicModel.setMeltingPoint(parseTemperature("fusión", htmlDocument));
-        inorganicModel.setBoilingPoint(parseTemperature("ebullición", htmlDocument));
+    private void parseAndSetProperties() {
+        parsedInorganic.setMolecularMass(parseMolecularMass());
+        parsedInorganic.setDensity(parseDensity());
+        parsedInorganic.setMeltingPoint(parseTemperature("fusión"));
+        parsedInorganic.setBoilingPoint(parseTemperature("ebullición"));
     }
 
-    private String parseMolecularMass(String htmlDocument) {
+    private String parseMolecularMass() {
         Optional<String> characteristic = parseCharacteristic(
                 List.of("Masa molar", "Masa Molar", "Peso Molecular"),
-                List.of("g"),
-                htmlDocument
+                List.of("g")
         );
 
         if (characteristic.isEmpty())
@@ -202,11 +204,10 @@ class FQPageComponent {
         return truncateToTwoDecimalPlaces(characteristic.get()); // Trailing zeros are kept
     }
 
-    private String parseTemperature(String temperatureLabel, String htmlDocument) {
+    private String parseTemperature(String temperatureLabel) {
         Optional<String> parsedCharacteristic = parseCharacteristic(
                 List.of("Punto de " + temperatureLabel, "Temperatura de " + temperatureLabel),
-                List.of("°", "º"),  // Similar yet different character
-                htmlDocument
+                List.of("°", "º") // Similar yet different character
         );
 
         if (parsedCharacteristic.isEmpty())
@@ -222,7 +223,7 @@ class FQPageComponent {
         return temperature;
     }
 
-    private Optional<String> parseCharacteristic(List<String> labels, List<String> units, String htmlDocument) {
+    private Optional<String> parseCharacteristic(List<String> labels, List<String> units) {
         String characteristic;
 
         Optional<Integer> indexAfterLabel = Optional.empty();
@@ -258,7 +259,7 @@ class FQPageComponent {
         return Optional.of(characteristic);
     }
 
-    private String parseDensity(String htmlDocument) {
+    private String parseDensity() {
         String density;
 
         Optional<Integer> index = indexAfterIn("Densidad:", htmlDocument);
@@ -320,13 +321,10 @@ class FQPageComponent {
 
     // I.e.: "-12.104 - 13.27" -> "12.104"
     // I.e.: "-12.104" -> "12.104"
-    private String firstInInterval(String interval) { // TODO Regexp?
+    private String firstInInterval(String interval) {
         interval = interval.trim(); // Leading and trailing spaces removed
-
-        if (interval.substring(1).contains("-")) // First dash might be a negative symbol
-            interval = interval.split("-", 2)[0];
-
-        return interval;
+        Matcher matcher = Pattern.compile("^-?[^-]+").matcher(interval); // First dash might be a negative symbol
+        return matcher.find() ? matcher.group() : "";
     }
 
     // I.e.: "14.457 -> 14.45"
@@ -342,6 +340,9 @@ class FQPageComponent {
             number = number.substring(0, afterDecimalsIndex);
 
         return number;
+
+        //Matcher matcher = Pattern.compile("^[^.]+\\.(\\d{0,2}).*$").matcher(number);
+        //    return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     // I.e.: "13.450" -> "13.45"
@@ -351,7 +352,7 @@ class FQPageComponent {
     }
 
     // I.e.: "X.000ABCD" -> "X.000ABC"
-    private String truncateToThreeSignificantDecimalPlaces(String number) {
+    private String truncateToThreeSignificantDecimalPlaces(String number) { // TODO Regexp?
         Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
         if (decimalPointIndex.isEmpty())
@@ -363,6 +364,9 @@ class FQPageComponent {
                     number = number.substring(0, i + 1);
 
         return number;
+
+        //Matcher matcher = Pattern.compile("^([^.]+\\.[0]{0,3}[1-9]+).*$").matcher(number);
+        //    return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     private Optional<Integer> indexAfterIn(String substring, String string) {
