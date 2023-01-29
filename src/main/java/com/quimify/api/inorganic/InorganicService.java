@@ -159,7 +159,7 @@ public class InorganicService {
             return new InorganicResult(searchedInDatabase.get());
         }
 
-        return processLearned(parsedInorganic.get());
+        return processNewlyLearned(parsedInorganic.get());
     }
 
     private Optional<InorganicModel> searchInDatabase(String input) {
@@ -189,21 +189,21 @@ public class InorganicService {
         }
     }
 
-    private InorganicResult processLearned(InorganicModel parsedInorganic) {
-        Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
+    private InorganicResult processNewlyLearned(InorganicModel learnedInorganic) {
+        Optional<Float> newMolecularMass = molecularMassService.get(learnedInorganic.getFormula());
 
         if(newMolecularMass.isPresent()) {
             String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
-            parsedInorganic.setMolecularMass(molecularMass);
+            learnedInorganic.setMolecularMass(molecularMass);
         }
 
-        inorganicRepository.save(parsedInorganic);
-        searchTagsCache.addAll(parsedInorganic.getSearchTags());
+        inorganicRepository.save(learnedInorganic);
+        searchTagsCache.addAll(learnedInorganic.getSearchTags());
 
         metricsService.inorganicLearned();
-        logger.info("Learned inorganic: " + parsedInorganic);
+        logger.info("Learned inorganic: " + learnedInorganic);
 
-        return new InorganicResult(parsedInorganic);
+        return new InorganicResult(learnedInorganic);
     }
 
 }
