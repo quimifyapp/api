@@ -174,7 +174,7 @@ class FQPageComponent {
             return null;
 
         // Uppercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
-        name = name.replaceAll("\\(([^)]+)\\)", "(\\U$1\\E)").toLowerCase(); // TODO test
+        name = Pattern.compile(".(?![^(]*\\))").matcher(name).replaceAll(match -> match.group().toLowerCase());
 
         for (String namingMistake : namingMistakeToCorrection.keySet())
             if (name.contains(namingMistake)) {
@@ -328,7 +328,7 @@ class FQPageComponent {
     }
 
     // I.e.: "14.457 -> 14.45"
-    private String truncateToTwoDecimalPlaces(String number) { // TODO Regexp?
+    private String truncateToTwoDecimalPlaces(String number) {
         Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
         if (decimalPointIndex.isEmpty())
@@ -341,8 +341,9 @@ class FQPageComponent {
 
         return number;
 
-        //Matcher matcher = Pattern.compile("^[^.]+\\.(\\d{0,2}).*$").matcher(number);
-        //    return matcher.find() ? matcher.replaceFirst("$1") : number;
+        // TODO Regexp?
+        // Matcher matcher = Pattern.compile("^[^.]+\\.(\\d{0,2}).*$").matcher(number);
+        // return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     // I.e.: "13.450" -> "13.45"
@@ -352,7 +353,7 @@ class FQPageComponent {
     }
 
     // I.e.: "X.000ABCD" -> "X.000ABC"
-    private String truncateToThreeSignificantDecimalPlaces(String number) { // TODO Regexp?
+    private String truncateToThreeSignificantDecimalPlaces(String number) {
         Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
         if (decimalPointIndex.isEmpty())
@@ -365,8 +366,9 @@ class FQPageComponent {
 
         return number;
 
-        //Matcher matcher = Pattern.compile("^([^.]+\\.[0]{0,3}[1-9]+).*$").matcher(number);
-        //    return matcher.find() ? matcher.replaceFirst("$1") : number;
+        // TODO Regexp?
+        // Matcher matcher = Pattern.compile("^([^.]+\\.[0]{0,3}[1-9]+).*$").matcher(number);
+        // return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     private Optional<Integer> indexAfterIn(String substring, String string) {
