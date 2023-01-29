@@ -1,4 +1,4 @@
-package com.quimify.api.download;
+package com.quimify.api.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-// This class makes HTTP GET requests and returns the text from their responses.
-// TODO component? scope?
-public class Download {
+// This class makes HTTPS GET requests and returns the text from their responses.
+
+public class Connection {
 
     private final HttpURLConnection httpURLConnection;
 
@@ -22,12 +22,12 @@ public class Download {
 
     // Constructors:
 
-    public Download(String url) throws IOException {
+    public Connection(String url) throws IOException {
         httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("GET");
     }
 
-    public Download(String url, String parameter) throws IOException {
+    public Connection(String url, String parameter) throws IOException {
         httpURLConnection = (HttpURLConnection) new URL(url + encodeForUrl(parameter)).openConnection();
         httpURLConnection.setRequestMethod("GET");
     }
