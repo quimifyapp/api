@@ -1,6 +1,6 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.download.Download;
+import com.quimify.api.utils.Connection;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import java.util.Set;
 // This class parses inorganic compounds from FQ.com web pages.
 
 @Component
+// TODO scoped prototype with fields
 class FQPageComponent {
 
     @Autowired
@@ -56,7 +57,7 @@ class FQPageComponent {
         if (invalidSubdirectories.stream().anyMatch(url::endsWith))
             throw new IllegalArgumentException("Invalid subdirectory.");
 
-        Download connection = new Download(url);
+        Connection connection = new Connection(url);
         connection.setProperty("User-Agent", settingsService.getUserAgent());
 
         String htmlDocument = connection.getText();
