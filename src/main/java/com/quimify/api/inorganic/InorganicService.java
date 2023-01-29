@@ -55,7 +55,7 @@ public class InorganicService {
         logger.info("Inorganic search tags updated in memory.");
     }
 
-    // Client autocompletion:
+    // Client:
 
     protected String autoComplete(String input) { // TODO clean code
         String normalizedInput = Normalizer.get(input);
@@ -91,8 +91,6 @@ public class InorganicService {
         return "";
     }
 
-    // Client searching:
-
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
@@ -122,10 +120,9 @@ public class InorganicService {
         return inorganicResult;
     }
 
-    // Private methods:
+    // Private:
 
     private InorganicResult searchOnTheWeb(String input) {
-        // Web search:
         webSearchComponent.search(input);
 
         if(!webSearchComponent.isFound()) {
@@ -162,24 +159,7 @@ public class InorganicService {
             return new InorganicResult(searchedInDatabase.get());
         }
 
-        // Process newly learned inorganic:
-
-        Optional<Float> molecularMass = molecularMassService.get(parsedInorganic.get().getFormula());
-
-        if(molecularMass.isPresent()) {
-            String molecularMassToString = String.format("%.2f", molecularMass.get()).replace(",", ".");
-            parsedInorganic.get().setMolecularMass(molecularMassToString);
-        }
-
-        InorganicResult inorganicResult = new InorganicResult(parsedInorganic.get());
-
-        inorganicRepository.save(parsedInorganic.get());
-        searchTagsCache.addAll(parsedInorganic.get().getSearchTags());
-
-        metricsService.inorganicLearned();
-        logger.info("Learned inorganic: " + parsedInorganic.get());
-
-        return inorganicResult;
+        return processLearned(parsedInorganic.get());
     }
 
     private Optional<InorganicModel> searchInDatabase(String input) {
@@ -207,6 +187,23 @@ public class InorganicService {
             errorService.log("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
             return Optional.empty();
         }
+    }
+
+    private InorganicResult processLearned(InorganicModel parsedInorganic) {
+        Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
+
+        if(newMolecularMass.isPresent()) {
+            String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
+            parsedInorganic.setMolecularMass(molecularMass);
+        }
+
+        inorganicRepository.save(parsedInorganic);
+        searchTagsCache.addAll(parsedInorganic.getSearchTags());
+
+        metricsService.inorganicLearned();
+        logger.info("Learned inorganic: " + parsedInorganic);
+
+        return new InorganicResult(parsedInorganic);
     }
 
 }
