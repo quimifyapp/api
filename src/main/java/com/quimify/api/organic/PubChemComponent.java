@@ -17,7 +17,7 @@ class PubChemComponent {
     ErrorService errorService; // API errors logic
 
     private String compoundId; // Compound's ID in Pub Chem DB
-    private String smiles; // Simplified Molecular Input Line Entry Specification
+    private String encodedSmiles; // Simplified Molecular Input Line Entry Specification
 
     // Constants:
 
@@ -32,11 +32,12 @@ class PubChemComponent {
     // Queries:
 
     protected void resolveCompound(String smiles) {
-        smiles = formatSmilesForUrl(smiles);
-        this.smiles = smiles;
+        // Adapted for URLs and PubChem:
+        encodedSmiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
+        encodedSmiles = Download.encodeForUrl(encodedSmiles); // Escapes special characters
 
         try {
-            compoundId = new Download(String.format(compoundIdUrl, smiles)).getText();
+            compoundId = new Download(String.format(compoundIdUrl, encodedSmiles)).getText();
         } catch (IOException ioException) {
             errorService.log("Exception getting cId for: " + smiles, ioException.toString(), this.getClass());
             compoundId = null;
@@ -45,7 +46,7 @@ class PubChemComponent {
 
     protected String getUrl2D() {
         if (invalidCompoundId())
-            return String.format(smiles2DUrl, smiles); // 300 x 300 px
+            return String.format(smiles2DUrl, encodedSmiles); // 300 x 300 px
 
         return String.format(compoundId2DUrl, compoundId); // 500 x 500 px
     }
@@ -60,7 +61,7 @@ class PubChemComponent {
             String text = new Download(String.format(molecularMassUrl, compoundId)).getText();
             molecularMass = Optional.of(Float.valueOf(text));
         } catch (Exception exception) {
-            errorService.log("Exception getting mass for: " + smiles, exception.toString(), this.getClass());
+            errorService.log("Exception getting mass for: " + compoundId, exception.toString(), this.getClass());
             molecularMass = Optional.empty();
         }
 
@@ -68,11 +69,6 @@ class PubChemComponent {
     }
 
     // Private:
-
-    private String formatSmilesForUrl(String smiles) {
-        smiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
-        return Download.formatForUrl(smiles);
-    }
 
     private boolean invalidCompoundId() {
         return compoundId == null || compoundId.equals("0");

@@ -9,14 +9,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 // This class makes HTTP GET requests and returns the text from their responses.
-
+// TODO component? scope?
 public class Download {
 
     private final HttpURLConnection httpURLConnection;
 
     // Static:
 
-    public static String formatForUrl(String input) {
+    public static String encodeForUrl(String input) {
         return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
@@ -28,7 +28,7 @@ public class Download {
     }
 
     public Download(String url, String parameter) throws IOException {
-        httpURLConnection = (HttpURLConnection) new URL(url + formatForUrl(parameter)).openConnection();
+        httpURLConnection = (HttpURLConnection) new URL(url + encodeForUrl(parameter)).openConnection();
         httpURLConnection.setRequestMethod("GET");
     }
 
