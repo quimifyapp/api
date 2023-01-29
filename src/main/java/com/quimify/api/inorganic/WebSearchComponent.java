@@ -32,7 +32,6 @@ class WebSearchComponent {
 
     private String input;
 
-    private boolean found;
     private String title;
     private String address;
 
@@ -41,13 +40,20 @@ class WebSearchComponent {
     protected void search(String input) {
         this.input = input;
 
+        boolean couldSearch = false;
+
         if(canGoogleSearch())
-            googleSearch();
-        else if(canFreeBingSearch())
-            bingSearch(settingsService.getFreeBingKey(), "free Bing");
-        else if(canPaidBingSearch())
+            couldSearch = googleSearch();
+
+        if(!couldSearch && canFreeBingSearch())
+            couldSearch = bingSearch(settingsService.getFreeBingKey(), "free Bing");
+
+        if(!couldSearch && canPaidBingSearch())
             bingSearch(settingsService.getPaidBingKey(), "paid Bing");
-        else found = false;
+    }
+
+    protected boolean isFound() {
+        return title != null && address != null;
     }
 
     // Private:
@@ -64,7 +70,9 @@ class WebSearchComponent {
         return queries < settingsService.getGoogleLimit();
     }
 
-    protected void googleSearch() {
+    protected boolean googleSearch() {
+        boolean searched;
+
         try {
             Connection connection = new Connection(settingsService.getGoogleURL(), input);
             connection.setProperty("Accept", "application/json");
@@ -73,23 +81,23 @@ class WebSearchComponent {
             if (response.getJSONObject("searchInformation").getInt("totalResults") > 0) {
                 JSONObject result = response.getJSONArray("items").getJSONObject(0);
 
-                found = true;
                 title = result.getString("title");
                 address = result.getString("formattedUrl");
             }
-            else {
-                logger.warn("Couldn't find \"" + input + "\" on Google.");
-                found = false;
-            }
+            else logger.warn("Couldn't find \"" + input + "\" on Google.");
+
+            searched = true;
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Google returned HTTP code 429.");
             else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
 
-            found = false;
+            searched = false;
         }
 
-        metricsService.googleSearch(found);
+        metricsService.googleSearch(searched && isFound());
+
+        return searched;
     }
 
     private boolean canFreeBingSearch() {
@@ -108,7 +116,9 @@ class WebSearchComponent {
         return queries < settingsService.getPaidBingLimit();
     }
 
-    private void bingSearch(String apiKey, String apiName) {
+    private boolean bingSearch(String apiKey, String apiName) {
+        boolean searched;
+
         try {
             Connection connection = new Connection(settingsService.getBingURL(), input);
             connection.setProperty("Ocp-Apim-Subscription-Key", apiKey);
@@ -117,33 +127,29 @@ class WebSearchComponent {
             if (response.has("webPages")) {
                 JSONObject result = response.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
 
-                found = true;
                 title = result.getString("name");
                 address = result.getString("url");
             }
-            else {
-                logger.warn("Couldn't find \"" + input + "\" on " + apiName);
-                found = false;
-            }
+            else logger.warn("Couldn't find \"" + input + "\" on " + apiName);
+
+            searched = true;
         } catch (IOException exception) {
             if (exception.toString().contains("HTTP response code: 403"))
                 logger.warn(apiName + " returned HTTP code 403.");
             else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
 
-            found = false;
+            searched = false;
         } catch (Exception exception) {
             errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
-            found = false;
+            searched = false;
         }
 
-        metricsService.bingSearch(found);
+        metricsService.bingSearch(searched && isFound());
+
+        return searched;
     }
 
     // Getters:
-
-    protected boolean isFound() {
-        return found;
-    }
 
     protected String getTitle() {
         return title;
