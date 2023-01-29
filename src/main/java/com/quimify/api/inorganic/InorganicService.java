@@ -24,10 +24,7 @@ public class InorganicService {
     InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
-    GoogleComponent googleComponent; // Google searches logic
-
-    @Autowired
-    BingComponent bingComponent; // Bing searches logic
+    WebSearchComponent webSearchComponent; // Web searches logic
 
     @Autowired
     FQPageComponent fqPageComponent; // Inorganic web pages logic
@@ -127,21 +124,18 @@ public class InorganicService {
 
     // Private methods:
 
-    private InorganicResult searchOnTheWeb(String input) { // TODO break up
-        Optional<WebSearchResult> searchResult;
+    private InorganicResult searchOnTheWeb(String input) {
+        // Web search:
+        webSearchComponent.search(input);
 
-        searchResult = googleComponent.search(input);
-        if (searchResult.isEmpty())
-            searchResult = bingComponent.freeSearch(input);
-        if (searchResult.isEmpty())
-            searchResult = bingComponent.paidSearch(input);
-
-        if (searchResult.isEmpty() || !searchResult.get().isFound()) {
+        if(!webSearchComponent.isFound()) {
             logger.warn("Couldn't find inorganic \"" + input + "\".");
             return InorganicResult.notFound;
         }
 
-        String[] words = searchResult.get().getTitle().trim().split(" ");
+        // Check if it was already in the DB:
+
+        String[] words = webSearchComponent.getTitle().trim().split(" ");
         String firstWord = words[0];
 
         if (firstWord.equals("ácido"))
@@ -153,16 +147,22 @@ public class InorganicService {
             return new InorganicResult(searchedInDatabase.get());
         }
 
-        Optional<InorganicModel> parsedInorganic = tryParseFQ(searchResult.get().getAddress());
+        // Parse the inorganic:
+
+        Optional<InorganicModel> parsedInorganic = tryParseFQ(webSearchComponent.getAddress());
 
         if (parsedInorganic.isEmpty())
             return InorganicResult.notFound;
+
+        // Check again if it was already in the DB:
 
         searchedInDatabase = searchInDatabase(parsedInorganic.get().getFormula());
         if (searchedInDatabase.isPresent()) {
             logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInDatabase.get());
             return new InorganicResult(searchedInDatabase.get());
         }
+
+        // Process newly learned inorganic:
 
         Optional<Float> molecularMass = molecularMassService.get(parsedInorganic.get().getFormula());
 
@@ -177,7 +177,7 @@ public class InorganicService {
         searchTagsCache.addAll(parsedInorganic.get().getSearchTags());
 
         metricsService.inorganicLearned();
-        logger.info("New inorganic: " + parsedInorganic.get());
+        logger.info("Learned inorganic: " + parsedInorganic.get());
 
         return inorganicResult;
     }
