@@ -14,12 +14,6 @@ public class Connection {
 
     private final HttpURLConnection httpURLConnection;
 
-    // Static:
-
-    public static String encodeForUrl(String input) {
-        return URLEncoder.encode(input, StandardCharsets.UTF_8);
-    }
-
     // Constructors:
 
     public Connection(String url) throws IOException {
@@ -50,6 +44,12 @@ public class Connection {
         this.httpURLConnection.disconnect();
 
         return text.toString();
+    }
+
+    // Static:
+
+    public static String encodeForUrl(String input) {
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
 }
