@@ -1,5 +1,5 @@
 package com.quimify.api.inorganic;
-import com.quimify.api.Normalized;
+import com.quimify.api.utils.Normalizer;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -23,7 +23,7 @@ class InorganicSearchTagModel {
     // Constructor:
 
     protected InorganicSearchTagModel(String tag) {
-        this.normalizedTag = Normalized.of(tag);
+        this.normalizedTag = Normalizer.get(tag);
     }
 
     protected InorganicSearchTagModel() {} // Needed by JPA

@@ -1,6 +1,6 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.Normalized;
+import com.quimify.api.utils.Normalizer;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.settings.SettingsService;
@@ -61,7 +61,7 @@ public class InorganicService {
     // Client autocompletion:
 
     protected String autoComplete(String input) { // TODO clean code
-        String normalizedInput = Normalized.of(input);
+        String normalizedInput = Normalizer.get(input);
 
         for (InorganicSearchTagModel searchTag : searchTagsCache)
             if (searchTag.getNormalizedTag().startsWith(normalizedInput)) {
@@ -73,19 +73,19 @@ public class InorganicService {
                 }
 
                 String completion = inorganicModel.get().getStockName();
-                if (completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
                     return completion;
 
                 completion = inorganicModel.get().getSystematicName();
-                if (completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
                     return completion;
 
                 completion = inorganicModel.get().getTraditionalName();
-                if (completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
                     return completion;
 
                 completion = inorganicModel.get().getOtherName();
-                if (completion != null && Normalized.of(completion).startsWith(normalizedInput))
+                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
                     return completion;
 
                 return inorganicModel.get().getFormula(); // Formula or a search tag
@@ -183,7 +183,7 @@ public class InorganicService {
     }
 
     private Optional<InorganicModel> searchInDatabase(String input) {
-        String normalizedInput = Normalized.of(input);
+        String normalizedInput = Normalizer.get(input);
 
         for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
             if (inorganicModel.getSearchTagsAsStrings().contains(normalizedInput)) {
