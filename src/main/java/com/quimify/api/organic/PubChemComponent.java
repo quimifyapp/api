@@ -1,8 +1,9 @@
 package com.quimify.api.organic;
 
-import com.quimify.api.download.Download;
+import com.quimify.api.utils.Connection;
 import com.quimify.api.error.ErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.Optional;
 // This class makes calls to the PubChem API.
 
 @Component
+@Scope("prototype") // New instance for each request, avoiding shared state
 class PubChemComponent {
 
     @Autowired
@@ -34,10 +36,10 @@ class PubChemComponent {
     protected void resolveCompound(String smiles) {
         // Adapted for URLs and PubChem:
         encodedSmiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
-        encodedSmiles = Download.encodeForUrl(encodedSmiles); // Escapes special characters
+        encodedSmiles = Connection.encodeForUrl(encodedSmiles); // Escapes special characters
 
         try {
-            compoundId = new Download(String.format(compoundIdUrl, encodedSmiles)).getText();
+            compoundId = new Connection(String.format(compoundIdUrl, encodedSmiles)).getText();
         } catch (IOException ioException) {
             errorService.log("Exception getting cId for: " + smiles, ioException.toString(), this.getClass());
             compoundId = null;
@@ -58,7 +60,7 @@ class PubChemComponent {
         Optional<Float> molecularMass;
 
         try {
-            String text = new Download(String.format(molecularMassUrl, compoundId)).getText();
+            String text = new Connection(String.format(molecularMassUrl, compoundId)).getText();
             molecularMass = Optional.of(Float.valueOf(text));
         } catch (Exception exception) {
             errorService.log("Exception getting mass for: " + compoundId, exception.toString(), this.getClass());
