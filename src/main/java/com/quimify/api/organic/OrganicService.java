@@ -48,8 +48,14 @@ class OrganicService {
 		try {
 			Optional<Organic> organic = OrganicFactory.getFromName(name);
 
-			if(organic.isPresent())
+			if(organic.isPresent()) {
 				organicResult = resolvePropertiesOf(organic.get());
+
+				if(organic.get().getStructureException() != null) {
+					Exception exception = organic.get().getStructureException();
+					errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+				}
+			}
 			else {
 				logger.warn("Couldn't solve organic \"" + name + "\".");
 				organicResult = OrganicResult.notFound;
