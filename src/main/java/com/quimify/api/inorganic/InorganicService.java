@@ -123,9 +123,7 @@ public class InorganicService {
     // Private:
 
     private InorganicResult searchOnTheWeb(String input) {
-        webSearchComponent.search(input);
-
-        if(!webSearchComponent.isFound()) {
+        if(!webSearchComponent.search(input)) {
             logger.warn("Couldn't find inorganic \"" + input + "\".");
             return InorganicResult.notFound;
         }

@@ -74,17 +74,23 @@ class MetricsService {
     }
 
     @Transactional
-    public void googleSearch(boolean found) {
-        if (found)
-            getTodayMetrics().incrementGoogleFoundFromText();
-        else getTodayMetrics().incrementGoogleNotFoundFromText();
+    public void googleSearchFound() {
+        getTodayMetrics().incrementGoogleFoundFromText();
     }
 
     @Transactional
-    public void bingSearch(boolean found) {
-        if (found)
-            getTodayMetrics().incrementBingFoundFromText();
-        else getTodayMetrics().incrementBingNotFoundFromText();
+    public void googleSearchNotFound() {
+        getTodayMetrics().incrementGoogleNotFoundFromText();
+    }
+
+    @Transactional
+    public void bingSearchFound() {
+        getTodayMetrics().incrementBingFoundFromText();
+    }
+
+    @Transactional
+    public void bingSearchNotFound() {
+        getTodayMetrics().incrementBingNotFoundFromText();
     }
 
     @Transactional

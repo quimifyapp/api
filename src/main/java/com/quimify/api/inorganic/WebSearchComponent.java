@@ -37,29 +37,31 @@ class WebSearchComponent {
 
     // Protected:
 
-    protected void search(String input) {
+    protected boolean search(String input) {
         this.input = input;
 
-        boolean couldSearch = false;
+        boolean searchDone = false;
 
-        if(canGoogleSearch())
-            couldSearch = googleSearch();
+        if (canGoogleSearch())
+            searchDone = googleSearch();
 
-        if(!couldSearch && canFreeBingSearch())
-            couldSearch = bingSearch(settingsService.getFreeBingKey(), "free Bing");
+        if (!searchDone && canFreeBingSearch())
+            searchDone = bingSearch(settingsService.getFreeBingKey(), "free Bing");
 
-        if(!couldSearch && canPaidBingSearch())
-            bingSearch(settingsService.getPaidBingKey(), "paid Bing");
-    }
+        if (!searchDone && canPaidBingSearch()) {
+            searchDone = bingSearch(settingsService.getPaidBingKey(), "paid Bing");
 
-    protected boolean isFound() {
+            if (searchDone)
+                metricsService.paidBingQuery();
+        }
+
         return title != null && address != null;
     }
 
     // Private:
 
     private boolean canGoogleSearch() {
-        if(!settingsService.getGoogleON())
+        if (!settingsService.getGoogleON())
             return false;
 
         int queries = metricsService.getGoogleQueries();
@@ -83,8 +85,13 @@ class WebSearchComponent {
 
                 title = result.getString("title");
                 address = result.getString("formattedUrl");
+
+                metricsService.googleSearchFound();
             }
-            else logger.warn("Couldn't find \"" + input + "\" on Google.");
+            else {
+                logger.warn("Couldn't find \"" + input + "\" on Google.");
+                metricsService.googleSearchNotFound();
+            }
 
             searched = true;
         } catch (Exception exception) {
@@ -92,10 +99,10 @@ class WebSearchComponent {
                 logger.warn("Google returned HTTP code 429.");
             else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
 
+            metricsService.googleSearchNotFound();
+
             searched = false;
         }
-
-        metricsService.googleSearch(searched && isFound());
 
         return searched;
     }
@@ -105,7 +112,7 @@ class WebSearchComponent {
     }
 
     private boolean canPaidBingSearch() {
-        if(!settingsService.getPaidBingON())
+        if (!settingsService.getPaidBingON())
             return false;
 
         int queries = metricsService.getPaidBingQueries();
@@ -129,8 +136,13 @@ class WebSearchComponent {
 
                 title = result.getString("name");
                 address = result.getString("url");
+
+                metricsService.bingSearchFound();
             }
-            else logger.warn("Couldn't find \"" + input + "\" on " + apiName);
+            else {
+                logger.warn("Couldn't find \"" + input + "\" on " + apiName);
+                metricsService.bingSearchNotFound();
+            }
 
             searched = true;
         } catch (IOException exception) {
@@ -138,13 +150,16 @@ class WebSearchComponent {
                 logger.warn(apiName + " returned HTTP code 403.");
             else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
 
+            metricsService.bingSearchNotFound();
+
             searched = false;
         } catch (Exception exception) {
             errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
+
+            metricsService.bingSearchNotFound();
+
             searched = false;
         }
-
-        metricsService.bingSearch(searched && isFound());
 
         return searched;
     }
