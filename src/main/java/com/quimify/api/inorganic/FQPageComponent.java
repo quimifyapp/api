@@ -39,8 +39,9 @@ class FQPageComponent {
             ".com/", "acidos-carboxilicos/", "alcanos/", "alcoholes/", "aldehidos/", "alquenos/", "alquinos/",
             "amidas/", "aminas/", "anhidridos/", "anhidridos-organicos/", "aromaticos/", "buscador/", "cetonas/",
             "cicloalquenos/", "ejemplos/", "ejercicios/", "esteres/", "eteres/", "halogenuros/", "hidracidos/",
-            "hidroxidos/", "hidruros/", "hidruros-volatiles/", "inorganica/", "nitrilos/", "organica/", "oxidos/",
-            "oxisales/", "oxoacidos/", "peroxidos/", "politica-privacidad/", "sales-neutras/", "sales-volatiles/"
+            "hidroxidos/", "hidruros/", "hidruros-volatiles/", "inorganica/", "nitrilos/", "organica/",
+            "oxidos-metalicos/", "oxidos/", "oxisales/", "oxoacidos/", "peroxidos/", "politica-privacidad/",
+            "sales-neutras/", "sales-volatiles/"
     );
 
     private final static Map<String, String> namingMistakeToCorrection = Map.of(
@@ -148,7 +149,7 @@ class FQPageComponent {
         if (name != null) {
             parsedInorganic.addSearchTagOf(name);
 
-            if (name.contains("ácido"))
+            if (name.contains("ácido")) // TODO "zinc", in corrections not in search tags
                 parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
         }
     }
