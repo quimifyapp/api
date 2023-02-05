@@ -2,7 +2,7 @@ SELECT * FROM inorganic
 # WHERE formula LIKE "C%"
 
 # WHERE systematic_name LIKE "%teleruro%"
-# WHERE stock_name LIKE "oxido de fosforo%"
+# WHERE traditional_name LIKE "%ina"
 # WHERE systematic_name LIKE "%-%"
 # WHERE formula REGEXP '.*C[0-9]*[\-]?H.*'
 # WHERE id = 781
