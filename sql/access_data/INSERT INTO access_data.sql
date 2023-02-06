@@ -1,4 +1,4 @@
-INSERT INTO client(version,
+INSERT INTO access_data(client_version,
 update_available,
 update_needed,
 update_details,
@@ -9,7 +9,7 @@ message_link_present,
 message_link_label,
 message_link)
 
-VALUES(5, # Version
+VALUES(5, # Client version
 false, # Update available
 null, # Update needed
 null, # Update details
