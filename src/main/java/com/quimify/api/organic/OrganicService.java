@@ -102,16 +102,15 @@ class OrganicService {
 				continue;
 			}
 
-			Group groupElection = openChain.getBondableGroups().get(inputSequence[i]);
+			Group group = Group.values()[inputSequence[i]];
 
-			if (groupElection != Group.radical)
-				openChain = openChain.bond(groupElection);
-			else {
+			if (group == Group.radical) {
 				boolean iso = inputSequence[++i] == 1;
 				int carbonCount = inputSequence[++i];
 
 				openChain = openChain.bond(new Substituent(carbonCount, iso));
 			}
+			else openChain = openChain.bond(group);
 		}
 
 		return openChain;
