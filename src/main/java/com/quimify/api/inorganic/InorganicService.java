@@ -147,7 +147,7 @@ public class InorganicService {
         if (normalizedInput.equals(Normalizer.get(possibleMatch)))
             return true;
 
-        possibleMatch = inorganicModel.getOtherName();
+        possibleMatch = inorganicModel.getCommonName();
         if (normalizedInput.equals(Normalizer.get(possibleMatch)))
             return true;
 

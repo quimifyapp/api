@@ -25,10 +25,10 @@ class InorganicModel {
     // With 'null' default value:
 
     private String stockName; // "óxido de níquel (III)"
-    private String systematicName; // "trióxido de diníquel"
+    private String systematicName; // "trióxido de diníquel", "sodio"
     private String traditionalName; // "óxido niquélico"
 
-    private String otherName; // "potasio"
+    private String commonName; // "agua"
 
     // Foreign key (one to many):
 
@@ -77,7 +77,7 @@ class InorganicModel {
         words.add(stockName);
         words.add(systematicName);
         words.add(traditionalName);
-        words.add(otherName);
+        words.add(commonName);
 
         words.removeIf(Objects::isNull);
 
@@ -126,12 +126,12 @@ class InorganicModel {
         this.traditionalName = traditionalName;
     }
 
-    protected String getOtherName() {
-        return otherName;
+    protected String getCommonName() {
+        return commonName;
     }
 
-    protected void setOtherName(String otherName) {
-        this.otherName = otherName;
+    protected void setCommonName(String otherName) {
+        this.commonName = otherName;
     }
 
     protected Set<InorganicSearchTagModel> getInorganicSearchTags() {

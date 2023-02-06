@@ -74,7 +74,7 @@ class AutocompleteComponent {
         addSearchTagIn(inorganicModel.getStockName(), inorganicModel.getId(), cache, keyToId);
         addSearchTagIn(inorganicModel.getSystematicName(), inorganicModel.getId(), cache, keyToId);
         addSearchTagIn(inorganicModel.getTraditionalName(), inorganicModel.getId(), cache, keyToId);
-        addSearchTagIn(inorganicModel.getOtherName(), inorganicModel.getId(), cache, keyToId);
+        addSearchTagIn(inorganicModel.getCommonName(), inorganicModel.getId(), cache, keyToId);
 
         for (String normalizedText : inorganicModel.getSearchTags())
             keyToId.put(normalizedText, inorganicModel.getId());
@@ -116,7 +116,7 @@ class AutocompleteComponent {
         if (normalizedText.equals(Normalizer.get(completion)))
             return completion;
 
-        completion = inorganicModel.get().getOtherName();
+        completion = inorganicModel.get().getCommonName();
         if (normalizedText.equals(Normalizer.get(completion)))
             return completion;
 

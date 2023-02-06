@@ -37,7 +37,7 @@ class InorganicResult {
         this.stockName = inorganicModel.getStockName();
         this.systematicName = inorganicModel.getSystematicName();
         this.traditionalName = inorganicModel.getTraditionalName();
-        this.otherName = inorganicModel.getOtherName();
+        this.otherName = inorganicModel.getCommonName();
 
         this.molecularMass = inorganicModel.getMolecularMass();
         this.density = inorganicModel.getDensity();
