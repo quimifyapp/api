@@ -15,6 +15,10 @@ class MetricsModel {
 
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer errorsOccurred = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer clientErrorsSent = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer reportsSent = 0;
 
     // Their sum is equivalent to the total number of client accesses:
     @Column(columnDefinition = "INT default 0", nullable = false)
@@ -69,9 +73,6 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer molecularMassesFailed = 0;
 
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer reportsSent = 0;
-
     // Constructors:
 
     protected MetricsModel() {} // JPA needs it
@@ -81,6 +82,18 @@ class MetricsModel {
     }
 
     // Incrementers:
+
+    protected void incrementErrorsOccurred() {
+        errorsOccurred += 1;
+    }
+
+    protected void incrementClientErrorsSent() {
+        clientErrorsSent += 1;
+    }
+
+    protected void incrementReportsSent() {
+        reportsSent += 1;
+    }
 
     protected void incrementAndroidAccesses() {
         androidAccesses += 1;
@@ -154,14 +167,6 @@ class MetricsModel {
         molecularMassesFailed += 1;
     }
 
-    protected void incrementErrorsOccurred() {
-        errorsOccurred += 1;
-    }
-
-    protected void incrementReportsSent() {
-        reportsSent += 1;
-    }
-
     // Getters and setters:
 
     protected Date getDate() {
@@ -178,6 +183,22 @@ class MetricsModel {
 
     protected void setErrorsOccurred(Integer errorsOccurred) {
         this.errorsOccurred = errorsOccurred;
+    }
+
+    protected Integer getClientErrorsSent() {
+        return clientErrorsSent;
+    }
+
+    protected void setClientErrorsSent(Integer clientErrorsOccurred) {
+        this.clientErrorsSent = clientErrorsOccurred;
+    }
+
+    protected Integer getReportsSent() {
+        return reportsSent;
+    }
+
+    protected void setReportsSent(Integer reportsSent) {
+        this.reportsSent = reportsSent;
     }
 
     protected Integer getAndroidAccesses() {
@@ -322,14 +343,6 @@ class MetricsModel {
 
     protected void setMolecularMassesFailed(Integer molecularMassesFailed) {
         this.molecularMassesFailed = molecularMassesFailed;
-    }
-
-    protected Integer getReportsSent() {
-        return reportsSent;
-    }
-
-    protected void setReportsSent(Integer reportsSent) {
-        this.reportsSent = reportsSent;
     }
 
 }

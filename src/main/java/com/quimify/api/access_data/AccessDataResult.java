@@ -1,8 +1,8 @@
-package com.quimify.api.client;
+package com.quimify.api.access_data;
 
-// This POJO class represents responses of accesses to the client.
+// This POJO class represents responses of access data to the client.
 
-class ClientResult {
+class AccessDataResult {
 
 	private boolean updateAvailable;
 	private Boolean updateNeeded;
@@ -17,10 +17,9 @@ class ClientResult {
 
 	// Constructors:
 
-	protected ClientResult(boolean updateAvailable, Boolean updateNeeded,
-						String updateDetails, boolean messagePresent, String messageTitle,
-						String messageDetails, Boolean messageLinkPresent, String messageLinkLabel,
-						String messageLink) {
+	protected AccessDataResult(boolean updateAvailable, Boolean updateNeeded, String updateDetails,
+							   boolean messagePresent, String messageTitle, String messageDetails,
+							   Boolean messageLinkPresent, String messageLinkLabel, String messageLink) {
 		this.updateAvailable = updateAvailable;
 		this.updateNeeded = updateNeeded;
 		this.updateDetails = updateDetails;

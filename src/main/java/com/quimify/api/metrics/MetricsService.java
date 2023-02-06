@@ -1,6 +1,6 @@
 package com.quimify.api.metrics;
 
-import com.quimify.api.client.ClientService;
+import com.quimify.api.access_data.AccessDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,15 +52,30 @@ class MetricsService {
     // Counters:
 
     @Transactional
+    public void errorOccurred() {
+        getTodayMetrics().incrementErrorsOccurred();
+    }
+
+    @Transactional
+    public void clientErrorSent() {
+        getTodayMetrics().incrementClientErrorsSent();
+    }
+
+    @Transactional
+    public void reportSent() {
+        getTodayMetrics().incrementReportsSent();
+    }
+
+    @Transactional
     public void countAccess(Short platform) {
         switch (platform) {
-            case ClientService.androidPlatform:
+            case AccessDataService.androidPlatform:
                 getTodayMetrics().incrementAndroidAccesses();
                 break;
-            case ClientService.iOSPlatform:
+            case AccessDataService.iOSPlatform:
                 getTodayMetrics().incrementIOSAccesses();
                 break;
-            case ClientService.webPlatform:
+            case AccessDataService.webPlatform:
                 getTodayMetrics().incrementWebAccesses();
                 break;
         }
@@ -127,16 +142,6 @@ class MetricsService {
         if (found)
             getTodayMetrics().incrementMolecularMassesSucceeded();
         else getTodayMetrics().incrementMolecularMassesFailed();
-    }
-
-    @Transactional
-    public void errorOccurred() {
-        getTodayMetrics().incrementErrorsOccurred();
-    }
-
-    @Transactional
-    public void reportSent() {
-        getTodayMetrics().incrementReportsSent();
     }
 
 }

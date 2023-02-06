@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-// Esta clase implementa conexiones con la DB automáticamente gracias a la librería JPA.
+// This class implements connections to the DB automatically thanks to the JPA library.
 
 @Repository
 interface ElementRepository extends CrudRepository<ElementModel, Integer> {

@@ -1,19 +1,17 @@
-package com.quimify.api.client;
+package com.quimify.api.access_data;
 
 import javax.persistence.*;
 
-// Esta clase representa la configuración de cada cliente según su versión.
+// Esta represents access data needed to load the client.
 
-@Entity // Es un modelo real
-@Table(name = "client") // En la tabla 'client' de la DB
-class ClientModel {
+@Entity
+@Table(name = "access_data")
+class AccessDataModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(unique = true, nullable = false)
-	private Integer version; // Se corresponde con la versión del cliente
-
-	// Bienvenida:
+	private Integer clientVersion;
 
 	@Column(nullable = false)
 	private Boolean updateAvailable;
@@ -39,16 +37,14 @@ class ClientModel {
 	@Column()
 	private String messageLink;
 
-	// --------------------------------------------------------------------------------
+	// Getters and setters:
 
-	// Getters y setters:
-
-	protected Integer getVersion() {
-		return version;
+	protected Integer getClientVersion() {
+		return clientVersion;
 	}
 
-	protected void setVersion(Integer version) {
-		this.version = version;
+	protected void setClientVersion(Integer version) {
+		this.clientVersion = version;
 	}
 
 	protected Boolean getUpdateAvailable() {

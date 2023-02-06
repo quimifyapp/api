@@ -18,15 +18,16 @@ class ReportController {
 
     // Constants:
 
-    private static final String postReportMessage = "POST report from V%s client. Title: \"%s\". Details: \"%s\".";
+    private static final String postReportMessage = "POST report from V%s client. Details saved in database.";
 
     // Client:
 
     @PostMapping()
-    protected void saveReport(@RequestParam("title") String title, @RequestParam("details") String details,
+    protected void saveReport(@RequestParam("context") String context, @RequestParam("details") String details,
+                              @RequestParam("user-message") String userMessage,
                               @RequestParam("client-version") Integer clientVersion) {
-        logger.warn(String.format(postReportMessage, clientVersion, title, details));
-        reportService.saveReport(title, details, clientVersion);
+        reportService.save(context, details, userMessage, clientVersion);
+        logger.warn(String.format(postReportMessage, clientVersion));
     }
 
 }

@@ -1,4 +1,4 @@
-package com.quimify.api.client;
+package com.quimify.api.access_data;
 
 import com.quimify.api.metrics.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public
-class ClientService {
+class AccessDataService {
 
 	@Autowired
-	ClientRepository clientRepository; // DB connection
+	AccessDataRepository accessDataRepository; // DB connection
 
 	@Autowired
     MetricsService metricsService; // Daily metrics logic
@@ -24,11 +24,11 @@ class ClientService {
 
 	// Client:
 
-	protected ClientResult getAccessData(Integer version, Short platform) {
-		ClientModel client = clientRepository.findByVersion(version);
+	protected AccessDataResult getAccessData(Integer clientVersion, Short platform) {
+		AccessDataModel client = accessDataRepository.findByClientVersion(clientVersion);
 
-		ClientResult clientResult = platform != webPlatform
-			? new ClientResult(
+		AccessDataResult accessDataResult = platform != webPlatform
+			? new AccessDataResult(
 				client.getUpdateAvailable(),
 				client.getUpdateNeeded(),
 				client.getUpdateDetails(),
@@ -38,7 +38,7 @@ class ClientService {
 				client.getMessageLinkPresent(),
 				client.getMessageLinkLabel(),
 				client.getMessageLink())
-			: new ClientResult(
+			: new AccessDataResult(
 				false,
 				null,
 				null,
@@ -52,7 +52,7 @@ class ClientService {
 
 		metricsService.countAccess(platform);
 
-		return clientResult;
+		return accessDataResult;
 	}
 
 }

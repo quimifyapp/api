@@ -1,13 +1,13 @@
-package com.quimify.api.report;
+package com.quimify.api.client_error;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-// This class represents a report sent by a user from the client.
+// This class represents an error sent by the client.
 
 @Entity
-@Table(name = "report")
-class ReportModel {
+@Table(name = "client_error")
+class ClientErrorModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,6 @@ class ReportModel {
     private String context;
     @Column(nullable = false)
     private String details;
-
-    private String userMessage;
-
     @Column(nullable = false)
     private Integer clientVersion;
 
@@ -58,14 +55,6 @@ class ReportModel {
 
     protected void setDetails(String details) {
         this.details = details;
-    }
-
-    protected String getUserMessage() {
-        return userMessage;
-    }
-
-    protected void setUserMessage(String userMessage) {
-        this.userMessage = userMessage;
     }
 
     protected Integer getClientVersion() {

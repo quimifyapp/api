@@ -7,26 +7,27 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-// Esta clase procesa los compuestos reportes del cliente.
+// This class implements the logic behind HTTP methods in "/report".
 
 @Service
 class ReportService {
 
     @Autowired
-    ReportRepository reportRepository; // Conexión con la DB
+    ReportRepository reportRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Procesos de las metricas diarias
+    MetricsService metricsService; // Daily metrics logic
 
     // Client:
 
-    protected void saveReport(String title, String details, Integer version) {
+    protected void save(String context, String details, String userMessage, Integer clientVersion) {
         ReportModel reportModel = new ReportModel();
 
         reportModel.setDateAndTime(Timestamp.from(Instant.now()));
-        reportModel.setTitle(title);
+        reportModel.setContext(context);
         reportModel.setDetails(details);
-        reportModel.setClientVersion(version);
+        reportModel.setUserMessage(userMessage);
+        reportModel.setClientVersion(clientVersion);
 
         reportRepository.save(reportModel);
 
