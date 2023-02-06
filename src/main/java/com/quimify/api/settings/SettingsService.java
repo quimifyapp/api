@@ -3,18 +3,18 @@ package com.quimify.api.settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// Esta clase procesa la configuración.
+// This class implements settings logic.
 
 @Service
 public
 class SettingsService {
 
     @Autowired
-    SettingsRepository settingsRepository; // Conexión con la DB
+    SettingsRepository settingsRepository; // DB connection
 
-    private static final int apiVersion = 3;
+    private static final int apiVersion = 4;
 
-    // --------------------------------------------------------------------------------
+    // Internal:
 
     public Boolean getGoogleON() {
         return settingsRepository.findByVersion(apiVersion).getUseGoogle();
