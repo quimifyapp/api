@@ -1,17 +1,16 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.utils.Normalizer;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecular_mass.MolecularMassService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 // This class implements the logic behind HTTP methods in "/inorganic".
 
@@ -22,6 +21,9 @@ public class InorganicService {
 
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
+
+    @Autowired
+    AutocompleteComponent autocompleteComponent; // Autocompletions logic
 
     @Autowired
     WebSearchComponent webSearchComponent; // Web searches logic
@@ -41,54 +43,10 @@ public class InorganicService {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private static final List<InorganicSearchTagModel> searchTagsCache = new ArrayList<>();
-
-    // Administration:
-
-    public void refreshAutocompletion() {
-        List<InorganicSearchTagModel> newSearchTags = inorganicRepository.findAllByOrderBySearchCountDesc().stream()
-                .flatMap(inorganicModel -> inorganicModel.getSearchTags().stream()).collect(Collectors.toList());
-
-        searchTagsCache.clear();
-        searchTagsCache.addAll(newSearchTags);
-
-        logger.info("Inorganic search tags updated in memory.");
-    }
-
     // Client:
 
-    protected String autoComplete(String input) { // TODO clean code
-        String normalizedInput = Normalizer.get(input);
-
-        for (InorganicSearchTagModel searchTag : searchTagsCache)
-            if (searchTag.getNormalizedTag().startsWith(normalizedInput)) {
-                Optional<InorganicModel> inorganicModel = inorganicRepository.findBySearchTagsContaining(searchTag);
-
-                if (inorganicModel.isEmpty()) {
-                    errorService.log("Search tag not in DB", searchTag.getNormalizedTag(), this.getClass());
-                    return "";
-                }
-
-                String completion = inorganicModel.get().getStockName();
-                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
-                    return completion;
-
-                completion = inorganicModel.get().getSystematicName();
-                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
-                    return completion;
-
-                completion = inorganicModel.get().getTraditionalName();
-                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
-                    return completion;
-
-                completion = inorganicModel.get().getOtherName();
-                if (completion != null && Normalizer.get(completion).startsWith(normalizedInput))
-                    return completion;
-
-                return inorganicModel.get().getFormula(); // Formula or a search tag
-            }
-
-        return "";
+    protected String autoComplete(String input) {
+        return autocompleteComponent.autoComplete(input);
     }
 
     protected InorganicResult searchFromCompletion(String completion) {
@@ -164,12 +122,40 @@ public class InorganicService {
         String normalizedInput = Normalizer.get(input);
 
         for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
-            if (inorganicModel.getSearchTagsAsStrings().contains(normalizedInput)) {
+            if(matches(normalizedInput, inorganicModel)) {
                 inorganicModel.countSearch();
                 return Optional.of(inorganicModel);
             }
 
         return Optional.empty();
+    }
+
+    private boolean matches(String normalizedInput, InorganicModel inorganicModel) {
+        String possibleMatch = inorganicModel.getFormula();
+        if (normalizedInput.equals(Normalizer.get(possibleMatch))) // Null safe
+            return true;
+
+        possibleMatch = inorganicModel.getStockName();
+        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
+            return true;
+
+        possibleMatch = inorganicModel.getSystematicName();
+        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
+            return true;
+
+        possibleMatch = inorganicModel.getTraditionalName();
+        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
+            return true;
+
+        possibleMatch = inorganicModel.getOtherName();
+        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
+            return true;
+
+        for(String searchTag : inorganicModel.getSearchTags())
+            if(normalizedInput.equals(searchTag))
+                return true;
+
+        return false;
     }
 
     private Optional<InorganicModel> tryParseFQ(String url) {
@@ -196,7 +182,7 @@ public class InorganicService {
         }
 
         inorganicRepository.save(learnedInorganic);
-        searchTagsCache.addAll(learnedInorganic.getSearchTags());
+        autocompleteComponent.saveInCache(learnedInorganic);
 
         metricsService.inorganicLearned();
         logger.info("Learned inorganic: " + learnedInorganic);

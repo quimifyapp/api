@@ -4,10 +4,10 @@ import com.quimify.api.utils.Normalizer;
 import javax.persistence.*;
 import java.util.Objects;
 
-// Esta clase representa una de las etiquetas de un elemento inorgánico.
+// This class represents one of the search tags an inorganic compound might have.
 
-@Entity // Es un modelo real
-@Table(name = "inorganic_search_tag") // En la tabla 'inorganic_search_tag' de la DB
+@Entity
+@Table(name = "inorganic_search_tag")
 class InorganicSearchTagModel {
 
     @Id
@@ -18,12 +18,10 @@ class InorganicSearchTagModel {
     @Column(nullable = false)
     private String normalizedTag; // "hidruromagnesico" | "aguaoxigenada" | ...
 
-    // --------------------------------------------------------------------------------
+    // Constructors:
 
-    // Constructor:
-
-    protected InorganicSearchTagModel(String tag) {
-        this.normalizedTag = Normalizer.get(tag);
+    protected InorganicSearchTagModel(String text) {
+        this.normalizedTag = Normalizer.get(text);
     }
 
     protected InorganicSearchTagModel() {} // Needed by JPA
@@ -35,12 +33,12 @@ class InorganicSearchTagModel {
         if (other == null || getClass() != other.getClass())
             return false;
 
-        InorganicSearchTagModel otherInorganicSearchTag = (InorganicSearchTagModel) other;
+        InorganicSearchTagModel otherSearchTag = (InorganicSearchTagModel) other;
 
-        if(!Objects.equals(id, otherInorganicSearchTag.id))
+        if(!Objects.equals(id, otherSearchTag.id))
             return false;
 
-        return normalizedTag.contentEquals(otherInorganicSearchTag.normalizedTag);
+        return normalizedTag.contentEquals(otherSearchTag.normalizedTag);
     }
 
     @Override

@@ -4,5 +4,5 @@ INNER JOIN inorganic
 ON inorganic_search_tag.inorganic_id = inorganic.id
 
 # WHERE normalized_tag LIKE "%telururo%"
-# WHERE inorganic_id = 340
+# WHERE inorganic_id = 1
 ORDER BY id DESC

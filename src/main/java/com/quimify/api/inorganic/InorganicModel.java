@@ -6,10 +6,10 @@ import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Esta clase representa los compuestos inorgánicos.
+// This class represents inorganic compounds.
 
-@Entity // Es un modelo real
-@Table(name = "inorganic") // En la tabla 'inorganico' de la DB
+@Entity
+@Table(name = "inorganic")
 class InorganicModel {
 
     // Non-nullable:
@@ -32,9 +32,9 @@ class InorganicModel {
 
     // Foreign key (one to many):
 
-    @OneToMany(cascade = CascadeType.ALL) // Se crean de la mano y se borran de la mano
-    @JoinColumn(name = "inorganic_id") // Cada etiqueta lleva asociado el inorgánico al que pertenece
-    private Set<InorganicSearchTagModel> searchTags = new HashSet<>(); // "hidruromagnesico" | "aguaoxigenada" | ...
+    @JoinColumn(name = "inorganic_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Always created, deleted and fetched together
+    private Set<InorganicSearchTagModel> inorganicSearchTags = new HashSet<>(); // "aguaoxigenada"
 
     // With default value:
 
@@ -43,27 +43,29 @@ class InorganicModel {
 
     // Typed 'String' because no calculations will be performed:
 
-    private String molecularMass;    // (g)
+    private String molecularMass;   // (g)
     private String density;         // (g/cm3)
     private String meltingPoint;    // (K)
     private String boilingPoint;    // (K)
 
+    // Queries:
+
+    protected Set<String> getSearchTags() {
+        return inorganicSearchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
+    }
+
     // Modifiers:
+
+    @Transactional
+    protected void addSearchTag(String text) {
+        inorganicSearchTags.add(new InorganicSearchTagModel(text));
+    }
 
     @Transactional
     protected void countSearch() {
         searchCount++;
     }
 
-    protected void addSearchTagOf(String tag) {
-        searchTags.add(new InorganicSearchTagModel(tag));
-    }
-
-    // Queries:
-
-    protected Set<String> getSearchTagsAsStrings() {
-        return searchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
-    }
 
     @Override
     public String toString() {
@@ -132,12 +134,12 @@ class InorganicModel {
         this.otherName = otherName;
     }
 
-    protected Set<InorganicSearchTagModel> getSearchTags() {
-        return searchTags;
+    protected Set<InorganicSearchTagModel> getInorganicSearchTags() {
+        return inorganicSearchTags;
     }
 
-    protected void setSearchTags(Set<InorganicSearchTagModel> searchTags) {
-        this.searchTags = searchTags;
+    protected void setInorganicSearchTags(Set<InorganicSearchTagModel> inorganicSearchTags) {
+        this.inorganicSearchTags = inorganicSearchTags;
     }
 
     protected Integer getSearchCount() {

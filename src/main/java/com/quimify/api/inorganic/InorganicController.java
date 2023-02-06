@@ -22,13 +22,6 @@ class InorganicController {
 
     private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RETURN: %s.";
 
-    // Administration:
-
-    @PutMapping("refresh-autocompletion")
-    protected void refreshAutocompletion() {
-        inorganicService.refreshAutocompletion();
-    }
-
     // Client:
 
     @GetMapping()

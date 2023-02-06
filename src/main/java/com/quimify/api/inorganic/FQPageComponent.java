@@ -138,20 +138,14 @@ class FQPageComponent {
     }
 
     private void setSearchTags() {
-        parsedInorganic.addSearchTagOf(parsedInorganic.getFormula());
-
         setNameSearchTag(parsedInorganic.getStockName());
         setNameSearchTag(parsedInorganic.getSystematicName());
         setNameSearchTag(parsedInorganic.getTraditionalName());
     }
 
     private void setNameSearchTag(String name) {
-        if (name != null) {
-            parsedInorganic.addSearchTagOf(name);
-
-            if (name.contains("ácido")) // TODO "zinc", in corrections not in search tags
-                parsedInorganic.addSearchTagOf(name.replace("ácido ", ""));
-        }
+        if (name != null && name.contains("ácido")) // TODO "zinc", in corrections not in search tags
+            parsedInorganic.addSearchTag(name.replace("ácido ", ""));
     }
 
     private void fixNomenclatureMistakes() {
