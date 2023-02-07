@@ -17,7 +17,7 @@ class InorganicResult {
     private String stockName; // "óxido de níquel (III)"
     private String systematicName; // "trióxido de diníquel"
     private String traditionalName; // "óxido niquélico"
-    private String otherName; // "potasio"
+    private String commonName; // "potasio"
 
     private String molecularMass; // (g)
     private String density; // (g/cm³)
@@ -37,7 +37,7 @@ class InorganicResult {
         this.stockName = inorganicModel.getStockName();
         this.systematicName = inorganicModel.getSystematicName();
         this.traditionalName = inorganicModel.getTraditionalName();
-        this.otherName = inorganicModel.getCommonName();
+        this.commonName = inorganicModel.getCommonName();
 
         this.molecularMass = inorganicModel.getMolecularMass();
         this.density = inorganicModel.getDensity();
@@ -59,7 +59,7 @@ class InorganicResult {
         identifiers.add(stockName);
         identifiers.add(systematicName);
         identifiers.add(traditionalName);
-        identifiers.add(otherName);
+        identifiers.add(commonName);
 
         identifiers.removeIf(Objects::isNull);
 
@@ -108,12 +108,12 @@ class InorganicResult {
         this.traditionalName = traditionalName;
     }
 
-    public String getOtherName() {
-        return otherName;
+    public String getCommonName() {
+        return commonName;
     }
 
-    public void setOtherName(String otherName) {
-        this.otherName = otherName;
+    public void setCommonName(String commonName) {
+        this.commonName = commonName;
     }
 
     public String getMolecularMass() {
