@@ -35,10 +35,12 @@ class WebSearchComponent {
     private String title;
     private String address;
 
-    // Protected:
+    // Internal:
 
     protected boolean search(String input) {
         this.input = input;
+        this.title = null;
+        this.address = null;
 
         boolean searchDone = false;
 
