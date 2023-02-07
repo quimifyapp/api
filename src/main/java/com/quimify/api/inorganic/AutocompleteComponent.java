@@ -42,13 +42,9 @@ class AutocompleteComponent {
     protected String autoComplete(String input) {
         String normalizedInput = Normalizer.get(input);
 
-        for (String normalizedText : orderedNormalizedTexts) {
-            if(normalizedText.equals("sal"))
-                return "XD";
-
+        for (String normalizedText : orderedNormalizedTexts)
             if (normalizedText.startsWith(normalizedInput))
                 return findNormalizedTextIn(normalizedText);
-        }
 
         return "";
     }
