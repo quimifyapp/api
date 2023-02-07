@@ -93,7 +93,7 @@ class AutocompleteComponent {
         Integer id = normalizedTextToId.get(normalizedText);
 
         if (id == null) {
-            errorService.log("Discrepancy between texts cache and IDs map", normalizedText, this.getClass());
+            errorService.log("Discrepancy between texts list and IDs map", normalizedText, this.getClass());
             return "";
         }
 
