@@ -27,7 +27,7 @@ class AutocompleteComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private List<String> orderedNormalizedTexts = Collections.synchronizedList(new ArrayList<>());
+    private List<String> normalizedTexts = Collections.synchronizedList(new ArrayList<>());
     private Map<String, Integer> normalizedTextToId = Collections.synchronizedMap(new LinkedHashMap<>());
 
     // Administration:
@@ -42,7 +42,7 @@ class AutocompleteComponent {
     protected String autoComplete(String input) {
         String normalizedInput = Normalizer.get(input);
 
-        for (String normalizedText : orderedNormalizedTexts)
+        for (String normalizedText : normalizedTexts)
             if (normalizedText.startsWith(normalizedInput))
                 return findNormalizedTextIn(normalizedText);
 
@@ -50,43 +50,43 @@ class AutocompleteComponent {
     }
 
     protected void saveInCache(InorganicModel inorganicModel) {
-        putIn(inorganicModel, orderedNormalizedTexts, normalizedTextToId);
+        putIn(inorganicModel, normalizedTexts, normalizedTextToId);
     }
 
     // Private:
 
     private void updateCache() {
-        List<String> newCache = Collections.synchronizedList(new ArrayList<>());
+        List<String> newNormalizedTexts = Collections.synchronizedList(new ArrayList<>());
         Map<String, Integer> newKeyToId = Collections.synchronizedMap(new LinkedHashMap<>());
 
         for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
-            putIn(inorganicModel, newCache, newKeyToId);
+            putIn(inorganicModel, newNormalizedTexts, newKeyToId);
 
-        orderedNormalizedTexts = newCache;
+        normalizedTexts = newNormalizedTexts;
         normalizedTextToId = newKeyToId;
 
         logger.info("Inorganic autocompletion cache updated.");
     }
 
-    private void putIn(InorganicModel inorganicModel, List<String> cache, Map<String, Integer> keyToId) {
-        addSearchTagIn(inorganicModel.getFormula(), inorganicModel.getId(), cache, keyToId);
+    private void putIn(InorganicModel inorganicModel, List<String> normalizedTexts, Map<String, Integer> keyToId) {
+        addSearchTagIn(inorganicModel.getFormula(), inorganicModel.getId(), normalizedTexts, keyToId);
 
-        addSearchTagIn(inorganicModel.getStockName(), inorganicModel.getId(), cache, keyToId);
-        addSearchTagIn(inorganicModel.getSystematicName(), inorganicModel.getId(), cache, keyToId);
-        addSearchTagIn(inorganicModel.getTraditionalName(), inorganicModel.getId(), cache, keyToId);
-        addSearchTagIn(inorganicModel.getCommonName(), inorganicModel.getId(), cache, keyToId);
+        addSearchTagIn(inorganicModel.getStockName(), inorganicModel.getId(), normalizedTexts, keyToId);
+        addSearchTagIn(inorganicModel.getSystematicName(), inorganicModel.getId(), normalizedTexts, keyToId);
+        addSearchTagIn(inorganicModel.getTraditionalName(), inorganicModel.getId(), normalizedTexts, keyToId);
+        addSearchTagIn(inorganicModel.getCommonName(), inorganicModel.getId(), normalizedTexts, keyToId);
 
         for (String normalizedText : inorganicModel.getSearchTags()) {
-            cache.add(normalizedText);
+            normalizedTexts.add(normalizedText);
             keyToId.put(normalizedText, inorganicModel.getId());
         }
     }
 
-    private void addSearchTagIn(String text, Integer id, List<String> cache, Map<String, Integer> keyToId) {
+    private void addSearchTagIn(String text, Integer id, List<String> normalizedTexts, Map<String, Integer> keyToId) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null) {
-            cache.add(normalizedText);
+            normalizedTexts.add(normalizedText);
             keyToId.put(normalizedText, id);
         }
     }
