@@ -42,9 +42,13 @@ class AutocompleteComponent {
     protected String autoComplete(String input) {
         String normalizedInput = Normalizer.get(input);
 
-        for (String normalizedText : orderedNormalizedTexts)
+        for (String normalizedText : orderedNormalizedTexts) {
+            if(normalizedText.equals("sal"))
+                return "XD";
+
             if (normalizedText.startsWith(normalizedInput))
                 return findNormalizedTextIn(normalizedText);
+        }
 
         return "";
     }
@@ -76,8 +80,10 @@ class AutocompleteComponent {
         addSearchTagIn(inorganicModel.getTraditionalName(), inorganicModel.getId(), cache, keyToId);
         addSearchTagIn(inorganicModel.getCommonName(), inorganicModel.getId(), cache, keyToId);
 
-        for (String normalizedText : inorganicModel.getSearchTags())
+        for (String normalizedText : inorganicModel.getSearchTags()) {
+            cache.add(normalizedText);
             keyToId.put(normalizedText, inorganicModel.getId());
+        }
     }
 
     private void addSearchTagIn(String text, Integer id, List<String> cache, Map<String, Integer> keyToId) {
