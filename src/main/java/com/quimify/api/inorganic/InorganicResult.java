@@ -53,17 +53,17 @@ class InorganicResult {
 
     @Override
     public String toString() {
-        List<String> words = new ArrayList<>();
+        List<String> identifiers = new ArrayList<>();
 
-        words.add(formula);
-        words.add(stockName);
-        words.add(systematicName);
-        words.add(traditionalName);
-        words.add(otherName);
+        identifiers.add(formula);
+        identifiers.add(stockName);
+        identifiers.add(systematicName);
+        identifiers.add(traditionalName);
+        identifiers.add(otherName);
 
-        words.removeIf(Objects::isNull);
+        identifiers.removeIf(Objects::isNull);
 
-        return words.toString();
+        return identifiers.toString();
     }
 
     // Getters y setters:
