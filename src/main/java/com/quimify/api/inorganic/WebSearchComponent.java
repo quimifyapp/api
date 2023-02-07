@@ -101,8 +101,6 @@ class WebSearchComponent {
                 logger.warn("Google returned HTTP code 429.");
             else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
 
-            metricsService.googleSearchNotFound();
-
             searched = false;
         }
 
@@ -152,13 +150,9 @@ class WebSearchComponent {
                 logger.warn(apiName + " returned HTTP code 403.");
             else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
 
-            metricsService.bingSearchNotFound();
-
             searched = false;
         } catch (Exception exception) {
             errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
-
-            metricsService.bingSearchNotFound();
 
             searched = false;
         }
