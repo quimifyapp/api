@@ -1,4 +1,4 @@
-package com.quimify.api.access_data;
+package com.quimify.api.accessdata;
 
 import com.quimify.api.metrics.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.quimify.api.molecular_mass;
+package com.quimify.api.molecularmass;
 
 import com.quimify.api.element.ElementModel;
 import com.quimify.api.element.ElementService;

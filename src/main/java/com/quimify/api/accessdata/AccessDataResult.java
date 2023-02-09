@@ -1,4 +1,4 @@
-package com.quimify.api.access_data;
+package com.quimify.api.accessdata;
 
 // This POJO class represents responses of access data to the client.
 

@@ -1,4 +1,4 @@
-package com.quimify.api.molecular_mass;
+package com.quimify.api.molecularmass;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

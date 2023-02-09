@@ -1,4 +1,4 @@
-package com.quimify.api.access_data;
+package com.quimify.api.accessdata;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

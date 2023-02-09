@@ -1,4 +1,4 @@
-package com.quimify.api.client_error;
+package com.quimify.api.clienterror;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

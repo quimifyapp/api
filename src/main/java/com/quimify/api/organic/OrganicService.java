@@ -1,7 +1,7 @@
 package com.quimify.api.organic;
 
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.molecular_mass.MolecularMassService;
+import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.organic.OrganicFactory;
 import com.quimify.organic.Organic;

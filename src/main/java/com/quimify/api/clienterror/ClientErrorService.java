@@ -1,4 +1,4 @@
-package com.quimify.api.client_error;
+package com.quimify.api.clienterror;
 
 import com.quimify.api.metrics.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;

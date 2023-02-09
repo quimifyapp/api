@@ -1,4 +1,4 @@
-package com.quimify.api.client_error;
+package com.quimify.api.clienterror;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

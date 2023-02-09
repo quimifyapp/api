@@ -1,4 +1,4 @@
-package com.quimify.api.access_data;
+package com.quimify.api.accessdata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

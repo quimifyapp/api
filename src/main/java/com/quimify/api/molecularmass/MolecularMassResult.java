@@ -1,4 +1,4 @@
-package com.quimify.api.molecular_mass;
+package com.quimify.api.molecularmass;
 
 // This POJO class represents responses of molecular masses to the client.
 
