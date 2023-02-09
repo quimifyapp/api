@@ -1,11 +1,14 @@
-INSERT INTO inorganic (formula, stock_name, systematic_name, traditional_name, other_name, molecular_mass, density, melting_point, boiling_point) 
+INSERT INTO inorganic (formula, stock_name, systematic_name, traditional_name, common_name, 
+molecular_mass, melting_point, boiling_point)
+
+# ALL BETWEEN QUOTES ("):
 VALUES (
-, # Formula
+ # Formula
 , # Stock name
 , # Systematic name
 , # Traditional name
-, # Other name
-# DECIMAL POINT, NOT COMMA:
+, # Common name
+# DOT AS DECIMAL POINT (.):
 , # Molecular mass (g / mol)
 , # Density (g / cm3)
 , # Melting point (K)
