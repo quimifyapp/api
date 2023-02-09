@@ -30,28 +30,25 @@ class WebSearchComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private String input;
-
     private String title;
     private String address;
 
     // Internal:
 
     protected boolean search(String input) {
-        this.input = input;
         this.title = null;
         this.address = null;
 
         boolean searchDone = false;
 
         if (canGoogleSearch())
-            searchDone = googleSearch();
+            searchDone = googleSearch(input);
 
         if (!searchDone && canFreeBingSearch())
-            searchDone = bingSearch(settingsService.getFreeBingKey(), "free Bing");
+            searchDone = bingSearch(input, settingsService.getFreeBingKey(), "free Bing");
 
         if (!searchDone && canPaidBingSearch()) {
-            searchDone = bingSearch(settingsService.getPaidBingKey(), "paid Bing");
+            searchDone = bingSearch(input, settingsService.getPaidBingKey(), "paid Bing");
 
             if (searchDone)
                 metricsService.paidBingQuery();
@@ -74,7 +71,7 @@ class WebSearchComponent {
         return queries < settingsService.getGoogleLimit();
     }
 
-    protected boolean googleSearch() {
+    protected boolean googleSearch(String input) {
         boolean searched;
 
         try {
@@ -98,7 +95,7 @@ class WebSearchComponent {
             searched = true;
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
-                logger.warn("Google returned HTTP code 429.");
+                logger.warn("Got HTTP code 403 from Google");
             else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
 
             searched = false;
@@ -123,7 +120,7 @@ class WebSearchComponent {
         return queries < settingsService.getPaidBingLimit();
     }
 
-    private boolean bingSearch(String apiKey, String apiName) {
+    private boolean bingSearch(String input, String apiKey, String apiName) {
         boolean searched;
 
         try {
@@ -147,7 +144,7 @@ class WebSearchComponent {
             searched = true;
         } catch (IOException exception) {
             if (exception.toString().contains("HTTP response code: 403"))
-                logger.warn(apiName + " returned HTTP code 403.");
+                logger.warn("Got HTTP code 403 from " + apiName);
             else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
 
             searched = false;
