@@ -1,2 +1,2 @@
 DELETE FROM report
-WHERE id <= 33
+WHERE id <= ;
