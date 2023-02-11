@@ -32,7 +32,7 @@ class AutocompleteComponent {
 
     // Administration:
 
-    @Scheduled(fixedDelay = 24 * 60 * 60 * 1000) // At startup, then once every 24h hours
+    @Scheduled(fixedDelay = 30 * 60 * 1000) // At startup, then once every 30 minutes
     private void updateCacheDaily() {
         updateCache();
     }
