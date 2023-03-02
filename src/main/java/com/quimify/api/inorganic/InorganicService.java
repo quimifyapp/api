@@ -2,6 +2,7 @@ package com.quimify.api.inorganic;
 
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.utils.Normalizer;
@@ -38,6 +39,9 @@ public class InorganicService {
     SettingsService settingsService; // Settings logic
 
     @Autowired
+    NotFoundQueryService notFoundQueryService; // Not found queries logic
+
+    @Autowired
     MetricsService metricsService; // Daily metrics logic
 
     @Autowired
@@ -72,6 +76,9 @@ public class InorganicService {
         Optional<InorganicModel> searchedInMemory = searchInDatabase(input);
 
         inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
+
+        if(!inorganicResult.isPresent())
+            notFoundQueryService.log(input, this.getClass());
 
         metricsService.inorganicSearched(inorganicResult.isPresent());
 

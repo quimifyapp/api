@@ -3,6 +3,7 @@ package com.quimify.api.organic;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
 import com.quimify.organic.OrganicFactory;
 import com.quimify.organic.Organic;
 import com.quimify.organic.components.Group;
@@ -29,6 +30,9 @@ class OrganicService {
 
 	@Autowired
 	MolecularMassService molecularMassService; // Molecular masses logic
+
+	@Autowired
+	NotFoundQueryService notFoundQueryService; // Not found queries logic
 
 	@Autowired
 	ErrorService errorService; // API errors logic
@@ -65,6 +69,9 @@ class OrganicService {
 			organicResult = OrganicResult.notFound;
 		}
 
+		if(!organicResult.isPresent())
+			notFoundQueryService.log(name, this.getClass());
+
 		metricsService.organicSearchedFromName(organicResult.isPresent());
 
 		return organicResult;
@@ -73,6 +80,8 @@ class OrganicService {
 	protected OrganicResult getFromStructure(int[] inputSequence) {
 		OrganicResult organicResult;
 
+		String sequenceToString = Arrays.toString(inputSequence); // For logging purposes
+
 		try {
 			OpenChain openChain = getOpenChainFromStructure(inputSequence);
 			Organic organic = OrganicFactory.getFromOpenChain(openChain);
@@ -80,11 +89,13 @@ class OrganicService {
 			organicResult = resolvePropertiesOf(organic);
 		}
 		catch (Exception exception) {
-			String sequenceToString = Arrays.toString(inputSequence);
 			errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
 
 			organicResult = OrganicResult.notFound;
 		}
+
+		if(!organicResult.isPresent())
+			notFoundQueryService.log(sequenceToString, this.getClass());
 
 		metricsService.organicSearchedFromStructure(organicResult.isPresent());
 

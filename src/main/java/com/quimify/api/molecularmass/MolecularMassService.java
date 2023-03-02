@@ -4,6 +4,7 @@ import com.quimify.api.element.ElementModel;
 import com.quimify.api.element.ElementService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ class MolecularMassService {
 
     @Autowired
     ElementService elementService; // Elements logic
+
+    @Autowired
+    NotFoundQueryService notFoundQueryService; // Not found queries logic
 
     @Autowired
     ErrorService errorService; // API errors logic
@@ -59,23 +63,26 @@ class MolecularMassService {
 
     // Client:
 
-    protected MolecularMassResult tryMolecularMassResult(String formula) {
+    protected MolecularMassResult tryMolecularMassResult(String query) {
         MolecularMassResult molecularMassResult;
 
         try {
-            molecularMassResult = calculate(formula);
+            molecularMassResult = calculate(query);
 
             if (!molecularMassResult.isPresent())
-                logger.warn("Couldn't calculate \"" + formula + "\". " + "RETURN: " + molecularMassResult.getError());
+                logger.warn("Couldn't calculate \"" + query + "\". " + "RETURN: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", formula, this.getClass());
+            errorService.log("StackOverflow error", query, this.getClass());
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
         }
         catch(Exception exception) {
-            errorService.log("Exception calculating: " + formula, exception.toString(), this.getClass());
+            errorService.log("Exception calculating: " + query, exception.toString(), this.getClass());
             molecularMassResult = new MolecularMassResult("");
         }
+
+        if(!molecularMassResult.isPresent())
+            notFoundQueryService.log(query, this.getClass());
 
         metricsService.molecularMassSearched(molecularMassResult.isPresent());
 
