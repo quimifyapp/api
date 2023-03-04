@@ -1,6 +1,5 @@
 package com.quimify.api.notfoundquery;
 
-
 import javax.persistence.*;
 
 // This class represents not found queries.
@@ -21,6 +20,8 @@ class NotFoundQueryModel {
 
     @Column(nullable = false)
     private String location;
+
+    // TODO frequency
 
     // Getters and setters:
 
