@@ -18,7 +18,7 @@ FROM inorganic
 GROUP BY traditional_name
 HAVING COUNT(traditional_name) > 1;
 
-SELECT other_name, COUNT(other_name) # Hay 0 aceptables
+SELECT common_name, COUNT(common_name) # Hay 0 aceptables
 FROM inorganic
-GROUP BY other_name
-HAVING COUNT(other_name) > 1;
+GROUP BY common_name
+HAVING COUNT(common_name) > 1;
