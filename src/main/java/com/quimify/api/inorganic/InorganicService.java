@@ -189,7 +189,6 @@ public class InorganicService {
         }
 
         inorganicRepository.save(learnedInorganic);
-        autocompleteComponent.saveInCache(learnedInorganic);
 
         metricsService.inorganicLearned();
         logger.info("Learned inorganic: " + learnedInorganic);

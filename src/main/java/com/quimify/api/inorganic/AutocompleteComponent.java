@@ -27,7 +27,7 @@ class AutocompleteComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private Map<String, Integer> normalizedTextToId = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final Map<String, Integer> normalizedTextToId = Collections.synchronizedMap(new LinkedHashMap<>());
 
     // Administration:
 
@@ -41,59 +41,48 @@ class AutocompleteComponent {
     protected String autoComplete(String input) {
         String normalizedInput = Normalizer.get(input);
 
-        for (String normalizedText : normalizedTextToId.keySet())
-            if (normalizedText.startsWith(normalizedInput))
-                return findNormalizedTextIn(normalizedText);
+        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
+            if (entry.getKey().startsWith(normalizedInput))
+                return findNormalizedTextIn(entry.getKey(), entry.getValue());
 
         return "";
-    }
-
-    protected void saveInCache(InorganicModel inorganicModel) {
-        putIn(inorganicModel, normalizedTextToId);
     }
 
     // Private:
 
     private void updateCache() {
-        Map<String, Integer> normalizedTextToId = Collections.synchronizedMap(new LinkedHashMap<>());
+        normalizedTextToId.clear();
 
         for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
-            putIn(inorganicModel, normalizedTextToId);
-
-        this.normalizedTextToId = normalizedTextToId;
+            putNormalized(inorganicModel);
 
         logger.info("Inorganic autocompletion cache updated.");
     }
 
-    private void putIn(InorganicModel inorganicModel, Map<String, Integer> normalizedTextToId) {
+    private void putNormalized(InorganicModel inorganicModel) {
         Integer id = inorganicModel.getId();
 
-        putIn(inorganicModel.getFormula(), id, normalizedTextToId);
+        putNormalized(inorganicModel.getFormula(), id);
 
-        putIn(inorganicModel.getStockName(), id, normalizedTextToId);
-        putIn(inorganicModel.getSystematicName(), id, normalizedTextToId);
-        putIn(inorganicModel.getTraditionalName(), id, normalizedTextToId);
-        putIn(inorganicModel.getCommonName(), id, normalizedTextToId);
+        putNormalized(inorganicModel.getStockName(), id);
+        putNormalized(inorganicModel.getSystematicName(), id);
+        putNormalized(inorganicModel.getTraditionalName(), id);
+        putNormalized(inorganicModel.getCommonName(), id);
+
+        // Search tags (already normalized):
 
         for (String normalizedText : inorganicModel.getSearchTags())
             normalizedTextToId.put(normalizedText, id);
     }
 
-    private void putIn(String text, Integer id, Map<String, Integer> normalizedTextToId) {
+    private void putNormalized(String text, Integer id) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null)
             normalizedTextToId.put(normalizedText, id);
     }
 
-    private String findNormalizedTextIn(String normalizedText) {
-        Integer id = normalizedTextToId.get(normalizedText);
-
-        if (id == null) {
-            errorService.log("Discrepancy between texts list and IDs map", normalizedText, this.getClass());
-            return "";
-        }
-
+    private String findNormalizedTextIn(String normalizedText, Integer id) {
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
 
         if (inorganicModel.isEmpty()) {
@@ -101,23 +90,19 @@ class AutocompleteComponent {
             return "";
         }
 
-        String completion = inorganicModel.get().getStockName();
-        if (normalizedText.equals(Normalizer.get(completion))) // Null safe
-            return completion;
+        List<String> texts = new ArrayList<>();
 
-        completion = inorganicModel.get().getSystematicName();
-        if (normalizedText.equals(Normalizer.get(completion)))
-            return completion;
+        texts.add(inorganicModel.get().getStockName());
+        texts.add(inorganicModel.get().getSystematicName());
+        texts.add(inorganicModel.get().getTraditionalName());
+        texts.add(inorganicModel.get().getCommonName());
 
-        completion = inorganicModel.get().getTraditionalName();
-        if (normalizedText.equals(Normalizer.get(completion)))
-            return completion;
+        for (String text : texts)
+            if (normalizedText.equals(Normalizer.get(text))) // Null safe
+                return text;
 
-        completion = inorganicModel.get().getCommonName();
-        if (normalizedText.equals(Normalizer.get(completion)))
-            return completion;
-
-        return inorganicModel.get().getFormula(); // 'normalizedText' comes from formula or a search tag
+        // Here, 'normalizedText' either comes from formula or a search tag
+        return inorganicModel.get().getFormula();
     }
 
 }
