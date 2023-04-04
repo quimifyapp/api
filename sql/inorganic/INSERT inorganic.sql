@@ -1,9 +1,9 @@
 INSERT INTO inorganic (formula, stock_name, systematic_name, traditional_name, common_name, 
-molecular_mass, melting_point, boiling_point)
+molecular_mass, density, melting_point, boiling_point)
 
 # ALL BETWEEN QUOTES ("):
 VALUES (
- # Formula
+, # Formula
 , # Stock name
 , # Systematic name
 , # Traditional name
