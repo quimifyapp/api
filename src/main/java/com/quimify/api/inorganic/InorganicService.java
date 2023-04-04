@@ -50,7 +50,7 @@ public class InorganicService {
     // Client:
 
     protected String autoComplete(String input) {
-        return autocompleteComponent.autoComplete(input);
+        return autocompleteComponent.tryAutoComplete(input);
     }
 
     protected InorganicResult searchFromCompletion(String completion) {

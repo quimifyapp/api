@@ -27,18 +27,29 @@ class AutocompleteComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
+    private Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
 
     // Administration:
 
-    @Scheduled(fixedDelay = 30 * 60 * 1000) // At startup, then once every 30 minutes
+    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
     private void updateCacheDaily() {
-        updateCache();
+        tryUpdateCache();
     }
 
     // Internal:
 
-    protected String autoComplete(String input) {
+    protected String tryAutoComplete(String input) {
+        try {
+            return autoComplete(input);
+        } catch (Exception exception) {
+            errorService.log("Exception autocompleting: " + input, exception.toString(), this.getClass());
+            return "";
+        }
+    }
+
+    // Private:
+
+    private String autoComplete(String input) {
         String normalizedInput = Normalizer.get(input);
 
         for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
@@ -48,28 +59,35 @@ class AutocompleteComponent {
         return "";
     }
 
-    // Private:
+    private void tryUpdateCache() {
+        try {
+            updateCache();
+        } catch (Exception exception) {
+            errorService.log("Exception updating cache", exception.toString(), this.getClass());
+        }
+    }
 
     private void updateCache() {
         List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
 
-        normalizedTextToId.clear();
-
+        Map<String, Integer> newNormalizedTextToId = new LinkedHashMap<>();
         for (InorganicModel inorganicModel : inorganicModels)
-            putNormalized(inorganicModel);
+            putNormalizedIn(inorganicModel, newNormalizedTextToId);
+
+        normalizedTextToId = newNormalizedTextToId;
 
         logger.info("Inorganic autocompletion cache updated.");
     }
 
-    private void putNormalized(InorganicModel inorganicModel) {
+    private void putNormalizedIn(InorganicModel inorganicModel, Map<String, Integer> normalizedTextToId) {
         Integer id = inorganicModel.getId();
 
-        putNormalized(inorganicModel.getFormula(), id);
+        putNormalizedIn(inorganicModel.getFormula(), id, normalizedTextToId);
 
-        putNormalized(inorganicModel.getStockName(), id);
-        putNormalized(inorganicModel.getSystematicName(), id);
-        putNormalized(inorganicModel.getTraditionalName(), id);
-        putNormalized(inorganicModel.getCommonName(), id);
+        putNormalizedIn(inorganicModel.getStockName(), id, normalizedTextToId);
+        putNormalizedIn(inorganicModel.getSystematicName(), id, normalizedTextToId);
+        putNormalizedIn(inorganicModel.getTraditionalName(), id, normalizedTextToId);
+        putNormalizedIn(inorganicModel.getCommonName(), id, normalizedTextToId);
 
         // Search tags (already normalized):
 
@@ -77,7 +95,7 @@ class AutocompleteComponent {
             normalizedTextToId.put(normalizedText, id);
     }
 
-    private void putNormalized(String text, Integer id) {
+    private void putNormalizedIn(String text, Integer id, Map<String, Integer> normalizedTextToId) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null)
