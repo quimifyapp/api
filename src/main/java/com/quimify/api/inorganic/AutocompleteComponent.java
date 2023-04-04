@@ -27,7 +27,7 @@ class AutocompleteComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final Map<String, Integer> normalizedTextToId = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
 
     // Administration:
 
