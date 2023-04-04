@@ -49,16 +49,6 @@ class AutocompleteComponent {
 
     // Private:
 
-    private String autoComplete(String input) {
-        String normalizedInput = Normalizer.get(input);
-
-        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
-            if (entry.getKey().startsWith(normalizedInput))
-                return findNormalizedTextIn(entry.getKey(), entry.getValue());
-
-        return "";
-    }
-
     private void tryUpdateCache() {
         try {
             updateCache();
@@ -77,6 +67,16 @@ class AutocompleteComponent {
         normalizedTextToId = newNormalizedTextToId;
 
         logger.info("Inorganic autocompletion cache updated.");
+    }
+
+    private String autoComplete(String input) {
+        String normalizedInput = Normalizer.get(input);
+
+        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
+            if (entry.getKey().startsWith(normalizedInput))
+                return findNormalizedTextIn(entry.getKey(), entry.getValue());
+
+        return "";
     }
 
     private void putNormalizedIn(InorganicModel inorganicModel, Map<String, Integer> normalizedTextToId) {
