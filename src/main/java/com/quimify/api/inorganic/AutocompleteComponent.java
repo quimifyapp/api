@@ -51,9 +51,11 @@ class AutocompleteComponent {
     // Private:
 
     private void updateCache() {
+        List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
+
         normalizedTextToId.clear();
 
-        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
+        for (InorganicModel inorganicModel : inorganicModels)
             putNormalized(inorganicModel);
 
         logger.info("Inorganic autocompletion cache updated.");
