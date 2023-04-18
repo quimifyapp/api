@@ -18,6 +18,8 @@ class ReportModel {
     private Timestamp dateAndTime;
     @Column(nullable = false)
     private String context;
+
+    @Lob // Large objects
     @Column(nullable = false)
     private String details;
 
