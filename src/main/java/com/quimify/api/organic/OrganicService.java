@@ -90,7 +90,6 @@ class OrganicService {
 		}
 		catch (Exception exception) {
 			errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
-
 			organicResult = OrganicResult.notFound;
 		}
 
