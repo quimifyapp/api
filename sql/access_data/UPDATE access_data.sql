@@ -1,3 +1,3 @@
 UPDATE access_data
 SET  = 
-WHERE  = 
+WHERE client_version = 

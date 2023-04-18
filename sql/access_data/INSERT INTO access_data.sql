@@ -9,7 +9,7 @@ message_link_present,
 message_link_label,
 message_link)
 
-VALUES(5, # Client version
+VALUES(7, # Client version
 false, # Update available
 null, # Update needed
 null, # Update details
