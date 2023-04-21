@@ -23,8 +23,8 @@ class ClientErrorController {
     // Client:
 
     @PostMapping()
-    protected void saveClientError(@RequestParam("context") String context, @RequestParam("details") String details,
-                                   @RequestParam("client-version") Integer clientVersion) {
+    protected void save(@RequestParam("context") String context, @RequestParam("details") String details,
+                        @RequestParam("client-version") Integer clientVersion) {
         clientErrorService.save(context, details, clientVersion);
         logger.warn(String.format(postClientErrorMessage, clientVersion));
     }

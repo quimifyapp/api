@@ -11,24 +11,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/access-data")
 class AccessDataController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	AccessDataService accessDataService; // Access data logic
+    @Autowired
+    AccessDataService accessDataService; // Access data logic
 
-	// Constants:
+    // Constants:
 
-	private static final String getAccessDataMessage = "GET access data from %s V%s client.";
+    private static final String getAccessDataMessage = "GET access data from %s V%s client.";
 
-	// Client:
+    // Client:
 
-	@GetMapping()
-	protected AccessDataResult getAccessData(@RequestParam("platform") Short platform,
-											 @RequestParam("client-version") Integer clientVersion) {
-		String platformName = platform == 0 ? "Android" : platform == 1 ? "iOS" : "web";
-		logger.info(String.format(getAccessDataMessage, platformName, clientVersion));
+    @GetMapping()
+    protected AccessDataResult get(@RequestParam("platform") Short platform,
+                                   @RequestParam("client-version") Integer clientVersion) {
+        String platformName = platform == 0 ? "Android" : platform == 1 ? "iOS" : "web";
+        logger.info(String.format(getAccessDataMessage, platformName, clientVersion));
 
-		return accessDataService.getAccessData(clientVersion, platform);
-	}
+        return accessDataService.getAccessData(clientVersion, platform);
+    }
 
 }

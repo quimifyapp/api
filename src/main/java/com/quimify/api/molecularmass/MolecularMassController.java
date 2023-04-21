@@ -23,7 +23,7 @@ class MolecularMassController {
     // Client:
 
     @GetMapping()
-    protected MolecularMassResult calculateMolecularMassOf(@RequestParam("formula") String formula) {
+    protected MolecularMassResult calculate(@RequestParam("formula") String formula) {
         MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResult(formula);
 
         if(molecularMassResult.isPresent())

@@ -24,31 +24,40 @@ class InorganicController {
 
     // Client:
 
-    @GetMapping()
-    protected InorganicResult searchInorganic(@RequestParam("input") String input) {
-        InorganicResult inorganicResult = inorganicService.search(input);
-
-        if(inorganicResult.isPresent())
-            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
-
-        return inorganicResult;
-    }
-
     @GetMapping("/completion")
-    protected @ResponseBody ResponseEntity<String> autoCompleteInorganic(@RequestParam("input") String input) {
+    protected @ResponseBody ResponseEntity<String> autoComplete(@RequestParam("input") String input) {
         String completion = inorganicService.autoComplete(input);
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
         return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header and body to the response
     }
 
     @GetMapping("/from-completion")
-    protected InorganicResult searchInorganicByCompletion(@RequestParam("completion") String completion) {
+    protected InorganicResult completionSearch(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
-        if(inorganicResult.isPresent())
+        if (inorganicResult.isPresent())
             logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
 
         return inorganicResult;
     }
 
+    @GetMapping()
+    protected InorganicResult search(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.search(input);
+
+        if (inorganicResult.isPresent())
+            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
+
+    //@GetMapping("/smart")
+    //protected InorganicResult smartSearch(@RequestParam("input") String input) {
+
+    //}
+
+    //@GetMapping("/enriched")
+    //protected InorganicResult enrichedSearch(@RequestParam("input") String input) {
+
+    //}
 }
