@@ -118,7 +118,7 @@ class OrganicService {
 				boolean iso = inputSequence[++i] == 1;
 				int carbonCount = inputSequence[++i];
 
-				openChain = openChain.bond(new Substituent(carbonCount, iso));
+				openChain = openChain.bond(Substituent.radical(carbonCount, iso));
 			}
 			else openChain = openChain.bond(group);
 		}
