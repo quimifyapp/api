@@ -5,19 +5,18 @@ import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-// This class solves inorganic autocompletions.
+// This class solves inorganic completions.
 
 @Component
 @EnableScheduling
-@Scope("singleton") // Only one instance of this bean will be created and shared between all the components.
-class AutocompleteComponent {
+//@Scope("singleton") // Only one instance of this bean will be created and shared between all the components.
+class AutocompleteComponent { // TODO rename "CompleteComponent"
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -27,28 +26,12 @@ class AutocompleteComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
+    private boolean updating = false;
+    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>(); // TODO concurrent? synchronized?
 
     // Administration:
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
-    private void updateCacheDaily() {
-        tryUpdateCache();
-    }
-
-    // Internal:
-
-    protected String tryAutoComplete(String input) {
-        try {
-            return autoComplete(input);
-        } catch (Exception exception) {
-            errorService.log("Exception autocompleting: " + input, exception.toString(), this.getClass());
-            return "";
-        }
-    }
-
-    // Private:
-
+    @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 minutes // TODO fix time
     private void tryUpdateCache() {
         try {
             updateCache();
@@ -60,34 +43,25 @@ class AutocompleteComponent {
     private void updateCache() {
         List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
 
-        Map<String, Integer> newNormalizedTextToId = new LinkedHashMap<>();
+        updating = true;
+
         for (InorganicModel inorganicModel : inorganicModels)
-            putNormalizedIn(inorganicModel, newNormalizedTextToId);
+            putNormalized(inorganicModel);
 
-        normalizedTextToId = newNormalizedTextToId;
+        updating = false;
 
-        logger.info("Inorganic autocompletion cache updated.");
+        logger.info("Inorganic completion cache updated.");
     }
 
-    private String autoComplete(String input) {
-        String normalizedInput = Normalizer.get(input);
-
-        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
-            if (entry.getKey().startsWith(normalizedInput))
-                return findNormalizedTextIn(entry.getKey(), entry.getValue());
-
-        return "";
-    }
-
-    private void putNormalizedIn(InorganicModel inorganicModel, Map<String, Integer> normalizedTextToId) {
+    private void putNormalized(InorganicModel inorganicModel) {
         Integer id = inorganicModel.getId();
 
-        putNormalizedIn(inorganicModel.getFormula(), id, normalizedTextToId);
+        putNormalized(inorganicModel.getFormula(), id);
 
-        putNormalizedIn(inorganicModel.getStockName(), id, normalizedTextToId);
-        putNormalizedIn(inorganicModel.getSystematicName(), id, normalizedTextToId);
-        putNormalizedIn(inorganicModel.getTraditionalName(), id, normalizedTextToId);
-        putNormalizedIn(inorganicModel.getCommonName(), id, normalizedTextToId);
+        putNormalized(inorganicModel.getStockName(), id);
+        putNormalized(inorganicModel.getSystematicName(), id);
+        putNormalized(inorganicModel.getTraditionalName(), id);
+        putNormalized(inorganicModel.getCommonName(), id);
 
         // Search tags (already normalized):
 
@@ -95,14 +69,38 @@ class AutocompleteComponent {
             normalizedTextToId.put(normalizedText, id);
     }
 
-    private void putNormalizedIn(String text, Integer id, Map<String, Integer> normalizedTextToId) {
+    private void putNormalized(String text, Integer id) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null)
             normalizedTextToId.put(normalizedText, id);
     }
 
-    private String findNormalizedTextIn(String normalizedText, Integer id) {
+    // Internal:
+
+    protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
+        try {
+            return autoComplete(input);
+        } catch (Exception exception) {
+            errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
+            return "";
+        }
+    }
+
+    private String autoComplete(String input) { // TODO rename "complete"
+        if (updating)
+            return "";
+
+        String normalizedInput = Normalizer.get(input);
+
+        for (Map.Entry<String, Integer> entry : new HashSet<>(normalizedTextToId.entrySet()))
+            if (entry.getKey().startsWith(normalizedInput))
+                return findNormalizedTextIn(entry.getKey(), entry.getValue());
+
+        return "";
+    }
+
+    private String findNormalizedTextIn(String normalizedText, Integer id) { // TODO rename
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
 
         if (inorganicModel.isEmpty()) {
