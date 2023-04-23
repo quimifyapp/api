@@ -49,9 +49,9 @@ class MetricsService {
         return getTodayMetrics().getPaidBingQueries();
     }
 
-    // Counters:
+    // Incrementers:
 
-    @Transactional
+    @Transactional // TODO Transactional here?
     public void errorOccurred() {
         getTodayMetrics().incrementErrorsOccurred();
     }

@@ -54,19 +54,6 @@ class InorganicModel {
         return inorganicSearchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
     }
 
-    // Modifiers:
-
-    @Transactional
-    protected void addSearchTag(String text) {
-        inorganicSearchTags.add(new InorganicSearchTagModel(text));
-    }
-
-    @Transactional
-    protected void countSearch() {
-        searchCount++;
-    }
-
-
     @Override
     public String toString() {
         List<String> identifiers = new ArrayList<>();
@@ -82,6 +69,18 @@ class InorganicModel {
         identifiers.removeIf(Objects::isNull);
 
         return identifiers.toString();
+    }
+
+    // Modifiers:
+
+    @Transactional
+    protected void addSearchTag(String text) {
+        inorganicSearchTags.add(new InorganicSearchTagModel(text));
+    }
+
+    @Transactional // TODO transactional here?
+    protected void countSearch() { // TODO rename
+        searchCount++; // TODO rename
     }
 
     // Getters and setters:
