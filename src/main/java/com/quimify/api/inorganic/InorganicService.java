@@ -49,7 +49,7 @@ public class InorganicService {
 
     // Client:
 
-    protected String autoComplete(String input) {
+    protected String complete(String input) {
         return autocompleteComponent.tryAutoComplete(input);
     }
 

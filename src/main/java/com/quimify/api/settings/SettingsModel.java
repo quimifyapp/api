@@ -2,7 +2,7 @@ package com.quimify.api.settings;
 
 import javax.persistence.*;
 
-// Esta clase representa la configuración de cada versión del servidor.
+// Esta clase representa la configuración de cada versión del servidor. // TODO translate comments
 
 @Entity // Es un modelo real
 @Table(name = "settings") // En la tabla 'settings' de la DB

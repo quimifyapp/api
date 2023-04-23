@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Service
 public
-class ElementService {
+class ElementService { // TODO translate comments
 
     @Autowired
     ElementRepository elementRepository; // Conexión con la DB

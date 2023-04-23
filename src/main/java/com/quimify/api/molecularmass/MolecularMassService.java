@@ -37,7 +37,7 @@ class MolecularMassService {
 
     // Internal:
 
-    public Optional<Float> get(String formula) {
+    public Optional<Float> get(String formula) { // TODO just use tryCalculate?
         Optional<Float> molecularMass;
 
         try {
@@ -63,7 +63,7 @@ class MolecularMassService {
 
     // Client:
 
-    protected MolecularMassResult tryMolecularMassResult(String query) {
+    protected MolecularMassResult tryCalculate(String query) {
         MolecularMassResult molecularMassResult;
 
         try {
@@ -91,12 +91,13 @@ class MolecularMassService {
 
     // Private:
 
-    private MolecularMassResult calculate(String formula) { // TODO translate
+    private MolecularMassResult calculate(String formula) { // TODO translate code
         // Se comprueba si tiene aspecto de fórmula:
         String adapted = formula.replaceAll("[≡=-]", ""); // Bonds
 
+        // TODO constant:
         Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?" +
-                "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more TODO constant
+                "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more
 
         if (!structurePattern.matcher(adapted).matches())
             return new MolecularMassResult("La fórmula \"" + formula + "\" no es válida.");
@@ -136,7 +137,7 @@ class MolecularMassService {
         return new MolecularMassResult(molecularMass, elementToGrams, elementToMoles.get());
     }
 
-    private Optional<Map<String, Integer>> getElementToMolesIn(String formula) {
+    private Optional<Map<String, Integer>> getElementToMolesIn(String formula) { // TODO translate and improve code
         Optional<Map<String, Integer>> resultado;
 
         // Separa las fórmulas anidadas entre paréntesis:
@@ -230,9 +231,9 @@ class MolecularMassService {
             map.replace(key, found + value); // It was present, values are added
         else map.put(key, value); // New element
     }
-    
+
     private Optional<Float> getMolecularMassOf(String symbol) {
         return elementService.searchBySymbol(symbol).map(ElementModel::getMolecularMass);
     }
-    
+
 }
