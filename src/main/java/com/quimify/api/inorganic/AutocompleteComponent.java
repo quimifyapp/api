@@ -26,12 +26,11 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private boolean updating = false;
     private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>(); // TODO concurrent? synchronized?
 
     // Administration:
 
-    @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 minutes // TODO fix time
+    @Scheduled(fixedDelay = 1 * 1000) // At startup, then once every 1 minute // TODO fix time
     private void tryUpdateCache() {
         try {
             updateCache();
@@ -40,15 +39,21 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
         }
     }
 
-    private void updateCache() {
-        List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
+    private boolean firstTime = true;
+    List<InorganicModel> inorganicModels;
 
-        updating = true;
+    private void updateCache() {
+        if (firstTime) {
+            this.inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
+            firstTime = false;
+        }
+
+        List<InorganicModel> inorganicModels = new ArrayList<>(this.inorganicModels);
 
         for (InorganicModel inorganicModel : inorganicModels)
             putNormalized(inorganicModel);
 
-        updating = false;
+        firstTime = false;
 
         logger.info("Inorganic completion cache updated.");
     }
@@ -88,7 +93,7 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     }
 
     private String autoComplete(String input) { // TODO rename "complete"
-        if (updating)
+        if (firstTime)
             return "";
 
         String normalizedInput = Normalizer.get(input);
