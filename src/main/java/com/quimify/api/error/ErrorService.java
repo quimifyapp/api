@@ -15,7 +15,7 @@ import java.time.Instant;
 public
 class ErrorService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ErrorRepository errorRepository; // DB connection

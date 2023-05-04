@@ -19,7 +19,7 @@ import java.io.IOException;
 @Scope("prototype")
 class WebSearchComponent {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     SettingsService settingsService; // Settings logic
@@ -96,7 +96,7 @@ class WebSearchComponent {
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Got HTTP code 403 from Google");
-            else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
+            else errorService.log("IOException Google: " + input, exception.toString(), getClass());
 
             searched = false;
         }
@@ -145,11 +145,11 @@ class WebSearchComponent {
         } catch (IOException exception) {
             if (exception.toString().contains("HTTP response code: 403"))
                 logger.warn("Got HTTP code 403 from " + apiName);
-            else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
+            else errorService.log("IOException " + apiName + ": " + input, exception.toString(), getClass());
 
             searched = false;
         } catch (Exception exception) {
-            errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
+            errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
 
             searched = false;
         }

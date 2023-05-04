@@ -19,7 +19,7 @@ import java.util.*;
 @Scope("singleton") // Only one instance of this bean will be created and shared between all the components.
 class AutocompleteComponent {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
@@ -42,7 +42,7 @@ class AutocompleteComponent {
         try {
             return autoComplete(input);
         } catch (Exception exception) {
-            errorService.log("Exception autocompleting: " + input, exception.toString(), this.getClass());
+            errorService.log("Exception autocompleting: " + input, exception.toString(), getClass());
             return "";
         }
     }
@@ -53,7 +53,7 @@ class AutocompleteComponent {
         try {
             updateCache();
         } catch (Exception exception) {
-            errorService.log("Exception updating cache", exception.toString(), this.getClass());
+            errorService.log("Exception updating cache", exception.toString(), getClass());
         }
     }
 
@@ -106,7 +106,7 @@ class AutocompleteComponent {
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
 
         if (inorganicModel.isEmpty()) {
-            errorService.log("Discrepancy between IDs map and DB", id.toString(), this.getClass());
+            errorService.log("Discrepancy between IDs map and DB", id.toString(), getClass());
             return "";
         }
 

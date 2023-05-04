@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 class OrganicService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	PubChemComponent pubChemComponent; // PubChem API logic
@@ -57,7 +57,7 @@ class OrganicService {
 
 				if(organic.get().getStructureException() != null) {
 					Exception exception = organic.get().getStructureException();
-					errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+					errorService.log("Exception solving name: " + name, exception.toString(), getClass());
 				}
 			}
 			else {
@@ -65,12 +65,12 @@ class OrganicService {
 				organicResult = OrganicResult.notFound;
 			}
 		} catch (Exception exception) {
-			errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+			errorService.log("Exception solving name: " + name, exception.toString(), getClass());
 			organicResult = OrganicResult.notFound;
 		}
 
 		if(!organicResult.isPresent())
-			notFoundQueryService.log(name, this.getClass());
+			notFoundQueryService.log(name, getClass());
 
 		metricsService.organicSearchedFromName(organicResult.isPresent());
 
@@ -89,12 +89,12 @@ class OrganicService {
 			organicResult = resolvePropertiesOf(organic);
 		}
 		catch (Exception exception) {
-			errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
+			errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
 			organicResult = OrganicResult.notFound;
 		}
 
 		if(!organicResult.isPresent())
-			notFoundQueryService.log(sequenceToString, this.getClass());
+			notFoundQueryService.log(sequenceToString, getClass());
 
 		metricsService.organicSearchedFromStructure(organicResult.isPresent());
 

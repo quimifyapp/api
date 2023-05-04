@@ -18,7 +18,7 @@ import java.util.*;
 @Service
 public class InorganicService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
@@ -60,7 +60,7 @@ public class InorganicService {
         if (searchedInorganic.isPresent())
             inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
-            errorService.log("Completion not in DB", completion, this.getClass());
+            errorService.log("Completion not in DB", completion, getClass());
             inorganicResult = InorganicResult.notFound;
         }
 
@@ -78,7 +78,7 @@ public class InorganicService {
         inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
 
         if(!inorganicResult.isPresent())
-            notFoundQueryService.log(input, this.getClass());
+            notFoundQueryService.log(input, getClass());
 
         metricsService.inorganicSearched(inorganicResult.isPresent());
 
@@ -175,7 +175,7 @@ public class InorganicService {
             return Optional.empty();
         }
         catch (Exception exception) {
-            errorService.log("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
+            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
             return Optional.empty();
         }
     }
