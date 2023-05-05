@@ -1,6 +1,7 @@
 package com.quimify.api.settings;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 // This class implements settings logic.
@@ -14,46 +15,69 @@ class SettingsService {
 
     private static final int apiVersion = 5;
 
-    // Internal:
+    // Environmental variables:
 
-    public Boolean getGoogleON() {
-        return settingsRepository.findByVersion(apiVersion).getUseGoogle();
+    @Value("${quimify.api.google.key}")
+    private String googleKey;
+
+    @Value("${quimify.api.bing.free.key}")
+    private String freeBingKey;
+
+    @Value("${quimify.api.bing.paid.key}")
+    private String paidBingKey;
+
+    // Private:
+
+    private SettingsModel getSettings() {
+        return settingsRepository.findByVersion(apiVersion);
     }
 
-    public Integer getGoogleLimit() {
-        return settingsRepository.findByVersion(apiVersion).getGoogleDailyLimit();
-    }
+    // Secret:
 
-    public String getGoogleURL() {
-        return settingsRepository.findByVersion(apiVersion).getGoogleUrl();
-    }
-
-    public String getBingURL() {
-        return settingsRepository.findByVersion(apiVersion).getBingUrl();
-    }
-
-    public Boolean getFreeBingON() {
-        return settingsRepository.findByVersion(apiVersion).getUseFreeBing();
-    }
-
-    public Integer getPaidBingLimit() {
-        return settingsRepository.findByVersion(apiVersion).getPaidBingDailyLimit();
+    public String getGoogleUrl() {
+        return String.format(getSettings().getGoogleUrl(), googleKey);
     }
 
     public String getFreeBingKey() {
-        return settingsRepository.findByVersion(apiVersion).getFreeBingKey();
-    }
-
-    public Boolean getPaidBingON() {
-        return settingsRepository.findByVersion(apiVersion).getUsePaidBing();
+        return freeBingKey;
     }
 
     public String getPaidBingKey() {
-        return settingsRepository.findByVersion(apiVersion).getPaidBingKey();
+        return paidBingKey;
+    }
+
+    // Trivial:
+
+    public Boolean getUseGoogle() {
+        return getSettings().getUseGoogle();
+    }
+
+    public Integer getGoogleDailyLimit() {
+        return getSettings().getGoogleDailyLimit();
+    }
+
+    public Boolean getUseFreeBing() {
+        return getSettings().getUseFreeBing();
+    }
+
+    public Integer getPaidBingDailyLimit() {
+        return getSettings().getPaidBingDailyLimit();
+    }
+
+    public Boolean getUsePaidBing() {
+        return getSettings().getUsePaidBing();
+    }
+
+    public String getBingUrl() {
+        return getSettings().getBingUrl();
+    }
+
+    public String getClassifierUrl() {
+        return getSettings().getClassifierUrl();
     }
 
     public String getUserAgent() {
-        return settingsRepository.findByVersion(apiVersion).getUserAgent();
+        return getSettings().getUserAgent();
     }
 
 }

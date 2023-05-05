@@ -11,39 +11,30 @@ class SettingsModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
-    private Integer version; // API version
+    private Integer version;
 
-    // Google API:
+    // External API settings:
 
     @Column(nullable = false)
-    private Boolean useGoogle = false; // Switch
+    private Boolean useGoogle;
     @Column(nullable = false)
     private Integer googleDailyLimit;
+
+    @Column(nullable = false)
+    private Boolean useFreeBing;
+
+    @Column(nullable = false)
+    private Boolean usePaidBing;
+    @Column(nullable = false)
+    private Integer paidBingDailyLimit;
+
+    // URLs:
+
     @Column(nullable = false)
     private String googleUrl; // TODO env
 
-    // Free Bing API:
-
-    @Column(nullable = false)
-    private Boolean useFreeBing = false; // Switch
-    @Column(nullable = false)
-    private String freeBingKey; // TODO env
-
-    // Paid Bing API:
-
-    @Column(nullable = false)
-    private Boolean usePaidBing = false; // Switch
-    @Column(nullable = false)
-    private Integer paidBingDailyLimit;
-    @Column(nullable = false)
-    private String paidBingKey; // TODO env
-
-    // Both Bing APIs:
-
     @Column(nullable = false)
     private String bingUrl;
-
-    // Classifier API:
 
     @Column(nullable = false)
     private String classifierUrl;
@@ -77,28 +68,12 @@ class SettingsModel {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    String getGoogleUrl() {
-        return googleUrl;
-    }
-
-    void setGoogleUrl(String googleUrl) {
-        this.googleUrl = googleUrl;
-    }
-
     Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
     void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
-    }
-
-    String getFreeBingKey() {
-        return freeBingKey;
-    }
-
-    void setFreeBingKey(String freeBingKey) {
-        this.freeBingKey = freeBingKey;
     }
 
     Boolean getUsePaidBing() {
@@ -117,12 +92,12 @@ class SettingsModel {
         this.paidBingDailyLimit = paidBingDailyLimit;
     }
 
-    String getPaidBingKey() {
-        return paidBingKey;
+    String getGoogleUrl() {
+        return googleUrl;
     }
 
-    void setPaidBingKey(String paidBingKey) {
-        this.paidBingKey = paidBingKey;
+    void setGoogleUrl(String googleUrl) {
+        this.googleUrl = googleUrl;
     }
 
     String getBingUrl() {
@@ -131,6 +106,14 @@ class SettingsModel {
 
     void setBingUrl(String bingUrl) {
         this.bingUrl = bingUrl;
+    }
+
+    String getClassifierUrl() {
+        return classifierUrl;
+    }
+
+    void setClassifierUrl(String classifierUrl) {
+        this.classifierUrl = classifierUrl;
     }
 
     String getUserAgent() {

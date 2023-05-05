@@ -60,22 +60,22 @@ class WebSearchComponent {
     // Private:
 
     private boolean canGoogleSearch() {
-        if (!settingsService.getGoogleON())
+        if (!settingsService.getUseGoogle())
             return false;
 
         int queries = metricsService.getGoogleQueries();
 
-        if (queries == settingsService.getGoogleLimit() - 1)
+        if (queries == settingsService.getGoogleDailyLimit() - 1)
             logger.warn("Daily Google queries have been exceeded.");
 
-        return queries < settingsService.getGoogleLimit();
+        return queries < settingsService.getGoogleDailyLimit();
     }
 
     boolean googleSearch(String input) {
         boolean searched;
 
         try {
-            Connection connection = new Connection(settingsService.getGoogleURL(), input);
+            Connection connection = new Connection(settingsService.getGoogleUrl(), input);
             connection.setProperty("Accept", "application/json");
             JSONObject response = new JSONObject(connection.getText());
 
@@ -105,26 +105,26 @@ class WebSearchComponent {
     }
 
     private boolean canFreeBingSearch() {
-        return settingsService.getFreeBingON();
+        return settingsService.getUseFreeBing();
     }
 
     private boolean canPaidBingSearch() {
-        if (!settingsService.getPaidBingON())
+        if (!settingsService.getUsePaidBing())
             return false;
 
         int queries = metricsService.getPaidBingQueries();
 
-        if (queries == settingsService.getPaidBingLimit() - 1)
+        if (queries == settingsService.getPaidBingDailyLimit() - 1)
             logger.warn("Daily paid Bing queries have been exceeded.");
 
-        return queries < settingsService.getPaidBingLimit();
+        return queries < settingsService.getPaidBingDailyLimit();
     }
 
     private boolean bingSearch(String input, String apiKey, String apiName) {
         boolean searched;
 
         try {
-            Connection connection = new Connection(settingsService.getBingURL(), input);
+            Connection connection = new Connection(settingsService.getBingUrl(), input);
             connection.setProperty("Ocp-Apim-Subscription-Key", apiKey);
             JSONObject response = new JSONObject(connection.getText());
 
