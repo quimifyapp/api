@@ -15,11 +15,11 @@ class OrganicResult {
 
     // Constants:
 
-    protected static final OrganicResult notFound = new OrganicResult();
+    static final OrganicResult notFound = new OrganicResult();
 
     // Constructors:
 
-    protected OrganicResult(String name, String structure, Float molecularMass, String url2D) {
+    OrganicResult(String name, String structure, Float molecularMass, String url2D) {
         this.present = true;
         this.name = name;
         this.structure = structure;

@@ -23,7 +23,7 @@ class ReportController {
     // Client:
 
     @PostMapping()
-    protected void save(@RequestParam("context") String context, @RequestParam("details") String details,
+    void save(@RequestParam("context") String context, @RequestParam("details") String details,
                         @RequestParam("user-message") String userMessage,
                         @RequestParam("client-version") Integer clientVersion) {
         reportService.save(context, details, userMessage, clientVersion);

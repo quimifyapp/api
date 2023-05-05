@@ -31,7 +31,7 @@ for(InorganicModel inorganic : inorganicRepository.findAll()) {
                 inorganic.setSearchTags(nuevas);
         }
 
-    protected Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
+    Optional<InorganicoModel> probarPaginaFQ(String direccion) { // TEST
         Optional<InorganicoModel> resultado;
 
         try {
@@ -51,11 +51,11 @@ for(InorganicModel inorganic : inorganicRepository.findAll()) {
 
 
     @GetMapping("/probarfq") // TEST
-    protected Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
+    Optional<InorganicoModel> probarPaginaFQ(@RequestParam("direccion") String direccion) {
         return inorganicoService.probarPaginaFQ(direccion);
     }
 
-    protected boolean igualA(InorganicoModel igual) {
+    boolean igualA(InorganicoModel igual) {
         if(!formula.contentEquals(igual.getFormula()))
             return false;
         if(!nombre.contentEquals(igual.getNombre()))

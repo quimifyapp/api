@@ -20,7 +20,7 @@ class ReportService {
 
     // Client:
 
-    protected void save(String context, String details, String userMessage, Integer clientVersion) {
+    void save(String context, String details, String userMessage, Integer clientVersion) {
         ReportModel reportModel = new ReportModel();
 
         reportModel.setDateAndTime(Timestamp.from(Instant.now()));

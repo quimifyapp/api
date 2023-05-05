@@ -24,7 +24,7 @@ class AccessDataService {
 
 	// Client:
 
-	protected AccessDataResult getAccessData(Integer clientVersion, Short platform) {
+	AccessDataResult getAccessData(Integer clientVersion, Short platform) {
 		AccessDataModel client = accessDataRepository.findByClientVersion(clientVersion);
 
 		AccessDataResult accessDataResult = platform != webPlatform

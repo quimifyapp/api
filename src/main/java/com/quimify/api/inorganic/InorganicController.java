@@ -25,14 +25,14 @@ class InorganicController {
     // Client:
 
     @GetMapping("/completion")
-    protected @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
+    @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
         String completion = inorganicService.complete(input);
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
         return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Response has both header and body
     }
 
     @GetMapping("/from-completion")
-    protected InorganicResult searchFromCompletion(@RequestParam("completion") String completion) {
+    InorganicResult searchFromCompletion(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
         if (inorganicResult.isPresent())
@@ -42,7 +42,7 @@ class InorganicController {
     }
 
     @GetMapping()
-    protected InorganicResult search(@RequestParam("input") String input) {
+    InorganicResult search(@RequestParam("input") String input) {
         InorganicResult inorganicResult = inorganicService.search(input);
 
         if (inorganicResult.isPresent())
@@ -52,12 +52,12 @@ class InorganicController {
     }
 
     //@GetMapping("/smart")
-    //protected InorganicResult smartSearch(@RequestParam("input") String input) {
+    //InorganicResult smartSearch(@RequestParam("input") String input) {
 
     //}
 
     //@GetMapping("/enriched")
-    //protected InorganicResult enrichedSearch(@RequestParam("input") String input) {
+    //InorganicResult enrichedSearch(@RequestParam("input") String input) {
 
     //}
 }

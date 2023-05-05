@@ -50,7 +50,7 @@ class InorganicModel {
 
     // Queries:
 
-    protected Set<String> getSearchTags() {
+    Set<String> getSearchTags() {
         return inorganicSearchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
     }
 
@@ -74,110 +74,110 @@ class InorganicModel {
     // Modifiers:
 
     @Transactional
-    protected void addSearchTag(String text) {
+    void addSearchTag(String text) {
         inorganicSearchTags.add(new InorganicSearchTagModel(text));
     }
 
     @Transactional // TODO transactional here?
-    protected void countSearch() { // TODO rename
+    void countSearch() { // TODO rename
         searchCount++; // TODO rename
     }
 
     // Getters and setters:
 
-    protected Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    protected String getFormula() {
+    String getFormula() {
         return formula;
     }
 
-    protected void setFormula(String formula) {
+    void setFormula(String formula) {
         this.formula = formula;
     }
 
-    protected String getStockName() {
+    String getStockName() {
         return stockName;
     }
 
-    protected void setStockName(String stockName) {
+    void setStockName(String stockName) {
         this.stockName = stockName;
     }
 
-    protected String getSystematicName() {
+    String getSystematicName() {
         return systematicName;
     }
 
-    protected void setSystematicName(String systematicName) {
+    void setSystematicName(String systematicName) {
         this.systematicName = systematicName;
     }
 
-    protected String getTraditionalName() {
+    String getTraditionalName() {
         return traditionalName;
     }
 
-    protected void setTraditionalName(String traditionalName) {
+    void setTraditionalName(String traditionalName) {
         this.traditionalName = traditionalName;
     }
 
-    protected String getCommonName() {
+    String getCommonName() {
         return commonName;
     }
 
-    protected void setCommonName(String otherName) {
+    void setCommonName(String otherName) {
         this.commonName = otherName;
     }
 
-    protected Set<InorganicSearchTagModel> getInorganicSearchTags() {
+    Set<InorganicSearchTagModel> getInorganicSearchTags() {
         return inorganicSearchTags;
     }
 
-    protected void setInorganicSearchTags(Set<InorganicSearchTagModel> inorganicSearchTags) {
+    void setInorganicSearchTags(Set<InorganicSearchTagModel> inorganicSearchTags) {
         this.inorganicSearchTags = inorganicSearchTags;
     }
 
-    protected Integer getSearchCount() {
+    Integer getSearchCount() {
         return searchCount;
     }
 
-    protected void setSearchCount(Integer searchCount) {
+    void setSearchCount(Integer searchCount) {
         this.searchCount = searchCount;
     }
 
-    protected String getMolecularMass() {
+    String getMolecularMass() {
         return molecularMass;
     }
 
-    protected void setMolecularMass(String molecularMass) {
+    void setMolecularMass(String molecularMass) {
         this.molecularMass = molecularMass;
     }
 
-    protected String getDensity() {
+    String getDensity() {
         return density;
     }
 
-    protected void setDensity(String density) {
+    void setDensity(String density) {
         this.density = density;
     }
 
-    protected String getMeltingPoint() {
+    String getMeltingPoint() {
         return meltingPoint;
     }
 
-    protected void setMeltingPoint(String meltingPoint) {
+    void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
-    protected String getBoilingPoint() {
+    String getBoilingPoint() {
         return boilingPoint;
     }
 
-    protected void setBoilingPoint(String boilingPoint) {
+    void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }
 

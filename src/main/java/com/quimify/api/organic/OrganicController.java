@@ -23,7 +23,7 @@ class OrganicController {
 	// Client:
 
 	@GetMapping("/structure")
-	protected OrganicResult getFromName(@RequestParam("name") String name) {
+	OrganicResult getFromName(@RequestParam("name") String name) {
 		OrganicResult result = organicService.getFromName(name);
 
 		if (result.isPresent())
@@ -33,7 +33,7 @@ class OrganicController {
 	}
 
 	@GetMapping("/name")
-	protected OrganicResult getFromStructure(@RequestParam("structure-sequence") int[] structureSequence) {
+	OrganicResult getFromStructure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult result = organicService.getFromStructure(structureSequence);
 
 		if(result.isPresent())

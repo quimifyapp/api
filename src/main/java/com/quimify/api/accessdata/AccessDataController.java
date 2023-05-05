@@ -23,7 +23,7 @@ class AccessDataController {
     // Client:
 
     @GetMapping()
-    protected AccessDataResult get(@RequestParam("platform") Short platform,
+    AccessDataResult get(@RequestParam("platform") Short platform,
                                    @RequestParam("client-version") Integer clientVersion) {
         String platformName = platform == 0 ? "Android" : platform == 1 ? "iOS" : "web";
         logger.info(String.format(getAccessDataMessage, platformName, clientVersion));

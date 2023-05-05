@@ -63,7 +63,7 @@ class MolecularMassService {
 
     // Client:
 
-    protected MolecularMassResult tryCalculate(String query) {
+    MolecularMassResult tryCalculate(String query) {
         MolecularMassResult molecularMassResult;
 
         try {

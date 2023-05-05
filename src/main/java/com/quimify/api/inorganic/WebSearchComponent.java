@@ -35,7 +35,7 @@ class WebSearchComponent {
 
     // Internal:
 
-    protected boolean search(String input) {
+    boolean search(String input) {
         this.title = null;
         this.address = null;
 
@@ -71,7 +71,7 @@ class WebSearchComponent {
         return queries < settingsService.getGoogleLimit();
     }
 
-    protected boolean googleSearch(String input) {
+    boolean googleSearch(String input) {
         boolean searched;
 
         try {
@@ -159,11 +159,11 @@ class WebSearchComponent {
 
     // Getters:
 
-    protected String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    protected String getAddress() {
+    String getAddress() {
         return address;
     }
 

@@ -49,11 +49,11 @@ public class InorganicService {
 
     // Client:
 
-    protected String complete(String input) {
+    String complete(String input) {
         return autocompleteComponent.tryAutoComplete(input);
     }
 
-    protected InorganicResult searchFromCompletion(String completion) {
+    InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInorganic = searchInDatabase(completion);
@@ -70,7 +70,7 @@ public class InorganicService {
         return inorganicResult;
     }
 
-    protected InorganicResult search(String input) {
+    InorganicResult search(String input) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = searchInDatabase(input);

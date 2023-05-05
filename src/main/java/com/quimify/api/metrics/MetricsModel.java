@@ -75,273 +75,273 @@ class MetricsModel {
 
     // Constructors:
 
-    protected MetricsModel() {} // JPA needs it
-
-    protected MetricsModel(Date date) {
+    MetricsModel(Date date) {
         setDate(date);
     }
 
+    protected MetricsModel() {} // JPA needs it
+
     // Incrementers:
 
-    protected void incrementErrorsOccurred() {
+    void incrementErrorsOccurred() {
         errorsOccurred += 1;
     }
 
-    protected void incrementClientErrorsSent() {
+    void incrementClientErrorsSent() {
         clientErrorsSent += 1;
     }
 
-    protected void incrementReportsSent() {
+    void incrementReportsSent() {
         reportsSent += 1;
     }
 
-    protected void incrementAndroidAccesses() {
+    void incrementAndroidAccesses() {
         androidAccesses += 1;
     }
 
-    protected void incrementIOSAccesses() {
+    void incrementIOSAccesses() {
         iosAccesses += 1;
     }
 
-    protected void incrementWebAccesses() {
+    void incrementWebAccesses() {
         webAccesses += 1;
     }
 
-    protected void incrementInorganicsFoundFromText() {
+    void incrementInorganicsFoundFromText() {
         inorganicsFoundFromText += 1;
     }
 
-    protected void incrementInorganicsNotFoundFromText() {
+    void incrementInorganicsNotFoundFromText() {
         inorganicsNotFoundFromText += 1;
     }
 
-    protected void incrementGoogleFoundFromText() {
+    void incrementGoogleFoundFromText() {
         googleFoundFromText += 1;
     }
 
-    protected void incrementGoogleNotFoundFromText() {
+    void incrementGoogleNotFoundFromText() {
         googleNotFoundFromText += 1;
     }
 
-    protected void incrementBingFoundFromText() {
+    void incrementBingFoundFromText() {
         bingFoundFromText += 1;
     }
 
-    protected void incrementBingNotFoundFromText() {
+    void incrementBingNotFoundFromText() {
         bingNotFoundFromText += 1;
     }
 
-    protected void incrementPaidBingQueries() {
+    void incrementPaidBingQueries() {
         paidBingQueries += 1;
     }
 
-    protected void incrementInorganicsLearned() {
+    void incrementInorganicsLearned() {
         inorganicsLearned += 1;
     }
 
-    protected void incrementInorganicsAutocompleted() {
+    void incrementInorganicsAutocompleted() {
         inorganicsAutocompleted += 1;
     }
 
-    protected void incrementOrganicsFoundFromNameFromText() {
+    void incrementOrganicsFoundFromNameFromText() {
         organicsFoundFromNameFromText += 1;
     }
 
-    protected void incrementOrganicsNotFoundFromNameFromText() {
+    void incrementOrganicsNotFoundFromNameFromText() {
         organicsNotFoundFromNameFromText += 1;
     }
 
-    protected void incrementOrganicsSucceededFromStructure() {
+    void incrementOrganicsSucceededFromStructure() {
         organicsSucceededFromStructure += 1;
     }
 
-    protected void incrementOrganicsFailedFromStructure() {
+    void incrementOrganicsFailedFromStructure() {
         organicsFailedFromStructure += 1;
     }
 
-    protected void incrementMolecularMassesSucceeded() {
+    void incrementMolecularMassesSucceeded() {
         molecularMassesSucceeded += 1;
     }
 
-    protected void incrementMolecularMassesFailed() {
+    void incrementMolecularMassesFailed() {
         molecularMassesFailed += 1;
     }
 
     // Getters and setters:
 
-    protected Date getDate() {
+    Date getDate() {
         return date;
     }
 
-    protected void setDate(Date date) {
+    void setDate(Date date) {
         this.date = date;
     }
 
-    protected Integer getErrorsOccurred() {
+    Integer getErrorsOccurred() {
         return errorsOccurred;
     }
 
-    protected void setErrorsOccurred(Integer errorsOccurred) {
+    void setErrorsOccurred(Integer errorsOccurred) {
         this.errorsOccurred = errorsOccurred;
     }
 
-    protected Integer getClientErrorsSent() {
+    Integer getClientErrorsSent() {
         return clientErrorsSent;
     }
 
-    protected void setClientErrorsSent(Integer clientErrorsOccurred) {
+    void setClientErrorsSent(Integer clientErrorsOccurred) {
         this.clientErrorsSent = clientErrorsOccurred;
     }
 
-    protected Integer getReportsSent() {
+    Integer getReportsSent() {
         return reportsSent;
     }
 
-    protected void setReportsSent(Integer reportsSent) {
+    void setReportsSent(Integer reportsSent) {
         this.reportsSent = reportsSent;
     }
 
-    protected Integer getAndroidAccesses() {
+    Integer getAndroidAccesses() {
         return androidAccesses;
     }
 
-    protected void setAndroidAccesses(Integer androidAccesses) {
+    void setAndroidAccesses(Integer androidAccesses) {
         this.androidAccesses = androidAccesses;
     }
 
-    protected Integer getIosAccesses() {
+    Integer getIosAccesses() {
         return iosAccesses;
     }
 
-    protected void setIosAccesses(Integer iosAccesses) {
+    void setIosAccesses(Integer iosAccesses) {
         this.iosAccesses = iosAccesses;
     }
 
-    protected Integer getWebAccesses() {
+    Integer getWebAccesses() {
         return webAccesses;
     }
 
-    protected void setWebAccesses(Integer webAccesses) {
+    void setWebAccesses(Integer webAccesses) {
         this.webAccesses = webAccesses;
     }
 
-    protected Integer getInorganicsFoundFromText() {
+    Integer getInorganicsFoundFromText() {
         return inorganicsFoundFromText;
     }
 
-    protected void setInorganicsFoundFromText(Integer inorganicsFoundFromText) {
+    void setInorganicsFoundFromText(Integer inorganicsFoundFromText) {
         this.inorganicsFoundFromText = inorganicsFoundFromText;
     }
 
-    protected Integer getInorganicsNotFoundFromText() {
+    Integer getInorganicsNotFoundFromText() {
         return inorganicsNotFoundFromText;
     }
 
-    protected void setInorganicsNotFoundFromText(Integer inorganicsNotFoundFromText) {
+    void setInorganicsNotFoundFromText(Integer inorganicsNotFoundFromText) {
         this.inorganicsNotFoundFromText = inorganicsNotFoundFromText;
     }
 
-    protected Integer getGoogleFoundFromText() {
+    Integer getGoogleFoundFromText() {
         return googleFoundFromText;
     }
 
-    protected void setGoogleFoundFromText(Integer googleFoundFromText) {
+    void setGoogleFoundFromText(Integer googleFoundFromText) {
         this.googleFoundFromText = googleFoundFromText;
     }
 
-    protected Integer getGoogleNotFoundFromText() {
+    Integer getGoogleNotFoundFromText() {
         return googleNotFoundFromText;
     }
 
-    protected void setGoogleNotFoundFromText(Integer googleNotFoundFromText) {
+    void setGoogleNotFoundFromText(Integer googleNotFoundFromText) {
         this.googleNotFoundFromText = googleNotFoundFromText;
     }
 
-    protected Integer getBingFoundFromText() {
+    Integer getBingFoundFromText() {
         return bingFoundFromText;
     }
 
-    protected void setBingFoundFromText(Integer bingFoundFromText) {
+    void setBingFoundFromText(Integer bingFoundFromText) {
         this.bingFoundFromText = bingFoundFromText;
     }
 
-    protected Integer getBingNotFoundFromText() {
+    Integer getBingNotFoundFromText() {
         return bingNotFoundFromText;
     }
 
-    protected void setBingNotFoundFromText(Integer bingNotFoundFromText) {
+    void setBingNotFoundFromText(Integer bingNotFoundFromText) {
         this.bingNotFoundFromText = bingNotFoundFromText;
     }
 
-    protected Integer getPaidBingQueries() {
+    Integer getPaidBingQueries() {
         return paidBingQueries;
     }
 
-    protected void setPaidBingQueries(Integer paidBingQueries) {
+    void setPaidBingQueries(Integer paidBingQueries) {
         this.paidBingQueries = paidBingQueries;
     }
 
-    protected Integer getInorganicsLearned() {
+    Integer getInorganicsLearned() {
         return inorganicsLearned;
     }
 
-    protected void setInorganicsLearned(Integer inorganicsLearned) {
+    void setInorganicsLearned(Integer inorganicsLearned) {
         this.inorganicsLearned = inorganicsLearned;
     }
 
-    protected Integer getInorganicsAutocompleted() {
+    Integer getInorganicsAutocompleted() {
         return inorganicsAutocompleted;
     }
 
-    protected void setInorganicsAutocompleted(Integer inorganicsAutocompleted) {
+    void setInorganicsAutocompleted(Integer inorganicsAutocompleted) {
         this.inorganicsAutocompleted = inorganicsAutocompleted;
     }
 
-    protected Integer getOrganicsFoundFromNameFromText() {
+    Integer getOrganicsFoundFromNameFromText() {
         return organicsFoundFromNameFromText;
     }
 
-    protected void setOrganicsFoundFromNameFromText(Integer organicsFoundFromNameFromText) {
+    void setOrganicsFoundFromNameFromText(Integer organicsFoundFromNameFromText) {
         this.organicsFoundFromNameFromText = organicsFoundFromNameFromText;
     }
 
-    protected Integer getOrganicsNotFoundFromNameFromText() {
+    Integer getOrganicsNotFoundFromNameFromText() {
         return organicsNotFoundFromNameFromText;
     }
 
-    protected void setOrganicsNotFoundFromNameFromText(Integer organicsNotFoundFromNameFromText) {
+    void setOrganicsNotFoundFromNameFromText(Integer organicsNotFoundFromNameFromText) {
         this.organicsNotFoundFromNameFromText = organicsNotFoundFromNameFromText;
     }
 
-    protected Integer getOrganicsSucceededFromStructure() {
+    Integer getOrganicsSucceededFromStructure() {
         return organicsSucceededFromStructure;
     }
 
-    protected void setOrganicsSucceededFromStructure(Integer organicsSucceededFromStructure) {
+    void setOrganicsSucceededFromStructure(Integer organicsSucceededFromStructure) {
         this.organicsSucceededFromStructure = organicsSucceededFromStructure;
     }
 
-    protected Integer getOrganicsFailedFromStructure() {
+    Integer getOrganicsFailedFromStructure() {
         return organicsFailedFromStructure;
     }
 
-    protected void setOrganicsFailedFromStructure(Integer organicsFailedFromStructure) {
+    void setOrganicsFailedFromStructure(Integer organicsFailedFromStructure) {
         this.organicsFailedFromStructure = organicsFailedFromStructure;
     }
 
-    protected Integer getMolecularMassesSucceeded() {
+    Integer getMolecularMassesSucceeded() {
         return molecularMassesSucceeded;
     }
 
-    protected void setMolecularMassesSucceeded(Integer molecularMassesSucceeded) {
+    void setMolecularMassesSucceeded(Integer molecularMassesSucceeded) {
         this.molecularMassesSucceeded = molecularMassesSucceeded;
     }
 
-    protected Integer getMolecularMassesFailed() {
+    Integer getMolecularMassesFailed() {
         return molecularMassesFailed;
     }
 
-    protected void setMolecularMassesFailed(Integer molecularMassesFailed) {
+    void setMolecularMassesFailed(Integer molecularMassesFailed) {
         this.molecularMassesFailed = molecularMassesFailed;
     }
 

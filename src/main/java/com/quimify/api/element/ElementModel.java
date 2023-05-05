@@ -24,19 +24,19 @@ class ElementModel {
 
     // Getters y setters:
 
-    protected Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    protected String getSymbol() {
+    String getSymbol() {
         return symbol;
     }
 
-    protected void setSymbol(String simbolo) {
+    void setSymbol(String simbolo) {
         this.symbol = simbolo;
     }
 
@@ -44,7 +44,7 @@ class ElementModel {
         return molecularMass;
     }
 
-    protected void setMolecularMass(float masa) {
+    void setMolecularMass(float masa) {
         this.molecularMass = masa;
     }
 }

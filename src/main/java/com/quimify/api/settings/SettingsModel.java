@@ -53,91 +53,91 @@ class SettingsModel {
 
     // Getters & setters:
 
-    protected Integer getVersion() {
+    Integer getVersion() {
         return version;
     }
 
-    protected void setVersion(Integer version) {
+    void setVersion(Integer version) {
         this.version = version;
     }
 
-    protected Boolean getUseGoogle() {
+    Boolean getUseGoogle() {
         return useGoogle;
     }
 
-    protected void setUseGoogle(Boolean useGoogle) {
+    void setUseGoogle(Boolean useGoogle) {
         this.useGoogle = useGoogle;
     }
 
-    protected Integer getGoogleDailyLimit() {
+    Integer getGoogleDailyLimit() {
         return googleDailyLimit;
     }
 
-    protected void setGoogleDailyLimit(Integer googleDailyLimit) {
+    void setGoogleDailyLimit(Integer googleDailyLimit) {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    protected String getGoogleUrl() {
+    String getGoogleUrl() {
         return googleUrl;
     }
 
-    protected void setGoogleUrl(String googleUrl) {
+    void setGoogleUrl(String googleUrl) {
         this.googleUrl = googleUrl;
     }
 
-    protected Boolean getUseFreeBing() {
+    Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
-    protected void setUseFreeBing(Boolean useFreeBing) {
+    void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
     }
 
-    protected String getFreeBingKey() {
+    String getFreeBingKey() {
         return freeBingKey;
     }
 
-    protected void setFreeBingKey(String freeBingKey) {
+    void setFreeBingKey(String freeBingKey) {
         this.freeBingKey = freeBingKey;
     }
 
-    protected Boolean getUsePaidBing() {
+    Boolean getUsePaidBing() {
         return usePaidBing;
     }
 
-    protected void setUsePaidBing(Boolean usePaidBing) {
+    void setUsePaidBing(Boolean usePaidBing) {
         this.usePaidBing = usePaidBing;
     }
 
-    protected Integer getPaidBingDailyLimit() {
+    Integer getPaidBingDailyLimit() {
         return paidBingDailyLimit;
     }
 
-    protected void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
+    void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
         this.paidBingDailyLimit = paidBingDailyLimit;
     }
 
-    protected String getPaidBingKey() {
+    String getPaidBingKey() {
         return paidBingKey;
     }
 
-    protected void setPaidBingKey(String paidBingKey) {
+    void setPaidBingKey(String paidBingKey) {
         this.paidBingKey = paidBingKey;
     }
 
-    protected String getBingUrl() {
+    String getBingUrl() {
         return bingUrl;
     }
 
-    protected void setBingUrl(String bingUrl) {
+    void setBingUrl(String bingUrl) {
         this.bingUrl = bingUrl;
     }
 
-    protected String getUserAgent() {
+    String getUserAgent() {
         return userAgent;
     }
 
-    protected void setUserAgent(String userAgent) {
+    void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 

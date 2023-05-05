@@ -42,11 +42,11 @@ class OrganicService {
 
 	// Constants:
 
-	protected static final int carbonInputCode = -1;
+	static final int carbonInputCode = -1;
 
 	// Client:
 
-	protected OrganicResult getFromName(String name) {
+	OrganicResult getFromName(String name) {
 		OrganicResult organicResult;
 
 		try {
@@ -77,7 +77,7 @@ class OrganicService {
 		return organicResult;
 	}
 
-	protected OrganicResult getFromStructure(int[] inputSequence) {
+	OrganicResult getFromStructure(int[] inputSequence) {
 		OrganicResult organicResult;
 
 		String sequenceToString = Arrays.toString(inputSequence); // For logging purposes

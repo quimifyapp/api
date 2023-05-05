@@ -28,43 +28,43 @@ class ErrorModel {
 
     // Getters y setters:
 
-    protected Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    protected Timestamp getDateAndTime() {
+    Timestamp getDateAndTime() {
         return dateAndTime;
     }
 
-    protected void setDateAndTime(Timestamp dateAndTime) {
+    void setDateAndTime(Timestamp dateAndTime) {
         this.dateAndTime = dateAndTime;
     }
 
-    protected String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    protected void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
-    protected String getDetails() {
+    String getDetails() {
         return details;
     }
 
-    protected void setDetails(String details) {
+    void setDetails(String details) {
         this.details = details;
     }
 
-    protected String getLocation() {
+    String getLocation() {
         return location;
     }
 
-    protected void setLocation(String location) {
+    void setLocation(String location) {
         this.location = location;
     }
 

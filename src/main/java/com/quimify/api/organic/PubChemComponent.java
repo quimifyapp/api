@@ -33,7 +33,7 @@ class PubChemComponent {
 
     // Queries:
 
-    protected void resolveCompound(String smiles) {
+    void resolveCompound(String smiles) {
         // Adapted for URLs and PubChem:
         encodedSmiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
         encodedSmiles = Connection.encodeForUrl(encodedSmiles); // Escapes special characters
@@ -46,14 +46,14 @@ class PubChemComponent {
         }
     }
 
-    protected String getUrl2D() {
+    String getUrl2D() {
         if (invalidCompoundId())
             return String.format(smiles2DUrl, encodedSmiles); // 300 x 300 px
 
         return String.format(compoundId2DUrl, compoundId); // 500 x 500 px
     }
 
-    protected Optional<Float> getMolecularMass() {
+    Optional<Float> getMolecularMass() {
         if(invalidCompoundId())
             return Optional.empty();
 

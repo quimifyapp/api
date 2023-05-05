@@ -57,7 +57,7 @@ class FQPageComponent {
 
     // Protected:
 
-    protected InorganicModel parseInorganic(String url) throws IOException {
+    InorganicModel parseInorganic(String url) throws IOException {
         if (!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 

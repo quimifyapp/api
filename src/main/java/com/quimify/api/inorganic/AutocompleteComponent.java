@@ -38,7 +38,7 @@ class AutocompleteComponent {
 
     // Internal:
 
-    protected String tryAutoComplete(String input) {
+    String tryAutoComplete(String input) {
         try {
             return autoComplete(input);
         } catch (Exception exception) {

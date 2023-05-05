@@ -26,11 +26,11 @@ class InorganicResult {
 
     // Constants:
 
-    protected static final InorganicResult notFound = new InorganicResult();
+    static final InorganicResult notFound = new InorganicResult();
 
     // Constructors:
 
-    protected InorganicResult(InorganicModel inorganicModel) {
+    InorganicResult(InorganicModel inorganicModel) {
         this.present = true;
         this.formula = inorganicModel.getFormula();
 
