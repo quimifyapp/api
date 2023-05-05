@@ -2,55 +2,56 @@ package com.quimify.api.settings;
 
 import javax.persistence.*;
 
-// Esta clase representa la configuración de cada versión del servidor. // TODO translate comments
+// This class represents each API version settings.
 
-@Entity // Es un modelo real
-@Table(name = "settings") // En la tabla 'settings' de la DB
+@Entity
+@Table(name = "settings")
 class SettingsModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
-    private Integer version; // Se corresponde con la versión del servidor
+    private Integer version; // API version
 
-    // API de Google:
-
-    @Column(nullable = false)
-    private Boolean useGoogle = false; // Interruptor
-    @Column(nullable = false)
-    private Integer googleDailyLimit; // Nº máx. de búsquedas diarias
-    @Column(nullable = false)
-    private String googleUrl; // URL + key
-
-    // API de Bing gratis:
+    // Google API:
 
     @Column(nullable = false)
-    private Boolean useFreeBing = false; // Interruptor
+    private Boolean useGoogle = false; // Switch
     @Column(nullable = false)
-    private String freeBingKey; // Suscripción
+    private Integer googleDailyLimit;
+    @Column(nullable = false)
+    private String googleUrl; // TODO env
 
-    // API de Bing de pago:
-
-    @Column(nullable = false)
-    private Boolean usePaidBing = false; // Interruptor
-    @Column(nullable = false)
-    private Integer paidBingDailyLimit; // Nº máx. de búsquedas diarias
-    @Column(nullable = false)
-    private String paidBingKey; // Suscripción
-
-    // API de Bing:
+    // Free Bing API:
 
     @Column(nullable = false)
-    private String bingUrl; // URL
+    private Boolean useFreeBing = false; // Switch
+    @Column(nullable = false)
+    private String freeBingKey; // TODO env
 
-    // Para FQ.com:
+    // Paid Bing API:
 
     @Column(nullable = false)
-    private String userAgent; // Requisito HTTP para parecer un visitante corriente
+    private Boolean usePaidBing = false; // Switch
+    @Column(nullable = false)
+    private Integer paidBingDailyLimit;
+    @Column(nullable = false)
+    private String paidBingKey; // TODO env
 
-    // --------------------------------------------------------------------------------
+    // Both Bing APIs:
 
-    // Getters y setters:
+    @Column(nullable = false)
+    private String bingUrl;
+
+    // Classifier API:
+
+    @Column(nullable = false)
+    private String classifierUrl;
+
+    @Column(nullable = false)
+    private String userAgent; // For web scrapping
+
+    // Getters & setters:
 
     protected Integer getVersion() {
         return version;
