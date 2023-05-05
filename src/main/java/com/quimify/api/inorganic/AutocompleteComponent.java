@@ -98,7 +98,7 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
 
         String normalizedInput = Normalizer.get(input);
 
-        for (Map.Entry<String, Integer> entry : new HashSet<>(normalizedTextToId.entrySet()))
+        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
             if (entry.getKey().startsWith(normalizedInput))
                 return findNormalizedTextIn(entry.getKey(), entry.getValue());
 
