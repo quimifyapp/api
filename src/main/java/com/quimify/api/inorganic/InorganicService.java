@@ -16,7 +16,7 @@ import java.util.*;
 // This class implements the logic behind HTTP methods in "/inorganic".
 
 @Service
-public class InorganicService {
+class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
