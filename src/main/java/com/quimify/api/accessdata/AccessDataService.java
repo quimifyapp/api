@@ -50,7 +50,7 @@ class AccessDataService {
 				client.getMessageLink()
 		);
 
-		metricsService.countAccess(platform);
+		metricsService.clientAccessed(platform);
 
 		return accessDataResult;
 	}

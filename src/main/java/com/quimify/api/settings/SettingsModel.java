@@ -31,7 +31,7 @@ class SettingsModel {
     // URLs:
 
     @Column(nullable = false)
-    private String googleUrl; // TODO env
+    private String googleUrl;
 
     @Column(nullable = false)
     private String bingUrl;

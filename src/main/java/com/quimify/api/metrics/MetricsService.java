@@ -67,7 +67,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void countAccess(Short platform) {
+    public void clientAccessed(Short platform) {
         switch (platform) {
             case AccessDataService.androidPlatform:
                 getTodayMetrics().incrementAndroidAccesses();
@@ -119,19 +119,19 @@ class MetricsService {
     }
 
     @Transactional
-    public void inorganicAutocompleted() {
+    public void inorganicAutocompleted() { // TODO rename
         getTodayMetrics().incrementInorganicsAutocompleted();
     }
 
     @Transactional
-    public void organicSearchedFromName(boolean found) {
+    public void organicFromNameSearched(boolean found) {
         if (found)
             getTodayMetrics().incrementOrganicsFoundFromNameFromText();
         else getTodayMetrics().incrementOrganicsNotFoundFromNameFromText();
     }
 
     @Transactional
-    public void organicSearchedFromStructure(boolean found) {
+    public void organicFromStructureSearched(boolean found) {
         if (found)
             getTodayMetrics().incrementOrganicsSucceededFromStructure();
         else getTodayMetrics().incrementOrganicsFailedFromStructure();

@@ -21,9 +21,7 @@ class NotFoundQueryModel {
     @Column(nullable = false)
     private String location;
 
-    // TODO frequency
-
-    // Getters and setters:
+    // Getters & setters:
 
     public Integer getId() {
         return id;

@@ -79,8 +79,8 @@ class InorganicModel {
     }
 
     @Transactional // TODO transactional here?
-    void countSearch() { // TODO rename
-        searchCount++; // TODO rename
+    void countSearch() {
+        searchCount++; // TODO rename to 'searches'
     }
 
     // Getters and setters:

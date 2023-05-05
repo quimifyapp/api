@@ -72,7 +72,7 @@ class OrganicService {
 		if(!organicResult.isPresent())
 			notFoundQueryService.log(name, getClass());
 
-		metricsService.organicSearchedFromName(organicResult.isPresent());
+		metricsService.organicFromNameSearched(organicResult.isPresent());
 
 		return organicResult;
 	}
@@ -96,7 +96,7 @@ class OrganicService {
 		if(!organicResult.isPresent())
 			notFoundQueryService.log(sequenceToString, getClass());
 
-		metricsService.organicSearchedFromStructure(organicResult.isPresent());
+		metricsService.organicFromStructureSearched(organicResult.isPresent());
 
 		return organicResult;
 	}
