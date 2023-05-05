@@ -17,7 +17,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 @EnableScheduling
-//@Scope("singleton") // Only one instance of this bean will be created and shared between all the components.
 class AutocompleteComponent { // TODO rename "CompleteComponent"
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -28,16 +27,18 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // TODO comment about it
-    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>(); // TODO concurrent? synchronized?
+    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
+
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading while writing
+    private Map<String, Integer> normalizedTextToIdShadow = new LinkedHashMap<>(); // Is read instead while writing
 
     // Administration:
 
     @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 seconds // TODO fix time
     private void tryUpdateCache() {
-        readWriteLock.writeLock().lock();
-
         try {
+            normalizedTextToIdShadow = new LinkedHashMap<>(normalizedTextToId);
+            readWriteLock.writeLock().lock();
             updateCache();
         } catch (Exception exception) {
             errorService.log("Exception updating cache", exception.toString(), this.getClass());
@@ -81,29 +82,30 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     // Internal:
 
     protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
-        readWriteLock.readLock().lock();
+        if (!readWriteLock.readLock().tryLock()) // Main one is being written
+            return autoCompleteUsing(input, normalizedTextToIdShadow); // Lock wasn't acquired
 
         try {
-            return autoComplete(input);
+            return autoCompleteUsing(input, normalizedTextToId);
         } catch (Exception exception) {
             errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
             return "";
         } finally {
-            readWriteLock.readLock().unlock();
+            readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
         }
     }
 
-    private String autoComplete(String input) { // TODO rename "complete"
+    private String autoCompleteUsing(String input, Map<String, Integer> cache) { // TODO rename "complete"
         String normalizedInput = Normalizer.get(input);
 
-        for (Map.Entry<String, Integer> entry : normalizedTextToId.entrySet())
+        for (Map.Entry<String, Integer> entry : cache.entrySet())
             if (entry.getKey().startsWith(normalizedInput))
                 return findNormalizedTextIn(entry.getKey(), entry.getValue());
 
         return "";
     }
 
-    private String findNormalizedTextIn(String normalizedText, Integer id) { // TODO rename
+    private String findNormalizedTextIn(String normalizedText, Integer id) {
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
 
         if (inorganicModel.isEmpty()) {
@@ -111,16 +113,16 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
             return "";
         }
 
-        List<String> texts = new ArrayList<>();
+        List<String> names = Arrays.asList(
+                inorganicModel.get().getStockName(),
+                inorganicModel.get().getSystematicName(),
+                inorganicModel.get().getTraditionalName(),
+                inorganicModel.get().getCommonName()
+        );
 
-        texts.add(inorganicModel.get().getStockName());
-        texts.add(inorganicModel.get().getSystematicName());
-        texts.add(inorganicModel.get().getTraditionalName());
-        texts.add(inorganicModel.get().getCommonName());
-
-        for (String text : texts)
-            if (normalizedText.equals(Normalizer.get(text))) // Null safe
-                return text;
+        for (String name : names)
+            if (normalizedText.equals(Normalizer.get(name))) // Null safe
+                return name;
 
         // Here, 'normalizedText' either comes from formula or a search tag
         return inorganicModel.get().getFormula();
