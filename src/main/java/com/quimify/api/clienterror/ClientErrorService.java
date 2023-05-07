@@ -16,7 +16,7 @@ class ClientErrorService {
     ClientErrorRepository clientErrorRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Client:
 

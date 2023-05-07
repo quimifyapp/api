@@ -14,7 +14,7 @@ class AccessDataService {
 	AccessDataRepository accessDataRepository; // DB connection
 
 	@Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
 	// Constants:
 

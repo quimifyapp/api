@@ -26,19 +26,19 @@ class OrganicService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
-	PubChemComponent pubChemComponent; // PubChem API logic
+	PubChemComponent pubChemComponent;
 
 	@Autowired
-	MolecularMassService molecularMassService; // Molecular masses logic
+	MolecularMassService molecularMassService;
 
 	@Autowired
-	NotFoundQueryService notFoundQueryService; // Not found queries logic
+	NotFoundQueryService notFoundQueryService;
 
 	@Autowired
-	ErrorService errorService; // API errors logic
+	ErrorService errorService;
 
 	@Autowired
-	MetricsService metricsService; // Daily metrics logic
+	MetricsService metricsService;
 
 	// Constants:
 

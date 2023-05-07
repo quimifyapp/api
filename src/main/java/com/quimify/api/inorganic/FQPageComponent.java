@@ -23,10 +23,10 @@ import java.util.regex.Pattern;
 class FQPageComponent {
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    SettingsService settingsService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     String htmlDocument;
     InorganicModel parsedInorganic;

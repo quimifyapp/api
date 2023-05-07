@@ -15,12 +15,12 @@ public
 class ClassifierService {
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    SettingsService settingsService;
 
     // TODO metrics
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     static final int notFoundResultCode = -1;
 

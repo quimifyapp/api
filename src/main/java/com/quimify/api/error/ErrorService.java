@@ -21,7 +21,7 @@ class ErrorService {
     ErrorRepository errorRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Protected:
 

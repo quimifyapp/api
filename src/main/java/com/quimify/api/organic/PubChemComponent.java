@@ -16,7 +16,7 @@ import java.util.Optional;
 class PubChemComponent {
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     private String compoundId; // Compound's ID in Pub Chem DB
     private String encodedSmiles; // Simplified Molecular Input Line Entry Specification

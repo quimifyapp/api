@@ -16,7 +16,7 @@ class InorganicController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicService inorganicService; // Inorganic compounds logic
+    InorganicService inorganicService;
 
     // Constants:
 

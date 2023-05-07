@@ -14,7 +14,7 @@ class ClientErrorController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ClientErrorService clientErrorService; // Client errors logic
+    ClientErrorService clientErrorService;
 
     // Constants:
 

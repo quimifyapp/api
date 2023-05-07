@@ -14,7 +14,7 @@ class ReportController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ReportService reportService; // Client reports logic
+    ReportService reportService;
 
     // Constants:
 

@@ -16,7 +16,7 @@ class ReportService {
     ReportRepository reportRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Client:
 

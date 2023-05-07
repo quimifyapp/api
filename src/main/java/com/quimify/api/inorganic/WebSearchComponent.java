@@ -22,13 +22,13 @@ class WebSearchComponent {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    SettingsService settingsService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     private String title;
     private String address;

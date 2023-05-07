@@ -24,16 +24,16 @@ class MolecularMassService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ElementService elementService; // Elements logic
+    ElementService elementService;
 
     @Autowired
-    NotFoundQueryService notFoundQueryService; // Not found queries logic
+    NotFoundQueryService notFoundQueryService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Internal:
 

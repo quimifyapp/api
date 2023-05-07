@@ -14,7 +14,7 @@ class MolecularMassController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    MolecularMassService molecularMassService; // Molecular masses logic
+    MolecularMassService molecularMassService;
 
     // Constants:
 
