@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 // This class runs web searches through Google's and Bing's API.
 
 @Component
@@ -95,8 +93,8 @@ class WebSearchComponent {
             searched = true;
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
-                logger.warn("Got HTTP code 403 from Google");
-            else errorService.log("IOException Google: " + input, exception.toString(), getClass());
+                logger.warn("Got HTTP code 429 from Google (probably limit exceeded).");
+            else errorService.log("Exception Google: " + input, exception.toString(), getClass());
 
             searched = false;
         }
@@ -142,14 +140,10 @@ class WebSearchComponent {
             }
 
             searched = true;
-        } catch (IOException exception) {
-            if (exception.toString().contains("HTTP response code: 403"))
-                logger.warn("Got HTTP code 403 from " + apiName);
-            else errorService.log("IOException " + apiName + ": " + input, exception.toString(), getClass());
-
-            searched = false;
         } catch (Exception exception) {
-            errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
+            if (exception.toString().contains("HTTP response code: 403"))
+                logger.warn("Got HTTP code 403 from " + apiName + "(probably limit exceeded).");
+            else errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
 
             searched = false;
         }
