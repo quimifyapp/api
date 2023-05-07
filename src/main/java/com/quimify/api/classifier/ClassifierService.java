@@ -11,8 +11,7 @@ import java.util.Optional;
 // This class handles calls to the Quimify Classifier API.
 
 @Service
-public
-class ClassifierService {
+public class ClassifierService {
 
     @Autowired
     SettingsService settingsService;
@@ -31,14 +30,21 @@ class ClassifierService {
             String response = new Connection(settingsService.getClassifierUrl(), text).getText();
             int result = Integer.parseInt(response);
 
-            if (result == notFoundResultCode)
-                return Optional.empty();
+            if (result == notFoundResultCode) return Optional.empty();
 
             return Optional.of(ClassifierResult.values()[result]);
         } catch (Exception exception) {
             errorService.log("Exception calling classifier for: " + text, exception.toString(), getClass());
             return Optional.empty();
         }
+    }
+
+    public boolean isInorganic(ClassifierResult result) {
+        return result == ClassifierResult.inorganicFormula || result == ClassifierResult.inorganicName;
+    }
+
+    public boolean isFormula(ClassifierResult result) {
+        return result == ClassifierResult.inorganicFormula || result == ClassifierResult.organicFormula;
     }
 
 }

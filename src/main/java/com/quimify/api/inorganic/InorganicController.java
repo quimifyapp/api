@@ -51,13 +51,25 @@ class InorganicController {
         return inorganicResult;
     }
 
-    //@GetMapping("/smart")
-    //InorganicResult smartSearch(@RequestParam("input") String input) {
+    @GetMapping("/smart")
+    InorganicResult smartSearch(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.smartSearch(input);
 
-    //}
+        // TODO logging
+        //if (inorganicResult.isPresent())
+        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
 
-    //@GetMapping("/enriched")
-    //InorganicResult enrichedSearch(@RequestParam("input") String input) {
+        return inorganicResult;
+    }
 
-    //}
+    @GetMapping("/enriched")
+    InorganicResult enrichedSearch(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.enrichedSearch(input);
+
+        // TODO logging
+        //if (inorganicResult.isPresent())
+        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
 }

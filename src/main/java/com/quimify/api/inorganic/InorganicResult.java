@@ -10,7 +10,14 @@ class InorganicResult {
 
     private boolean present;
 
-    // If present is true
+    // If not present:
+
+    private boolean organicFormulaHint;
+    private boolean organicNameHint;
+
+    // If present:
+
+    private String suggestion; // "trióxido de diníquel"
 
     private String formula; // "MgH2"
 
@@ -24,14 +31,13 @@ class InorganicResult {
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
 
-    // Constants:
-
-    static final InorganicResult notFound = new InorganicResult();
-
     // Constructors:
 
-    InorganicResult(InorganicModel inorganicModel) {
+    InorganicResult(InorganicModel inorganicModel, String suggestion) {
         this.present = true;
+
+        this.suggestion = suggestion;
+
         this.formula = inorganicModel.getFormula();
 
         this.stockName = inorganicModel.getStockName();
@@ -45,14 +51,35 @@ class InorganicResult {
         this.boilingPoint = inorganicModel.getBoilingPoint();
     }
 
-    private InorganicResult() {
-        this.present = false;
+    InorganicResult(InorganicModel inorganicModel) {
+        this(inorganicModel, null);
     }
 
-    // Texto:
+    // If not present:
+
+    private InorganicResult(boolean organicFormulaHint, boolean organicNameHint) {
+        this.present = false;
+
+        this.organicFormulaHint = organicFormulaHint;
+        this.organicNameHint = organicNameHint;
+    }
+
+    static InorganicResult organicFormulaHint() {
+        return new InorganicResult(true, false);
+    }
+
+    static InorganicResult organicNameHint() {
+        return new InorganicResult(false, true);
+    }
+
+    static InorganicResult notFound() {
+        return new InorganicResult(false, false);
+    }
+
+    // Text:
 
     @Override
-    public String toString() {
+    public String toString() { // TODO remake
         List<String> identifiers = new ArrayList<>();
 
         identifiers.add(formula);
@@ -74,6 +101,30 @@ class InorganicResult {
 
     public void setPresent(boolean present) {
         this.present = present;
+    }
+
+    public boolean isOrganicFormulaHint() {
+        return organicFormulaHint;
+    }
+
+    public void setOrganicFormulaHint(boolean organicFormulaHint) {
+        this.organicFormulaHint = organicFormulaHint;
+    }
+
+    public boolean isOrganicNameHint() {
+        return organicNameHint;
+    }
+
+    public void setOrganicNameHint(boolean organicNameHint) {
+        this.organicNameHint = organicNameHint;
+    }
+
+    public String getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(String suggestion) {
+        this.suggestion = suggestion;
     }
 
     public String getFormula() {

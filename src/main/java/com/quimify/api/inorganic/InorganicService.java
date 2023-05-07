@@ -1,5 +1,7 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.classifier.ClassifierResult;
+import com.quimify.api.classifier.ClassifierService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -24,28 +26,31 @@ class InorganicService {
     InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
-    AutocompleteComponent autocompleteComponent; // Autocompletions logic
+    AutocompleteComponent autocompleteComponent;
 
     @Autowired
-    WebSearchComponent webSearchComponent; // Web searches logic
+    ClassifierService classifierService;
 
     @Autowired
-    FQPageComponent fqPageComponent; // Inorganic web pages logic
+    WebSearchComponent webSearchComponent;
 
     @Autowired
-    MolecularMassService molecularMassService; // Molecular masses logic
+    FQPageComponent fqPageComponent;
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    MolecularMassService molecularMassService;
 
     @Autowired
-    NotFoundQueryService notFoundQueryService; // Not found queries logic
+    SettingsService settingsService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    NotFoundQueryService notFoundQueryService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    MetricsService metricsService;
+
+    @Autowired
+    ErrorService errorService;
 
     // Client:
 
@@ -56,12 +61,12 @@ class InorganicService {
     InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
-        Optional<InorganicModel> searchedInorganic = searchInDatabase(completion);
+        Optional<InorganicModel> searchedInorganic = databaseSearch(completion);
         if (searchedInorganic.isPresent())
             inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
             errorService.log("Completion not in DB", completion, getClass());
-            inorganicResult = InorganicResult.notFound;
+            inorganicResult = InorganicResult.notFound();
         }
 
         metricsService.inorganicAutocompleted();
@@ -70,38 +75,49 @@ class InorganicService {
         return inorganicResult;
     }
 
+        //if(!inorganicResult.isPresent())
+        //        notFoundQueryService.log(input, getClass());
+
+        //metricsService.inorganicSearched(inorganicResult.isPresent());
+
     InorganicResult search(String input) {
-        InorganicResult inorganicResult;
+        Optional<InorganicModel> searchedInDatabase = databaseSearch(input);
 
-        Optional<InorganicModel> searchedInMemory = searchInDatabase(input);
+        if(searchedInDatabase.isPresent())
+            return new InorganicResult(searchedInDatabase.get());
 
-        inorganicResult = searchedInMemory.map(InorganicResult::new).orElseGet(() -> searchOnTheWeb(input));
+        Optional<ClassifierResult> classifierResult = classifierService.classify(input);
 
-        if(!inorganicResult.isPresent())
-            notFoundQueryService.log(input, getClass());
+        if (classifierResult.isPresent()) {
+            if(classifierResult.get() == ClassifierResult.organicFormula)
+                return InorganicResult.organicFormulaHint();
 
-        metricsService.inorganicSearched(inorganicResult.isPresent());
+            if(classifierResult.get() == ClassifierResult.organicName)
+                return InorganicResult.organicNameHint();
+        }
 
-        return inorganicResult;
+        return smartSearch(input);
     }
 
-    // Private:
+    InorganicResult smartSearch(String input) { // TODO
+        return enrichedSearch(input);
+    }
 
-    private InorganicResult searchOnTheWeb(String input) {
+    InorganicResult enrichedSearch(String input) {
         if(!webSearchComponent.search(input)) {
             logger.warn("Couldn't find inorganic \"" + input + "\".");
-            return InorganicResult.notFound;
+            return InorganicResult.notFound();
         }
 
         // Check if it was already in the DB:
 
-        String[] words = webSearchComponent.getTitle().trim().split(" ");
+        String[] words = webSearchComponent.getTitle().trim().split(" "); // TODO REGEX spaces
         String firstWord = words[0];
 
         if (firstWord.equals("ácido"))
             firstWord += words[1];
 
-        Optional<InorganicModel> searchedInDatabase = searchInDatabase(firstWord);
+        Optional<InorganicModel> searchedInDatabase = databaseSearch(firstWord);
         if (searchedInDatabase.isPresent()) {
             logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInDatabase.get());
             return new InorganicResult(searchedInDatabase.get());
@@ -112,11 +128,11 @@ class InorganicService {
         Optional<InorganicModel> parsedInorganic = tryParseFQ(webSearchComponent.getAddress());
 
         if (parsedInorganic.isEmpty())
-            return InorganicResult.notFound;
+            return InorganicResult.notFound();
 
         // Check again if it was already in the DB:
 
-        searchedInDatabase = searchInDatabase(parsedInorganic.get().getFormula());
+        searchedInDatabase = databaseSearch(parsedInorganic.get().getFormula());
         if (searchedInDatabase.isPresent()) {
             logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInDatabase.get());
             return new InorganicResult(searchedInDatabase.get());
@@ -125,10 +141,12 @@ class InorganicService {
         return processNewlyLearned(parsedInorganic.get());
     }
 
-    private Optional<InorganicModel> searchInDatabase(String input) {
+    // Private:
+
+    private Optional<InorganicModel> databaseSearch(String input) {
         String normalizedInput = Normalizer.get(input);
 
-        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
+        for (InorganicModel inorganicModel : inorganicRepository.findAll())
             if(matches(normalizedInput, inorganicModel)) {
                 inorganicModel.countSearch();
                 return Optional.of(inorganicModel);

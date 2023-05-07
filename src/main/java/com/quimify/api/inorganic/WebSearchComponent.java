@@ -16,7 +16,7 @@ import java.io.IOException;
 // This class runs web searches through Google's and Bing's API.
 
 @Component
-@Scope("prototype")
+@Scope("prototype") // TODO reconsider and return a result
 class WebSearchComponent {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
