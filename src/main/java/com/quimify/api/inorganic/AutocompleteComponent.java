@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 @EnableScheduling
+// TODO singleton? prototype?
 class AutocompleteComponent { // TODO rename "CompleteComponent"
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
