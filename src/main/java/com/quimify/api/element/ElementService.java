@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// Esta clase procesa los elementos químicos.
+// This class processes chemical elements of the periodic table.
 
 @Service
 public
-class ElementService { // TODO translate comments
+class ElementService {
 
     @Autowired
-    ElementRepository elementRepository; // Conexión con la DB
+    ElementRepository elementRepository; // DB connection
 
     // Public:
 

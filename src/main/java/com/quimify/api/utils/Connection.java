@@ -8,7 +8,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-// This class makes HTTPS GET requests and returns the text from their responses.
+// This class makes HTTP(s) GET requests and returns the body text from their responses.
 
 public class Connection {
 
@@ -17,13 +17,13 @@ public class Connection {
     // Constructors:
 
     public Connection(String url) throws IOException {
-        httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
-        httpURLConnection.setRequestMethod("GET");
+        this.httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+        this.httpURLConnection.setRequestMethod("GET");
     }
 
     public Connection(String url, String parameter) throws IOException {
-        httpURLConnection = (HttpURLConnection) new URL(url + encodeForUrl(parameter)).openConnection();
-        httpURLConnection.setRequestMethod("GET");
+        this.httpURLConnection = (HttpURLConnection) new URL(url + encodeForUrl(parameter)).openConnection();
+        this.httpURLConnection.setRequestMethod("GET");
     }
 
     // Queries:
@@ -33,7 +33,7 @@ public class Connection {
     }
 
     public String getText() throws IOException {
-        BufferedReader download = new BufferedReader(new InputStreamReader(this.httpURLConnection.getInputStream()));
+        BufferedReader download = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
         StringBuilder text = new StringBuilder();
 
         String line;
@@ -41,7 +41,7 @@ public class Connection {
             text.append(line);
 
         download.close();
-        this.httpURLConnection.disconnect();
+        httpURLConnection.disconnect();
 
         return text.toString();
     }
