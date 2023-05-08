@@ -23,8 +23,8 @@ public class InorganicService {
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
 
-    @Autowired
-    AutocompleteComponent autocompleteComponent; // Autocompletions logic
+    //@Autowired
+    //AutocompleteComponent autocompleteComponent; // Autocompletions logic
 
     @Autowired
     WebSearchComponent webSearchComponent; // Web searches logic
@@ -49,9 +49,9 @@ public class InorganicService {
 
     // Client:
 
-    protected String autoComplete(String input) {
-        return autocompleteComponent.tryAutoComplete(input);
-    }
+    //protected String autoComplete(String input) {
+    //    return autocompleteComponent.tryAutoComplete(input);
+    //}
 
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;

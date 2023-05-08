@@ -31,14 +31,14 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading while writing
-    private Map<String, Integer> normalizedTextToIdShadow = new LinkedHashMap<>(); // Is read instead while writing
+    //private Map<String, Integer> normalizedTextToIdShadow = new LinkedHashMap<>(); // Is read instead while writing
 
     // Administration:
 
     @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 seconds // TODO fix time
     private void tryUpdateCache() {
         try {
-            normalizedTextToIdShadow = new LinkedHashMap<>(normalizedTextToId);
+            //normalizedTextToIdShadow = new LinkedHashMap<>(normalizedTextToId);
             readWriteLock.writeLock().lock();
             updateCache();
         } catch (Exception exception) {
@@ -83,8 +83,8 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     // Internal:
 
     protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
-        if (!readWriteLock.readLock().tryLock()) // Main one is being written
-            return autoCompleteUsing(input, normalizedTextToIdShadow); // Lock wasn't acquired
+        readWriteLock.readLock().lock(); //if (!readWriteLock.readLock().tryLock()) // Main one is being written
+        //    return autoCompleteUsing(input, normalizedTextToIdShadow); // Lock wasn't acquired
 
         try {
             return autoCompleteUsing(input, normalizedTextToId);
