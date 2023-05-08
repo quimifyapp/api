@@ -64,7 +64,7 @@ class OrganicService {
 				logger.warn("Couldn't solve organic \"" + name + "\".");
 				organicResult = OrganicResult.notFound;
 			}
-		} catch (Exception exception) {
+		} catch (Exception exception) { // TODO unrecognized atom
 			errorService.log("Exception solving name: " + name, exception.toString(), getClass());
 			organicResult = OrganicResult.notFound;
 		}
