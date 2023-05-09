@@ -21,6 +21,8 @@ public class ClassifierService {
     @Autowired
     ErrorService errorService;
 
+    // Constants:
+
     static final int notFoundResultCode = -1;
 
     // Public:
