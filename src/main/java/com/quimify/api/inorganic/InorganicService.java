@@ -35,7 +35,7 @@ class InorganicService {
     WebSearchComponent webSearchComponent;
 
     @Autowired
-    FQPageComponent fqPageComponent;
+    FqPageComponent fqPageComponent;
 
     @Autowired
     MolecularMassService molecularMassService;
@@ -125,7 +125,7 @@ class InorganicService {
 
         // Parse the inorganic:
 
-        Optional<InorganicModel> parsedInorganic = tryParseFQ(webSearchComponent.getAddress());
+        Optional<InorganicModel> parsedInorganic = tryParseFqPage(webSearchComponent.getAddress());
 
         if (parsedInorganic.isEmpty())
             return InorganicResult.notFound();
@@ -183,17 +183,17 @@ class InorganicService {
         return false;
     }
 
-    private Optional<InorganicModel> tryParseFQ(String url) {
+    private Optional<InorganicModel> tryParseFqPage(String url) {
         try {
             InorganicModel parsedInorganic = fqPageComponent.parseInorganic(url);
             return Optional.of(parsedInorganic);
         }
         catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
+            logger.warn("Exception parsing FqPage: " + url + ". " + illegalArgumentException.getMessage());
             return Optional.empty();
         }
         catch (Exception exception) {
-            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
+            errorService.log("Exception parsing FqPage: " + url, exception.toString(), getClass());
             return Optional.empty();
         }
     }

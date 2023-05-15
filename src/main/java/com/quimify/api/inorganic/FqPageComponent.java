@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Scope("prototype") // New instance for each request, avoiding shared state
-class FQPageComponent {
+class FqPageComponent {
 
     @Autowired
     SettingsService settingsService;
