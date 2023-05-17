@@ -53,6 +53,8 @@ class WebSearchComponent {
         }
 
         return title != null && address != null;
+
+        // logger.warn("Couldn't find inorganic \"" + input + "\" in the web."); TODO
     }
 
     // Private:

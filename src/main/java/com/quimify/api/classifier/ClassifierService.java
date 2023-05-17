@@ -32,7 +32,8 @@ public class ClassifierService {
             String response = new Connection(settingsService.getClassifierUrl(), text).getText();
             int result = Integer.parseInt(response);
 
-            if (result == notFoundResultCode) return Optional.empty();
+            if (result == notFoundResultCode)
+                return Optional.empty();
 
             return Optional.of(ClassifierResult.values()[result]);
         } catch (Exception exception) {
@@ -41,12 +42,8 @@ public class ClassifierService {
         }
     }
 
-    public boolean isInorganic(ClassifierResult result) {
-        return result == ClassifierResult.inorganicFormula || result == ClassifierResult.inorganicName;
-    }
-
-    public boolean isFormula(ClassifierResult result) {
-        return result == ClassifierResult.inorganicFormula || result == ClassifierResult.organicFormula;
+    public boolean isOrganic(ClassifierResult result) {
+        return result == ClassifierResult.organicFormula || result == ClassifierResult.organicName;
     }
 
 }

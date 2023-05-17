@@ -8,12 +8,7 @@ import java.util.Objects;
 
 class InorganicResult {
 
-    private boolean present;
-
-    // If not present:
-
-    private boolean organicFormulaHint;
-    private boolean organicNameHint;
+    private boolean found;
 
     // If present:
 
@@ -26,15 +21,19 @@ class InorganicResult {
     private String traditionalName; // "óxido niquélico"
     private String commonName; // "potasio"
 
-    private String molecularMass; // (g)
+    private String molecularMass; // (g/mol)
     private String density; // (g/cm³)
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
 
+    // If not present:
+
+    private String menuSuggestion; // "organic-finding-formula"
+
     // Constructors:
 
     InorganicResult(InorganicModel inorganicModel, String suggestion) {
-        this.present = true;
+        this.found = true;
 
         this.suggestion = suggestion;
 
@@ -55,31 +54,19 @@ class InorganicResult {
         this(inorganicModel, null);
     }
 
-    // If not present:
-
-    private InorganicResult(boolean organicFormulaHint, boolean organicNameHint) {
-        this.present = false;
-
-        this.organicFormulaHint = organicFormulaHint;
-        this.organicNameHint = organicNameHint;
-    }
-
-    static InorganicResult organicFormulaHint() {
-        return new InorganicResult(true, false);
-    }
-
-    static InorganicResult organicNameHint() {
-        return new InorganicResult(false, true);
+    InorganicResult(String menuSuggestion) {
+        this.found = false;
+        this.menuSuggestion = menuSuggestion;
     }
 
     static InorganicResult notFound() {
-        return new InorganicResult(false, false);
+        return new InorganicResult((String) null);
     }
 
     // Text:
 
     @Override
-    public String toString() { // TODO remake
+    public String toString() { // TODO remake or remove?
         List<String> identifiers = new ArrayList<>();
 
         identifiers.add(formula);
@@ -95,28 +82,12 @@ class InorganicResult {
 
     // Getters y setters:
 
-    public boolean isPresent() {
-        return present;
+    public boolean isFound() {
+        return found;
     }
 
-    public void setPresent(boolean present) {
-        this.present = present;
-    }
-
-    public boolean isOrganicFormulaHint() {
-        return organicFormulaHint;
-    }
-
-    public void setOrganicFormulaHint(boolean organicFormulaHint) {
-        this.organicFormulaHint = organicFormulaHint;
-    }
-
-    public boolean isOrganicNameHint() {
-        return organicNameHint;
-    }
-
-    public void setOrganicNameHint(boolean organicNameHint) {
-        this.organicNameHint = organicNameHint;
+    public void setFound(boolean found) {
+        this.found = found;
     }
 
     public String getSuggestion() {
@@ -197,6 +168,14 @@ class InorganicResult {
 
     public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
+    }
+
+    public String getMenuSuggestion() {
+        return menuSuggestion;
+    }
+
+    public void setMenuSuggestion(String menuSuggestion) {
+        this.menuSuggestion = menuSuggestion;
     }
 
 }

@@ -26,7 +26,7 @@ class OrganicController {
 	OrganicResult getFromName(@RequestParam("name") String name) {
 		OrganicResult result = organicService.getFromName(name);
 
-		if (result.isPresent())
+		if (result.isFound())
 			logger.info(String.format(getOrganicMessage, "name", name, result.getStructure()));
 
 		return result;
@@ -36,7 +36,7 @@ class OrganicController {
 	OrganicResult getFromStructure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult result = organicService.getFromStructure(structureSequence);
 
-		if(result.isPresent())
+		if(result.isFound())
 			logger.info(String.format(getOrganicMessage, "structure", result.getStructure(), result.getName()));
 
 		return result;

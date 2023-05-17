@@ -52,6 +52,13 @@ class InorganicService {
     @Autowired
     ErrorService errorService;
 
+    // Constants:
+
+    private static final Map<ClassifierResult, String> classifierResultToMenuSuggestion = Map.of(
+            ClassifierResult.organicFormula, "organic-naming",
+            ClassifierResult.organicName, "organic-finding-formula"
+    );
+
     // Client:
 
     String complete(String input) {
@@ -70,48 +77,42 @@ class InorganicService {
         }
 
         metricsService.inorganicAutocompleted();
-        metricsService.inorganicSearched(inorganicResult.isPresent());
+        metricsService.inorganicSearched(inorganicResult.isFound());
 
         return inorganicResult;
     }
 
-        //if(!inorganicResult.isPresent())
-        //        notFoundQueryService.log(input, getClass());
+    //if(!inorganicResult.isPresent()) TODO
+    //        notFoundQueryService.log(input, getClass());
 
-        //metricsService.inorganicSearched(inorganicResult.isPresent());
+    //metricsService.inorganicSearched(inorganicResult.isPresent());
 
     InorganicResult search(String input) {
         Optional<InorganicModel> searchedInDatabase = databaseSearch(input);
 
-        if(searchedInDatabase.isPresent())
+        if (searchedInDatabase.isPresent())
             return new InorganicResult(searchedInDatabase.get());
 
         Optional<ClassifierResult> classifierResult = classifierService.classify(input);
 
-        if (classifierResult.isPresent()) {
-            if(classifierResult.get() == ClassifierResult.organicFormula)
-                return InorganicResult.organicFormulaHint();
-
-            if(classifierResult.get() == ClassifierResult.organicName)
-                return InorganicResult.organicNameHint();
-        }
+        if (classifierResult.isPresent() && classifierService.isOrganic(classifierResult.get()))
+            return new InorganicResult(classifierResultToMenuSuggestion.get(classifierResult.get()));
 
         return smartSearch(input);
     }
 
-    InorganicResult smartSearch(String input) { // TODO
+    InorganicResult smartSearch(String input) {
+        // TODO
         return enrichedSearch(input);
     }
 
     InorganicResult enrichedSearch(String input) {
-        if(!webSearchComponent.search(input)) {
-            logger.warn("Couldn't find inorganic \"" + input + "\".");
+        if (!webSearchComponent.search(input))
             return InorganicResult.notFound();
-        }
 
         // Check if it was already in the DB:
 
-        String[] words = webSearchComponent.getTitle().trim().split(" "); // TODO REGEX spaces
+        String[] words = webSearchComponent.getTitle().trim().split("\\s+"); // TODO test
         String firstWord = words[0];
 
         if (firstWord.equals("ácido"))
@@ -120,7 +121,7 @@ class InorganicService {
         Optional<InorganicModel> searchedInDatabase = databaseSearch(firstWord);
         if (searchedInDatabase.isPresent()) {
             logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInDatabase.get());
-            return new InorganicResult(searchedInDatabase.get());
+            return new InorganicResult(searchedInDatabase.get()); // TODO with suggestion
         }
 
         // Parse the inorganic:
@@ -135,19 +136,19 @@ class InorganicService {
         searchedInDatabase = databaseSearch(parsedInorganic.get().getFormula());
         if (searchedInDatabase.isPresent()) {
             logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInDatabase.get());
-            return new InorganicResult(searchedInDatabase.get());
+            return new InorganicResult(searchedInDatabase.get()); // TODO with suggestion
         }
 
-        return processNewlyLearned(parsedInorganic.get());
+        return processNewlyLearned(parsedInorganic.get()); // TODO with suggestion
     }
 
     // Private:
 
-    private Optional<InorganicModel> databaseSearch(String input) {
+    private Optional<InorganicModel> databaseSearch(String input) { // TODO cache?
         String normalizedInput = Normalizer.get(input);
 
         for (InorganicModel inorganicModel : inorganicRepository.findAll())
-            if(matches(normalizedInput, inorganicModel)) {
+            if (matches(normalizedInput, inorganicModel)) {
                 inorganicModel.countSearch();
                 return Optional.of(inorganicModel);
             }
@@ -176,8 +177,8 @@ class InorganicService {
         if (normalizedInput.equals(Normalizer.get(possibleMatch)))
             return true;
 
-        for(String searchTag : inorganicModel.getSearchTags())
-            if(normalizedInput.equals(searchTag))
+        for (String searchTag : inorganicModel.getSearchTags())
+            if (normalizedInput.equals(searchTag))
                 return true;
 
         return false;
@@ -187,12 +188,10 @@ class InorganicService {
         try {
             InorganicModel parsedInorganic = fqPageComponent.parseInorganic(url);
             return Optional.of(parsedInorganic);
-        }
-        catch (IllegalArgumentException illegalArgumentException) {
+        } catch (IllegalArgumentException illegalArgumentException) {
             logger.warn("Exception parsing FqPage: " + url + ". " + illegalArgumentException.getMessage());
             return Optional.empty();
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             errorService.log("Exception parsing FqPage: " + url, exception.toString(), getClass());
             return Optional.empty();
         }
@@ -201,7 +200,7 @@ class InorganicService {
     private InorganicResult processNewlyLearned(InorganicModel learnedInorganic) {
         Optional<Float> newMolecularMass = molecularMassService.get(learnedInorganic.getFormula());
 
-        if(newMolecularMass.isPresent()) {
+        if (newMolecularMass.isPresent()) {
             String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
             learnedInorganic.setMolecularMass(molecularMass);
         }

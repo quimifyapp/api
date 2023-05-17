@@ -55,24 +55,27 @@ class OrganicService {
 			if(organic.isPresent()) {
 				organicResult = resolvePropertiesOf(organic.get());
 
-				if(organic.get().getStructureException() != null) {
+				if(organic.get().getStructureException() != null) { // TODO unrecognized atom
+					// TODO classifier & menu suggestion
 					Exception exception = organic.get().getStructureException();
 					errorService.log("Exception solving name: " + name, exception.toString(), getClass());
 				}
 			}
 			else {
+				// TODO classifier & menu suggestion
 				logger.warn("Couldn't solve organic \"" + name + "\".");
-				organicResult = OrganicResult.notFound;
+				organicResult = OrganicResult.notFound();
 			}
-		} catch (Exception exception) { // TODO unrecognized atom
+		} catch (Exception exception) {
+			// TODO classifier & menu suggestion
 			errorService.log("Exception solving name: " + name, exception.toString(), getClass());
-			organicResult = OrganicResult.notFound;
+			organicResult = OrganicResult.notFound();
 		}
 
-		if(!organicResult.isPresent())
+		if(!organicResult.isFound())
 			notFoundQueryService.log(name, getClass());
 
-		metricsService.organicFromNameSearched(organicResult.isPresent());
+		metricsService.organicFromNameSearched(organicResult.isFound());
 
 		return organicResult;
 	}
@@ -90,13 +93,13 @@ class OrganicService {
 		}
 		catch (Exception exception) {
 			errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
-			organicResult = OrganicResult.notFound;
+			organicResult = OrganicResult.notFound();
 		}
 
-		if(!organicResult.isPresent())
+		if(!organicResult.isFound())
 			notFoundQueryService.log(sequenceToString, getClass());
 
-		metricsService.organicFromStructureSearched(organicResult.isPresent());
+		metricsService.organicFromStructureSearched(organicResult.isFound());
 
 		return organicResult;
 	}

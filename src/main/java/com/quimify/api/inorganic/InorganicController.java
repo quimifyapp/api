@@ -35,7 +35,7 @@ class InorganicController {
     InorganicResult searchFromCompletion(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
-        if (inorganicResult.isPresent())
+        if (inorganicResult.isFound())
             logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
 
         return inorganicResult;
@@ -45,7 +45,7 @@ class InorganicController {
     InorganicResult search(@RequestParam("input") String input) {
         InorganicResult inorganicResult = inorganicService.search(input);
 
-        if (inorganicResult.isPresent())
+        if (inorganicResult.isFound())
             logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
 
         return inorganicResult;
