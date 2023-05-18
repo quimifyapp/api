@@ -102,7 +102,7 @@ class InorganicService {
     }
 
     InorganicResult smartSearch(String input) {
-        // TODO
+        // TODO correctiosn & similarity
         return enrichedSearch(input);
     }
 
@@ -112,7 +112,7 @@ class InorganicService {
 
         // Check if it was already in the DB:
 
-        String[] words = webSearchComponent.getTitle().trim().split("\\s+"); // TODO test
+        String[] words = webSearchComponent.getTitle().trim().split("\\s+");
         String firstWord = words[0];
 
         if (firstWord.equals("ácido"))
