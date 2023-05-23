@@ -5,6 +5,8 @@ import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,10 +19,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 @EnableScheduling
-// TODO singleton? prototype?
 class AutocompleteComponent { // TODO rename "CompleteComponent"
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    CacheManager cacheManager;
 
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
@@ -28,17 +32,13 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
-
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading while writing
-    //private Map<String, Integer> normalizedTextToIdShadow = new LinkedHashMap<>(); // Is read instead while writing
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Pauses read and write requests
 
     // Administration:
 
     @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 seconds // TODO fix time
     private void tryUpdateCache() {
         try {
-            //normalizedTextToIdShadow = new LinkedHashMap<>(normalizedTextToId);
             readWriteLock.writeLock().lock();
             updateCache();
         } catch (Exception exception) {
@@ -49,6 +49,8 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     }
 
     private void updateCache() {
+        cacheManager.getCache("cache").clear();
+
         List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
 
         for (InorganicModel inorganicModel : inorganicModels)
@@ -70,40 +72,48 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
         // Search tags (already normalized):
 
         for (String normalizedText : inorganicModel.getSearchTags())
-            normalizedTextToId.put(normalizedText, id);
+            cacheManager.getCache("cache").put(normalizedText, id);
     }
 
     private void putNormalized(String text, Integer id) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null)
-            normalizedTextToId.put(normalizedText, id);
+            cacheManager.getCache("cache").put(normalizedText, id);
     }
 
     // Internal:
 
     protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
-        readWriteLock.readLock().lock(); //if (!readWriteLock.readLock().tryLock()) // Main one is being written
-        //    return autoCompleteUsing(input, normalizedTextToIdShadow); // Lock wasn't acquired
+        readWriteLock.readLock().lock();
 
         try {
-            return autoCompleteUsing(input, normalizedTextToId);
+            return autoCompleteUsing(input);
         } catch (Exception exception) {
             errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
             return "";
         } finally {
-            readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
+            readWriteLock.readLock().unlock();
         }
     }
 
-    private String autoCompleteUsing(String input, Map<String, Integer> cache) { // TODO rename "complete"
+    private String autoCompleteUsing(String input) { // TODO rename "complete"
         String normalizedInput = Normalizer.get(input);
 
-        for (Map.Entry<String, Integer> entry : cache.entrySet())
-            if (entry.getKey().startsWith(normalizedInput))
-                return findNormalizedTextIn(entry.getKey(), entry.getValue());
+        for (Map.Entry<Object, Object> entry : getCacheEntrySet()) {
+            String normalizedText = (String) entry.getKey();
+            Integer id = (Integer) entry.getValue();
+
+            if (normalizedText.startsWith(normalizedInput))
+                return findNormalizedTextIn(normalizedText, id);
+        }
 
         return "";
+    }
+
+    private Set<Map.Entry<Object, Object>> getCacheEntrySet() {
+        CaffeineCache caffeineCache = (CaffeineCache) cacheManager.getCache("cache");
+        return caffeineCache.getNativeCache().asMap().entrySet();
     }
 
     private String findNormalizedTextIn(String normalizedText, Integer id) {
