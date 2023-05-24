@@ -33,7 +33,7 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
 
     // Administration:
 
-    @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every day TODO FIX TIME
+    @Scheduled(fixedDelay = 24 * 60 * 60 * 1000) // At startup, then once every day
     private void tryUpdateCache() {
         try {
             readWriteLock.writeLock().lock();
