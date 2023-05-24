@@ -5,8 +5,6 @@ import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,19 +22,18 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    CacheManager cacheManager;
-
-    @Autowired
     InorganicRepository inorganicRepository; // DB connection
 
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Pauses read and write requests
+    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
+
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading while writing
 
     // Administration:
 
-    @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every 5 seconds // TODO fix time
+    @Scheduled(fixedDelay = 5 * 1000) // At startup, then once every day TODO FIX TIME
     private void tryUpdateCache() {
         try {
             readWriteLock.writeLock().lock();
@@ -49,8 +46,6 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     }
 
     private void updateCache() {
-        cacheManager.getCache("cache").clear();
-
         List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
 
         for (InorganicModel inorganicModel : inorganicModels)
@@ -72,48 +67,38 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
         // Search tags (already normalized):
 
         for (String normalizedText : inorganicModel.getSearchTags())
-            cacheManager.getCache("cache").put(normalizedText, id);
+            normalizedTextToId.put(normalizedText, id);
     }
 
     private void putNormalized(String text, Integer id) {
         String normalizedText = Normalizer.get(text);
 
         if (normalizedText != null)
-            cacheManager.getCache("cache").put(normalizedText, id);
+            normalizedTextToId.put(normalizedText, id);
     }
 
     // Internal:
 
     protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
-        readWriteLock.readLock().lock();
-
         try {
-            return autoCompleteUsing(input);
+            readWriteLock.readLock().lock();
+            return autoCompleteUsing(input, normalizedTextToId);
         } catch (Exception exception) {
             errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
             return "";
         } finally {
-            readWriteLock.readLock().unlock();
+            readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
         }
     }
 
-    private String autoCompleteUsing(String input) { // TODO rename "complete"
+    private String autoCompleteUsing(String input, Map<String, Integer> cache) { // TODO rename "complete"
         String normalizedInput = Normalizer.get(input);
 
-        for (Map.Entry<Object, Object> entry : getCacheEntrySet()) {
-            String normalizedText = (String) entry.getKey();
-            Integer id = (Integer) entry.getValue();
-
-            if (normalizedText.startsWith(normalizedInput))
-                return findNormalizedTextIn(normalizedText, id);
-        }
+        for (Map.Entry<String, Integer> entry : cache.entrySet())
+            if (entry.getKey().startsWith(normalizedInput))
+                return findNormalizedTextIn(entry.getKey(), entry.getValue());
 
         return "";
-    }
-
-    private Set<Map.Entry<Object, Object>> getCacheEntrySet() {
-        CaffeineCache caffeineCache = (CaffeineCache) cacheManager.getCache("cache");
-        return caffeineCache.getNativeCache().asMap().entrySet();
     }
 
     private String findNormalizedTextIn(String normalizedText, Integer id) {

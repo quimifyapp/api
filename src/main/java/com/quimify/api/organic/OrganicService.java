@@ -17,132 +17,138 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture; // TODO REMOVE
+import java.util.concurrent.TimeUnit; // TODO REMOVE
+import java.util.concurrent.TimeoutException; // TODO REMOVE
 
 // This class implements the logic behind HTTP methods in "/organic".
 
 @Service
 class OrganicService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	PubChemComponent pubChemComponent; // PubChem API logic
+    @Autowired
+    PubChemComponent pubChemComponent; // PubChem API logic
 
-	@Autowired
-	MolecularMassService molecularMassService; // Molecular masses logic
+    @Autowired
+    MolecularMassService molecularMassService; // Molecular masses logic
 
-	@Autowired
-	NotFoundQueryService notFoundQueryService; // Not found queries logic
+    @Autowired
+    NotFoundQueryService notFoundQueryService; // Not found queries logic
 
-	@Autowired
-	ErrorService errorService; // API errors logic
+    @Autowired
+    ErrorService errorService; // API errors logic
 
-	@Autowired
-	MetricsService metricsService; // Daily metrics logic
+    @Autowired
+    MetricsService metricsService; // Daily metrics logic
 
-	// Constants:
+    // Constants:
 
-	protected static final int carbonInputCode = -1;
+    protected static final int carbonInputCode = -1;
 
-	// Client:
+    // Client:
 
-	protected OrganicResult getFromName(String name) {
-		OrganicResult organicResult;
+    protected OrganicResult getFromName(String name) {
+        OrganicResult organicResult;
 
-		try {
-			Optional<Organic> organic = OrganicFactory.getFromName(name);
+        try {
+            Optional<Organic> organic = CompletableFuture.supplyAsync(  // TODO REMOVE
+                    () -> OrganicFactory.getFromName(name)
+            ).get(10, TimeUnit.SECONDS);  // TODO REMOVE
 
-			if(organic.isPresent()) {
-				organicResult = resolvePropertiesOf(organic.get());
+            if (organic.isPresent()) {
+                organicResult = resolvePropertiesOf(organic.get());
 
-				if(organic.get().getStructureException() != null) {
-					Exception exception = organic.get().getStructureException();
-					errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
-				}
-			}
-			else {
-				logger.warn("Couldn't solve organic \"" + name + "\".");
-				organicResult = OrganicResult.notFound;
-			}
-		} catch (Exception exception) {
-			errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
-			organicResult = OrganicResult.notFound;
-		}
+                if (organic.get().getStructureException() != null) {
+                    Exception exception = organic.get().getStructureException();
+                    errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+                }
+            } else {
+                logger.warn("Couldn't solve organic \"" + name + "\".");
+                organicResult = OrganicResult.notFound;
+            }
+        }
+        catch (TimeoutException ignore) { // TODO REMOVE
+            organicResult = OrganicResult.notFound;
+        }
+        catch (Exception exception) {
+            errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+            organicResult = OrganicResult.notFound;
+        }
 
-		if(!organicResult.isPresent())
-			notFoundQueryService.log(name, this.getClass());
+        if (!organicResult.isPresent())
+            notFoundQueryService.log(name, this.getClass());
 
-		metricsService.organicSearchedFromName(organicResult.isPresent());
+        metricsService.organicSearchedFromName(organicResult.isPresent());
 
-		return organicResult;
-	}
+        return organicResult;
+    }
 
-	protected OrganicResult getFromStructure(int[] inputSequence) {
-		OrganicResult organicResult;
+    protected OrganicResult getFromStructure(int[] inputSequence) {
+        OrganicResult organicResult;
 
-		String sequenceToString = Arrays.toString(inputSequence); // For logging purposes
+        String sequenceToString = Arrays.toString(inputSequence); // For logging purposes
 
-		try {
-			OpenChain openChain = getOpenChainFromStructure(inputSequence);
-			Organic organic = OrganicFactory.getFromOpenChain(openChain);
-			
-			organicResult = resolvePropertiesOf(organic);
-		}
-		catch (Exception exception) {
-			errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
-			organicResult = OrganicResult.notFound;
-		}
+        try {
+            OpenChain openChain = getOpenChainFromStructure(inputSequence);
+            Organic organic = OrganicFactory.getFromOpenChain(openChain);
 
-		if(!organicResult.isPresent())
-			notFoundQueryService.log(sequenceToString, this.getClass());
+            organicResult = resolvePropertiesOf(organic);
+        } catch (Exception exception) {
+            errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
+            organicResult = OrganicResult.notFound;
+        }
 
-		metricsService.organicSearchedFromStructure(organicResult.isPresent());
+        if (!organicResult.isPresent())
+            notFoundQueryService.log(sequenceToString, this.getClass());
 
-		return organicResult;
-	}
+        metricsService.organicSearchedFromStructure(organicResult.isPresent());
 
-	// Private:
+        return organicResult;
+    }
 
-	private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
-		OpenChain openChain = new Simple();
+    // Private:
 
-		for(int i = 0; i < inputSequence.length; i++) {
-			if (inputSequence[i] == carbonInputCode) {
-				openChain.bondCarbon();
-				continue;
-			}
+    private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
+        OpenChain openChain = new Simple();
 
-			Group group = Group.values()[inputSequence[i]];
+        for (int i = 0; i < inputSequence.length; i++) {
+            if (inputSequence[i] == carbonInputCode) {
+                openChain.bondCarbon();
+                continue;
+            }
 
-			if (group == Group.radical) {
-				boolean iso = inputSequence[++i] == 1;
-				int carbonCount = inputSequence[++i];
+            Group group = Group.values()[inputSequence[i]];
 
-				openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-			}
-			else openChain = openChain.bond(group);
-		}
+            if (group == Group.radical) {
+                boolean iso = inputSequence[++i] == 1;
+                int carbonCount = inputSequence[++i];
 
-		return openChain;
-	}
+                openChain = openChain.bond(Substituent.radical(carbonCount, iso));
+            } else openChain = openChain.bond(group);
+        }
 
-	private OrganicResult resolvePropertiesOf(Organic organic) {
-		if(organic.getSmiles() == null)
-			return new OrganicResult(organic.getName(), organic.getStructure(), null, null);
+        return openChain;
+    }
 
-		pubChemComponent.resolveCompound(organic.getSmiles());
+    private OrganicResult resolvePropertiesOf(Organic organic) {
+        if (organic.getSmiles() == null)
+            return new OrganicResult(organic.getName(), organic.getStructure(), null, null);
 
-		String url2D = pubChemComponent.getUrl2D();
+        pubChemComponent.resolveCompound(organic.getSmiles());
 
-		Optional<Float> molecularMass = Optional.empty();
+        String url2D = pubChemComponent.getUrl2D();
 
-		if(organic.getStructure() != null)
-			molecularMass = molecularMassService.get(organic.getStructure());
+        Optional<Float> molecularMass = Optional.empty();
 
-		if(molecularMass.isEmpty())
-			molecularMass = pubChemComponent.getMolecularMass();
+        if (organic.getStructure() != null)
+            molecularMass = molecularMassService.get(organic.getStructure());
 
-		return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D);
-	}
+        if (molecularMass.isEmpty())
+            molecularMass = pubChemComponent.getMolecularMass();
+
+        return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D);
+    }
 
 }
