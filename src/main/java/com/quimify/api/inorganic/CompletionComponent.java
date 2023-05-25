@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 // This class solves inorganic completions.
 
@@ -68,8 +69,8 @@ class CompletionComponent {
                 inorganicModel.getCommonName()
         );
 
-        for (String name : names)
-            if (Normalizer.get(name).startsWith(normalizedInput)) // Null safe
+        for (String name : names.stream().filter(Objects::nonNull).collect(Collectors.toList()))
+            if (Normalizer.get(name).startsWith(normalizedInput))
                 return name;
 
         // Here, 'normalizedInput' either comes from formula or a search tag
