@@ -74,7 +74,7 @@ public class InorganicService {
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
-        Optional<InorganicModel> searchedInorganic = searchInDatabase(completion);
+        Optional<InorganicModel> searchedInorganic = searchInDatabase(Normalizer.get(completion));
         if (searchedInorganic.isPresent())
             inorganicResult = new InorganicResult(searchedInorganic.get());
         else {
