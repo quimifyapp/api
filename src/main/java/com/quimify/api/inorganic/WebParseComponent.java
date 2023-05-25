@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Scope("prototype") // New instance for each request, avoiding shared state
-class FQPageComponent {
+class WebParseComponent {
 
     @Autowired
     SettingsService settingsService; // Settings logic
@@ -57,7 +57,7 @@ class FQPageComponent {
 
     // Protected:
 
-    protected InorganicModel parseInorganic(String url) throws IOException {
+    protected InorganicModel parse(String url) throws IOException {
         if (!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 

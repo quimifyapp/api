@@ -18,8 +18,6 @@ class InorganicController {
     @Autowired
     InorganicService inorganicService; // Inorganic compounds logic
 
-    @Autowired
-    AutocompleteComponent autocompleteComponent; // Autocompletions logic
 
     // Constants:
 
@@ -28,8 +26,8 @@ class InorganicController {
     // Client:
 
     @GetMapping("/completion")
-    protected @ResponseBody ResponseEntity<String> autoComplete(@RequestParam("input") String input) {
-        String completion = autocompleteComponent.tryAutoComplete(input);
+    protected @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
+        String completion =  inorganicService.complete(input);
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
         return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header and body to the response
     }
@@ -54,13 +52,4 @@ class InorganicController {
         return inorganicResult;
     }
 
-    //@GetMapping("/smart")
-    //protected InorganicResult smartSearch(@RequestParam("input") String input) {
-
-    //}
-
-    //@GetMapping("/enriched")
-    //protected InorganicResult enrichedSearch(@RequestParam("input") String input) {
-
-    //}
 }

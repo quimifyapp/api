@@ -119,7 +119,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void inorganicAutocompleted() {
+    public void inorganicAutocompleted() { // TODO rename
         getTodayMetrics().incrementInorganicsAutocompleted();
     }
 
