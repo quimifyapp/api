@@ -27,15 +27,17 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>();
+    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>(); // Cache
 
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading while writing
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Impedes reading cache while writing
+    private Map<String, Integer> shadowNormalizedTextToId; // Secondary cache to read when main one is being written
 
     // Administration:
 
-    @Scheduled(fixedDelay = 24 * 60 * 60 * 1000) // At startup, then once every day
+    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
     private void tryUpdateCache() {
         try {
+            shadowNormalizedTextToId = new LinkedHashMap<>(normalizedTextToId);
             readWriteLock.writeLock().lock();
             updateCache();
         } catch (Exception exception) {
@@ -46,9 +48,9 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     }
 
     private void updateCache() {
-        List<InorganicModel> inorganicModels = inorganicRepository.findAllByOrderBySearchCountDesc();
+        normalizedTextToId.clear();
 
-        for (InorganicModel inorganicModel : inorganicModels)
+        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
             putNormalized(inorganicModel);
 
         logger.info("Inorganic completion cache updated.");
@@ -80,23 +82,26 @@ class AutocompleteComponent { // TODO rename "CompleteComponent"
     // Internal:
 
     protected String tryAutoComplete(String input) { // TODO rename "tryComplete"
+        if (!readWriteLock.readLock().tryLock())
+            return tryAutoCompleteUsing(input, shadowNormalizedTextToId); // Main one is being written
+
         try {
-            readWriteLock.readLock().lock();
-            return autoCompleteUsing(input, normalizedTextToId);
-        } catch (Exception exception) {
-            errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
-            return "";
+            return tryAutoCompleteUsing(input, normalizedTextToId);
         } finally {
             readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
         }
     }
 
-    private String autoCompleteUsing(String input, Map<String, Integer> cache) { // TODO rename "complete"
-        String normalizedInput = Normalizer.get(input);
+    protected String tryAutoCompleteUsing(String input, Map<String, Integer> cache) { // TODO rename "tryComplete"
+        try {
+            String normalizedInput = Normalizer.get(input);
 
-        for (Map.Entry<String, Integer> entry : cache.entrySet())
-            if (entry.getKey().startsWith(normalizedInput))
-                return findNormalizedTextIn(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Integer> entry : cache.entrySet())
+                if (entry.getKey().startsWith(normalizedInput))
+                    return findNormalizedTextIn(entry.getKey(), entry.getValue());
+        } catch (Exception exception) {
+            errorService.log("Exception completing: " + input, exception.toString(), this.getClass());
+        }
 
         return "";
     }
