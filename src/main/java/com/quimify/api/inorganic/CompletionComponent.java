@@ -27,6 +27,8 @@ class CompletionComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
+    // Constants:
+
     private static final String notFound = "";
 
     // Internal:
