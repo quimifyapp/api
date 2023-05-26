@@ -74,9 +74,9 @@ public class InorganicService {
     protected InorganicResult searchFromCompletion(String completion) {
         InorganicResult inorganicResult;
 
-        Optional<InorganicModel> searchedInorganic = searchInDatabase(Normalizer.get(completion));
-        if (searchedInorganic.isPresent())
-            inorganicResult = new InorganicResult(searchedInorganic.get());
+        Optional<InorganicModel> searchedInMemory = fetch(completion);
+        if (searchedInMemory.isPresent())
+            inorganicResult = new InorganicResult(searchedInMemory.get());
         else {
             errorService.log("Completion not in DB", completion, getClass());
             inorganicResult = InorganicResult.notFound;
@@ -92,16 +92,6 @@ public class InorganicService {
 
     private Optional<InorganicModel> fetch(String input) {
         String normalizedInput = Normalizer.get(input);
-
-        Optional<InorganicModel> cachedResult = searchInMemory(normalizedInput);
-
-        if (cachedResult.isPresent())
-            return cachedResult;
-
-        return searchInDatabase(input);
-    }
-
-    private Optional<InorganicModel> searchInMemory(String normalizedInput) {
         Optional<Integer> id = cacheComponent.find(normalizedInput);
 
         if (id.isEmpty())
@@ -115,44 +105,6 @@ public class InorganicService {
         }
 
         return inorganicModel;
-    }
-
-    private Optional<InorganicModel> searchInDatabase(String normalizedInput) {
-        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
-            if (matches(normalizedInput, inorganicModel)) {
-                inorganicModel.countSearch();
-                return Optional.of(inorganicModel);
-            }
-
-        return Optional.empty();
-    }
-
-    private boolean matches(String normalizedInput, InorganicModel inorganicModel) {
-        String possibleMatch = inorganicModel.getFormula();
-        if (normalizedInput.equals(Normalizer.get(possibleMatch))) // Null safe
-            return true;
-
-        possibleMatch = inorganicModel.getStockName();
-        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
-            return true;
-
-        possibleMatch = inorganicModel.getSystematicName();
-        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
-            return true;
-
-        possibleMatch = inorganicModel.getTraditionalName();
-        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
-            return true;
-
-        possibleMatch = inorganicModel.getCommonName();
-        if (normalizedInput.equals(Normalizer.get(possibleMatch)))
-            return true;
-
-        for (String searchTag : inorganicModel.getSearchTags())
-            if (normalizedInput.equals(searchTag))
-                return true;
-
-        return false;
     }
 
     private InorganicResult searchOnTheWeb(String input) {
@@ -169,10 +121,10 @@ public class InorganicService {
         if (firstWord.equals("ácido"))
             firstWord += words[1];
 
-        Optional<InorganicModel> searchedInDatabase = fetch(firstWord);
-        if (searchedInDatabase.isPresent()) {
-            logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInDatabase.get());
-            return new InorganicResult(searchedInDatabase.get());
+        Optional<InorganicModel> searchedInMemory = fetch(firstWord);
+        if (searchedInMemory.isPresent()) {
+            logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInMemory.get());
+            return new InorganicResult(searchedInMemory.get());
         }
 
         // Parse the inorganic:
@@ -184,10 +136,10 @@ public class InorganicService {
 
         // Check again if it was already in the DB:
 
-        searchedInDatabase = fetch(parsedInorganic.get().getFormula());
-        if (searchedInDatabase.isPresent()) {
-            logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInDatabase.get());
-            return new InorganicResult(searchedInDatabase.get());
+        searchedInMemory = fetch(parsedInorganic.get().getFormula());
+        if (searchedInMemory.isPresent()) {
+            logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInMemory.get());
+            return new InorganicResult(searchedInMemory.get());
         }
 
         return processNewlyLearned(parsedInorganic.get());

@@ -17,9 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture; // TODO REMOVE
-import java.util.concurrent.TimeUnit; // TODO REMOVE
-import java.util.concurrent.TimeoutException; // TODO REMOVE
 
 // This class implements the logic behind HTTP methods in "/organic".
 
@@ -53,9 +50,7 @@ class OrganicService {
         OrganicResult organicResult;
 
         try {
-            Optional<Organic> organic = CompletableFuture.supplyAsync(  // TODO REMOVE
-                    () -> OrganicFactory.getFromName(name)
-            ).get(10, TimeUnit.SECONDS);  // TODO REMOVE
+            Optional<Organic> organic = OrganicFactory.getFromName(name);
 
             if (organic.isPresent()) {
                 organicResult = resolvePropertiesOf(organic.get());
@@ -64,15 +59,12 @@ class OrganicService {
                     Exception exception = organic.get().getStructureException();
                     errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
                 }
-            } else {
+            }
+            else {
                 logger.warn("Couldn't solve organic \"" + name + "\".");
                 organicResult = OrganicResult.notFound;
             }
-        }
-        catch (TimeoutException ignore) { // TODO REMOVE
-            organicResult = OrganicResult.notFound;
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
             organicResult = OrganicResult.notFound;
         }
@@ -126,7 +118,8 @@ class OrganicService {
                 int carbonCount = inputSequence[++i];
 
                 openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-            } else openChain = openChain.bond(group);
+            }
+            else openChain = openChain.bond(group);
         }
 
         return openChain;
