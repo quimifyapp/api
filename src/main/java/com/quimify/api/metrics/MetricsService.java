@@ -23,7 +23,7 @@ class MetricsService {
 
     // Private:
 
-    private MetricsModel getTodayMetrics() {
+    private MetricsModel getTodayMetrics() { // TODO fix concurrency issues
         MetricsModel todayMetrics;
 
         // Day starts at 13:00 of Spain and 07:00 of Bolivia
@@ -41,7 +41,6 @@ class MetricsService {
 
     public Integer getGoogleQueries() {
         MetricsModel todayMetrics = getTodayMetrics();
-
         return todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
     }
 
