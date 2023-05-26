@@ -167,7 +167,7 @@ public class InorganicService {
         }
 
         inorganicRepository.save(learnedInorganic);
-        cacheComponent.tryUpdateCache(); // TODO don't leave out in merge
+        cacheComponent.add(learnedInorganic); // TODO don't leave out in merge
 
         metricsService.inorganicLearned();
         logger.info("Learned inorganic: " + learnedInorganic);

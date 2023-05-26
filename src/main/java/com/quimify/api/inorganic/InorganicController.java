@@ -25,6 +25,16 @@ class InorganicController {
 
     // Client:
 
+    @GetMapping()
+    protected InorganicResult search(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.search(input);
+
+        if (inorganicResult.isPresent())
+            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
+
     @GetMapping("/completion")
     protected @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
         String completion =  inorganicService.complete(input);
@@ -38,16 +48,6 @@ class InorganicController {
 
         if (inorganicResult.isPresent())
             logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
-
-        return inorganicResult;
-    }
-
-    @GetMapping()
-    protected InorganicResult search(@RequestParam("input") String input) {
-        InorganicResult inorganicResult = inorganicService.search(input);
-
-        if (inorganicResult.isPresent())
-            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
 
         return inorganicResult;
     }

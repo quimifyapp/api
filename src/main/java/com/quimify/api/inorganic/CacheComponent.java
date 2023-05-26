@@ -32,12 +32,47 @@ class CacheComponent {
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Avoids reading main cache while writing
     private Map<String, Integer> shadowNormalizedTextToId; // Secondary cache to be read when main one is being written
 
+    // Updating:
+
+    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
+    private void tryUpdateCache() {
+        try {
+            shadowNormalizedTextToId = new LinkedHashMap<>(normalizedTextToId);
+            readWriteLock.writeLock().lock();
+
+            normalizedTextToId.clear();
+
+            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
+                add(inorganicModel);
+
+            logger.info("Inorganic cache updated.");
+        } catch (Exception exception) {
+            errorService.log("Exception updating cache", exception.toString(), getClass());
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
     // Internal:
+
+    void add(InorganicModel inorganicModel) {
+        Integer id = inorganicModel.getId();
+
+        addNormalized(inorganicModel.getFormula(), id);
+        addNormalized(inorganicModel.getStockName(), id);
+        addNormalized(inorganicModel.getSystematicName(), id);
+        addNormalized(inorganicModel.getTraditionalName(), id);
+        addNormalized(inorganicModel.getCommonName(), id);
+
+        // Search tags (already normalized):
+
+        for (String normalizedText : inorganicModel.getSearchTags())
+            normalizedTextToId.put(normalizedText, id);
+    }
 
     Optional<Integer> find(String normalizedInput) {
         if (!readWriteLock.readLock().tryLock())
             return findIn(normalizedInput, shadowNormalizedTextToId); // Main one is being written
-
         try {
             return findIn(normalizedInput, normalizedTextToId);
         } finally {
@@ -56,20 +91,12 @@ class CacheComponent {
         }
     }
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
-    void tryUpdateCache() {
-        try {
-            shadowNormalizedTextToId = new LinkedHashMap<>(normalizedTextToId);
-            readWriteLock.writeLock().lock();
-            updateCache();
-        } catch (Exception exception) {
-            errorService.log("Exception updating cache", exception.toString(), getClass());
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
     // Private:
+
+    private void addNormalized(String text, Integer id) {
+        if (text != null)
+            normalizedTextToId.put(Normalizer.get(text), id);
+    }
 
     private Optional<Integer> findIn(String normalizedInput, Map<String, Integer> cache) {
         return Optional.ofNullable(cache.get(normalizedInput));
@@ -81,35 +108,6 @@ class CacheComponent {
                 return Optional.of(entry.getValue());
 
         return Optional.empty();
-    }
-
-    private void updateCache() {
-        normalizedTextToId.clear();
-
-        for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
-            putNormalized(inorganicModel);
-
-        logger.info("Inorganic cache updated.");
-    }
-
-    private void putNormalized(InorganicModel inorganicModel) {
-        Integer id = inorganicModel.getId();
-
-        putNormalized(inorganicModel.getFormula(), id);
-        putNormalized(inorganicModel.getStockName(), id);
-        putNormalized(inorganicModel.getSystematicName(), id);
-        putNormalized(inorganicModel.getTraditionalName(), id);
-        putNormalized(inorganicModel.getCommonName(), id);
-
-        // Search tags (already normalized):
-
-        for (String normalizedText : inorganicModel.getSearchTags())
-            normalizedTextToId.put(normalizedText, id);
-    }
-
-    private void putNormalized(String text, Integer id) {
-        if (text != null)
-            normalizedTextToId.put(Normalizer.get(text), id);
     }
 
 }
