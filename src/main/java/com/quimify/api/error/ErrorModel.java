@@ -16,6 +16,8 @@ class ErrorModel {
 
     @Column(nullable = false)
     private Timestamp dateAndTime;
+
+    @Lob // Large objects
     @Column(nullable = false)
     private String title;
 
