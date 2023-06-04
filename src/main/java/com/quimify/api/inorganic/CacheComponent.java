@@ -41,7 +41,7 @@ class CacheComponent {
             readWriteLock.writeLock().lock();
 
             normalizedTextToId.clear();
-
+            // TODO add all search tags at the end?
             for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
                 add(inorganicModel);
 
