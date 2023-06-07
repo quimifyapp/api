@@ -1,2 +1,3 @@
 SELECT * FROM client_error
-ORDER BY id DESC;
+ORDER BY id DESC
+LIMIT 500;
