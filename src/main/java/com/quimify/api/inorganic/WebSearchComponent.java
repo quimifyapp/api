@@ -37,6 +37,8 @@ class WebSearchComponent {
         this.title = null;
         this.address = null;
 
+        // TODO re-order: Free bing > Google
+
         boolean searchDone = false;
 
         if (canGoogleSearch())
@@ -144,6 +146,7 @@ class WebSearchComponent {
             searched = true;
         } catch (Exception exception) {
             if (exception.toString().contains("HTTP response code: 403"))
+                // TODO count monthly metrics
                 logger.warn("Got HTTP code 403 from " + apiName + "(probably limit exceeded).");
             else errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
 
