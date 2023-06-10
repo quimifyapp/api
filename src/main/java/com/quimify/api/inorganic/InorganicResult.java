@@ -28,7 +28,7 @@ class InorganicResult {
 
     // If not present:
 
-    private String menuSuggestion; // "organic-finding-formula"
+    private String menuSuggestion; // "organic-finding-formula" // TODO more like inputKindSuggestion, with molecular mass and excercise/problem as kinds too
 
     // Constructors:
 
