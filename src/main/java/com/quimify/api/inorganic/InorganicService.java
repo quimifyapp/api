@@ -84,7 +84,7 @@ public class InorganicService {
     }
 
     InorganicResult smartSearch(String input) {
-        // TODO correctiosn & similarity
+        // TODO corrections, common errors & similarity
         return enrichedSearch(input);
     }
 
