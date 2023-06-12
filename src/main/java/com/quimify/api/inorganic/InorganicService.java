@@ -107,7 +107,7 @@ public class InorganicService {
             logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInMemory.get());
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
         }
-
+// TODO a separate method from here
         // Parse the inorganic:
 
         Optional<InorganicModel> parsedInorganic = tryParseWeb(webSearchComponent.getAddress());
@@ -115,7 +115,7 @@ public class InorganicService {
         if (parsedInorganic.isEmpty())
             return InorganicResult.notFound();
 
-        // Check again if it was already in the DB:
+        // Check if it was already in the DB:
 
         searchedInMemory = fetch(parsedInorganic.get().getFormula());
         if (searchedInMemory.isPresent()) {
@@ -150,8 +150,7 @@ public class InorganicService {
     // Private:
 
     private Optional<InorganicModel> fetch(String input) {
-        String normalizedInput = Normalizer.get(input);
-        Optional<Integer> id = cacheComponent.find(normalizedInput);
+        Optional<Integer> id = cacheComponent.find(Normalizer.get(input));
 
         if (id.isEmpty())
             return Optional.empty();

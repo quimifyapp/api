@@ -12,10 +12,11 @@ public class Normalizer {
             return null;
 
         text = java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFD); // Without accents or diacritics
-        text = text.replaceAll("[^\\p{ASCII}]", ""); // Only ASCII
+        text = text.replaceAll("[^\\p{ASCII}]", ""); // Only ASCII TODO useless? because of next one
         text = text.replaceAll("[^A-Za-z0-9]", ""); // Only alphanumeric
+        text = text.toLowerCase(); // Self-explanatory
 
-        return text.toLowerCase();
+        return text;
     }
 
 }
