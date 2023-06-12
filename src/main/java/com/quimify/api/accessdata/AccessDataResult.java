@@ -17,9 +17,9 @@ class AccessDataResult {
 
 	// Constructors:
 
-	protected AccessDataResult(boolean updateAvailable, Boolean updateNeeded, String updateDetails,
-							   boolean messagePresent, String messageTitle, String messageDetails,
-							   Boolean messageLinkPresent, String messageLinkLabel, String messageLink) {
+	AccessDataResult(boolean updateAvailable, Boolean updateNeeded, String updateDetails,
+					 boolean messagePresent, String messageTitle, String messageDetails,
+					 Boolean messageLinkPresent, String messageLinkLabel, String messageLink) {
 		this.updateAvailable = updateAvailable;
 		this.updateNeeded = updateNeeded;
 		this.updateDetails = updateDetails;

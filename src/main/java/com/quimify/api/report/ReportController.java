@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/report")
 class ReportController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ReportService reportService; // Client reports logic
+    ReportService reportService;
 
     // Constants:
 
@@ -23,9 +23,9 @@ class ReportController {
     // Client:
 
     @PostMapping()
-    protected void save(@RequestParam("context") String context, @RequestParam("details") String details,
-                        @RequestParam("user-message") String userMessage,
-                        @RequestParam("client-version") Integer clientVersion) {
+    void save(@RequestParam("context") String context, @RequestParam("details") String details,
+              @RequestParam("user-message") String userMessage,
+              @RequestParam("client-version") Integer clientVersion) {
         reportService.save(context, details, userMessage, clientVersion);
         logger.warn(String.format(postReportMessage, clientVersion));
     }

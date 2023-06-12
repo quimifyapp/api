@@ -16,7 +16,7 @@ import java.util.Optional;
 class PubChemComponent {
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     private String compoundId; // Compound's ID in Pub Chem DB
     private String encodedSmiles; // Simplified Molecular Input Line Entry Specification
@@ -33,7 +33,7 @@ class PubChemComponent {
 
     // Queries:
 
-    protected void resolveCompound(String smiles) {
+    void resolveCompound(String smiles) {
         // Adapted for URLs and PubChem:
         encodedSmiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
         encodedSmiles = Connection.encodeForUrl(encodedSmiles); // Escapes special characters
@@ -41,19 +41,19 @@ class PubChemComponent {
         try {
             compoundId = new Connection(String.format(compoundIdUrl, encodedSmiles)).getText();
         } catch (IOException ioException) {
-            errorService.log("Exception getting cId for: " + smiles, ioException.toString(), this.getClass());
+            errorService.log("Exception getting cId for: " + smiles, ioException.toString(), getClass());
             compoundId = null;
         }
     }
 
-    protected String getUrl2D() {
+    String getUrl2D() {
         if (invalidCompoundId())
             return String.format(smiles2DUrl, encodedSmiles); // 300 x 300 px
 
         return String.format(compoundId2DUrl, compoundId); // 500 x 500 px
     }
 
-    protected Optional<Float> getMolecularMass() {
+    Optional<Float> getMolecularMass() {
         if(invalidCompoundId())
             return Optional.empty();
 
@@ -63,7 +63,7 @@ class PubChemComponent {
             String text = new Connection(String.format(molecularMassUrl, compoundId)).getText();
             molecularMass = Optional.of(Float.valueOf(text));
         } catch (Exception exception) {
-            errorService.log("Exception getting mass for: " + compoundId, exception.toString(), this.getClass());
+            errorService.log("Exception getting mass for: " + compoundId, exception.toString(), getClass());
             molecularMass = Optional.empty();
         }
 

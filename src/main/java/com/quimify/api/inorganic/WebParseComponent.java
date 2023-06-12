@@ -23,10 +23,10 @@ import java.util.regex.Pattern;
 class WebParseComponent {
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    SettingsService settingsService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     String htmlDocument;
     InorganicModel parsedInorganic;
@@ -57,7 +57,7 @@ class WebParseComponent {
 
     // Protected:
 
-    protected InorganicModel parse(String url) throws IOException {
+    InorganicModel parse(String url) throws IOException {
         if (!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 
@@ -161,7 +161,7 @@ class WebParseComponent {
         parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
         parsedInorganic.setSystematicName(null); // Systematic names for peroxides NEVER include that word
 
-        errorService.log("Learned peroxide needs manual correction", parsedInorganic.toString(), this.getClass());
+        errorService.log("Learned peroxide needs manual correction", parsedInorganic.toString(), getClass());
     }
 
     private String correctName(String name) {

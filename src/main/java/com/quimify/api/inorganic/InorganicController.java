@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/inorganic")
 class InorganicController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicService inorganicService; // Inorganic compounds logic
-
+    InorganicService inorganicService;
 
     // Constants:
 
@@ -25,31 +24,52 @@ class InorganicController {
 
     // Client:
 
-    @GetMapping()
-    protected InorganicResult search(@RequestParam("input") String input) {
-        InorganicResult inorganicResult = inorganicService.search(input);
-
-        if (inorganicResult.isPresent())
-            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
-
-        return inorganicResult;
-    }
-
     @GetMapping("/completion")
-    protected @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
-        String completion =  inorganicService.complete(input);
+    @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
+        String completion = inorganicService.complete(input);
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
-        return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Adds header and body to the response
+        return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Response has both header and body
     }
 
     @GetMapping("/from-completion")
-    protected InorganicResult completionSearch(@RequestParam("completion") String completion) {
+    InorganicResult searchFromCompletion(@RequestParam("completion") String completion) {
         InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
 
-        if (inorganicResult.isPresent())
+        if (inorganicResult.isFound())
             logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
 
         return inorganicResult;
     }
 
+    @GetMapping()
+    InorganicResult search(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.search(input);
+
+        if (inorganicResult.isFound())
+            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
+
+    @GetMapping("/smart")
+    InorganicResult smartSearch(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.smartSearch(input);
+
+        // TODO logging
+        //if (inorganicResult.isPresent())
+        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
+
+    @GetMapping("/enriched")
+    InorganicResult enrichedSearch(@RequestParam("input") String input) {
+        InorganicResult inorganicResult = inorganicService.enrichedSearch(input);
+
+        // TODO logging
+        //if (inorganicResult.isPresent())
+        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+
+        return inorganicResult;
+    }
 }

@@ -2,7 +2,7 @@ package com.quimify.api.accessdata;
 
 import javax.persistence.*;
 
-// Esta represents access data needed to load the client.
+// This class represents access data needed to load the client.
 
 @Entity
 @Table(name = "access_data")
@@ -39,83 +39,83 @@ class AccessDataModel {
 
 	// Getters and setters:
 
-	protected Integer getClientVersion() {
+	Integer getClientVersion() {
 		return clientVersion;
 	}
 
-	protected void setClientVersion(Integer version) {
+	void setClientVersion(Integer version) {
 		this.clientVersion = version;
 	}
 
-	protected Boolean getUpdateAvailable() {
+	Boolean getUpdateAvailable() {
 		return updateAvailable;
 	}
 
-	protected void setUpdateAvailable(Boolean updateAvailable) {
+	void setUpdateAvailable(Boolean updateAvailable) {
 		this.updateAvailable = updateAvailable;
 	}
 
-	protected Boolean getUpdateNeeded() {
+	Boolean getUpdateNeeded() {
 		return updateNeeded;
 	}
 
-	protected void setUpdateNeeded(Boolean updateNeeded) {
+	void setUpdateNeeded(Boolean updateNeeded) {
 		this.updateNeeded = updateNeeded;
 	}
 
-	protected String getUpdateDetails() {
+	String getUpdateDetails() {
 		return updateDetails;
 	}
 
-	protected void setUpdateDetails(String updateDetails) {
+	void setUpdateDetails(String updateDetails) {
 		this.updateDetails = updateDetails;
 	}
 
-	protected Boolean getMessagePresent() {
+	Boolean getMessagePresent() {
 		return messagePresent;
 	}
 
-	protected void setMessagePresent(Boolean messagePresent) {
+	void setMessagePresent(Boolean messagePresent) {
 		this.messagePresent = messagePresent;
 	}
 
-	protected String getMessageTitle() {
+	String getMessageTitle() {
 		return messageTitle;
 	}
 
-	protected void setMessageTitle(String messageTitle) {
+	void setMessageTitle(String messageTitle) {
 		this.messageTitle = messageTitle;
 	}
 
-	protected String getMessageDetails() {
+	String getMessageDetails() {
 		return messageDetails;
 	}
 
-	protected void setMessageDetails(String messageDetails) {
+	void setMessageDetails(String messageDetails) {
 		this.messageDetails = messageDetails;
 	}
 
-	protected Boolean getMessageLinkPresent() {
+	Boolean getMessageLinkPresent() {
 		return messageLinkPresent;
 	}
 
-	protected void setMessageLinkPresent(Boolean messageLinkPresent) {
+	void setMessageLinkPresent(Boolean messageLinkPresent) {
 		this.messageLinkPresent = messageLinkPresent;
 	}
 
-	protected String getMessageLinkLabel() {
+	String getMessageLinkLabel() {
 		return messageLinkLabel;
 	}
 
-	protected void setMessageLinkLabel(String messageLinkLabel) {
+	void setMessageLinkLabel(String messageLinkLabel) {
 		this.messageLinkLabel = messageLinkLabel;
 	}
 
-	protected String getMessageLink() {
+	String getMessageLink() {
 		return messageLink;
 	}
 
-	protected void setMessageLink(String messageLink) {
+	void setMessageLink(String messageLink) {
 		this.messageLink = messageLink;
 	}
 

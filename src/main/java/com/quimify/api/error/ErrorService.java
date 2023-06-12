@@ -12,16 +12,15 @@ import java.time.Instant;
 // This class implements API errors logic.
 
 @Service
-public
-class ErrorService {
+public class ErrorService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ErrorRepository errorRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Protected:
 

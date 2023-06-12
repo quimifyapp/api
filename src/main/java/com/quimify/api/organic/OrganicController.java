@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/organic")
 class OrganicController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
-	OrganicService organicService; // Organic compounds logic
+	OrganicService organicService;
 
 	// Constants:
 
@@ -22,21 +22,21 @@ class OrganicController {
 
 	// Client:
 
-	@GetMapping("/from-name")
-	protected OrganicResult nameSearch(@RequestParam("name") String name) {
+	@GetMapping("/structure")
+	OrganicResult getFromName(@RequestParam("name") String name) {
 		OrganicResult result = organicService.getFromName(name);
 
-		if (result.isPresent())
+		if (result.isFound())
 			logger.info(String.format(getOrganicMessage, "name", name, result.getStructure()));
 
 		return result;
 	}
 
-	@GetMapping("/from-structure")
-	protected OrganicResult structureSearch(@RequestParam("structure-sequence") int[] structureSequence) {
+	@GetMapping("/name")
+	OrganicResult getFromStructure(@RequestParam("structure-sequence") int[] structureSequence) {
 		OrganicResult result = organicService.getFromStructure(structureSequence);
 
-		if(result.isPresent())
+		if(result.isFound())
 			logger.info(String.format(getOrganicMessage, "structure", result.getStructure(), result.getName()));
 
 		return result;

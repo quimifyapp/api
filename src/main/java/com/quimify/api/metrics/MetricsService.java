@@ -41,6 +41,7 @@ class MetricsService {
 
     public Integer getGoogleQueries() {
         MetricsModel todayMetrics = getTodayMetrics();
+
         return todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
     }
 
@@ -48,9 +49,9 @@ class MetricsService {
         return getTodayMetrics().getPaidBingQueries();
     }
 
-    // Counters:
+    // Incrementers:
 
-    @Transactional
+    @Transactional // TODO Transactional here?
     public void errorOccurred() {
         getTodayMetrics().incrementErrorsOccurred();
     }
@@ -66,7 +67,7 @@ class MetricsService {
     }
 
     @Transactional
-    public void countAccess(Short platform) {
+    public void clientAccessed(Short platform) {
         switch (platform) {
             case AccessDataService.androidPlatform:
                 getTodayMetrics().incrementAndroidAccesses();
@@ -123,14 +124,14 @@ class MetricsService {
     }
 
     @Transactional
-    public void organicSearchedFromName(boolean found) {
+    public void organicFromNameSearched(boolean found) {
         if (found)
             getTodayMetrics().incrementOrganicsFoundFromNameFromText();
         else getTodayMetrics().incrementOrganicsNotFoundFromNameFromText();
     }
 
     @Transactional
-    public void organicSearchedFromStructure(boolean found) {
+    public void organicFromStructureSearched(boolean found) {
         if (found)
             getTodayMetrics().incrementOrganicsSucceededFromStructure();
         else getTodayMetrics().incrementOrganicsFailedFromStructure();

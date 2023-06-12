@@ -16,11 +16,11 @@ class ClientErrorService {
     ClientErrorRepository clientErrorRepository; // DB connection
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Client:
 
-    protected void save(String context, String details, Integer clientVersion) {
+    void save(String context, String details, Integer clientVersion) {
         ClientErrorModel clientErrorModel = new ClientErrorModel();
 
         clientErrorModel.setDateAndTime(Timestamp.from(Instant.now()));

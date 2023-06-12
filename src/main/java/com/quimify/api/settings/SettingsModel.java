@@ -2,141 +2,125 @@ package com.quimify.api.settings;
 
 import javax.persistence.*;
 
-// Esta clase representa la configuración de cada versión del servidor.
+// This class represents each API version settings.
 
-@Entity // Es un modelo real
-@Table(name = "settings") // En la tabla 'settings' de la DB
+@Entity
+@Table(name = "settings")
 class SettingsModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
-    private Integer version; // Se corresponde con la versión del servidor
+    private Integer version;
 
-    // API de Google:
-
-    @Column(nullable = false)
-    private Boolean useGoogle = false; // Interruptor
-    @Column(nullable = false)
-    private Integer googleDailyLimit; // Nº máx. de búsquedas diarias
-    @Column(nullable = false)
-    private String googleUrl; // URL + key
-
-    // API de Bing gratis:
+    // External API settings:
 
     @Column(nullable = false)
-    private Boolean useFreeBing = false; // Interruptor
+    private Boolean useGoogle;
     @Column(nullable = false)
-    private String freeBingKey; // Suscripción
-
-    // API de Bing de pago:
+    private Integer googleDailyLimit;
 
     @Column(nullable = false)
-    private Boolean usePaidBing = false; // Interruptor
-    @Column(nullable = false)
-    private Integer paidBingDailyLimit; // Nº máx. de búsquedas diarias
-    @Column(nullable = false)
-    private String paidBingKey; // Suscripción
-
-    // API de Bing:
+    private Boolean useFreeBing;
 
     @Column(nullable = false)
-    private String bingUrl; // URL
+    private Boolean usePaidBing;
+    @Column(nullable = false)
+    private Integer paidBingDailyLimit;
 
-    // Para FQ.com:
+    // URLs:
 
     @Column(nullable = false)
-    private String userAgent; // Requisito HTTP para parecer un visitante corriente
+    private String googleUrl;
 
-    // --------------------------------------------------------------------------------
+    @Column(nullable = false)
+    private String bingUrl;
 
-    // Getters y setters:
+    @Column(nullable = false)
+    private String classifierUrl;
 
-    protected Integer getVersion() {
+    @Column(nullable = false)
+    private String userAgent; // For web scrapping
+
+    // Getters & setters:
+
+    Integer getVersion() {
         return version;
     }
 
-    protected void setVersion(Integer version) {
+    void setVersion(Integer version) {
         this.version = version;
     }
 
-    protected Boolean getUseGoogle() {
+    Boolean getUseGoogle() {
         return useGoogle;
     }
 
-    protected void setUseGoogle(Boolean useGoogle) {
+    void setUseGoogle(Boolean useGoogle) {
         this.useGoogle = useGoogle;
     }
 
-    protected Integer getGoogleDailyLimit() {
+    Integer getGoogleDailyLimit() {
         return googleDailyLimit;
     }
 
-    protected void setGoogleDailyLimit(Integer googleDailyLimit) {
+    void setGoogleDailyLimit(Integer googleDailyLimit) {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    protected String getGoogleUrl() {
-        return googleUrl;
-    }
-
-    protected void setGoogleUrl(String googleUrl) {
-        this.googleUrl = googleUrl;
-    }
-
-    protected Boolean getUseFreeBing() {
+    Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
-    protected void setUseFreeBing(Boolean useFreeBing) {
+    void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
     }
 
-    protected String getFreeBingKey() {
-        return freeBingKey;
-    }
-
-    protected void setFreeBingKey(String freeBingKey) {
-        this.freeBingKey = freeBingKey;
-    }
-
-    protected Boolean getUsePaidBing() {
+    Boolean getUsePaidBing() {
         return usePaidBing;
     }
 
-    protected void setUsePaidBing(Boolean usePaidBing) {
+    void setUsePaidBing(Boolean usePaidBing) {
         this.usePaidBing = usePaidBing;
     }
 
-    protected Integer getPaidBingDailyLimit() {
+    Integer getPaidBingDailyLimit() {
         return paidBingDailyLimit;
     }
 
-    protected void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
+    void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
         this.paidBingDailyLimit = paidBingDailyLimit;
     }
 
-    protected String getPaidBingKey() {
-        return paidBingKey;
+    String getGoogleUrl() {
+        return googleUrl;
     }
 
-    protected void setPaidBingKey(String paidBingKey) {
-        this.paidBingKey = paidBingKey;
+    void setGoogleUrl(String googleUrl) {
+        this.googleUrl = googleUrl;
     }
 
-    protected String getBingUrl() {
+    String getBingUrl() {
         return bingUrl;
     }
 
-    protected void setBingUrl(String bingUrl) {
+    void setBingUrl(String bingUrl) {
         this.bingUrl = bingUrl;
     }
 
-    protected String getUserAgent() {
+    String getClassifierUrl() {
+        return classifierUrl;
+    }
+
+    void setClassifierUrl(String classifierUrl) {
+        this.classifierUrl = classifierUrl;
+    }
+
+    String getUserAgent() {
         return userAgent;
     }
 
-    protected void setUserAgent(String userAgent) {
+    void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 

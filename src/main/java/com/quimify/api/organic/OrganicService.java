@@ -23,30 +23,30 @@ import java.util.Optional;
 @Service
 class OrganicService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    PubChemComponent pubChemComponent; // PubChem API logic
+    PubChemComponent pubChemComponent;
 
     @Autowired
-    MolecularMassService molecularMassService; // Molecular masses logic
+    MolecularMassService molecularMassService;
 
     @Autowired
-    NotFoundQueryService notFoundQueryService; // Not found queries logic
+    NotFoundQueryService notFoundQueryService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Constants:
 
-    protected static final int carbonInputCode = -1;
+    static final int carbonInputCode = -1;
 
     // Client:
 
-    protected OrganicResult getFromName(String name) {
+    OrganicResult getFromName(String name) {
         OrganicResult organicResult;
 
         try {
@@ -55,29 +55,32 @@ class OrganicService {
             if (organic.isPresent()) {
                 organicResult = resolvePropertiesOf(organic.get());
 
-                if (organic.get().getStructureException() != null) {
+                if (organic.get().getStructureException() != null) { // TODO unrecognized atom
+                    // TODO classifier & menu suggestion
                     Exception exception = organic.get().getStructureException();
-                    errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
+                    errorService.log("Exception solving name: " + name, exception.toString(), getClass());
                 }
             }
             else {
+                // TODO classifier & menu suggestion
                 logger.warn("Couldn't solve organic \"" + name + "\".");
-                organicResult = OrganicResult.notFound;
+                organicResult = OrganicResult.notFound();
             }
         } catch (Exception exception) {
-            errorService.log("Exception solving name: " + name, exception.toString(), this.getClass());
-            organicResult = OrganicResult.notFound;
+            // TODO classifier & menu suggestion
+            errorService.log("Exception solving name: " + name, exception.toString(), getClass());
+            organicResult = OrganicResult.notFound();
         }
 
-        if (!organicResult.isPresent())
-            notFoundQueryService.log(name, this.getClass());
+        if (!organicResult.isFound())
+            notFoundQueryService.log(name, getClass());
 
-        metricsService.organicSearchedFromName(organicResult.isPresent());
+        metricsService.organicFromNameSearched(organicResult.isFound());
 
         return organicResult;
     }
 
-    protected OrganicResult getFromStructure(int[] inputSequence) {
+    OrganicResult getFromStructure(int[] inputSequence) {
         OrganicResult organicResult;
 
         String sequenceToString = Arrays.toString(inputSequence); // For logging purposes
@@ -88,14 +91,14 @@ class OrganicService {
 
             organicResult = resolvePropertiesOf(organic);
         } catch (Exception exception) {
-            errorService.log("Exception naming: " + sequenceToString, exception.toString(), this.getClass());
-            organicResult = OrganicResult.notFound;
+            errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
+            organicResult = OrganicResult.notFound();
         }
 
-        if (!organicResult.isPresent())
-            notFoundQueryService.log(sequenceToString, this.getClass());
+        if (!organicResult.isFound())
+            notFoundQueryService.log(sequenceToString, getClass());
 
-        metricsService.organicSearchedFromStructure(organicResult.isPresent());
+        metricsService.organicFromStructureSearched(organicResult.isFound());
 
         return organicResult;
     }

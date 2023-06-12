@@ -8,9 +8,11 @@ import java.util.Objects;
 
 class InorganicResult {
 
-    private boolean present;
+    private boolean found;
 
-    // If present is true
+    // If found:
+
+    private String suggestion; // "trióxido de diníquel"
 
     private String formula; // "MgH2"
 
@@ -19,19 +21,22 @@ class InorganicResult {
     private String traditionalName; // "óxido niquélico"
     private String commonName; // "potasio"
 
-    private String molecularMass; // (g)
+    private String molecularMass; // (g/mol)
     private String density; // (g/cm³)
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
 
-    // Constants:
+    // If not found:
 
-    protected static final InorganicResult notFound = new InorganicResult();
+    private String menuSuggestion; // "organic-finding-formula" // TODO more like inputKindSuggestion, with molecular mass and excercise/problem as kinds too
 
     // Constructors:
 
-    protected InorganicResult(InorganicModel inorganicModel) {
-        this.present = true;
+    InorganicResult(InorganicModel inorganicModel, String suggestion) {
+        this.found = true;
+
+        this.suggestion = suggestion;
+
         this.formula = inorganicModel.getFormula();
 
         this.stockName = inorganicModel.getStockName();
@@ -45,14 +50,23 @@ class InorganicResult {
         this.boilingPoint = inorganicModel.getBoilingPoint();
     }
 
-    private InorganicResult() {
-        this.present = false;
+    InorganicResult(InorganicModel inorganicModel) {
+        this(inorganicModel, null);
     }
 
-    // Texto:
+    InorganicResult(String menuSuggestion) {
+        this.found = false;
+        this.menuSuggestion = menuSuggestion;
+    }
+
+    static InorganicResult notFound() {
+        return new InorganicResult((String) null);
+    }
+
+    // Text:
 
     @Override
-    public String toString() {
+    public String toString() { // TODO remake or remove?
         List<String> identifiers = new ArrayList<>();
 
         identifiers.add(formula);
@@ -68,12 +82,20 @@ class InorganicResult {
 
     // Getters y setters:
 
-    public boolean isPresent() {
-        return present;
+    public boolean isFound() {
+        return found;
     }
 
-    public void setPresent(boolean present) {
-        this.present = present;
+    public void setFound(boolean found) {
+        this.found = found;
+    }
+
+    public String getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(String suggestion) {
+        this.suggestion = suggestion;
     }
 
     public String getFormula() {
@@ -146,6 +168,14 @@ class InorganicResult {
 
     public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
+    }
+
+    public String getMenuSuggestion() {
+        return menuSuggestion;
+    }
+
+    public void setMenuSuggestion(String menuSuggestion) {
+        this.menuSuggestion = menuSuggestion;
     }
 
 }

@@ -17,15 +17,15 @@ class MolecularMassResult {
 
 	// Constructors:
 
-	protected MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams,
-								  Map<String, Integer> elementToMoles) {
+	MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams,
+						Map<String, Integer> elementToMoles) {
 		this.present = true;
 		this.molecularMass = molecularMass;
 		this.elementToGrams = elementToGrams;
 		this.elementToMoles = elementToMoles;
 	}
 
-	protected MolecularMassResult(String error) {
+	MolecularMassResult(String error) {
 		this.present = false;
 		this.error = error;
 	}

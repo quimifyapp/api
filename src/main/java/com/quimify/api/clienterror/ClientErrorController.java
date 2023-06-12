@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/client-error")
 class ClientErrorController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ClientErrorService clientErrorService; // Client errors logic
+    ClientErrorService clientErrorService;
 
     // Constants:
 
@@ -23,8 +23,8 @@ class ClientErrorController {
     // Client:
 
     @PostMapping()
-    protected void save(@RequestParam("context") String context, @RequestParam("details") String details,
-                        @RequestParam("client-version") Integer clientVersion) {
+    void save(@RequestParam("context") String context, @RequestParam("details") String details,
+              @RequestParam("client-version") Integer clientVersion) {
         clientErrorService.save(context, details, clientVersion);
         logger.warn(String.format(postClientErrorMessage, clientVersion));
     }

@@ -21,23 +21,23 @@ import java.util.regex.Pattern;
 public
 class MolecularMassService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ElementService elementService; // Elements logic
+    ElementService elementService;
 
     @Autowired
-    NotFoundQueryService notFoundQueryService; // Not found queries logic
+    NotFoundQueryService notFoundQueryService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     // Internal:
 
-    public Optional<Float> get(String formula) {
+    public Optional<Float> get(String formula) { // TODO just use tryCalculate?
         Optional<Float> molecularMass;
 
         try {
@@ -47,14 +47,14 @@ class MolecularMassService {
                 molecularMass = Optional.ofNullable(molecularMassResult.getMolecularMass());
             else {
                 String errorMessage = molecularMassResult.getError();
-                errorService.log("Couldn't calculate: " + formula, errorMessage, this.getClass());
+                errorService.log("Couldn't calculate: " + formula, errorMessage, getClass());
                 molecularMass = Optional.empty();
             }
         } catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", formula, this.getClass());
+            errorService.log("StackOverflow error", formula, getClass());
             molecularMass = Optional.empty();
         } catch (Exception exception) {
-            errorService.log("Exception calculating: " + formula, exception.toString(), this.getClass());
+            errorService.log("Exception calculating: " + formula, exception.toString(), getClass());
             molecularMass = Optional.empty();
         }
 
@@ -63,7 +63,7 @@ class MolecularMassService {
 
     // Client:
 
-    protected MolecularMassResult tryMolecularMassResult(String query) {
+    MolecularMassResult tryCalculate(String query) {
         MolecularMassResult molecularMassResult;
 
         try {
@@ -73,16 +73,16 @@ class MolecularMassService {
                 logger.warn("Couldn't calculate \"" + query + "\". " + "RETURN: " + molecularMassResult.getError());
         }
         catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", query, this.getClass());
+            errorService.log("StackOverflow error", query, getClass());
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
         }
         catch(Exception exception) {
-            errorService.log("Exception calculating: " + query, exception.toString(), this.getClass());
+            errorService.log("Exception calculating: " + query, exception.toString(), getClass());
             molecularMassResult = new MolecularMassResult("");
         }
 
         if(!molecularMassResult.isPresent())
-            notFoundQueryService.log(query, this.getClass());
+            notFoundQueryService.log(query, getClass());
 
         metricsService.molecularMassSearched(molecularMassResult.isPresent());
 
@@ -91,10 +91,11 @@ class MolecularMassService {
 
     // Private:
 
-    private MolecularMassResult calculate(String formula) { // TODO translate
+    private MolecularMassResult calculate(String formula) { // TODO translate code
         // Se comprueba si tiene aspecto de fórmula:
         String adapted = formula.replaceAll("[≡=-]", ""); // Bonds
 
+        // TODO constant:
         Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?" +
                 "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more TODO constant
 
@@ -136,7 +137,7 @@ class MolecularMassService {
         return new MolecularMassResult(molecularMass, elementToGrams, elementToMoles.get());
     }
 
-    private Optional<Map<String, Integer>> getElementToMolesIn(String formula) {
+    private Optional<Map<String, Integer>> getElementToMolesIn(String formula) { // TODO translate and improve code
         Optional<Map<String, Integer>> resultado;
 
         // Separa las fórmulas anidadas entre paréntesis:
@@ -230,9 +231,9 @@ class MolecularMassService {
             map.replace(key, found + value); // It was present, values are added
         else map.put(key, value); // New element
     }
-    
+
     private Optional<Float> getMolecularMassOf(String symbol) {
         return elementService.searchBySymbol(symbol).map(ElementModel::getMolecularMass);
     }
-    
+
 }

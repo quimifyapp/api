@@ -2,7 +2,7 @@ package com.quimify.api.element;
 
 import javax.persistence.*;
 
-// Esta clase representa los elementos químicos de la tabla periódica.
+// Esta clase representa los elementos químicos de la tabla periódica. TODO translate comments
 
 @Entity // Es un modelo real
 @Table(name = "element")
@@ -20,31 +20,29 @@ class ElementModel {
     @Column(nullable = false)
     private Float molecularMass;  // 24.305 (g / mol)
 
-    // --------------------------------------------------------------------------------
-
     // Getters y setters:
 
-    protected Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    protected String getSymbol() {
+    String getSymbol() {
         return symbol;
     }
 
-    protected void setSymbol(String simbolo) {
-        this.symbol = simbolo;
+    void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public float getMolecularMass() {
         return molecularMass;
     }
 
-    protected void setMolecularMass(float masa) {
+    void setMolecularMass(float masa) {
         this.molecularMass = masa;
     }
 }

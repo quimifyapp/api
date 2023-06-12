@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/molecular-mass")
 class MolecularMassController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    MolecularMassService molecularMassService; // Molecular masses logic
+    MolecularMassService molecularMassService;
 
     // Constants:
 
@@ -23,8 +23,8 @@ class MolecularMassController {
     // Client:
 
     @GetMapping()
-    protected MolecularMassResult calculate(@RequestParam("formula") String formula) {
-        MolecularMassResult molecularMassResult = molecularMassService.tryMolecularMassResult(formula);
+    MolecularMassResult calculate(@RequestParam("formula") String formula) {
+        MolecularMassResult molecularMassResult = molecularMassService.tryCalculate(formula);
 
         if(molecularMassResult.isPresent())
             logger.info(String.format(getMolecularMassMessage, formula, molecularMassResult.getMolecularMass()));

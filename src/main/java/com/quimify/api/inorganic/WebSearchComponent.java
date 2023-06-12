@@ -11,33 +11,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 // This class runs web searches through Google's and Bing's API.
 
 @Component
-@Scope("prototype")
+@Scope("prototype") // TODO reconsider and return a result
 class WebSearchComponent {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    SettingsService settingsService; // Settings logic
+    SettingsService settingsService;
 
     @Autowired
-    MetricsService metricsService; // Daily metrics logic
+    MetricsService metricsService;
 
     @Autowired
-    ErrorService errorService; // API errors logic
+    ErrorService errorService;
 
     private String title;
     private String address;
 
     // Internal:
 
-    protected boolean search(String input) {
+    boolean search(String input) {
         this.title = null;
         this.address = null;
+
+        // TODO re-order: Free bing > Google
 
         boolean searchDone = false;
 
@@ -55,27 +55,29 @@ class WebSearchComponent {
         }
 
         return title != null && address != null;
+
+        // logger.warn("Couldn't find inorganic \"" + input + "\" in the web."); TODO
     }
 
     // Private:
 
     private boolean canGoogleSearch() {
-        if (!settingsService.getGoogleON())
+        if (!settingsService.getUseGoogle())
             return false;
 
         int queries = metricsService.getGoogleQueries();
 
-        if (queries == settingsService.getGoogleLimit() - 1)
+        if (queries == settingsService.getGoogleDailyLimit() - 1)
             logger.warn("Daily Google queries have been exceeded.");
 
-        return queries < settingsService.getGoogleLimit();
+        return queries < settingsService.getGoogleDailyLimit();
     }
 
-    protected boolean googleSearch(String input) {
+    boolean googleSearch(String input) {
         boolean searched;
 
         try {
-            Connection connection = new Connection(settingsService.getGoogleURL(), input);
+            Connection connection = new Connection(settingsService.getGoogleUrl(), input);
             connection.setProperty("Accept", "application/json");
             JSONObject response = new JSONObject(connection.getText());
 
@@ -86,8 +88,7 @@ class WebSearchComponent {
                 address = result.getString("formattedUrl");
 
                 metricsService.googleSearchFound();
-            }
-            else {
+            } else {
                 logger.warn("Couldn't find \"" + input + "\" on Google.");
                 metricsService.googleSearchNotFound();
             }
@@ -95,8 +96,8 @@ class WebSearchComponent {
             searched = true;
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
-                logger.warn("Got HTTP code 403 from Google");
-            else errorService.log("IOException Google: " + input, exception.toString(), this.getClass());
+                logger.warn("Got HTTP code 429 from Google (probably limit exceeded).");
+            else errorService.log("Exception Google: " + input, exception.toString(), getClass());
 
             searched = false;
         }
@@ -105,26 +106,26 @@ class WebSearchComponent {
     }
 
     private boolean canFreeBingSearch() {
-        return settingsService.getFreeBingON();
+        return settingsService.getUseFreeBing();
     }
 
     private boolean canPaidBingSearch() {
-        if (!settingsService.getPaidBingON())
+        if (!settingsService.getUsePaidBing())
             return false;
 
         int queries = metricsService.getPaidBingQueries();
 
-        if (queries == settingsService.getPaidBingLimit() - 1)
+        if (queries == settingsService.getPaidBingDailyLimit() - 1)
             logger.warn("Daily paid Bing queries have been exceeded.");
 
-        return queries < settingsService.getPaidBingLimit();
+        return queries < settingsService.getPaidBingDailyLimit();
     }
 
     private boolean bingSearch(String input, String apiKey, String apiName) {
         boolean searched;
 
         try {
-            Connection connection = new Connection(settingsService.getBingURL(), input);
+            Connection connection = new Connection(settingsService.getBingUrl(), input);
             connection.setProperty("Ocp-Apim-Subscription-Key", apiKey);
             JSONObject response = new JSONObject(connection.getText());
 
@@ -135,21 +136,17 @@ class WebSearchComponent {
                 address = result.getString("url");
 
                 metricsService.bingSearchFound();
-            }
-            else {
+            } else {
                 logger.warn("Couldn't find \"" + input + "\" on " + apiName);
                 metricsService.bingSearchNotFound();
             }
 
             searched = true;
-        } catch (IOException exception) {
-            if (exception.toString().contains("HTTP response code: 403"))
-                logger.warn("Got HTTP code 403 from " + apiName);
-            else errorService.log("IOException " + apiName + ": " + input, exception.toString(), this.getClass());
-
-            searched = false;
         } catch (Exception exception) {
-            errorService.log("Exception " + apiName + ": " + input, exception.toString(), this.getClass());
+            if (exception.toString().contains("HTTP response code: 403"))
+                // TODO count monthly metrics
+                logger.warn("Got HTTP code 403 from " + apiName + "(probably limit exceeded).");
+            else errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
 
             searched = false;
         }
@@ -159,11 +156,11 @@ class WebSearchComponent {
 
     // Getters:
 
-    protected String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    protected String getAddress() {
+    String getAddress() {
         return address;
     }
 
