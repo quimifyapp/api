@@ -127,6 +127,7 @@ public class InorganicService {
     }
 
     String complete(String input) {
+        // TODO do quick corrections to input
         return completionComponent.tryComplete(input);
     }
 

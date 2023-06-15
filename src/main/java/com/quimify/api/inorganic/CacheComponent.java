@@ -27,23 +27,31 @@ class CacheComponent {
     @Autowired
     ErrorService errorService; // API errors logic
 
-    private final Map<String, Integer> normalizedTextToId = new LinkedHashMap<>(); // Main cache
+    private final Map<String, Integer> cache = new LinkedHashMap<>(); // Ordered by searches
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Avoids reading main cache while writing
-    private Map<String, Integer> shadowNormalizedTextToId; // Secondary cache to be read when main one is being written
+    private Map<String, Integer> shadowCache; // Read while main one is being modified
 
     // Updating:
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000) // At startup, then once every 5 minutes
+    @Scheduled(fixedDelay = 5 * 60 * 1000) // It's called at startup too
     private void tryUpdateCache() {
         try {
-            shadowNormalizedTextToId = new LinkedHashMap<>(normalizedTextToId);
+            shadowCache = new LinkedHashMap<>(cache);
             readWriteLock.writeLock().lock();
 
-            normalizedTextToId.clear();
-            // TODO add all search tags at the end?
-            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc())
+            cache.clear();
+
+            Map<String, Integer> searchTagsCache = new LinkedHashMap<>();
+
+            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc()) {
                 add(inorganicModel);
+
+                for (String normalizedText : inorganicModel.getSearchTags())
+                    searchTagsCache.put(normalizedText, inorganicModel.getId()); // Already normalized
+            }
+
+            cache.putAll(searchTagsCache); // Search tags go at the end
 
             logger.info("Inorganic cache updated.");
         } catch (Exception exception) {
@@ -63,18 +71,13 @@ class CacheComponent {
         addNormalized(inorganicModel.getSystematicName(), id);
         addNormalized(inorganicModel.getTraditionalName(), id);
         addNormalized(inorganicModel.getCommonName(), id);
-
-        // Search tags (already normalized):
-
-        for (String normalizedText : inorganicModel.getSearchTags())
-            normalizedTextToId.put(normalizedText, id);
     }
 
     Optional<Integer> find(String normalizedInput) {
         if (!readWriteLock.readLock().tryLock())
-            return findIn(normalizedInput, shadowNormalizedTextToId); // Main one is being written
+            return findIn(normalizedInput, shadowCache); // Main one is being written
         try {
-            return findIn(normalizedInput, normalizedTextToId);
+            return findIn(normalizedInput, cache);
         } finally {
             readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
         }
@@ -82,10 +85,10 @@ class CacheComponent {
 
     Optional<Integer> findStartingWith(String normalizedInput) {
         if (!readWriteLock.readLock().tryLock())
-            return findStartingWithIn(normalizedInput, shadowNormalizedTextToId); // Main one is being written
+            return findStartingWithIn(normalizedInput, shadowCache); // Main one is being written
 
         try {
-            return findStartingWithIn(normalizedInput, normalizedTextToId);
+            return findStartingWithIn(normalizedInput, cache);
         } finally {
             readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
         }
@@ -95,7 +98,7 @@ class CacheComponent {
 
     private void addNormalized(String text, Integer id) {
         if (text != null)
-            normalizedTextToId.put(Normalizer.get(text), id);
+            cache.put(Normalizer.get(text), id);
     }
 
     private Optional<Integer> findIn(String normalizedInput, Map<String, Integer> cache) {
