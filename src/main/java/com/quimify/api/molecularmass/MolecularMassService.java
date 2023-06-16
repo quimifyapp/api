@@ -43,18 +43,18 @@ class MolecularMassService {
         try {
             MolecularMassResult molecularMassResult = calculate(formula);
 
-            if(molecularMassResult.isPresent())
+            if (molecularMassResult.isPresent())
                 molecularMass = Optional.ofNullable(molecularMassResult.getMolecularMass());
             else {
                 String errorMessage = molecularMassResult.getError();
                 errorService.log("Couldn't calculate: " + formula, errorMessage, getClass());
                 molecularMass = Optional.empty();
             }
-        } catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", formula, getClass());
-            molecularMass = Optional.empty();
         } catch (Exception exception) {
             errorService.log("Exception calculating: " + formula, exception.toString(), getClass());
+            molecularMass = Optional.empty();
+        } catch (StackOverflowError error) {
+            errorService.log("StackOverflow error", formula, getClass());
             molecularMass = Optional.empty();
         }
 
@@ -71,17 +71,15 @@ class MolecularMassService {
 
             if (!molecularMassResult.isPresent())
                 logger.warn("Couldn't calculate \"" + query + "\". " + "RETURN: " + molecularMassResult.getError());
-        }
-        catch (StackOverflowError error) {
+        } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", query, getClass());
             molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
-        }
-        catch(Exception exception) {
+        } catch (Exception exception) {
             errorService.log("Exception calculating: " + query, exception.toString(), getClass());
             molecularMassResult = new MolecularMassResult("");
         }
 
-        if(!molecularMassResult.isPresent())
+        if (!molecularMassResult.isPresent())
             notFoundQueryService.log(query, getClass());
 
         metricsService.molecularMassSearched(molecularMassResult.isPresent());
@@ -145,11 +143,11 @@ class MolecularMassService {
         int balance = 0;
         Map<String, Integer> anidada_a_moles = new HashMap<>();
 
-        for(int i = 0, parentesis = 0; i < formula.length(); i++) {
-            if(formula.charAt(i) == ')') {
+        for (int i = 0, parentesis = 0; i < formula.length(); i++) {
+            if (formula.charAt(i) == ')') {
                 balance -= 1;
 
-                if(balance == 0) { // Implica que hay '(' antes
+                if (balance == 0) { // Implica que hay '(' antes
                     StringBuilder anidada = new StringBuilder(formula.substring(parentesis + 1, i));
 
                     // Se procesan los cuantificadores:
@@ -157,7 +155,7 @@ class MolecularMassService {
                     i += 1; // Lo siguiente tras el último paréntesis
 
                     int moles;
-                    if(i < formula.length()) {
+                    if (i < formula.length()) {
                         String digitos = formula.substring(i);
                         Matcher matcher = Pattern.compile("^(\\d+)").matcher(digitos);
                         if (matcher.find()) {
@@ -175,12 +173,10 @@ class MolecularMassService {
                     String closedNested = "(" + anidada + ")" + (moles != 1 ? moles : "");
                     formula = formula.replaceFirst(Pattern.quote(closedNested), "");
                     i = parentesis - 1; // Continúa donde estaba el primer paréntesis (luego se incrementa en 1)
-                }
-                else if(balance < 0)
+                } else if (balance < 0)
                     return Optional.empty();
-            }
-            else if(formula.charAt(i) == '(') {
-                if(balance == 0)
+            } else if (formula.charAt(i) == '(') {
+                if (balance == 0)
                     parentesis = i;
 
                 balance += 1;
@@ -191,24 +187,24 @@ class MolecularMassService {
 
         Map<String, Integer> elemento_a_moles = new HashMap<>();
 
-        for(Map.Entry<String, Integer> anidada : anidada_a_moles.entrySet()) {
+        for (Map.Entry<String, Integer> anidada : anidada_a_moles.entrySet()) {
             Optional<Map<String, Integer>> anidados = getElementToMolesIn(anidada.getKey());
 
-            if(anidados.isPresent())
-                for(Map.Entry<String, Integer> elemento : anidados.get().entrySet())
+            if (anidados.isPresent())
+                for (Map.Entry<String, Integer> elemento : anidados.get().entrySet())
                     addInMap(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
             else return Optional.empty();
         }
 
         // Procesa lo que no va entre paréntesis:
 
-        if(balance == 0 && !(formula.contains("(") || formula.contains(")"))) { // No queda ningún paréntesis suelto
-            if(!formula.equals("")) { // Puede pasar con fórmulas como "(NaCl)3" -> "()3"
+        if (balance == 0 && !(formula.contains("(") || formula.contains(")"))) { // No queda ningún paréntesis suelto
+            if (!formula.equals("")) { // Puede pasar con fórmulas como "(NaCl)3" -> "()3"
                 String[] partes = formula.split("(?=[A-Z])"); // "Aa11Bb22" -> ("Aa11", "Bb22")
 
                 // Se registran los elementos y sus moles:
 
-                for(String parte : partes) {
+                for (String parte : partes) {
                     String simbolo = parte.replaceAll("\\d", "");
                     String digitos = parte.replaceAll("[A-Za-z]", "");
                     int moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
@@ -218,8 +214,7 @@ class MolecularMassService {
             }
 
             resultado = Optional.of(elemento_a_moles);
-        }
-        else resultado = Optional.empty();
+        } else resultado = Optional.empty();
 
         return resultado;
     }
@@ -227,7 +222,7 @@ class MolecularMassService {
     private void addInMap(String key, Integer value, Map<String, Integer> map) {
         Integer found = map.get(key);
 
-        if(found != null)
+        if (found != null)
             map.replace(key, found + value); // It was present, values are added
         else map.put(key, value); // New element
     }
