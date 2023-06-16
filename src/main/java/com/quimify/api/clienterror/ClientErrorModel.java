@@ -19,7 +19,7 @@ class ClientErrorModel {
     @Column(nullable = false)
     private String context;
 
-    @Lob // Large objects
+    @Lob // Large object in DB
     @Column(nullable = false)
     private String details;
     @Column(nullable = false)

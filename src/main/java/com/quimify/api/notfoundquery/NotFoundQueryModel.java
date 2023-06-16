@@ -15,7 +15,7 @@ class NotFoundQueryModel {
     @Column(unique = true, nullable = false)
     private Integer id;
 
-    @Lob // Large objects
+    @Lob // Large object in DB
     @Column(nullable = false)
     private String query;
 

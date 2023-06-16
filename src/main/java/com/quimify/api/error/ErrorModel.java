@@ -17,11 +17,11 @@ class ErrorModel {
     @Column(nullable = false)
     private Timestamp dateAndTime;
 
-    @Lob // Large objects
+    @Lob // Large object in DB
     @Column(nullable = false)
     private String title;
 
-    @Lob // Large objects
+    @Lob // Large object in DB
     @Column(nullable = false)
     private String details;
 
