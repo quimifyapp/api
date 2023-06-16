@@ -17,10 +17,13 @@ import java.util.*;
 
 // This class implements the logic behind HTTP methods in "/inorganic".
 
+// TODO testear A FONDO los cambios antes de commit (apis web, settings, metrics...) y
+// TODO resolver los otros TODO
+
 @Service
 public class InorganicService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     InorganicRepository inorganicRepository; // DB connection
@@ -88,15 +91,15 @@ public class InorganicService {
         return enrichedSearch(input);
     }
 
-    InorganicResult enrichedSearch(String input) {
-        if (!webSearchComponent.search(input)) {
-            logger.warn("Couldn't find inorganic \"" + input + "\".");
+    InorganicResult enrichedSearch(String input) { // TODO break in different methods
+        Optional<WebSearchResult> webSearchResult = webSearchComponent.search(input);
+
+        if (webSearchResult.isEmpty())
             return InorganicResult.notFound();
-        }
 
         // Check if it was already in the DB:
 
-        String[] words = webSearchComponent.getTitle().trim().split("\\s+");
+        String[] words = webSearchResult.get().getTitle().trim().split("\\s+");
         String firstWord = words[0];
 
         if (firstWord.equals("ácido"))
@@ -107,10 +110,10 @@ public class InorganicService {
             logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInMemory.get());
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
         }
-// TODO a separate method from here
+
         // Parse the inorganic:
 
-        Optional<InorganicModel> parsedInorganic = tryParseWeb(webSearchComponent.getAddress());
+        Optional<InorganicModel> parsedInorganic = tryParseWeb(webSearchResult.get().getAddress());
 
         if (parsedInorganic.isEmpty())
             return InorganicResult.notFound();
@@ -127,7 +130,7 @@ public class InorganicService {
     }
 
     String complete(String input) {
-        // TODO do quick corrections to input
+        // TODO do quick corrections & common errors to input
         return completionComponent.tryComplete(input);
     }
 
@@ -135,6 +138,7 @@ public class InorganicService {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = fetch(completion);
+
         if (searchedInMemory.isPresent())
             inorganicResult = new InorganicResult(searchedInMemory.get());
         else {
@@ -142,7 +146,7 @@ public class InorganicService {
             inorganicResult = InorganicResult.notFound();
         }
 
-        metricsService.inorganicAutocompleted();
+        metricsService.inorganicCompleted();
         metricsService.inorganicSearched(inorganicResult.isFound());
 
         return inorganicResult;
@@ -158,10 +162,9 @@ public class InorganicService {
 
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id.get());
 
-        if (inorganicModel.isEmpty()) {
-            logger.warn("Discrepancy between DB and cached ID: " + id);
-            return Optional.empty();
-        }
+        if (inorganicModel.isPresent())
+            inorganicModel.get().incrementSearches();
+        else logger.warn("Discrepancy between DB and cached ID: " + id.get());
 
         return inorganicModel;
     }
@@ -174,7 +177,7 @@ public class InorganicService {
             logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
             return Optional.empty();
         } catch (Exception exception) {
-            errorService.log("Exception parsing FQPage: " + url, exception.toString(), this.getClass());
+            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
             return Optional.empty();
         }
     }

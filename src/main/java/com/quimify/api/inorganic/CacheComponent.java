@@ -44,7 +44,7 @@ class CacheComponent {
 
             Map<String, Integer> searchTagsCache = new LinkedHashMap<>();
 
-            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchCountDesc()) {
+            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc()) {
                 add(inorganicModel);
 
                 for (String normalizedText : inorganicModel.getSearchTags())

@@ -22,13 +22,13 @@ public class Connection {
     }
 
     public Connection(String url, String parameter) throws IOException {
-        this.httpURLConnection = (HttpURLConnection) new URL(url + encodeForUrl(parameter)).openConnection();
+        this.httpURLConnection = (HttpURLConnection) new URL(url + encode(parameter)).openConnection();
         this.httpURLConnection.setRequestMethod("GET");
     }
 
     // Queries:
 
-    public void setProperty(String key, String value) {
+    public void setRequestProperty(String key, String value) {
         httpURLConnection.setRequestProperty(key, value);
     }
 
@@ -41,6 +41,7 @@ public class Connection {
             text.append(line);
 
         download.close();
+
         httpURLConnection.disconnect();
 
         return text.toString();
@@ -48,7 +49,7 @@ public class Connection {
 
     // Static:
 
-    public static String encodeForUrl(String input) {
+    public static String encode(String input) {
         return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 

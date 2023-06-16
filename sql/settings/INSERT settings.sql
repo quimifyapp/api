@@ -1,18 +1,16 @@
 INSERT INTO settings(version,
+use_free_bing, free_bing_daily_limit,
 use_google, google_daily_limit,
-use_free_bing,
-use_paid_bing, paid_bing_daily_limit,
+free_bing_url,
 google_url,
-bing_url,
-free_bing_key, 
-paid_bing_key,
-user_agent)
+classifier_url,
+user_agent
+)
 VALUES(5, # Versión
+true, 33, # Free Bing
 true, 100, # Google
-true, # Free Bing
-false, 0, # Paid Bing
-, # Google URL
-, # Bing URL
-, # Free Bing key
-, # Paid Bing key
-"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.147 Safari/537.36") # User agent
+"https://api.bing.microsoft.com/v7.0/search?count=1&q=site:www.formulacionquimica.com+", # Free Bing URL
+"https://www.googleapis.com/customsearch/v1/siterestrict?key=%s&cx=f475470fccb0e037e&num=1&q=", # Google URL
+"http://localhost:8000", # Classifier URL
+"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.147 Safari/537.36" # User agent
+)

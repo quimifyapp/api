@@ -8,13 +8,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 // This class runs web searches through Google's and Bing's API.
 
 @Component
-@Scope("prototype") // TODO reconsider and return a result
 class WebSearchComponent {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -28,140 +28,107 @@ class WebSearchComponent {
     @Autowired
     ErrorService errorService;
 
-    private String title;
-    private String address;
-
     // Internal:
 
-    boolean search(String input) {
-        this.title = null;
-        this.address = null;
+    Optional<WebSearchResult> search(String input) {
+        Optional<WebSearchResult> result = Optional.empty();
 
-        // TODO re-order: Free bing > Google
+        if (canFreeBingSearch())
+            result = freeBingSearch(input);
 
-        boolean searchDone = false;
+        if (result.isEmpty() && canGoogleSearch())
+            result = googleSearch(input);
 
-        if (canGoogleSearch())
-            searchDone = googleSearch(input);
+        if (result.isEmpty())
+            logger.warn("Couldn't find inorganic \"" + input + "\" on the web.");
 
-        if (!searchDone && canFreeBingSearch())
-            searchDone = bingSearch(input, settingsService.getFreeBingKey(), "free Bing");
-
-        if (!searchDone && canPaidBingSearch()) {
-            searchDone = bingSearch(input, settingsService.getPaidBingKey(), "paid Bing");
-
-            if (searchDone)
-                metricsService.paidBingQuery();
-        }
-
-        return title != null && address != null;
-
-        // logger.warn("Couldn't find inorganic \"" + input + "\" in the web."); TODO
+        return result;
     }
 
     // Private:
+
+    private boolean canFreeBingSearch() {
+        if (!settingsService.getUseFreeBing())
+            return false;
+
+        int queries = metricsService.getFreeBingQueries();
+        int dailyLimit = settingsService.getFreeBingDailyLimit();
+
+        if (queries == dailyLimit - 1)
+            logger.warn("Daily free Bing queries have just been exceeded.");
+
+        return queries < dailyLimit;
+    }
+
+    private Optional<WebSearchResult> freeBingSearch(String input) {
+        Optional<WebSearchResult> result = Optional.empty();
+
+        try {
+            Connection connection = new Connection(settingsService.getFreeBingUrl(), input);
+            connection.setRequestProperty("Ocp-Apim-Subscription-Key", settingsService.getFreeBingKey());
+            JSONObject response = new JSONObject(connection.getText());
+
+            if (response.has("webPages")) {
+                JSONObject firstResult = response.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
+
+                String title = firstResult.getString("name");
+                String address = firstResult.getString("url");
+
+                result = Optional.of(new WebSearchResult(title, address));
+            }
+            else logger.warn("Couldn't find \"" + input + "\" on free Bing");
+
+            metricsService.freeBingSearched(result.isPresent());
+        } catch (Exception exception) {
+            if (exception.toString().contains("HTTP response code: 403"))
+                logger.warn("Got HTTP code 403 from free Bing (probably limit exceeded).");
+            else errorService.log("Exception free Bing: " + input, exception.toString(), getClass());
+        }
+
+        return result;
+    }
 
     private boolean canGoogleSearch() {
         if (!settingsService.getUseGoogle())
             return false;
 
         int queries = metricsService.getGoogleQueries();
+        int dailyLimit = settingsService.getGoogleDailyLimit();
 
-        if (queries == settingsService.getGoogleDailyLimit() - 1)
-            logger.warn("Daily Google queries have been exceeded.");
+        if (queries == dailyLimit - 1)
+            logger.warn("Daily Google queries have just been exceeded.");
 
-        return queries < settingsService.getGoogleDailyLimit();
+        return queries < dailyLimit;
     }
 
-    boolean googleSearch(String input) {
-        boolean searched;
+    private Optional<WebSearchResult> googleSearch(String input) {
+        Optional<WebSearchResult> result = Optional.empty();
 
         try {
-            Connection connection = new Connection(settingsService.getGoogleUrl(), input);
-            connection.setProperty("Accept", "application/json");
+            String url = String.format(settingsService.getGoogleUrl(), settingsService.getGoogleKey());
+
+            Connection connection = new Connection(url, input);
+            connection.setRequestProperty("Accept", "application/json");
             JSONObject response = new JSONObject(connection.getText());
 
             if (response.getJSONObject("searchInformation").getInt("totalResults") > 0) {
-                JSONObject result = response.getJSONArray("items").getJSONObject(0);
+                JSONObject firstResult = response.getJSONArray("items").getJSONObject(0);
 
-                title = result.getString("title");
-                address = result.getString("formattedUrl");
+                String title = firstResult.getString("title");
+                String address = firstResult.getString("formattedUrl");
 
-                metricsService.googleSearchFound();
-            } else {
-                logger.warn("Couldn't find \"" + input + "\" on Google.");
-                metricsService.googleSearchNotFound();
+                result = Optional.of(new WebSearchResult(title, address));
             }
+            else logger.warn("Couldn't find \"" + input + "\" on Google.");
 
-            searched = true;
+            metricsService.googleSearched(result.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Got HTTP code 429 from Google (probably limit exceeded).");
             else errorService.log("Exception Google: " + input, exception.toString(), getClass());
-
-            searched = false;
         }
 
-        return searched;
-    }
-
-    private boolean canFreeBingSearch() {
-        return settingsService.getUseFreeBing();
-    }
-
-    private boolean canPaidBingSearch() {
-        if (!settingsService.getUsePaidBing())
-            return false;
-
-        int queries = metricsService.getPaidBingQueries();
-
-        if (queries == settingsService.getPaidBingDailyLimit() - 1)
-            logger.warn("Daily paid Bing queries have been exceeded.");
-
-        return queries < settingsService.getPaidBingDailyLimit();
-    }
-
-    private boolean bingSearch(String input, String apiKey, String apiName) {
-        boolean searched;
-
-        try {
-            Connection connection = new Connection(settingsService.getBingUrl(), input);
-            connection.setProperty("Ocp-Apim-Subscription-Key", apiKey);
-            JSONObject response = new JSONObject(connection.getText());
-
-            if (response.has("webPages")) {
-                JSONObject result = response.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
-
-                title = result.getString("name");
-                address = result.getString("url");
-
-                metricsService.bingSearchFound();
-            } else {
-                logger.warn("Couldn't find \"" + input + "\" on " + apiName);
-                metricsService.bingSearchNotFound();
-            }
-
-            searched = true;
-        } catch (Exception exception) {
-            if (exception.toString().contains("HTTP response code: 403"))
-                // TODO count monthly metrics
-                logger.warn("Got HTTP code 403 from " + apiName + "(probably limit exceeded).");
-            else errorService.log("Exception " + apiName + ": " + input, exception.toString(), getClass());
-
-            searched = false;
-        }
-
-        return searched;
-    }
-
-    // Getters:
-
-    String getTitle() {
-        return title;
-    }
-
-    String getAddress() {
-        return address;
+        return result;
     }
 
 }

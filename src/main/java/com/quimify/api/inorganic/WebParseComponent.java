@@ -65,7 +65,7 @@ class WebParseComponent {
             throw new IllegalArgumentException("Invalid subdirectory.");
 
         Connection connection = new Connection(url);
-        connection.setProperty("User-Agent", settingsService.getUserAgent());
+        connection.setRequestProperty("User-Agent", settingsService.getUserAgent());
 
         htmlDocument = connection.getText();
 
@@ -143,7 +143,7 @@ class WebParseComponent {
         setNameSearchTag(parsedInorganic.getTraditionalName());
     }
 
-    private void setNameSearchTag(String name) {
+    private void setNameSearchTag(String name) { // TODO remove
         if (name != null && name.contains("ácido")) // TODO "zinc", in corrections not in search tags
             parsedInorganic.addSearchTag(name.replace("ácido ", ""));
     }

@@ -16,25 +16,22 @@ class SettingsModel {
     // External API settings:
 
     @Column(nullable = false)
+    private Boolean useFreeBing;
+    @Column(nullable = false)
+    private Integer freeBingDailyLimit;
+
+    @Column(nullable = false)
     private Boolean useGoogle;
     @Column(nullable = false)
     private Integer googleDailyLimit;
 
-    @Column(nullable = false)
-    private Boolean useFreeBing;
-
-    @Column(nullable = false)
-    private Boolean usePaidBing;
-    @Column(nullable = false)
-    private Integer paidBingDailyLimit;
-
     // URLs:
 
     @Column(nullable = false)
-    private String googleUrl;
+    private String freeBingUrl;
 
     @Column(nullable = false)
-    private String bingUrl;
+    private String googleUrl;
 
     @Column(nullable = false)
     private String classifierUrl;
@@ -42,85 +39,77 @@ class SettingsModel {
     @Column(nullable = false)
     private String userAgent; // For web scrapping
 
-    // Getters & setters:
+    // Getters and setters:
 
-    Integer getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    void setVersion(Integer version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 
-    Boolean getUseGoogle() {
-        return useGoogle;
-    }
-
-    void setUseGoogle(Boolean useGoogle) {
-        this.useGoogle = useGoogle;
-    }
-
-    Integer getGoogleDailyLimit() {
-        return googleDailyLimit;
-    }
-
-    void setGoogleDailyLimit(Integer googleDailyLimit) {
-        this.googleDailyLimit = googleDailyLimit;
-    }
-
-    Boolean getUseFreeBing() {
+    public Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
-    void setUseFreeBing(Boolean useFreeBing) {
+    public void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
     }
 
-    Boolean getUsePaidBing() {
-        return usePaidBing;
+    public Integer getFreeBingDailyLimit() {
+        return freeBingDailyLimit;
     }
 
-    void setUsePaidBing(Boolean usePaidBing) {
-        this.usePaidBing = usePaidBing;
+    public void setFreeBingDailyLimit(Integer freeBingDailyLimit) {
+        this.freeBingDailyLimit = freeBingDailyLimit;
     }
 
-    Integer getPaidBingDailyLimit() {
-        return paidBingDailyLimit;
+    public Boolean getUseGoogle() {
+        return useGoogle;
     }
 
-    void setPaidBingDailyLimit(Integer paidBingDailyLimit) {
-        this.paidBingDailyLimit = paidBingDailyLimit;
+    public void setUseGoogle(Boolean useGoogle) {
+        this.useGoogle = useGoogle;
     }
 
-    String getGoogleUrl() {
+    public Integer getGoogleDailyLimit() {
+        return googleDailyLimit;
+    }
+
+    public void setGoogleDailyLimit(Integer googleDailyLimit) {
+        this.googleDailyLimit = googleDailyLimit;
+    }
+
+    public String getFreeBingUrl() {
+        return freeBingUrl;
+    }
+
+    public void setFreeBingUrl(String freeBingUrl) {
+        this.freeBingUrl = freeBingUrl;
+    }
+
+    public String getGoogleUrl() {
         return googleUrl;
     }
 
-    void setGoogleUrl(String googleUrl) {
+    public void setGoogleUrl(String googleUrl) {
         this.googleUrl = googleUrl;
     }
 
-    String getBingUrl() {
-        return bingUrl;
-    }
-
-    void setBingUrl(String bingUrl) {
-        this.bingUrl = bingUrl;
-    }
-
-    String getClassifierUrl() {
+    public String getClassifierUrl() {
         return classifierUrl;
     }
 
-    void setClassifierUrl(String classifierUrl) {
+    public void setClassifierUrl(String classifierUrl) {
         this.classifierUrl = classifierUrl;
     }
 
-    String getUserAgent() {
+    public String getUserAgent() {
         return userAgent;
     }
 
-    void setUserAgent(String userAgent) {
+    public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 

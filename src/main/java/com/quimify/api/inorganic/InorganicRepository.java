@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 interface InorganicRepository extends CrudRepository<InorganicModel, Integer> {
 
-    List<InorganicModel> findAllByOrderBySearchCountDesc();
+    List<InorganicModel> findAllByOrderBySearchesDesc();
 
 }

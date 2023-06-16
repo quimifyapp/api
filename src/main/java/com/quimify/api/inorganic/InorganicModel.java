@@ -1,7 +1,5 @@
 package com.quimify.api.inorganic;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +37,7 @@ class InorganicModel {
     // With default value:
 
     @Column(columnDefinition = "INT default 1", nullable = false)
-    private Integer searchCount = 1;
+    private Integer searches = 1;
 
     // Typed 'String' because no calculations will be performed:
 
@@ -50,21 +48,18 @@ class InorganicModel {
 
     // Modifiers:
 
-    @Transactional
-    void addSearchTag(String text) {
+    void addSearchTag(String text) { // TODO remove
         inorganicSearchTags.add(new InorganicSearchTagModel(text));
     }
 
-    // TODO unused. Be used!
-    @Transactional // TODO transactional here?
-    void countSearch() {
-        searchCount++; // TODO rename to 'searches'?
+    void incrementSearches() {
+        searches++;
     }
 
     // Queries:
 
-    Set<String> getSearchTags() {
-        return inorganicSearchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toSet());
+    List<String> getSearchTags() {
+        return inorganicSearchTags.stream().map(InorganicSearchTagModel::getNormalizedTag).collect(Collectors.toList());
     }
 
     @Override
@@ -142,12 +137,12 @@ class InorganicModel {
         this.inorganicSearchTags = inorganicSearchTags;
     }
 
-    Integer getSearchCount() {
-        return searchCount;
+    Integer getSearches() {
+        return searches;
     }
 
-    void setSearchCount(Integer searchCount) {
-        this.searchCount = searchCount;
+    void setSearches(Integer searchCount) {
+        this.searches = searchCount;
     }
 
     String getMolecularMass() {

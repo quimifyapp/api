@@ -41,17 +41,17 @@ class MetricsService {
 
     public Integer getGoogleQueries() {
         MetricsModel todayMetrics = getTodayMetrics();
-
-        return todayMetrics.getGoogleFoundFromText() + todayMetrics.getGoogleNotFoundFromText();
+        return todayMetrics.getGoogleFound() + todayMetrics.getGoogleNotFound();
     }
 
-    public Integer getPaidBingQueries() {
-        return getTodayMetrics().getPaidBingQueries();
+    public Integer getFreeBingQueries() {
+        MetricsModel todayMetrics = getTodayMetrics();
+        return todayMetrics.getFreeBingFound() + todayMetrics.getFreeBingNotFound();
     }
 
     // Incrementers:
 
-    @Transactional // TODO Transactional here?
+    @Transactional
     public void errorOccurred() {
         getTodayMetrics().incrementErrorsOccurred();
     }
@@ -68,49 +68,31 @@ class MetricsService {
 
     @Transactional
     public void clientAccessed(Short platform) {
-        switch (platform) {
-            case AccessDataService.androidPlatform:
-                getTodayMetrics().incrementAndroidAccesses();
-                break;
-            case AccessDataService.iOSPlatform:
-                getTodayMetrics().incrementIOSAccesses();
-                break;
-            case AccessDataService.webPlatform:
-                getTodayMetrics().incrementWebAccesses();
-                break;
-        }
+        if (platform == AccessDataService.androidPlatform)
+            getTodayMetrics().incrementAndroidAccesses();
+        else if (platform == AccessDataService.iosPlatform)
+            getTodayMetrics().incrementIosAccesses();
     }
 
     @Transactional
     public void inorganicSearched(boolean found) {
         if (found)
-            getTodayMetrics().incrementInorganicsFoundFromText();
-        else getTodayMetrics().incrementInorganicsNotFoundFromText();
+            getTodayMetrics().incrementInorganicsFound();
+        else getTodayMetrics().incrementInorganicsNotFound();
     }
 
     @Transactional
-    public void googleSearchFound() {
-        getTodayMetrics().incrementGoogleFoundFromText();
+    public void freeBingSearched(boolean found) {
+        if(found)
+            getTodayMetrics().incrementFreeBingFound();
+        else getTodayMetrics().incrementFreeBingNotFound();
     }
 
     @Transactional
-    public void googleSearchNotFound() {
-        getTodayMetrics().incrementGoogleNotFoundFromText();
-    }
-
-    @Transactional
-    public void bingSearchFound() {
-        getTodayMetrics().incrementBingFoundFromText();
-    }
-
-    @Transactional
-    public void bingSearchNotFound() {
-        getTodayMetrics().incrementBingNotFoundFromText();
-    }
-
-    @Transactional
-    public void paidBingQuery() {
-        getTodayMetrics().incrementPaidBingQueries();
+    public void googleSearched(boolean found) {
+        if(found)
+            getTodayMetrics().incrementGoogleFound();
+        else getTodayMetrics().incrementGoogleNotFound();
     }
 
     @Transactional
@@ -119,15 +101,15 @@ class MetricsService {
     }
 
     @Transactional
-    public void inorganicAutocompleted() { // TODO rename
-        getTodayMetrics().incrementInorganicsAutocompleted();
+    public void inorganicCompleted() {
+        getTodayMetrics().incrementInorganicsCompleted();
     }
 
     @Transactional
     public void organicFromNameSearched(boolean found) {
         if (found)
-            getTodayMetrics().incrementOrganicsFoundFromNameFromText();
-        else getTodayMetrics().incrementOrganicsNotFoundFromNameFromText();
+            getTodayMetrics().incrementOrganicsFoundFromName();
+        else getTodayMetrics().incrementOrganicsNotFoundFromName();
     }
 
     @Transactional

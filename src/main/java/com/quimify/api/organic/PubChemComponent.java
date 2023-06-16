@@ -36,7 +36,7 @@ class PubChemComponent {
     void resolveCompound(String smiles) {
         // Adapted for URLs and PubChem:
         encodedSmiles = smiles.replaceAll("[/\\\\]", ""); // Isomeric (uses dashes) -> canonical
-        encodedSmiles = Connection.encodeForUrl(encodedSmiles); // Escapes special characters
+        encodedSmiles = Connection.encode(encodedSmiles); // Escapes special characters
 
         try {
             compoundId = new Connection(String.format(compoundIdUrl, encodedSmiles)).getText();

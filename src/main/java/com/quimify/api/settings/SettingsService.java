@@ -16,27 +16,20 @@ public class SettingsService {
 
     // Environmental variables:
 
-    @Value("${quimify.api.google.key}")
-    private String googleKey;
-
     @Value("${quimify.api.bing.free.key}")
     private String freeBingKey;
 
-    @Value("${quimify.api.bing.paid.key}")
-    private String paidBingKey;
+    @Value("${quimify.api.google.key}")
+    private String googleKey;
 
     // Secret:
-
-    public String getGoogleUrl() {
-        return String.format(getSettings().getGoogleUrl(), googleKey);
-    }
 
     public String getFreeBingKey() {
         return freeBingKey;
     }
 
-    public String getPaidBingKey() {
-        return paidBingKey;
+    public String getGoogleKey() {
+        return googleKey;
     }
 
     // Private:
@@ -47,28 +40,28 @@ public class SettingsService {
 
     // Trivial:
 
-    public Boolean getUseGoogle() {
-        return getSettings().getUseGoogle();
-    }
-
-    public Integer getGoogleDailyLimit() {
-        return getSettings().getGoogleDailyLimit();
-    }
-
     public Boolean getUseFreeBing() {
         return getSettings().getUseFreeBing();
     }
 
-    public Integer getPaidBingDailyLimit() {
-        return getSettings().getPaidBingDailyLimit();
+    public String getFreeBingUrl() {
+        return getSettings().getFreeBingUrl();
     }
 
-    public Boolean getUsePaidBing() {
-        return getSettings().getUsePaidBing();
+    public Integer getFreeBingDailyLimit() {
+        return getSettings().getFreeBingDailyLimit();
     }
 
-    public String getBingUrl() {
-        return getSettings().getBingUrl();
+    public Boolean getUseGoogle() {
+        return getSettings().getUseGoogle();
+    }
+
+    public String getGoogleUrl() {
+        return getSettings().getGoogleUrl();
+    }
+
+    public Integer getGoogleDailyLimit() {
+        return getSettings().getGoogleDailyLimit();
     }
 
     public String getClassifierUrl() {

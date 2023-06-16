@@ -19,29 +19,17 @@ class AccessDataService {
     // Constants:
 
     public static final short androidPlatform = 0;
-    public static final short iOSPlatform = 1;
-    public static final short webPlatform = 2; // TODO REMOVE
+    public static final short iosPlatform = 1;
 
     // Client:
 
     AccessDataResult getAccessData(Integer clientVersion, Short platform) {
         AccessDataModel client = accessDataRepository.findByClientVersion(clientVersion);
 
-        AccessDataResult accessDataResult = platform != webPlatform
-                ? new AccessDataResult(
+        AccessDataResult accessDataResult = new AccessDataResult(
                 client.getUpdateAvailable(),
                 client.getUpdateNeeded(),
                 client.getUpdateDetails(),
-                client.getMessagePresent(),
-                client.getMessageTitle(),
-                client.getMessageDetails(),
-                client.getMessageLinkPresent(),
-                client.getMessageLinkLabel(),
-                client.getMessageLink())
-                : new AccessDataResult(
-                false,
-                null,
-                null,
                 client.getMessagePresent(),
                 client.getMessageTitle(),
                 client.getMessageDetails(),
