@@ -55,7 +55,7 @@ class OrganicService {
             if (organic.isPresent()) {
                 organicResult = resolvePropertiesOf(organic.get());
 
-                if (organic.get().getStructureException() != null) { // TODO unrecognized atom
+                if (organic.get().getStructureException() != null) {
                     // TODO classifier & menu suggestion
                     Exception exception = organic.get().getStructureException();
                     errorService.log("Exception solving name: " + name, exception.toString(), getClass());
@@ -69,6 +69,9 @@ class OrganicService {
         } catch (Exception exception) {
             // TODO classifier & menu suggestion
             errorService.log("Exception solving name: " + name, exception.toString(), getClass());
+            organicResult = OrganicResult.notFound();
+        } catch (StackOverflowError error) {
+            errorService.log("StackOverflow error", name, getClass());
             organicResult = OrganicResult.notFound();
         }
 
