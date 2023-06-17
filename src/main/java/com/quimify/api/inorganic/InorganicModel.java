@@ -32,7 +32,7 @@ class InorganicModel {
 
     @JoinColumn(name = "inorganic_id")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Always created, deleted and fetched together
-    private Set<InorganicSearchTagModel> inorganicSearchTags = new HashSet<>(); // "aguaoxigenada"
+    private List<InorganicSearchTagModel> inorganicSearchTags = new ArrayList<>(); // "aguaoxigenada"
 
     // With default value:
 
@@ -129,11 +129,11 @@ class InorganicModel {
         this.commonName = otherName;
     }
 
-    Set<InorganicSearchTagModel> getInorganicSearchTags() {
+    List<InorganicSearchTagModel> getInorganicSearchTags() {
         return inorganicSearchTags;
     }
 
-    void setInorganicSearchTags(Set<InorganicSearchTagModel> inorganicSearchTags) {
+    void setInorganicSearchTags(List<InorganicSearchTagModel> inorganicSearchTags) {
         this.inorganicSearchTags = inorganicSearchTags;
     }
 

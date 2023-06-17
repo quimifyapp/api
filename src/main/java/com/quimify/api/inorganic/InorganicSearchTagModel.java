@@ -26,27 +26,7 @@ class InorganicSearchTagModel {
 
     protected InorganicSearchTagModel() {} // Needed by JPA, don't touch
 
-    // Queries:
-
-    @Override
-    public boolean equals(Object other) {
-        if (other == null || getClass() != other.getClass())
-            return false;
-
-        InorganicSearchTagModel otherSearchTag = (InorganicSearchTagModel) other;
-
-        if(!Objects.equals(id, otherSearchTag.id))
-            return false;
-
-        return normalizedTag.contentEquals(otherSearchTag.normalizedTag);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, normalizedTag);
-    }
-
-    // Getters y setters:
+    // Getters and setters:
 
     Integer getId() {
         return id;
