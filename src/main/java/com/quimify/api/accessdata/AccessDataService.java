@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 // This class implements the logic behind HTTP methods in "/access-data".
 
 @Service
-public
-class AccessDataService {
+public class AccessDataService {
 
     @Autowired
     AccessDataRepository accessDataRepository; // DB connection

@@ -80,7 +80,7 @@ class InorganicResult {
         return identifiers.toString();
     }
 
-    // Getters y setters:
+    // Getters and setters (must be public to enable JSON serialization):
 
     public boolean isFound() {
         return found;

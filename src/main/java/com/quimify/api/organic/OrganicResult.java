@@ -36,7 +36,7 @@ class OrganicResult {
         return new OrganicResult(null);
     }
 
-    // Getters and setters:
+    // Getters and setters (must be public to enable JSON serialization):
 
     public boolean isFound() {
         return found;

@@ -2,12 +2,12 @@ package com.quimify.api.element;
 
 import javax.persistence.*;
 
-// Esta clase representa los elementos químicos de la tabla periódica. TODO translate comments
+// Esta clase representa los elementos químicos de la tabla periódica.
+// TODO translate comments
 
 @Entity // Es un modelo real
 @Table(name = "element")
-public // En la tabla 'elemento' de la DB
-class ElementModel {
+public class ElementModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

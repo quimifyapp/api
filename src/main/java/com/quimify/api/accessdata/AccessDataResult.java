@@ -31,7 +31,7 @@ class AccessDataResult {
 		this.messageLink = messageLink;
 	}
 
-	// Getters and setters:
+	// Getters and setters (must be public to enable JSON serialization):
 
 	public boolean getUpdateAvailable() {
 		return updateAvailable;

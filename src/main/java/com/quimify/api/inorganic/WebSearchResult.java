@@ -1,24 +1,24 @@
 package com.quimify.api.inorganic;
 
-public class WebSearchResult {
+class WebSearchResult {
 
     private final String title;
     private final String address;
 
     // Constructor:
 
-    public WebSearchResult(String title, String address) {
+    WebSearchResult(String title, String address) {
         this.title = title;
         this.address = address;
     }
 
     // Getters:
 
-    public String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    public String getAddress() {
+    String getAddress() {
         return address;
     }
 

@@ -12,8 +12,7 @@ import java.util.Optional;
 // This class handles daily metrics.
 
 @Service
-public
-class MetricsService {
+public class MetricsService {
 
     @Autowired
     MetricsRepository metricsRepository; // DB connection

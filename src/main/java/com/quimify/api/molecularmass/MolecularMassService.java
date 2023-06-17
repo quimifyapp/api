@@ -18,8 +18,7 @@ import java.util.regex.Pattern;
 // Esta clase procesa las masas moleculares.
 
 @Service
-public
-class MolecularMassService {
+public class MolecularMassService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

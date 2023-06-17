@@ -26,27 +26,27 @@ class NotFoundQueryModel {
 
     // Getters and setters:
 
-    public Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    public String getQuery() {
+    String getQuery() {
         return query;
     }
 
-    public void setQuery(String input) {
+    void setQuery(String input) {
         this.query = input;
     }
 
-    public String getLocation() {
+    String getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    void setLocation(String location) {
         this.location = location;
     }
 

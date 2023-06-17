@@ -20,11 +20,11 @@ class InorganicSearchTagModel {
 
     // Constructors:
 
-    protected InorganicSearchTagModel(String text) {
+    InorganicSearchTagModel(String text) {
         this.normalizedTag = Normalizer.get(text);
     }
 
-    protected InorganicSearchTagModel() {} // Needed by JPA
+    protected InorganicSearchTagModel() {} // Needed by JPA, don't touch
 
     // Queries:
 
@@ -48,19 +48,19 @@ class InorganicSearchTagModel {
 
     // Getters y setters:
 
-    protected Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    protected void setId(Integer id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
-    protected String getNormalizedTag() {
+    String getNormalizedTag() {
         return normalizedTag;
     }
 
-    protected void setNormalizedTag(String normalizedTag) {
+    void setNormalizedTag(String normalizedTag) {
         this.normalizedTag = normalizedTag;
     }
 

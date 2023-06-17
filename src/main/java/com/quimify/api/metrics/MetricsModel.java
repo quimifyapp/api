@@ -73,7 +73,7 @@ class MetricsModel {
         setDate(date);
     }
 
-    protected MetricsModel() {} // JPA needs it
+    protected MetricsModel() {} // Needed by JPA, don't touch
 
     // Incrementers:
 

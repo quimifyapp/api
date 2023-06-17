@@ -21,7 +21,7 @@ import java.util.*;
 // TODO resolver los otros TODO
 
 @Service
-public class InorganicService {
+class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

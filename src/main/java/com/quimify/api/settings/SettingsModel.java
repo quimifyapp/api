@@ -41,75 +41,75 @@ class SettingsModel {
 
     // Getters and setters:
 
-    public Integer getVersion() {
+    Integer getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    void setVersion(Integer version) {
         this.version = version;
     }
 
-    public Boolean getUseFreeBing() {
+    Boolean getUseFreeBing() {
         return useFreeBing;
     }
 
-    public void setUseFreeBing(Boolean useFreeBing) {
+    void setUseFreeBing(Boolean useFreeBing) {
         this.useFreeBing = useFreeBing;
     }
 
-    public Integer getFreeBingDailyLimit() {
+    Integer getFreeBingDailyLimit() {
         return freeBingDailyLimit;
     }
 
-    public void setFreeBingDailyLimit(Integer freeBingDailyLimit) {
+    void setFreeBingDailyLimit(Integer freeBingDailyLimit) {
         this.freeBingDailyLimit = freeBingDailyLimit;
     }
 
-    public Boolean getUseGoogle() {
+    Boolean getUseGoogle() {
         return useGoogle;
     }
 
-    public void setUseGoogle(Boolean useGoogle) {
+    void setUseGoogle(Boolean useGoogle) {
         this.useGoogle = useGoogle;
     }
 
-    public Integer getGoogleDailyLimit() {
+    Integer getGoogleDailyLimit() {
         return googleDailyLimit;
     }
 
-    public void setGoogleDailyLimit(Integer googleDailyLimit) {
+    void setGoogleDailyLimit(Integer googleDailyLimit) {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    public String getFreeBingUrl() {
+    String getFreeBingUrl() {
         return freeBingUrl;
     }
 
-    public void setFreeBingUrl(String freeBingUrl) {
+    void setFreeBingUrl(String freeBingUrl) {
         this.freeBingUrl = freeBingUrl;
     }
 
-    public String getGoogleUrl() {
+    String getGoogleUrl() {
         return googleUrl;
     }
 
-    public void setGoogleUrl(String googleUrl) {
+    void setGoogleUrl(String googleUrl) {
         this.googleUrl = googleUrl;
     }
 
-    public String getClassifierUrl() {
+    String getClassifierUrl() {
         return classifierUrl;
     }
 
-    public void setClassifierUrl(String classifierUrl) {
+    void setClassifierUrl(String classifierUrl) {
         this.classifierUrl = classifierUrl;
     }
 
-    public String getUserAgent() {
+    String getUserAgent() {
         return userAgent;
     }
 
-    public void setUserAgent(String userAgent) {
+    void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 
