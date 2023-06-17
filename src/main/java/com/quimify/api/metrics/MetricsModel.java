@@ -14,11 +14,11 @@ class MetricsModel {
     private Date date;
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer errorsOccurred = 0;
+    private Integer errors = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer clientErrorsSent = 0;
+    private Integer clientErrors = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer reportsSent = 0;
+    private Integer reports = 0;
 
     // Their sum is equivalent to the total number of client accesses:
     @Column(columnDefinition = "INT default 0", nullable = false)
@@ -28,44 +28,44 @@ class MetricsModel {
 
     // Their sum is equivalent to the total number of client inorganics searched:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsFound = 0;
+    private Integer inorganicSearches = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsNotFound = 0;
+    private Integer inorganicNotFoundSearches = 0;
 
     // Their sum is equivalent to the total number of client inorganic searches that required a web search:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer freeBingFound = 0;
+    private Integer freeBingQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer freeBingNotFound = 0;
+    private Integer freeBingNotFoundQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleFound = 0;
+    private Integer googleQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleNotFound = 0;
+    private Integer googleNotFoundQueries = 0;
 
     // New inorganics from the web incorporated to the DB:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsLearned = 0;
+    private Integer inorganicLearnings = 0;
 
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicsCompleted = 0;
+    private Integer inorganicCompletions = 0;
 
     // Their sum is equivalent to the total number of client organics queried from name:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsFoundFromName = 0;
+    private Integer organicFromNameQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsNotFoundFromName = 0;
+    private Integer organicFromNameFailedQueries = 0;
 
     // Their sum is equivalent to the total number of client organics queried from structure:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsSucceededFromStructure = 0;
+    private Integer organicFromStructureQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicsFailedFromStructure = 0;
+    private Integer organicFromStructureFailedQueries = 0;
 
     // Their sum is equivalent to the total number of client molecular masses queried:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer molecularMassesSucceeded = 0;
+    private Integer molecularMassQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer molecularMassesFailed = 0;
+    private Integer molecularMassFailedQueries = 0;
 
     // Constructors:
 
@@ -77,16 +77,16 @@ class MetricsModel {
 
     // Incrementers:
 
-    void incrementErrorsOccurred() {
-        errorsOccurred += 1;
+    void incrementErrors() {
+        errors += 1;
     }
 
-    void incrementClientErrorsSent() {
-        clientErrorsSent += 1;
+    void incrementClientErrors() {
+        clientErrors += 1;
     }
 
-    void incrementReportsSent() {
-        reportsSent += 1;
+    void incrementReports() {
+        reports += 1;
     }
 
     void incrementAndroidAccesses() {
@@ -97,222 +97,223 @@ class MetricsModel {
         iosAccesses += 1;
     }
 
-    void incrementInorganicsFound() {
-        inorganicsFound += 1;
+    void incrementInorganicSearches() {
+        inorganicSearches += 1;
     }
 
-    void incrementInorganicsNotFound() {
-        inorganicsNotFound += 1;
+    void incrementInorganicNotFoundSearches() {
+        inorganicNotFoundSearches += 1;
     }
 
-    void incrementFreeBingFound() {
-        freeBingFound += 1;
+    void incrementFreeBingQueries() {
+        freeBingQueries += 1;
     }
 
-    void incrementFreeBingNotFound() {
-        freeBingFound += 1;
+    void incrementFreeBingNotFoundQueries() {
+        freeBingNotFoundQueries += 1;
     }
 
-    void incrementGoogleFound() {
-        googleFound += 1;
+    void incrementGoogleQueries() {
+        googleQueries += 1;
     }
 
-    void incrementGoogleNotFound() {
-        googleNotFound += 1;
+    void incrementGoogleNotFoundQueries() {
+        googleNotFoundQueries += 1;
     }
 
-    void incrementInorganicsLearned() {
-        inorganicsLearned += 1;
+    void incrementInorganicLearnings() {
+        inorganicLearnings += 1;
     }
 
-    void incrementInorganicsCompleted() {
-        inorganicsCompleted += 1;
+    void incrementInorganicCompletions() {
+        inorganicCompletions += 1;
     }
 
-    void incrementOrganicsFoundFromName() {
-        organicsFoundFromName += 1;
+    void incrementOrganicFromNameQueries() {
+        organicFromNameQueries += 1;
     }
 
-    void incrementOrganicsNotFoundFromName() {
-        organicsNotFoundFromName += 1;
+    void incrementOrganicFromNameFailedQueries() {
+        organicFromNameFailedQueries += 1;
     }
 
-    void incrementOrganicsSucceededFromStructure() {
-        organicsSucceededFromStructure += 1;
+    void incrementOrganicFromStructureQueries() {
+        organicFromStructureQueries += 1;
     }
 
-    void incrementOrganicsFailedFromStructure() {
-        organicsFailedFromStructure += 1;
+    void incrementOrganicFromStructureFailedQueries() {
+        organicFromStructureFailedQueries += 1;
     }
 
-    void incrementMolecularMassesSucceeded() {
-        molecularMassesSucceeded += 1;
+    void incrementMolecularMassQueries() {
+        molecularMassQueries += 1;
     }
 
-    void incrementMolecularMassesFailed() {
-        molecularMassesFailed += 1;
+    void incrementMolecularMassFailedQueries() {
+        molecularMassFailedQueries += 1;
     }
+
 
     // Getters and setters:
 
-    public Date getDate() {
+    Date getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    void setDate(Date date) {
         this.date = date;
     }
 
-    public Integer getErrorsOccurred() {
-        return errorsOccurred;
+    Integer getErrors() {
+        return errors;
     }
 
-    public void setErrorsOccurred(Integer errorsOccurred) {
-        this.errorsOccurred = errorsOccurred;
+    void setErrors(Integer errors) {
+        this.errors = errors;
     }
 
-    public Integer getClientErrorsSent() {
-        return clientErrorsSent;
+    Integer getClientErrors() {
+        return clientErrors;
     }
 
-    public void setClientErrorsSent(Integer clientErrorsSent) {
-        this.clientErrorsSent = clientErrorsSent;
+    void setClientErrors(Integer clientErrors) {
+        this.clientErrors = clientErrors;
     }
 
-    public Integer getReportsSent() {
-        return reportsSent;
+    Integer getReports() {
+        return reports;
     }
 
-    public void setReportsSent(Integer reportsSent) {
-        this.reportsSent = reportsSent;
+    void setReports(Integer reports) {
+        this.reports = reports;
     }
 
-    public Integer getAndroidAccesses() {
+    Integer getAndroidAccesses() {
         return androidAccesses;
     }
 
-    public void setAndroidAccesses(Integer androidAccesses) {
+    void setAndroidAccesses(Integer androidAccesses) {
         this.androidAccesses = androidAccesses;
     }
 
-    public Integer getIosAccesses() {
+    Integer getIosAccesses() {
         return iosAccesses;
     }
 
-    public void setIosAccesses(Integer iosAccesses) {
+    void setIosAccesses(Integer iosAccesses) {
         this.iosAccesses = iosAccesses;
     }
 
-    public Integer getInorganicsFound() {
-        return inorganicsFound;
+    Integer getInorganicSearches() {
+        return inorganicSearches;
     }
 
-    public void setInorganicsFound(Integer inorganicsFound) {
-        this.inorganicsFound = inorganicsFound;
+    void setInorganicSearches(Integer inorganicSearches) {
+        this.inorganicSearches = inorganicSearches;
     }
 
-    public Integer getInorganicsNotFound() {
-        return inorganicsNotFound;
+    Integer getInorganicNotFoundSearches() {
+        return inorganicNotFoundSearches;
     }
 
-    public void setInorganicsNotFound(Integer inorganicsNotFound) {
-        this.inorganicsNotFound = inorganicsNotFound;
+    void setInorganicNotFoundSearches(Integer inorganicNotFoundSearches) {
+        this.inorganicNotFoundSearches = inorganicNotFoundSearches;
     }
 
-    public Integer getFreeBingFound() {
-        return freeBingFound;
+    Integer getFreeBingQueries() {
+        return freeBingQueries;
     }
 
-    public void setFreeBingFound(Integer freeBingFound) {
-        this.freeBingFound = freeBingFound;
+    void setFreeBingQueries(Integer freeBingQueries) {
+        this.freeBingQueries = freeBingQueries;
     }
 
-    public Integer getFreeBingNotFound() {
-        return freeBingNotFound;
+    Integer getFreeBingNotFoundQueries() {
+        return freeBingNotFoundQueries;
     }
 
-    public void setFreeBingNotFound(Integer freeBingNotFound) {
-        this.freeBingNotFound = freeBingNotFound;
+    void setFreeBingNotFoundQueries(Integer freeBingNotFoundQueries) {
+        this.freeBingNotFoundQueries = freeBingNotFoundQueries;
     }
 
-    public Integer getGoogleFound() {
-        return googleFound;
+    Integer getGoogleQueries() {
+        return googleQueries;
     }
 
-    public void setGoogleFound(Integer googleFound) {
-        this.googleFound = googleFound;
+    void setGoogleQueries(Integer googleQueries) {
+        this.googleQueries = googleQueries;
     }
 
-    public Integer getGoogleNotFound() {
-        return googleNotFound;
+    Integer getGoogleNotFoundQueries() {
+        return googleNotFoundQueries;
     }
 
-    public void setGoogleNotFound(Integer googleNotFound) {
-        this.googleNotFound = googleNotFound;
+    void setGoogleNotFoundQueries(Integer googleNotFoundQueries) {
+        this.googleNotFoundQueries = googleNotFoundQueries;
     }
 
-    public Integer getInorganicsLearned() {
-        return inorganicsLearned;
+    Integer getInorganicLearnings() {
+        return inorganicLearnings;
     }
 
-    public void setInorganicsLearned(Integer inorganicsLearned) {
-        this.inorganicsLearned = inorganicsLearned;
+    void setInorganicLearnings(Integer inorganicLearnings) {
+        this.inorganicLearnings = inorganicLearnings;
     }
 
-    public Integer getInorganicsCompleted() {
-        return inorganicsCompleted;
+    Integer getInorganicCompletions() {
+        return inorganicCompletions;
     }
 
-    public void setInorganicsCompleted(Integer inorganicsCompleted) {
-        this.inorganicsCompleted = inorganicsCompleted;
+    void setInorganicCompletions(Integer inorganicCompletions) {
+        this.inorganicCompletions = inorganicCompletions;
     }
 
-    public Integer getOrganicsFoundFromName() {
-        return organicsFoundFromName;
+    Integer getOrganicFromNameQueries() {
+        return organicFromNameQueries;
     }
 
-    public void setOrganicsFoundFromName(Integer organicsFoundFromName) {
-        this.organicsFoundFromName = organicsFoundFromName;
+    void setOrganicFromNameQueries(Integer organicFromNameQueries) {
+        this.organicFromNameQueries = organicFromNameQueries;
     }
 
-    public Integer getOrganicsNotFoundFromName() {
-        return organicsNotFoundFromName;
+    Integer getOrganicFromNameFailedQueries() {
+        return organicFromNameFailedQueries;
     }
 
-    public void setOrganicsNotFoundFromName(Integer organicsNotFoundFromName) {
-        this.organicsNotFoundFromName = organicsNotFoundFromName;
+    void setOrganicFromNameFailedQueries(Integer organicFromNameFailedQueries) {
+        this.organicFromNameFailedQueries = organicFromNameFailedQueries;
     }
 
-    public Integer getOrganicsSucceededFromStructure() {
-        return organicsSucceededFromStructure;
+    Integer getOrganicFromStructureQueries() {
+        return organicFromStructureQueries;
     }
 
-    public void setOrganicsSucceededFromStructure(Integer organicsSucceededFromStructure) {
-        this.organicsSucceededFromStructure = organicsSucceededFromStructure;
+    void setOrganicFromStructureQueries(Integer organicFromStructureQueries) {
+        this.organicFromStructureQueries = organicFromStructureQueries;
     }
 
-    public Integer getOrganicsFailedFromStructure() {
-        return organicsFailedFromStructure;
+    Integer getOrganicFromStructureFailedQueries() {
+        return organicFromStructureFailedQueries;
     }
 
-    public void setOrganicsFailedFromStructure(Integer organicsFailedFromStructure) {
-        this.organicsFailedFromStructure = organicsFailedFromStructure;
+    void setOrganicFromStructureFailedQueries(Integer organicFromStructureFailedQueries) {
+        this.organicFromStructureFailedQueries = organicFromStructureFailedQueries;
     }
 
-    public Integer getMolecularMassesSucceeded() {
-        return molecularMassesSucceeded;
+    Integer getMolecularMassQueries() {
+        return molecularMassQueries;
     }
 
-    public void setMolecularMassesSucceeded(Integer molecularMassesSucceeded) {
-        this.molecularMassesSucceeded = molecularMassesSucceeded;
+    void setMolecularMassQueries(Integer molecularMassQueries) {
+        this.molecularMassQueries = molecularMassQueries;
     }
 
-    public Integer getMolecularMassesFailed() {
-        return molecularMassesFailed;
+    Integer getMolecularMassFailedQueries() {
+        return molecularMassFailedQueries;
     }
 
-    public void setMolecularMassesFailed(Integer molecularMassesFailed) {
-        this.molecularMassesFailed = molecularMassesFailed;
+    void setMolecularMassFailedQueries(Integer molecularMassFailedQueries) {
+        this.molecularMassFailedQueries = molecularMassFailedQueries;
     }
 
 }

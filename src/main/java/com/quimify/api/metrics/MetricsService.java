@@ -40,30 +40,28 @@ class MetricsService {
     // Queries:
 
     public Integer getGoogleQueries() {
-        MetricsModel todayMetrics = getTodayMetrics();
-        return todayMetrics.getGoogleFound() + todayMetrics.getGoogleNotFound();
+        return getTodayMetrics().getGoogleQueries();
     }
 
     public Integer getFreeBingQueries() {
-        MetricsModel todayMetrics = getTodayMetrics();
-        return todayMetrics.getFreeBingFound() + todayMetrics.getFreeBingNotFound();
+        return getTodayMetrics().getFreeBingQueries();
     }
 
     // Incrementers:
 
     @Transactional
     public void errorOccurred() {
-        getTodayMetrics().incrementErrorsOccurred();
+        getTodayMetrics().incrementErrors();
     }
 
     @Transactional
     public void clientErrorSent() {
-        getTodayMetrics().incrementClientErrorsSent();
+        getTodayMetrics().incrementClientErrors();
     }
 
     @Transactional
     public void reportSent() {
-        getTodayMetrics().incrementReportsSent();
+        getTodayMetrics().incrementReports();
     }
 
     @Transactional
@@ -76,54 +74,72 @@ class MetricsService {
 
     @Transactional
     public void inorganicSearched(boolean found) {
-        if (found)
-            getTodayMetrics().incrementInorganicsFound();
-        else getTodayMetrics().incrementInorganicsNotFound();
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!found)
+            todayMetrics.incrementInorganicNotFoundSearches();
+
+        todayMetrics.incrementInorganicSearches();
     }
 
     @Transactional
-    public void freeBingSearched(boolean found) {
-        if(found)
-            getTodayMetrics().incrementFreeBingFound();
-        else getTodayMetrics().incrementFreeBingNotFound();
+    public void freeBingQueried(boolean found) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!found)
+            todayMetrics.incrementFreeBingNotFoundQueries();
+
+        todayMetrics.incrementFreeBingQueries();
     }
 
     @Transactional
-    public void googleSearched(boolean found) {
-        if(found)
-            getTodayMetrics().incrementGoogleFound();
-        else getTodayMetrics().incrementGoogleNotFound();
+    public void googleQueried(boolean found) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!found)
+            todayMetrics.incrementGoogleNotFoundQueries();
+
+        todayMetrics.incrementGoogleQueries();
     }
 
     @Transactional
     public void inorganicLearned() {
-        getTodayMetrics().incrementInorganicsLearned();
+        getTodayMetrics().incrementInorganicLearnings();
     }
 
     @Transactional
     public void inorganicCompleted() {
-        getTodayMetrics().incrementInorganicsCompleted();
+        getTodayMetrics().incrementInorganicCompletions();
     }
 
     @Transactional
-    public void organicFromNameSearched(boolean found) {
-        if (found)
-            getTodayMetrics().incrementOrganicsFoundFromName();
-        else getTodayMetrics().incrementOrganicsNotFoundFromName();
+    public void organicFromNameQueried(boolean succeeded) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!succeeded)
+            todayMetrics.incrementOrganicFromNameFailedQueries();
+
+        todayMetrics.incrementOrganicFromNameQueries();
     }
 
     @Transactional
-    public void organicFromStructureSearched(boolean found) {
-        if (found)
-            getTodayMetrics().incrementOrganicsSucceededFromStructure();
-        else getTodayMetrics().incrementOrganicsFailedFromStructure();
+    public void organicFromStructureQueried(boolean succeeded) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!succeeded)
+            todayMetrics.incrementOrganicFromStructureFailedQueries();
+
+        todayMetrics.incrementOrganicFromStructureQueries();
     }
 
     @Transactional
-    public void molecularMassSearched(boolean found) {
-        if (found)
-            getTodayMetrics().incrementMolecularMassesSucceeded();
-        else getTodayMetrics().incrementMolecularMassesFailed();
+    public void molecularMassQueried(boolean succeeded) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if(!succeeded)
+            todayMetrics.incrementMolecularMassFailedQueries();
+
+        todayMetrics.incrementMolecularMassQueries();
     }
 
 }

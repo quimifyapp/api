@@ -82,7 +82,7 @@ class MolecularMassService {
         if (!molecularMassResult.isPresent())
             notFoundQueryService.log(query, getClass());
 
-        metricsService.molecularMassSearched(molecularMassResult.isPresent());
+        metricsService.molecularMassQueried(molecularMassResult.isPresent());
 
         return molecularMassResult;
     }

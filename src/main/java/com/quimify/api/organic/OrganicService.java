@@ -78,7 +78,7 @@ class OrganicService {
         if (!organicResult.isFound())
             notFoundQueryService.log(name, getClass());
 
-        metricsService.organicFromNameSearched(organicResult.isFound());
+        metricsService.organicFromNameQueried(organicResult.isFound());
 
         return organicResult;
     }
@@ -101,7 +101,7 @@ class OrganicService {
         if (!organicResult.isFound())
             notFoundQueryService.log(sequenceToString, getClass());
 
-        metricsService.organicFromStructureSearched(organicResult.isFound());
+        metricsService.organicFromStructureQueried(organicResult.isFound());
 
         return organicResult;
     }

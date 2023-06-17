@@ -78,7 +78,7 @@ class WebSearchComponent {
             }
             else logger.warn("Couldn't find \"" + input + "\" on free Bing");
 
-            metricsService.freeBingSearched(result.isPresent());
+            metricsService.freeBingQueried(result.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("HTTP response code: 403"))
                 logger.warn("Got HTTP code 403 from free Bing (probably limit exceeded).");
@@ -121,7 +121,7 @@ class WebSearchComponent {
             }
             else logger.warn("Couldn't find \"" + input + "\" on Google.");
 
-            metricsService.googleSearched(result.isPresent());
+            metricsService.googleQueried(result.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Got HTTP code 429 from Google (probably limit exceeded).");
