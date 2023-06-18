@@ -10,9 +10,9 @@ class InorganicResult {
 
     private boolean found;
 
-    // If found:
+    private String suggestion; // "trióxido de diníquel" or an input kind like "organic-name"
 
-    private String suggestion; // "trióxido de diníquel"
+    // If found:
 
     private String formula; // "MgH2"
 
@@ -25,10 +25,6 @@ class InorganicResult {
     private String density; // (g/cm³)
     private String meltingPoint; // (K)
     private String boilingPoint; // (K)
-
-    // If not found:
-
-    private String menuSuggestion; // "organic-finding-formula" // TODO more like inputKindSuggestion, with molecular mass and excercise/problem as kinds too
 
     // Constructors:
 
@@ -54,9 +50,9 @@ class InorganicResult {
         this(inorganicModel, null);
     }
 
-    InorganicResult(String menuSuggestion) {
+    InorganicResult(String suggestion) {
         this.found = false;
-        this.menuSuggestion = menuSuggestion;
+        this.suggestion = suggestion;
     }
 
     static InorganicResult notFound() {
@@ -168,14 +164,6 @@ class InorganicResult {
 
     public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
-    }
-
-    public String getMenuSuggestion() {
-        return menuSuggestion;
-    }
-
-    public void setMenuSuggestion(String menuSuggestion) {
-        this.menuSuggestion = menuSuggestion;
     }
 
 }

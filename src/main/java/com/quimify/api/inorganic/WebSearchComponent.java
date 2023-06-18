@@ -4,6 +4,7 @@ import com.quimify.api.error.ErrorService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.utils.Connection;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,19 +31,19 @@ class WebSearchComponent {
 
     // Internal:
 
-    Optional<WebSearchResult> search(String input) {
-        Optional<WebSearchResult> result = Optional.empty();
+    Optional<String> search(String input) {
+        Optional<String> url = Optional.empty();
 
         if (canFreeBingSearch())
-            result = freeBingSearch(input);
+            url = freeBingSearch(input);
 
-        if (result.isEmpty() && canGoogleSearch())
-            result = googleSearch(input);
+        if (url.isEmpty() && canGoogleSearch())
+            url = googleSearch(input);
 
-        if (result.isEmpty())
+        if (url.isEmpty())
             logger.warn("Couldn't find inorganic \"" + input + "\" on the web.");
 
-        return result;
+        return url;
     }
 
     // Private:
@@ -60,8 +61,8 @@ class WebSearchComponent {
         return queries < dailyLimit;
     }
 
-    private Optional<WebSearchResult> freeBingSearch(String input) {
-        Optional<WebSearchResult> result = Optional.empty();
+    private Optional<String> freeBingSearch(String input) {
+        Optional<String> address = Optional.empty();
 
         try {
             Connection connection = new Connection(settingsService.getFreeBingUrl(), input);
@@ -69,23 +70,21 @@ class WebSearchComponent {
             JSONObject response = new JSONObject(connection.getText());
 
             if (response.has("webPages")) {
-                JSONObject firstResult = response.getJSONObject("webPages").getJSONArray("value").getJSONObject(0);
+                JSONArray results = response.getJSONObject("webPages").getJSONArray("value");
+                JSONObject firstResult = results.getJSONObject(0);
 
-                String title = firstResult.getString("name");
-                String address = firstResult.getString("url");
-
-                result = Optional.of(new WebSearchResult(title, address));
+                address = Optional.ofNullable(firstResult.getString("url"));
             }
             else logger.warn("Couldn't find \"" + input + "\" on free Bing");
 
-            metricsService.freeBingQueried(result.isPresent());
+            metricsService.freeBingQueried(address.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("HTTP response code: 403"))
                 logger.warn("Got HTTP code 403 from free Bing (probably limit exceeded).");
             else errorService.log("Exception free Bing: " + input, exception.toString(), getClass());
         }
 
-        return result;
+        return address;
     }
 
     private boolean canGoogleSearch() {
@@ -101,8 +100,8 @@ class WebSearchComponent {
         return queries < dailyLimit;
     }
 
-    private Optional<WebSearchResult> googleSearch(String input) {
-        Optional<WebSearchResult> result = Optional.empty();
+    private Optional<String> googleSearch(String input) {
+        Optional<String> address = Optional.empty();
 
         try {
             String url = String.format(settingsService.getGoogleUrl(), settingsService.getGoogleKey());
@@ -112,23 +111,21 @@ class WebSearchComponent {
             JSONObject response = new JSONObject(connection.getText());
 
             if (response.getJSONObject("searchInformation").getInt("totalResults") > 0) {
-                JSONObject firstResult = response.getJSONArray("items").getJSONObject(0);
+                JSONArray results = response.getJSONArray("items");
+                JSONObject firstResult = results.getJSONObject(0);
 
-                String title = firstResult.getString("title");
-                String address = firstResult.getString("formattedUrl");
-
-                result = Optional.of(new WebSearchResult(title, address));
+                address = Optional.ofNullable(firstResult.getString("formattedUrl"));
             }
             else logger.warn("Couldn't find \"" + input + "\" on Google.");
 
-            metricsService.googleQueried(result.isPresent());
+            metricsService.googleQueried(address.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("Server returned HTTP response code: 429"))
                 logger.warn("Got HTTP code 429 from Google (probably limit exceeded).");
             else errorService.log("Exception Google: " + input, exception.toString(), getClass());
         }
 
-        return result;
+        return address;
     }
 
 }

@@ -3,6 +3,8 @@ package com.quimify.api.inorganic;
 import com.quimify.api.utils.Connection;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,7 +14,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,20 +23,23 @@ import java.util.regex.Pattern;
 @Scope("prototype") // New instance for each request, avoiding shared state
 class WebParseComponent {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     SettingsService settingsService;
 
     @Autowired
     ErrorService errorService;
 
-    String htmlDocument;
-    InorganicModel parsedInorganic;
+    private String htmlDocument;
+
+    private InorganicModel parsedInorganic;
 
     // Constants:
 
     private final static String fqUrl = "https://www.formulacionquimica.com/";
 
-    private final static Set<String> invalidSubdirectories = Set.of(
+    private final static List<String> invalidSubdirectories = List.of(
             ".com/", "acidos-carboxilicos/", "alcanos/", "alcoholes/", "aldehidos/", "alquenos/", "alquinos/",
             "amidas/", "aminas/", "anhidridos/", "anhidridos-organicos/", "aromaticos/", "buscador/", "cetonas/",
             "cicloalquenos/", "ejemplos/", "ejercicios/", "esteres/", "eteres/", "halogenuros/", "hidracidos/",
@@ -44,20 +48,36 @@ class WebParseComponent {
             "sales-neutras/", "sales-volatiles/"
     );
 
+    // Common mistakes in FQ.com:
+
     private final static Map<String, String> namingMistakeToCorrection = Map.of(
             " (", "(", // I.e.: "hierro (II)" -> "hierro(II)"
             "iuro", "uro", // I.e.: "antimoniuro", "arseniuro", "seleniuro" -> "antimonuro"...
             "iato", "ato", // I.e.: "arseniato", "antimoniato" -> "arsenato"...
-            "teleruro", "telururo", // Common mistake
-            "teleluro", "telururo", // Weird mistake in FQ.com
-            "fosfonio", "fosfanio", // Common mistake
-            "arsonio", "arsanio", // Common mistake
-            "estibonio", "estibanio" // Common mistake
+            "teleruro", "telururo",
+            "teleluro", "telururo", // Weird but true
+            "fosfonio", "fosfanio",
+            "arsonio", "arsanio",
+            "estibonio", "estibanio"
     );
 
-    // Protected:
+    // Internal:
 
-    InorganicModel parse(String url) throws IOException {
+    Optional<InorganicModel> tryParse(String url) {
+        try {
+            return Optional.of(parse(url));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
+            return Optional.empty();
+        } catch (Exception exception) {
+            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
+            return Optional.empty();
+        }
+    }
+
+    // Steps:
+
+    private InorganicModel parse(String url) throws IOException {
         if (!url.contains(fqUrl))
             throw new IllegalArgumentException("Not a FQ address.");
 
@@ -80,8 +100,6 @@ class WebParseComponent {
 
         return parsedInorganic;
     }
-
-    // Steps:
 
     private void parseAndSetFormula() {
         String formula;
@@ -106,8 +124,7 @@ class WebParseComponent {
             formula = formula.substring(0, formula.indexOf("</p>"));
 
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
-        }
-        else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
+        } else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
         // TODO optional get check
         parsedInorganic.setFormula(formula);
     }

@@ -17,9 +17,6 @@ import java.util.*;
 
 // This class implements the logic behind HTTP methods in "/inorganic".
 
-// TODO testear A FONDO los cambios antes de commit (apis web, settings, metrics...) y
-// TODO resolver los otros TODO
-
 @Service
 class InorganicService {
 
@@ -60,17 +57,14 @@ class InorganicService {
 
     // Constants:
 
-    private static final Map<ClassifierResult, String> classifierResultToMenuSuggestion = Map.of( // TODO rename
-            ClassifierResult.organicFormula, "organic-naming",
-            ClassifierResult.organicName, "organic-finding-formula"
-    );
+    // TODO common errors here
+
+    // Client:
 
     //if(!inorganicResult.isPresent()) TODO logs, metrics...
     //        notFoundQueryService.log(input, getClass());
 
     //metricsService.inorganicSearched(inorganicResult.isPresent());
-
-    // Client:
 
     InorganicResult search(String input) {
         Optional<InorganicModel> searchedInMemory = fetch(input);
@@ -81,7 +75,7 @@ class InorganicService {
         Optional<ClassifierResult> classifierResult = classifierService.classify(input);
 
         if (classifierResult.isPresent() && classifierService.isOrganic(classifierResult.get()))
-            return new InorganicResult(classifierResultToMenuSuggestion.get(classifierResult.get()));
+            return new InorganicResult(classifierResult.get().toString());
 
         return smartSearch(input);
     }
@@ -91,42 +85,13 @@ class InorganicService {
         return enrichedSearch(input);
     }
 
-    InorganicResult enrichedSearch(String input) { // TODO break in different methods
-        Optional<WebSearchResult> webSearchResult = webSearchComponent.search(input);
+    InorganicResult enrichedSearch(String input) {
+        Optional<String> url = webSearchComponent.search(input);
 
-        if (webSearchResult.isEmpty())
+        if (url.isEmpty())
             return InorganicResult.notFound();
 
-        // Check if it was already in the DB:
-
-        String[] words = webSearchResult.get().getTitle().trim().split("\\s+");
-        String firstWord = words[0];
-
-        if (firstWord.equals("ácido"))
-            firstWord += words[1];
-
-        Optional<InorganicModel> searchedInMemory = fetch(firstWord);
-        if (searchedInMemory.isPresent()) {
-            logger.warn("Searched inorganic \"" + input + "\" was: " + searchedInMemory.get());
-            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
-        }
-
-        // Parse the inorganic:
-
-        Optional<InorganicModel> parsedInorganic = tryParseWeb(webSearchResult.get().getAddress());
-
-        if (parsedInorganic.isEmpty())
-            return InorganicResult.notFound();
-
-        // Check if it was already in the DB:
-
-        searchedInMemory = fetch(parsedInorganic.get().getFormula());
-        if (searchedInMemory.isPresent()) {
-            logger.warn("Parsed inorganic \"" + input + "\" was: " + searchedInMemory.get());
-            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
-        }
-
-        return processNewlyLearned(parsedInorganic.get()); // TODO with suggestion
+        return parseInorganic(url.get(), input);
     }
 
     String complete(String input) {
@@ -147,7 +112,7 @@ class InorganicService {
         }
 
         metricsService.inorganicCompleted();
-        metricsService.inorganicSearched(inorganicResult.isFound());
+        metricsService.inorganicSearched(inorganicResult.isFound()); // TODO here?
 
         return inorganicResult;
     }
@@ -169,34 +134,39 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private Optional<InorganicModel> tryParseWeb(String url) {
-        try {
-            InorganicModel parsedInorganic = webParseComponent.parse(url);
-            return Optional.of(parsedInorganic);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
-            return Optional.empty();
-        } catch (Exception exception) {
-            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
-            return Optional.empty();
+    private InorganicResult parseInorganic(String url, String input) {
+        Optional<InorganicModel> parsedInorganic = webParseComponent.tryParse(url);
+
+        if (parsedInorganic.isEmpty())
+            return InorganicResult.notFound();
+
+        // Check if it was already in the DB:
+
+        Optional<InorganicModel> searchedInMemory = fetch(parsedInorganic.get().getFormula());
+
+        if (searchedInMemory.isPresent()) {
+            logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
+            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
         }
+
+        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion
     }
 
-    private InorganicResult processNewlyLearned(InorganicModel learnedInorganic) {
-        Optional<Float> newMolecularMass = molecularMassService.get(learnedInorganic.getFormula());
+    private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
+        Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
 
         if (newMolecularMass.isPresent()) {
             String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
-            learnedInorganic.setMolecularMass(molecularMass);
+            parsedInorganic.setMolecularMass(molecularMass);
         }
 
-        inorganicRepository.save(learnedInorganic);
-        cacheComponent.add(learnedInorganic);
+        inorganicRepository.save(parsedInorganic);
+        cacheComponent.add(parsedInorganic);
 
         metricsService.inorganicLearned();
-        logger.info("Learned inorganic: " + learnedInorganic);
+        logger.info("Learned inorganic: " + parsedInorganic);
 
-        return new InorganicResult(learnedInorganic);
+        return new InorganicResult(parsedInorganic);
     }
 
 }
