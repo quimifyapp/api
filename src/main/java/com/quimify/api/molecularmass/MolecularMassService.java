@@ -72,10 +72,10 @@ public class MolecularMassService {
                 logger.warn("Couldn't calculate \"" + query + "\". " + "RETURN: " + molecularMassResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", query, getClass());
-            molecularMassResult = new MolecularMassResult("La fórmula es demasiado larga.");
+            molecularMassResult = MolecularMassResult.error("La fórmula es demasiado larga.");
         } catch (Exception exception) {
             errorService.log("Exception calculating: " + query, exception.toString(), getClass());
-            molecularMassResult = new MolecularMassResult("");
+            molecularMassResult = MolecularMassResult.error("");
         }
 
         if (!molecularMassResult.isPresent())
@@ -97,11 +97,11 @@ public class MolecularMassService {
                 "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more TODO constant
 
         if (!structurePattern.matcher(adapted).matches())
-            return new MolecularMassResult("La fórmula \"" + formula + "\" no es válida.");
+            return MolecularMassResult.error("La fórmula \"" + formula + "\" no es válida.");
         else if (StringUtils.countOccurrencesOf(adapted, "(") != StringUtils.countOccurrencesOf(adapted, ")"))
-            return new MolecularMassResult("Los paréntesis no están balanceados.");
+            return MolecularMassResult.error("Los paréntesis no están balanceados.");
         else if (adapted.contains("()"))
-            return new MolecularMassResult("Los paréntesis huecos \"()\" no son válidos.");
+            return MolecularMassResult.error("Los paréntesis huecos \"()\" no son válidos.");
 
         // Parece que sí:
 
@@ -110,7 +110,7 @@ public class MolecularMassService {
         // Se calcula la masa molecular:
 
         if (elementToMoles.isEmpty())
-            return new MolecularMassResult("No se ha podido calcular la masa molecular.");
+            return MolecularMassResult.error("No se ha podido calcular la masa molecular.");
 
         float molecularMass = 0;
         Map<String, Float> elementToGrams = new HashMap<>();
@@ -123,7 +123,7 @@ public class MolecularMassService {
             Optional<Float> elementMolecularMass = getMolecularMassOf(symbol);
 
             if (elementMolecularMass.isEmpty())
-                return new MolecularMassResult("No se reconoce el elemento \"" + symbol + "\".");
+                return MolecularMassResult.error("No se reconoce el elemento \"" + symbol + "\".");
 
             float grams = element.getValue() * elementMolecularMass.get();
             elementToGrams.put(symbol, grams);

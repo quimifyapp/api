@@ -44,6 +44,8 @@ class OrganicService {
 
     static final int carbonInputCode = -1;
 
+    // TODO "EX" -> "HEX" ?
+
     // Client:
 
     OrganicResult getFromName(String name) {
