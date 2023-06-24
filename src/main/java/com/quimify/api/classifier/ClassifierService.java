@@ -25,6 +25,8 @@ public class ClassifierService {
 
     static final int notFoundResultCode = -1;
 
+    // TODO problems vocabulary
+
     // Public:
 
     public Optional<ClassifierResult> classify(String text) {
