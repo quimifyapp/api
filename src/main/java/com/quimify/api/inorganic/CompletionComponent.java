@@ -29,7 +29,7 @@ class CompletionComponent {
 
     // Constants:
 
-    private static final String notFound = "";
+    public static final String notFound = "";
 
     // Internal:
 

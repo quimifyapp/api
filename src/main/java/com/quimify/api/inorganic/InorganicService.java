@@ -2,6 +2,7 @@ package com.quimify.api.inorganic;
 
 import com.quimify.api.classifier.ClassifierResult;
 import com.quimify.api.classifier.ClassifierService;
+import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -30,6 +31,9 @@ class InorganicService {
 
     @Autowired
     ClassifierService classifierService;
+
+    @Autowired
+    CorrectionService correctionService;
 
     @Autowired
     CompletionComponent completionComponent;
@@ -77,7 +81,17 @@ class InorganicService {
     }
 
     InorganicResult smartSearch(String input) {
-        // TODO corrections, common errors & similarity
+        String correctedInput = correctionService.correct(input);
+
+        if(!input.equals(correctedInput)) {
+            Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
+
+            if (searchedInMemory.isPresent())
+                return new InorganicResult(searchedInMemory.get(), correctedInput);
+        }
+
+        // TODO similarity
+
         return enrichedSearch(input);
     }
 
@@ -91,8 +105,16 @@ class InorganicService {
     }
 
     String complete(String input) {
-        // TODO do quick corrections & common errors to input
-        return completionComponent.tryComplete(input);
+        String completion = completionComponent.tryComplete(input);
+
+        if(completion.equals(CompletionComponent.notFound)) {
+            String correctedInput = correctionService.correct(input);
+
+            if(!input.equals(correctedInput))
+                completion = completionComponent.tryComplete(correctedInput);
+        }
+
+        return completion;
     }
 
     InorganicResult searchFromCompletion(String completion) {

@@ -1,6 +1,5 @@
 package com.quimify.api.correction;
 
-import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,37 +17,16 @@ public class CorrectionService {
 
     public String correct(String input) {
         for(CorrectionModel correctionModel : correctionRepository.findAll()) {
-            String mistake = correctionModel.getMistake();
-            String correction = correctionModel.getCorrection();
+            if (input.contains(correctionModel.getMistake())) {
+                String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 
-            input = correctIfWrong(input, mistake, correction);
+                logger.warn("Corrected input \"" + input + "\" to \"" + correctedInput + "\".");
+
+                input = correctedInput;
+            }
         }
 
         return input;
-    }
-
-    public String correctNormalized(String normalizedInput) {
-        for(CorrectionModel correctionModel : correctionRepository.findAll()) {
-            String normalizedMistake = Normalizer.get(correctionModel.getMistake());
-            String normalizedCorrection = Normalizer.get(correctionModel.getCorrection());
-
-            normalizedInput = correctIfWrong(normalizedInput, normalizedMistake, normalizedCorrection);
-        }
-
-        return normalizedInput;
-    }
-
-    // Private:
-
-    private String correctIfWrong(String input, String mistake, String correction) {
-        if(!input.contains(mistake))
-            return input;
-
-        String correctedInput = input.replace(mistake, correction);
-
-        logger.warn("Corrected \"" + input + "\" into \"" + correctedInput + "\".");
-
-        return correctedInput;
     }
 
 }
