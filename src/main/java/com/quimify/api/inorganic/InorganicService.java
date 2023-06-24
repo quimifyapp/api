@@ -55,10 +55,6 @@ class InorganicService {
     @Autowired
     ErrorService errorService;
 
-    // Constants:
-
-    // TODO common errors here
-
     // Client:
 
     //if(!inorganicResult.isPresent()) TODO logs, metrics...
