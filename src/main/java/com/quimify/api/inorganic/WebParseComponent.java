@@ -1,5 +1,6 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.utils.Connection;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +24,9 @@ import java.util.regex.Pattern;
 class WebParseComponent {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    CorrectionService correctionService; // TODO test this
 
     @Autowired
     SettingsService settingsService;
@@ -48,19 +51,6 @@ class WebParseComponent {
             "sales-neutras/", "sales-volatiles/"
     );
 
-    // Common mistakes in FQ.com:
-
-    private final static Map<String, String> namingMistakeToCorrection = Map.of(
-            " (", "(", // I.e.: "hierro (II)" -> "hierro(II)"
-            "iuro", "uro", // I.e.: "antimoniuro", "arseniuro", "seleniuro" -> "antimonuro"...
-            "iato", "ato", // I.e.: "arseniato", "antimoniato" -> "arsenato"...
-            "teleruro", "telururo",
-            "teleluro", "telururo", // Weird but true
-            "fosfonio", "fosfanio",
-            "arsonio", "arsanio",
-            "estibonio", "estibanio"
-    );
-
     // Internal:
 
     Optional<InorganicModel> tryParse(String url) {
@@ -75,7 +65,7 @@ class WebParseComponent {
         }
     }
 
-    // Steps:
+    // Private:
 
     private InorganicModel parse(String url) throws IOException {
         if (!url.contains(fqUrl))
@@ -95,8 +85,7 @@ class WebParseComponent {
         parseAndSetNames();
         parseAndSetProperties();
 
-        setSearchTags();
-        fixNomenclatureMistakes(); // Might update search tags
+        fixNomenclatureMistakes();
 
         return parsedInorganic;
     }
@@ -126,7 +115,10 @@ class WebParseComponent {
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
         } else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
         // TODO optional get check
-        parsedInorganic.setFormula(formula);
+
+        String correctedFormula = correctionService.correct(formula);
+
+        parsedInorganic.setFormula(correctedFormula);
     }
 
     private void parseAndSetNames() {
@@ -154,17 +146,6 @@ class WebParseComponent {
         return name;
     }
 
-    private void setSearchTags() {
-        setNameSearchTag(parsedInorganic.getStockName());
-        setNameSearchTag(parsedInorganic.getSystematicName());
-        setNameSearchTag(parsedInorganic.getTraditionalName());
-    }
-
-    private void setNameSearchTag(String name) { // TODO remove
-        if (name != null && name.contains("ácido")) // TODO "zinc", in corrections not in search tags
-            parsedInorganic.addSearchTag(name.replace("ácido ", ""));
-    }
-
     private void fixNomenclatureMistakes() {
         if (parsedInorganic.toString().contains("peróxido")) // Any of its names
             correctPeroxide();
@@ -185,16 +166,10 @@ class WebParseComponent {
         if (name == null)
             return null;
 
-        // Uppercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
+        // Lowercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
         name = Pattern.compile(".(?![^(]*\\))").matcher(name).replaceAll(match -> match.group().toLowerCase());
 
-        for (String namingMistake : namingMistakeToCorrection.keySet())
-            if (name.contains(namingMistake)) {
-                name = name.replace(namingMistake, namingMistakeToCorrection.get(namingMistake));
-                setNameSearchTag(name);
-            }
-
-        return name;
+        return correctionService.correct(name);
     }
 
     private void parseAndSetProperties() {
