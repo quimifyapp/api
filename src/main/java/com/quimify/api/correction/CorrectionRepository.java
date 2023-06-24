@@ -5,8 +5,12 @@ package com.quimify.api.correction;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 interface CorrectionRepository extends CrudRepository<CorrectionModel, Integer> {
+
+    List<CorrectionModel> findAllByOrderByPriority();
 
 }
 

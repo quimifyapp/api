@@ -21,6 +21,9 @@ class CorrectionModel {
     @Column(nullable = false)
     private String correction; // "fosfanio", "ato", "CH"...
 
+    @Column(nullable = false)
+    private Integer priority; // "0", "1"... (order of appliance)
+
     // Getters and setters:
 
     Integer getId() {
@@ -45,6 +48,14 @@ class CorrectionModel {
 
     void setCorrection(String correction) {
         this.correction = correction;
+    }
+
+    Integer getPriority() {
+        return priority;
+    }
+
+    void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
 }

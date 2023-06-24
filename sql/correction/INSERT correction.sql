@@ -1,7 +1,7 @@
-INSERT INTO correction (mistake, correction)
+INSERT INTO correction (mistake, correction, priority)
 
-# ALL BETWEEN QUOTES ("):
 VALUES (
 , # Mistake
- # Correction
+, # Correction
+ # Priority
 );
