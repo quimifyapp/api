@@ -33,7 +33,7 @@ class InorganicService {
     ClassifierService classifierService;
 
     @Autowired
-    CorrectionService correctionService;
+    CorrectionService correctionService; // TODO run it over all DB and delete search tags
 
     @Autowired
     CompletionComponent completionComponent;
@@ -82,6 +82,8 @@ class InorganicService {
 
     InorganicResult smartSearch(String input) {
         String correctedInput = correctionService.correct(input);
+
+        // TODO acido prefix
 
         if(!input.equals(correctedInput)) {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
@@ -146,7 +148,7 @@ class InorganicService {
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id.get());
 
         if (inorganicModel.isPresent())
-            inorganicModel.get().incrementSearches();
+            inorganicModel.get().countSearch();
         else logger.warn("Discrepancy between DB and cached ID: " + id.get());
 
         return inorganicModel;

@@ -48,11 +48,7 @@ class InorganicModel {
 
     // Modifiers:
 
-    void addSearchTag(String text) { // TODO remove
-        inorganicSearchTags.add(new InorganicSearchTagModel(text));
-    }
-
-    void incrementSearches() {
+    void countSearch() {
         searches++;
     }
 
