@@ -25,6 +25,8 @@ class OrganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    // TODO classifier, corrections
+
     @Autowired
     PubChemComponent pubChemComponent;
 
