@@ -27,6 +27,8 @@ class OrganicService {
 
     // TODO classifier, corrections
 
+    // TODO: Sugerencia con regex "^[a-zA-Z].*oxi.*o$" (afinar más) de "1-...", para "butoxidecano" por ejemplo
+
     @Autowired
     PubChemComponent pubChemComponent;
 
