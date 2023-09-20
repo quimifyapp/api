@@ -33,6 +33,8 @@ public class Connection {
     }
 
     public String getText() throws IOException {
+        // TODO timeout
+
         BufferedReader download = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
         StringBuilder text = new StringBuilder();
 
