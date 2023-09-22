@@ -16,7 +16,7 @@ public class Connection {
 
     // Constants:
 
-    private static final int connectTimeoutMilliseconds = 5 * 1000;
+    private static final int connectTimeoutMilliseconds = 3 * 1000;
     private static final int readTimeoutMilliseconds = 2 * 1000;
 
     // Constructors:
