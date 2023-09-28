@@ -42,16 +42,12 @@ class CacheComponent {
 
             cache.clear();
 
-            Map<String, Integer> searchTagsCache = new LinkedHashMap<>();
-
             for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc()) {
                 add(inorganicModel);
 
                 for (String normalizedText : inorganicModel.getSearchTags())
-                    searchTagsCache.put(normalizedText, inorganicModel.getId()); // Already normalized
+                    cache.put(normalizedText, inorganicModel.getId()); // Already normalized
             }
-
-            cache.putAll(searchTagsCache); // Search tags go at the end
 
             logger.info("Inorganic cache updated.");
         } catch (Exception exception) {
