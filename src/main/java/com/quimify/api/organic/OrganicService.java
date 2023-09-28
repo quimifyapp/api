@@ -29,6 +29,8 @@ class OrganicService {
 
     // TODO: Sugerencia con regex "^[a-zA-Z].*oxi.*o$" (afinar más) de "1-...", para "butoxidecano" por ejemplo
 
+    // TODO "EX" -> "HEX" ?
+
     @Autowired
     PubChemComponent pubChemComponent;
 
@@ -47,8 +49,6 @@ class OrganicService {
     // Constants:
 
     static final int carbonInputCode = -1;
-
-    // TODO "EX" -> "HEX" ?
 
     // Client:
 

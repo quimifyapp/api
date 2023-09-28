@@ -113,7 +113,8 @@ class WebParseComponent {
             formula = formula.substring(0, formula.indexOf("</p>"));
 
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
-        } else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
+        }
+        else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
         // TODO optional get check
 
         String correctedFormula = correctionService.correct(formula);
@@ -157,7 +158,7 @@ class WebParseComponent {
 
     private void correctPeroxide() {
         parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
-        parsedInorganic.setSystematicName(null); // Systematic names for peroxides NEVER include that word
+        parsedInorganic.setSystematicName(null); // Systematic names for peroxides must NEVER include that word
 
         errorService.log("Learned peroxide needs manual correction", parsedInorganic.toString(), getClass());
     }
