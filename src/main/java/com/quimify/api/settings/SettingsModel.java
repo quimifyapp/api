@@ -34,7 +34,7 @@ class SettingsModel {
     private String googleUrl;
 
     @Column(nullable = false)
-    private String classifierUrl;
+    private String classifierAiUrl;
 
     @Column(nullable = false)
     private String userAgent; // For web scrapping
@@ -97,12 +97,12 @@ class SettingsModel {
         this.googleUrl = googleUrl;
     }
 
-    String getClassifierUrl() {
-        return classifierUrl;
+    String getClassifierAiUrl() {
+        return classifierAiUrl;
     }
 
-    void setClassifierUrl(String classifierUrl) {
-        this.classifierUrl = classifierUrl;
+    void setClassifierAiUrl(String classifierAiUrl) {
+        this.classifierAiUrl = classifierAiUrl;
     }
 
     String getUserAgent() {

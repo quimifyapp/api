@@ -1,7 +1,7 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.classifier.ClassifierResult;
-import com.quimify.api.classifier.ClassifierService;
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
 import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
@@ -30,10 +30,10 @@ class InorganicService {
     CacheComponent cacheComponent;
 
     @Autowired
-    ClassifierService classifierService;
+    ClassificationService classificationService; // TODO run all over DB
 
     @Autowired
-    CorrectionService correctionService; // TODO run it over all DB and delete search tags
+    CorrectionService correctionService;
 
     @Autowired
     CompletionComponent completionComponent;
@@ -61,8 +61,6 @@ class InorganicService {
 
     // Client:
 
-    // TODO zinc, cinc...
-
     //if(!inorganicResult.isPresent()) TODO logs, metrics...
     //        notFoundQueryService.log(input, getClass());
 
@@ -74,29 +72,30 @@ class InorganicService {
         if (searchedInMemory.isPresent())
             return new InorganicResult(searchedInMemory.get());
 
-        Optional<ClassifierResult> classifierResult = classifierService.classify(input);
+        Optional<Classification> classifierResult = classificationService.classify(input);
 
-        if (classifierResult.isPresent() && classifierService.isOrganic(classifierResult.get()))
+        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
             return new InorganicResult(classifierResult.get().toString());
 
         return smartSearch(input);
     }
 
-    InorganicResult smartSearch(String input) {
+    InorganicResult smartSearch(String input) { // TODO re-structure
         String correctedInput = correctionService.correct(input);
 
-        // TODO acido prefix
-
-        if(!input.equals(correctedInput)) {
+        if (!input.equals(correctedInput)) {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
 
             if (searchedInMemory.isPresent())
                 return new InorganicResult(searchedInMemory.get(), correctedInput);
         }
 
-        // TODO similarity
+        Optional<InorganicModel> searchedInMemory = fetch("ácido " + correctedInput);
 
-        return enrichedSearch(input);
+        if (searchedInMemory.isPresent())
+            return new InorganicResult(searchedInMemory.get(), correctedInput);
+
+        return enrichedSearch(input); // TODO similarity instead
     }
 
     InorganicResult enrichedSearch(String input) {
@@ -111,10 +110,10 @@ class InorganicService {
     String complete(String input) {
         String completion = completionComponent.tryComplete(input);
 
-        if(completion.equals(CompletionComponent.notFound)) {
+        if (completion.equals(CompletionComponent.notFound)) {
             String correctedInput = correctionService.correct(input);
 
-            if(!input.equals(correctedInput))
+            if (!input.equals(correctedInput))
                 completion = completionComponent.tryComplete(correctedInput);
         }
 
@@ -168,10 +167,10 @@ class InorganicService {
 
         if (searchedInMemory.isPresent()) {
             logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
-            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
+            return new InorganicResult(searchedInMemory.get()); // TODO deduce suggestion
         }
 
-        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion
+        return learnParsedInorganic(parsedInorganic.get()); // TODO deduce suggestion
     }
 
     private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {

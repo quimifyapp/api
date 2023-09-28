@@ -64,8 +64,8 @@ public class SettingsService {
         return getSettings().getGoogleDailyLimit();
     }
 
-    public String getClassifierUrl() {
-        return getSettings().getClassifierUrl();
+    public String getClassifierAiUrl() {
+        return getSettings().getClassifierAiUrl();
     }
 
     public String getUserAgent() {
