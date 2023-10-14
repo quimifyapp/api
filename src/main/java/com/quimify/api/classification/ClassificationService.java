@@ -98,7 +98,7 @@ public class ClassificationService {
                     result = Optional.of(Classification.chemicalProblem); // It's part of a greater chemical problem
                 break;
             case chemicalReaction:
-                if (input.length() < 2)
+                if (input.length() < 3)
                     result = Optional.empty(); // It's something like "+a"
                 break;
         }
