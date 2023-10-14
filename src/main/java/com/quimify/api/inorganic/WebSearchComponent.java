@@ -34,7 +34,7 @@ class WebSearchComponent {
     Optional<String> search(String input) {
         Optional<String> url = Optional.empty();
 
-        if (canFreeBingSearch())
+        if (canFreeBingSearch()) // TODO Put a daily limit of 33!
             url = freeBingSearch(input);
 
         if (url.isEmpty() && canGoogleSearch())
