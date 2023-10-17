@@ -1,7 +1,7 @@
-INSERT INTO classification (substring, classification, priority)
+INSERT INTO classification (regex_pattern, classification, priority)
 
 VALUES (
-, # Substring
+, # Regex pattern
 , # Classification
  # Priority
 );
