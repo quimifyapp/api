@@ -19,7 +19,7 @@ public class Normalizer {
         return text;
     }
 
-    public static String getWithSymbols(String text) {
+    public static String getWithSpacesAndSymbols(String text) {
         text = java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFD);
         text = text.replaceAll("[^\\p{ASCII}]", ""); // Without accents or diacritics
         text = text.toLowerCase();

@@ -35,8 +35,10 @@ public class ClassificationService {
         String adaptedInput = adaptInput(input);
 
         for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
-            if (adaptedInput.matches(classificationModel.getRegexPattern()))
+            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
                 return filteredResult(input, classificationModel.getClassification());
+                // TODO log info
+            }
 
         return classifyWithAi(input);
     }
@@ -49,7 +51,7 @@ public class ClassificationService {
 
     private String adaptInput(String input) {
         input = input.replace("⁺", "+"); // TODO remove (client won't send ⁺ anymore)
-        input = Normalizer.getWithSymbols(input);
+        input = Normalizer.getWithSpacesAndSymbols(input);
 
         return input;
     }
@@ -59,11 +61,15 @@ public class ClassificationService {
             String response = new Connection(settingsService.getClassifierAiUrl(), input).getText();
             int resultCode = Integer.parseInt(response);
 
-            if (resultCode != notFoundResultCode)
+            if (resultCode != notFoundResultCode) {
                 return filteredResult(input, Classification.values()[resultCode]);
+                // TODO log info
+            }
         } catch (Exception exception) {
             errorService.log("Exception calling classifier for: " + input, exception.toString(), getClass());
         }
+
+        // TODO log warn
 
         return Optional.empty();
     }
@@ -103,7 +109,7 @@ public class ClassificationService {
                 break;
         }
 
-        // TODO log message
+        // TODO log warn if updated
 
         return result;
     }
