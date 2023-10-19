@@ -26,6 +26,8 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer iosAccesses = 0;
 
+    // TODO re-do below
+
     // Their sum is equivalent to the total number of client inorganics searched:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicSearches = 0;
@@ -48,6 +50,8 @@ class MetricsModel {
 
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicCompletions = 0;
+
+    // TODO re-do above
 
     // Their sum is equivalent to the total number of client organics queried from name:
     @Column(columnDefinition = "INT default 0", nullable = false)

@@ -181,11 +181,13 @@ class InorganicService {
             parsedInorganic.setMolecularMass(molecularMass);
         }
 
+        // TODO check if is inorganic
+
         inorganicRepository.save(parsedInorganic);
         cacheComponent.add(parsedInorganic);
 
         metricsService.inorganicLearned();
-        logger.info("Learned inorganic: " + parsedInorganic);
+        logger.warn("Learned inorganic: " + parsedInorganic);
 
         return new InorganicResult(parsedInorganic);
     }
