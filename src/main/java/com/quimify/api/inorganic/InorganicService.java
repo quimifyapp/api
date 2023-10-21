@@ -30,7 +30,7 @@ class InorganicService {
     CacheComponent cacheComponent;
 
     @Autowired
-    ClassificationService classificationService; // TODO run all over DB
+    ClassificationService classificationService; // TODO run all over DB once more
 
     @Autowired
     CorrectionService correctionService;
@@ -61,50 +61,61 @@ class InorganicService {
 
     // Client:
 
-    //if(!inorganicResult.isPresent()) TODO logs, metrics...
-    //        notFoundQueryService.log(input, getClass());
-
-    //metricsService.inorganicSearched(inorganicResult.isPresent());
+    // TODO LOG & not found query
 
     InorganicResult search(String input) {
         Optional<InorganicModel> searchedInMemory = fetch(input);
 
+        metricsService.inorganicSearched(searchedInMemory.isPresent());
+
         if (searchedInMemory.isPresent())
             return new InorganicResult(searchedInMemory.get());
 
-        Optional<Classification> classifierResult = classificationService.classify(input);
+        Optional<InorganicResult> filteredResult = classificationSearch(input);
 
-        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
-            return new InorganicResult(classifierResult.get().toString());
+        if (filteredResult.isPresent())
+            return filteredResult.get();
 
         return smartSearch(input);
     }
 
-    InorganicResult smartSearch(String input) { // TODO re-structure
-        String correctedInput = correctionService.correct(input);
+    InorganicResult smartSearch(String input) {
+        Optional<InorganicResult> inorganicResult = correctionSearch(input);
 
-        if (!input.equals(correctedInput)) {
-            Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
+        // TODO by similarity
+        // TODO metricsService.inorganicSimilaritySearched(...);
 
-            if (searchedInMemory.isPresent())
-                return new InorganicResult(searchedInMemory.get(), correctedInput);
-        }
+        if (inorganicResult.isPresent())
+            return inorganicResult.get();
 
-        Optional<InorganicModel> searchedInMemory = fetch("ácido " + correctedInput);
-
-        if (searchedInMemory.isPresent())
-            return new InorganicResult(searchedInMemory.get(), correctedInput);
-
-        return enrichedSearch(input); // TODO similarity instead
+        return enrichedSearch(input);
     }
 
     InorganicResult enrichedSearch(String input) {
         Optional<String> url = webSearchComponent.search(input);
 
-        if (url.isEmpty())
+        if (url.isEmpty()) {
+            metricsService.inorganicDeepSearchFailed();
             return InorganicResult.notFound();
+        }
 
-        return parseInorganic(url.get(), input);
+        Optional<InorganicModel> parsedInorganic = webParseComponent.tryParse(url.get());
+
+        if (parsedInorganic.isEmpty()) {
+            metricsService.inorganicDeepSearchFailed();
+            return InorganicResult.notFound();
+        }
+
+        Optional<InorganicModel> searchedInMemory = fetch(parsedInorganic.get().getFormula());
+
+        if (searchedInMemory.isPresent()) {
+            metricsService.inorganicDeepSearchFound();
+            logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
+
+            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
+        }
+
+        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion
     }
 
     String complete(String input) {
@@ -120,7 +131,7 @@ class InorganicService {
         return completion;
     }
 
-    InorganicResult searchFromCompletion(String completion) {
+    InorganicResult completionSearch(String completion) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = fetch(completion);
@@ -133,7 +144,7 @@ class InorganicService {
         }
 
         metricsService.inorganicCompleted();
-        metricsService.inorganicSearched(inorganicResult.isFound()); // TODO here?
+        metricsService.inorganicSearched(inorganicResult.isFound());
 
         return inorganicResult;
     }
@@ -155,25 +166,47 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private InorganicResult parseInorganic(String url, String input) {
-        Optional<InorganicModel> parsedInorganic = webParseComponent.tryParse(url);
+    private Optional<InorganicResult> classificationSearch(String input) {
+        Optional<Classification> classifierResult = classificationService.classify(input);
 
-        if (parsedInorganic.isEmpty())
-            return InorganicResult.notFound();
+        metricsService.inorganicClassificationSearched(classifierResult.isPresent());
 
-        // Check if it was already in the DB:
+        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
+            return Optional.of(new InorganicResult(classifierResult.get().toString()));
 
-        Optional<InorganicModel> searchedInMemory = fetch(parsedInorganic.get().getFormula());
+        return Optional.empty();
+    }
 
-        if (searchedInMemory.isPresent()) {
-            logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
-            return new InorganicResult(searchedInMemory.get()); // TODO deduce suggestion
+    private Optional<InorganicResult> correctionSearch(String input) {
+        Optional<InorganicResult> inorganicResult = Optional.empty();
+
+        String correctedInput = correctionService.correct(input);
+
+        if (!input.equals(correctedInput)) {
+            Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
+
+            if (searchedInMemory.isPresent())
+                inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
         }
 
-        return learnParsedInorganic(parsedInorganic.get()); // TODO deduce suggestion
+        if (inorganicResult.isEmpty()) {
+            Optional<InorganicModel> searchedInMemory = fetch("ácido " + correctedInput);
+
+            if (searchedInMemory.isPresent())
+                inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
+        }
+
+        metricsService.inorganicCorrectionSearched(inorganicResult.isPresent());
+
+        return inorganicResult;
     }
 
     private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
+        if(hasInorganicName(parsedInorganic)) {
+            metricsService.inorganicDeepSearchFailed();
+            return InorganicResult.notFound();
+        }
+
         Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
 
         if (newMolecularMass.isPresent()) {
@@ -181,15 +214,27 @@ class InorganicService {
             parsedInorganic.setMolecularMass(molecularMass);
         }
 
-        // TODO check if is inorganic
-
         inorganicRepository.save(parsedInorganic);
         cacheComponent.add(parsedInorganic);
 
-        metricsService.inorganicLearned();
+        metricsService.inorganicDeepSearchLearned();
         logger.warn("Learned inorganic: " + parsedInorganic);
 
         return new InorganicResult(parsedInorganic);
+    }
+
+    private boolean hasInorganicName(InorganicModel inorganicModel) {
+        String name = inorganicModel.getStockName();
+
+        if (name == null)
+            name = inorganicModel.getSystematicName();
+
+        if (name == null)
+            name = inorganicModel.getTraditionalName();
+
+        Optional<Classification> classifierResult = classificationService.classify(name);
+
+        return classifierResult.isEmpty() || classificationService.isInorganic(classifierResult.get());
     }
 
 }

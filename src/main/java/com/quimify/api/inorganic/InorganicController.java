@@ -20,6 +20,7 @@ class InorganicController {
 
     // Constants:
 
+    // TODO remake
     private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RETURN: %s.";
 
     // Client:
@@ -32,8 +33,8 @@ class InorganicController {
     }
 
     @GetMapping("/from-completion")
-    InorganicResult searchFromCompletion(@RequestParam("completion") String completion) {
-        InorganicResult inorganicResult = inorganicService.searchFromCompletion(completion);
+    InorganicResult completionSearch(@RequestParam("completion") String completion) {
+        InorganicResult inorganicResult = inorganicService.completionSearch(completion);
 
         if (inorganicResult.isFound())
             logger.info(String.format(getInorganicMessage, "completion", completion, inorganicResult));
@@ -62,8 +63,8 @@ class InorganicController {
         return inorganicResult;
     }
 
-    @GetMapping("/enriched")
-    InorganicResult enrichedSearch(@RequestParam("input") String input) {
+    @GetMapping("/deep")
+    InorganicResult deepSearch(@RequestParam("input") String input) {
         InorganicResult inorganicResult = inorganicService.enrichedSearch(input);
 
         // TODO logging

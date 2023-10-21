@@ -26,55 +26,71 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer iosAccesses = 0;
 
-    // TODO re-do below
-
-    // Their sum is equivalent to the total number of client inorganics searched:
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicSearches = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicNotFoundSearches = 0;
-
-    // Their sum is equivalent to the total number of client inorganic searches that required a web search:
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer freeBingQueries = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer freeBingNotFoundQueries = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleQueries = 0;
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer googleNotFoundQueries = 0;
-
-    // New inorganics from the web incorporated to the DB:
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicLearnings = 0;
-
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicCompletions = 0;
 
-    // TODO re-do above
-
-    // Their sum is equivalent to the total number of client organics queried from name:
+    // Their sum is the total of inorganics queried:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicFromNameQueries = 0;
+    private Integer inorganicFoundSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFailedSearches = 0;
+
+    // Their sum is the total of classifications attempted:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFoundClassifications = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFailedClassifications = 0;
+
+    // Their sum minus failed classifications is the total of rejected classifications:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFoundCorrectionSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFailedCorrectionSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFoundSimilaritySearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFailedSimilaritySearches = 0;
+
+    // Their sum minus failed corrections and failed similarities is the total of rejected smart searches:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFoundDeepSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicLearnedDeepSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicFailedDeepSearches = 0;
+
+    // Their sum is the total of web searches done:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bingFoundSearches = 0; // TODO rename freeBing -> bing
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer bingFailedSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer googleFoundSearches = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer googleFailedSearches = 0;
+
+    // Their sum is the total of client organics queried from name:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer organicFromNameFoundQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicFromNameFailedQueries = 0;
 
-    // Their sum is equivalent to the total number of client organics queried from structure:
+    // Their sum is the total of client organics queried from structure:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer organicFromStructureQueries = 0;
+    private Integer organicFromStructureFoundQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer organicFromStructureFailedQueries = 0;
 
-    // Their sum is equivalent to the total number of client molecular masses queried:
+    // Their sum is the total of client molecular masses queried:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer molecularMassQueries = 0;
+    private Integer molecularMassFoundQueries = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer molecularMassFailedQueries = 0;
 
     // Constructors:
 
     MetricsModel(Date date) {
-        setDate(date);
+        this.date = date;
     }
 
     protected MetricsModel() {} // Needed by JPA, don't touch
@@ -101,62 +117,93 @@ class MetricsModel {
         iosAccesses += 1;
     }
 
-    void incrementInorganicSearches() {
-        inorganicSearches += 1;
-    }
-
-    void incrementInorganicNotFoundSearches() {
-        inorganicNotFoundSearches += 1;
-    }
-
-    void incrementFreeBingQueries() {
-        freeBingQueries += 1;
-    }
-
-    void incrementFreeBingNotFoundQueries() {
-        freeBingNotFoundQueries += 1;
-    }
-
-    void incrementGoogleQueries() {
-        googleQueries += 1;
-    }
-
-    void incrementGoogleNotFoundQueries() {
-        googleNotFoundQueries += 1;
-    }
-
-    void incrementInorganicLearnings() {
-        inorganicLearnings += 1;
-    }
-
     void incrementInorganicCompletions() {
         inorganicCompletions += 1;
     }
 
-    void incrementOrganicFromNameQueries() {
-        organicFromNameQueries += 1;
+    void incrementInorganicFoundSearches() {
+        inorganicFoundSearches += 1;
+    }
+
+    void incrementInorganicFailedSearches() {
+        inorganicFailedSearches += 1;
+    }
+
+    void incrementInorganicFoundClassifications() {
+        inorganicFoundClassifications += 1;
+    }
+
+    void incrementInorganicFailedClassifications() {
+        inorganicFailedClassifications += 1;
+    }
+
+    void incrementInorganicFoundCorrectionSearches() {
+        inorganicFoundCorrectionSearches += 1;
+    }
+
+    void incrementInorganicFailedCorrectionSearches() {
+        inorganicFailedCorrectionSearches += 1;
+    }
+
+    void incrementInorganicFoundSimilaritySearches() {
+        inorganicFoundSimilaritySearches += 1;
+    }
+
+    void incrementInorganicFailedSimilaritySearches() {
+        inorganicFailedSimilaritySearches += 1;
+    }
+
+    void incrementInorganicFoundDeepSearches() {
+        inorganicFoundDeepSearches += 1;
+    }
+
+    void incrementInorganicLearnedDeepSearches() {
+        inorganicLearnedDeepSearches += 1;
+    }
+
+    void incrementInorganicFailedDeepSearches() {
+        inorganicFailedDeepSearches += 1;
+    }
+
+    void incrementBingFoundSearches() {
+        bingFoundSearches += 1;
+    }
+
+    void incrementBingFailedSearches() {
+        bingFailedSearches += 1;
+    }
+
+    void incrementGoogleFoundSearches() {
+        googleFoundSearches += 1;
+    }
+
+    void incrementGoogleFailedSearches() {
+        googleFailedSearches += 1;
+    }
+
+    void incrementOrganicFromNameFoundQueries() {
+        organicFromNameFoundQueries += 1;
     }
 
     void incrementOrganicFromNameFailedQueries() {
         organicFromNameFailedQueries += 1;
     }
 
-    void incrementOrganicFromStructureQueries() {
-        organicFromStructureQueries += 1;
+    void incrementOrganicFromStructureFoundQueries() {
+        organicFromStructureFoundQueries += 1;
     }
 
     void incrementOrganicFromStructureFailedQueries() {
         organicFromStructureFailedQueries += 1;
     }
 
-    void incrementMolecularMassQueries() {
-        molecularMassQueries += 1;
+    void incrementMolecularMassFoundQueries() {
+        molecularMassFoundQueries += 1;
     }
 
     void incrementMolecularMassFailedQueries() {
         molecularMassFailedQueries += 1;
     }
-
 
     // Getters and setters:
 
@@ -208,62 +255,6 @@ class MetricsModel {
         this.iosAccesses = iosAccesses;
     }
 
-    Integer getInorganicSearches() {
-        return inorganicSearches;
-    }
-
-    void setInorganicSearches(Integer inorganicSearches) {
-        this.inorganicSearches = inorganicSearches;
-    }
-
-    Integer getInorganicNotFoundSearches() {
-        return inorganicNotFoundSearches;
-    }
-
-    void setInorganicNotFoundSearches(Integer inorganicNotFoundSearches) {
-        this.inorganicNotFoundSearches = inorganicNotFoundSearches;
-    }
-
-    Integer getFreeBingQueries() {
-        return freeBingQueries;
-    }
-
-    void setFreeBingQueries(Integer freeBingQueries) {
-        this.freeBingQueries = freeBingQueries;
-    }
-
-    Integer getFreeBingNotFoundQueries() {
-        return freeBingNotFoundQueries;
-    }
-
-    void setFreeBingNotFoundQueries(Integer freeBingNotFoundQueries) {
-        this.freeBingNotFoundQueries = freeBingNotFoundQueries;
-    }
-
-    Integer getGoogleQueries() {
-        return googleQueries;
-    }
-
-    void setGoogleQueries(Integer googleQueries) {
-        this.googleQueries = googleQueries;
-    }
-
-    Integer getGoogleNotFoundQueries() {
-        return googleNotFoundQueries;
-    }
-
-    void setGoogleNotFoundQueries(Integer googleNotFoundQueries) {
-        this.googleNotFoundQueries = googleNotFoundQueries;
-    }
-
-    Integer getInorganicLearnings() {
-        return inorganicLearnings;
-    }
-
-    void setInorganicLearnings(Integer inorganicLearnings) {
-        this.inorganicLearnings = inorganicLearnings;
-    }
-
     Integer getInorganicCompletions() {
         return inorganicCompletions;
     }
@@ -272,12 +263,132 @@ class MetricsModel {
         this.inorganicCompletions = inorganicCompletions;
     }
 
-    Integer getOrganicFromNameQueries() {
-        return organicFromNameQueries;
+    Integer getInorganicFoundSearches() {
+        return inorganicFoundSearches;
     }
 
-    void setOrganicFromNameQueries(Integer organicFromNameQueries) {
-        this.organicFromNameQueries = organicFromNameQueries;
+    void setInorganicFoundSearches(Integer inorganicFoundSearches) {
+        this.inorganicFoundSearches = inorganicFoundSearches;
+    }
+
+    Integer getInorganicFailedSearches() {
+        return inorganicFailedSearches;
+    }
+
+    void setInorganicFailedSearches(Integer inorganicFailedSearches) {
+        this.inorganicFailedSearches = inorganicFailedSearches;
+    }
+
+    Integer getInorganicFoundClassifications() {
+        return inorganicFoundClassifications;
+    }
+
+    void setInorganicFoundClassifications(Integer inorganicFoundClassifications) {
+        this.inorganicFoundClassifications = inorganicFoundClassifications;
+    }
+
+    Integer getInorganicFailedClassifications() {
+        return inorganicFailedClassifications;
+    }
+
+    void setInorganicFailedClassifications(Integer inorganicFailedClassifications) {
+        this.inorganicFailedClassifications = inorganicFailedClassifications;
+    }
+
+    Integer getInorganicFoundCorrectionSearches() {
+        return inorganicFoundCorrectionSearches;
+    }
+
+    void setInorganicFoundCorrectionSearches(Integer inorganicFoundCorrectionSearches) {
+        this.inorganicFoundCorrectionSearches = inorganicFoundCorrectionSearches;
+    }
+
+    Integer getInorganicFailedCorrectionSearches() {
+        return inorganicFailedCorrectionSearches;
+    }
+
+    void setInorganicFailedCorrectionSearches(Integer inorganicFailedCorrectionSearches) {
+        this.inorganicFailedCorrectionSearches = inorganicFailedCorrectionSearches;
+    }
+
+    Integer getInorganicFoundSimilaritySearches() {
+        return inorganicFoundSimilaritySearches;
+    }
+
+    void setInorganicFoundSimilaritySearches(Integer inorganicFoundSimilaritySearches) {
+        this.inorganicFoundSimilaritySearches = inorganicFoundSimilaritySearches;
+    }
+
+    Integer getInorganicFailedSimilaritySearches() {
+        return inorganicFailedSimilaritySearches;
+    }
+
+    void setInorganicFailedSimilaritySearches(Integer inorganicFailedSimilaritySearches) {
+        this.inorganicFailedSimilaritySearches = inorganicFailedSimilaritySearches;
+    }
+
+    Integer getInorganicFoundDeepSearches() {
+        return inorganicFoundDeepSearches;
+    }
+
+    void setInorganicFoundDeepSearches(Integer inorganicFoundEnrichedSearches) {
+        this.inorganicFoundDeepSearches = inorganicFoundEnrichedSearches;
+    }
+
+    Integer getInorganicLearnedDeepSearches() {
+        return inorganicLearnedDeepSearches;
+    }
+
+    void setInorganicLearnedDeepSearches(Integer inorganicLearnedEnrichedSearches) {
+        this.inorganicLearnedDeepSearches = inorganicLearnedEnrichedSearches;
+    }
+
+    Integer getInorganicFailedDeepSearches() {
+        return inorganicFailedDeepSearches;
+    }
+
+    void setInorganicFailedDeepSearches(Integer inorganicFailedEnrichedSearches) {
+        this.inorganicFailedDeepSearches = inorganicFailedEnrichedSearches;
+    }
+
+    Integer getBingFoundSearches() {
+        return bingFoundSearches;
+    }
+
+    void setBingFoundSearches(Integer bingFoundSearches) {
+        this.bingFoundSearches = bingFoundSearches;
+    }
+
+    Integer getBingFailedSearches() {
+        return bingFailedSearches;
+    }
+
+    void setBingFailedSearches(Integer bingFailedSearches) {
+        this.bingFailedSearches = bingFailedSearches;
+    }
+
+    Integer getGoogleFoundSearches() {
+        return googleFoundSearches;
+    }
+
+    void setGoogleFoundSearches(Integer googleFoundSearches) {
+        this.googleFoundSearches = googleFoundSearches;
+    }
+
+    Integer getGoogleFailedSearches() {
+        return googleFailedSearches;
+    }
+
+    void setGoogleFailedSearches(Integer googleFailedSearches) {
+        this.googleFailedSearches = googleFailedSearches;
+    }
+
+    Integer getOrganicFromNameFoundQueries() {
+        return organicFromNameFoundQueries;
+    }
+
+    void setOrganicFromNameFoundQueries(Integer organicFromNameFoundQueries) {
+        this.organicFromNameFoundQueries = organicFromNameFoundQueries;
     }
 
     Integer getOrganicFromNameFailedQueries() {
@@ -288,12 +399,12 @@ class MetricsModel {
         this.organicFromNameFailedQueries = organicFromNameFailedQueries;
     }
 
-    Integer getOrganicFromStructureQueries() {
-        return organicFromStructureQueries;
+    Integer getOrganicFromStructureFoundQueries() {
+        return organicFromStructureFoundQueries;
     }
 
-    void setOrganicFromStructureQueries(Integer organicFromStructureQueries) {
-        this.organicFromStructureQueries = organicFromStructureQueries;
+    void setOrganicFromStructureFoundQueries(Integer organicFromStructureFoundQueries) {
+        this.organicFromStructureFoundQueries = organicFromStructureFoundQueries;
     }
 
     Integer getOrganicFromStructureFailedQueries() {
@@ -304,12 +415,12 @@ class MetricsModel {
         this.organicFromStructureFailedQueries = organicFromStructureFailedQueries;
     }
 
-    Integer getMolecularMassQueries() {
-        return molecularMassQueries;
+    Integer getMolecularMassFoundQueries() {
+        return molecularMassFoundQueries;
     }
 
-    void setMolecularMassQueries(Integer molecularMassQueries) {
-        this.molecularMassQueries = molecularMassQueries;
+    void setMolecularMassFoundQueries(Integer molecularMassFoundQueries) {
+        this.molecularMassFoundQueries = molecularMassFoundQueries;
     }
 
     Integer getMolecularMassFailedQueries() {
