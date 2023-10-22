@@ -36,12 +36,8 @@ class WebSearchComponent {
 
         if (canBingSearch())
             url = bingSearch(input);
-
-        if (url.isEmpty() && canGoogleSearch())
+        else if (canGoogleSearch())
             url = googleSearch(input);
-
-        if (url.isEmpty())
-            logger.warn("Couldn't find inorganic \"" + input + "\" on the web.");
 
         return url;
     }

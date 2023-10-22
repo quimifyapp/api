@@ -20,8 +20,7 @@ class InorganicController {
 
     // Constants:
 
-    // TODO remake
-    private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RETURN: %s.";
+    private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RESULT: %s.";
 
     // Client:
 
@@ -47,7 +46,7 @@ class InorganicController {
         InorganicResult inorganicResult = inorganicService.search(input);
 
         if (inorganicResult.isFound())
-            logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+            logger.info(String.format(getInorganicMessage, "search", input, inorganicResult));
 
         return inorganicResult;
     }
@@ -56,20 +55,18 @@ class InorganicController {
     InorganicResult smartSearch(@RequestParam("input") String input) {
         InorganicResult inorganicResult = inorganicService.smartSearch(input);
 
-        // TODO logging
-        //if (inorganicResult.isPresent())
-        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+        if (inorganicResult.isFound())
+            logger.info(String.format(getInorganicMessage, "smart search", input, inorganicResult));
 
         return inorganicResult;
     }
 
     @GetMapping("/deep")
     InorganicResult deepSearch(@RequestParam("input") String input) {
-        InorganicResult inorganicResult = inorganicService.enrichedSearch(input);
+        InorganicResult inorganicResult = inorganicService.deepSearch(input);
 
-        // TODO logging
-        //if (inorganicResult.isPresent())
-        //    logger.info(String.format(getInorganicMessage, "input", input, inorganicResult));
+        if (inorganicResult.isFound())
+            logger.info(String.format(getInorganicMessage, "deep search", input, inorganicResult));
 
         return inorganicResult;
     }

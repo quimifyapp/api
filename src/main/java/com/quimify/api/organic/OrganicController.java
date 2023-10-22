@@ -18,7 +18,7 @@ class OrganicController {
 
 	// Constants:
 
-	private static final String getOrganicMessage = "GET organic %s: \"%s\". RETURN: %s.";
+	private static final String getOrganicMessage = "GET organic %s: \"%s\". RESULT: %s.";
 
 	// Client:
 

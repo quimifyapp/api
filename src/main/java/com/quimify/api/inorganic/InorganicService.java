@@ -61,7 +61,7 @@ class InorganicService {
 
     // Client:
 
-    // TODO LOG & not found query
+    // TODO not found query
 
     InorganicResult search(String input) {
         Optional<InorganicModel> searchedInMemory = fetch(input);
@@ -71,27 +71,24 @@ class InorganicService {
         if (searchedInMemory.isPresent())
             return new InorganicResult(searchedInMemory.get());
 
+        logger.warn("Inorganic not in DB: \"" + input + "\".");
+
+        return correctionSearch(input).orElse(smartSearch(input));
+    }
+
+    InorganicResult smartSearch(String input) {
         Optional<InorganicResult> filteredResult = classificationSearch(input);
 
         if (filteredResult.isPresent())
             return filteredResult.get();
 
-        return smartSearch(input);
-    }
-
-    InorganicResult smartSearch(String input) {
-        Optional<InorganicResult> inorganicResult = correctionSearch(input);
-
         // TODO by similarity
         // TODO metricsService.inorganicSimilaritySearched(...);
 
-        if (inorganicResult.isPresent())
-            return inorganicResult.get();
-
-        return enrichedSearch(input);
+        return deepSearch(input);
     }
 
-    InorganicResult enrichedSearch(String input) {
+    InorganicResult deepSearch(String input) {
         Optional<String> url = webSearchComponent.search(input);
 
         if (url.isEmpty()) {
@@ -190,10 +187,14 @@ class InorganicService {
         }
 
         if (inorganicResult.isEmpty()) {
-            Optional<InorganicModel> searchedInMemory = fetch("ácido " + correctedInput);
+            correctedInput = "ácido " + correctedInput;
 
-            if (searchedInMemory.isPresent())
+            Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
+
+            if (searchedInMemory.isPresent()) {
+                logger.warn("Successfully corrected \"" + input + "\" to : \"" + correctedInput + "\".");
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
+            }
         }
 
         metricsService.inorganicCorrectionSearched(inorganicResult.isPresent());
@@ -202,8 +203,10 @@ class InorganicService {
     }
 
     private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
-        if(hasInorganicName(parsedInorganic)) {
+        if (!hasInorganicName(parsedInorganic)) {
             metricsService.inorganicDeepSearchFailed();
+            logger.warn("Parsed inorganic " + parsedInorganic + " doesn't look like an inorganic.");
+
             return InorganicResult.notFound();
         }
 

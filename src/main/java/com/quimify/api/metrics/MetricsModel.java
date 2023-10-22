@@ -26,9 +26,6 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer iosAccesses = 0;
 
-    @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer inorganicCompletions = 0;
-
     // Their sum is the total of inorganics queried:
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer inorganicFoundSearches = 0;
@@ -68,6 +65,9 @@ class MetricsModel {
     private Integer googleFoundSearches = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer googleFailedSearches = 0;
+
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer inorganicCompletions = 0;
 
     // Their sum is the total of client organics queried from name:
     @Column(columnDefinition = "INT default 0", nullable = false)

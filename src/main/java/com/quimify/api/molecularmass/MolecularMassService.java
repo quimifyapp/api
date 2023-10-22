@@ -71,7 +71,7 @@ public class MolecularMassService {
             molecularMassResult = calculate(query);
 
             if (!molecularMassResult.isPresent())
-                logger.warn("Couldn't calculate \"" + query + "\". " + "RETURN: " + molecularMassResult.getError());
+                logger.warn("Couldn't calculate \"" + query + "\". " + "RESULT: " + molecularMassResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", query, getClass());
             molecularMassResult = MolecularMassResult.error("La fórmula es demasiado larga.");

@@ -57,10 +57,10 @@ class WebParseComponent {
         try {
             return Optional.of(parse(url));
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Exception parsing FQPage: " + url + ". " + illegalArgumentException.getMessage());
+            logger.warn("Exception parsing web: " + url + ". " + illegalArgumentException.getMessage());
             return Optional.empty();
         } catch (Exception exception) {
-            errorService.log("Exception parsing FQPage: " + url, exception.toString(), getClass());
+            errorService.log("Exception parsing web: " + url, exception.toString(), getClass());
             return Optional.empty();
         }
     }
@@ -69,7 +69,7 @@ class WebParseComponent {
 
     private InorganicModel parse(String url) throws IOException {
         if (!url.contains(fqUrl))
-            throw new IllegalArgumentException("Not a FQ address.");
+            throw new IllegalArgumentException("Invalid address.");
 
         if (invalidSubdirectories.stream().anyMatch(url::endsWith))
             throw new IllegalArgumentException("Invalid subdirectory.");

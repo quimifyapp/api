@@ -22,7 +22,7 @@ public class CorrectionService {
             if (input.contains(correctionModel.getMistake())) {
                 String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 
-                logger.warn("Corrected input \"" + input + "\" to \"" + correctedInput + "\".");
+                logger.warn("Corrected \"" + input + "\" to: \"" + correctedInput + "\".");
 
                 input = correctedInput;
             }

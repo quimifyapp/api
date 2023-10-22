@@ -18,7 +18,7 @@ class MolecularMassController {
 
     // Constants:
 
-    private static final String getMolecularMassMessage = "GET molecular mass: \"%s\". RETURN: %s.";
+    private static final String getMolecularMassMessage = "GET molecular mass: \"%s\". RESULT: %s.";
 
     // Client:
 

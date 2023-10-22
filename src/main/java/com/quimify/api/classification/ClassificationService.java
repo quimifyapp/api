@@ -4,6 +4,8 @@ import com.quimify.api.error.ErrorService;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.utils.Connection;
 import com.quimify.api.utils.Normalizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class ClassificationService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     ClassificationRepository classificationRepository; // DB connection
@@ -36,8 +40,8 @@ public class ClassificationService {
 
         for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
             if (adaptedInput.matches(classificationModel.getRegexPattern())) {
+                logger.warn("Classified \"" + input + "\" with DB: " + classificationModel.getClassification() + ".");
                 return filteredResult(input, classificationModel.getClassification());
-                // TODO log info
             }
 
         return classifyWithAi(input);
@@ -62,14 +66,14 @@ public class ClassificationService {
             int resultCode = Integer.parseInt(response);
 
             if (resultCode != notFoundResultCode) {
-                return filteredResult(input, Classification.values()[resultCode]);
-                // TODO log info
+                Classification classification = Classification.values()[resultCode];
+                logger.warn("Classified \"" + input + "\" with AI: " + classification + ".");
+                return filteredResult(input, classification);
             }
+            else errorService.log("Classifier AI returned " + notFoundResultCode, input, getClass());
         } catch (Exception exception) {
-            errorService.log("Exception calling classifier for: " + input, exception.toString(), getClass());
+            errorService.log("Exception calling Classifier AI for: " + input, exception.toString(), getClass());
         }
-
-        // TODO log warn
 
         return Optional.empty();
     }
@@ -109,7 +113,8 @@ public class ClassificationService {
                 break;
         }
 
-        // TODO log warn if updated
+        if(result.isEmpty() || !result.get().equals(classification))
+            logger.warn("Classification [" + classification + "] was filtered to: " + result + ".");
 
         return result;
     }
