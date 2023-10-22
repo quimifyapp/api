@@ -24,7 +24,7 @@ class InorganicService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicRepository inorganicRepository; // DB connection
+    InorganicRepository inorganicRepository;
 
     @Autowired
     CacheComponent cacheComponent;

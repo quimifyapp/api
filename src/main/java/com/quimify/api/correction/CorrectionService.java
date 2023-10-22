@@ -11,7 +11,7 @@ public class CorrectionService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    CorrectionRepository correctionRepository; // DB connection
+    CorrectionRepository correctionRepository; 
 
     // TODO metrics
 

@@ -23,7 +23,7 @@ class CacheComponent {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicRepository inorganicRepository; // DB connection
+    InorganicRepository inorganicRepository; 
 
     @Autowired
     ErrorService errorService; // API errors logic

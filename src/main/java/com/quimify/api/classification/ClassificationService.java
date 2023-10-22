@@ -19,7 +19,7 @@ public class ClassificationService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ClassificationRepository classificationRepository; // DB connection
+    ClassificationRepository classificationRepository;
 
     @Autowired
     SettingsService settingsService;

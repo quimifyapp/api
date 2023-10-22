@@ -15,7 +15,7 @@ import java.util.Optional;
 public class MetricsService {
 
     @Autowired
-    MetricsRepository metricsRepository; // DB connection
+    MetricsRepository metricsRepository; 
 
     // Day starts at 13:00 of Spain and 07:00 of Bolivia
     private static final Duration offSet = Duration.ofHours(-13);

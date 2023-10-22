@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class AccessDataService {
 
     @Autowired
-    AccessDataRepository accessDataRepository; // DB connection
+    AccessDataRepository accessDataRepository; 
 
     @Autowired
     MetricsService metricsService;

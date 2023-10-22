@@ -13,7 +13,7 @@ import java.time.Instant;
 class ReportService {
 
     @Autowired
-    ReportRepository reportRepository; // DB connection
+    ReportRepository reportRepository; 
 
     @Autowired
     MetricsService metricsService;

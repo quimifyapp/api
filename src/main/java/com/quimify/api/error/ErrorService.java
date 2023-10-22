@@ -17,7 +17,7 @@ public class ErrorService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ErrorRepository errorRepository; // DB connection
+    ErrorRepository errorRepository; 
 
     @Autowired
     MetricsService metricsService;

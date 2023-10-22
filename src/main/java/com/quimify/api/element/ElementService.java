@@ -11,7 +11,7 @@ import java.util.Optional;
 public class ElementService {
 
     @Autowired
-    ElementRepository elementRepository; // DB connection
+    ElementRepository elementRepository; 
 
     // Public:
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class SettingsService {
 
     @Autowired
-    SettingsRepository settingsRepository; // DB connection
+    SettingsRepository settingsRepository; 
 
     private static final int apiVersion = 5;
 

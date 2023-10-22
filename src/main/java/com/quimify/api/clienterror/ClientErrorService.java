@@ -13,7 +13,7 @@ import java.time.Instant;
 class ClientErrorService {
 
     @Autowired
-    ClientErrorRepository clientErrorRepository; // DB connection
+    ClientErrorRepository clientErrorRepository; 
 
     @Autowired
     MetricsService metricsService;

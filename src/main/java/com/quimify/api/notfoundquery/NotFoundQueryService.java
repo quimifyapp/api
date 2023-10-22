@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class NotFoundQueryService {
 
     @Autowired
-    NotFoundQueryRepository notFoundQueryRepository; // DB connection
+    NotFoundQueryRepository notFoundQueryRepository; 
 
     // Internal:
 
