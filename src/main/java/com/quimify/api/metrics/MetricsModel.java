@@ -61,7 +61,7 @@ class MetricsModel {
 
     // Their sum is the total of web searches done:
     @Column(columnDefinition = "INT default 0", nullable = false)
-    private Integer bingFoundSearches = 0; // TODO rename freeBing -> bing
+    private Integer bingFoundSearches = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer bingFailedSearches = 0;
     @Column(columnDefinition = "INT default 0", nullable = false)

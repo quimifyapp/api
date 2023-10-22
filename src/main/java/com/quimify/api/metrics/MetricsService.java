@@ -44,7 +44,7 @@ public class MetricsService {
         return todayMetrics.getGoogleFoundSearches() + todayMetrics.getGoogleFailedSearches();
     }
 
-    public Integer getFreeBingQueries() {
+    public Integer getBingQueries() {
         MetricsModel todayMetrics = getTodayMetrics();
 
         return todayMetrics.getBingFoundSearches() + todayMetrics.getBingFailedSearches();
@@ -132,7 +132,7 @@ public class MetricsService {
     }
 
     @Transactional
-    public void freeBingQueried(boolean found) {
+    public void bingQueried(boolean found) {
         MetricsModel todayMetrics = getTodayMetrics();
 
         if (found)

@@ -34,8 +34,8 @@ class WebSearchComponent {
     Optional<String> search(String input) {
         Optional<String> url = Optional.empty();
 
-        if (canFreeBingSearch()) // TODO Put a daily limit of 33!
-            url = freeBingSearch(input);
+        if (canBingSearch())
+            url = bingSearch(input);
 
         if (url.isEmpty() && canGoogleSearch())
             url = googleSearch(input);
@@ -48,25 +48,25 @@ class WebSearchComponent {
 
     // Private:
 
-    private boolean canFreeBingSearch() {
-        if (!settingsService.getUseFreeBing())
+    private boolean canBingSearch() {
+        if (!settingsService.getUseBing())
             return false;
 
-        int queries = metricsService.getFreeBingQueries();
-        int dailyLimit = settingsService.getFreeBingDailyLimit();
+        int queries = metricsService.getBingQueries();
+        int dailyLimit = settingsService.getBingDailyLimit();
 
         if (queries == dailyLimit - 1)
-            logger.warn("Daily free Bing queries have just been exceeded.");
+            logger.warn("Daily Bing queries have just been exceeded.");
 
         return queries < dailyLimit;
     }
 
-    private Optional<String> freeBingSearch(String input) {
+    private Optional<String> bingSearch(String input) {
         Optional<String> address = Optional.empty();
 
         try {
-            Connection connection = new Connection(settingsService.getFreeBingUrl(), input);
-            connection.setRequestProperty("Ocp-Apim-Subscription-Key", settingsService.getFreeBingKey());
+            Connection connection = new Connection(settingsService.getBingUrl(), input);
+            connection.setRequestProperty("Ocp-Apim-Subscription-Key", settingsService.getBingKey());
             JSONObject response = new JSONObject(connection.getText());
 
             if (response.has("webPages")) {
@@ -75,13 +75,13 @@ class WebSearchComponent {
 
                 address = Optional.ofNullable(firstResult.getString("url"));
             }
-            else logger.warn("Couldn't find \"" + input + "\" on free Bing");
+            else logger.warn("Couldn't find \"" + input + "\" on Bing");
 
-            metricsService.freeBingQueried(address.isPresent());
+            metricsService.bingQueried(address.isPresent());
         } catch (Exception exception) {
             if (exception.toString().contains("HTTP response code: 403"))
-                logger.warn("Got HTTP code 403 from free Bing (probably limit exceeded).");
-            else errorService.log("Exception free Bing: " + input, exception.toString(), getClass());
+                logger.warn("Got HTTP code 403 from Bing (probably limit exceeded).");
+            else errorService.log("Exception Bing: " + input, exception.toString(), getClass());
         }
 
         return address;

@@ -16,9 +16,9 @@ class SettingsModel {
     // External API settings:
 
     @Column(nullable = false)
-    private Boolean useFreeBing;
+    private Boolean useBing;
     @Column(nullable = false)
-    private Integer freeBingDailyLimit;
+    private Integer bingDailyLimit;
 
     @Column(nullable = false)
     private Boolean useGoogle;
@@ -28,7 +28,7 @@ class SettingsModel {
     // URLs:
 
     @Column(nullable = false)
-    private String freeBingUrl;
+    private String bingUrl;
 
     @Column(nullable = false)
     private String googleUrl;
@@ -49,20 +49,20 @@ class SettingsModel {
         this.version = version;
     }
 
-    Boolean getUseFreeBing() {
-        return useFreeBing;
+    Boolean getUseBing() {
+        return useBing;
     }
 
-    void setUseFreeBing(Boolean useFreeBing) {
-        this.useFreeBing = useFreeBing;
+    void setUseBing(Boolean useBing) {
+        this.useBing = useBing;
     }
 
-    Integer getFreeBingDailyLimit() {
-        return freeBingDailyLimit;
+    Integer getBingDailyLimit() {
+        return bingDailyLimit;
     }
 
-    void setFreeBingDailyLimit(Integer freeBingDailyLimit) {
-        this.freeBingDailyLimit = freeBingDailyLimit;
+    void setBingDailyLimit(Integer bingDailyLimit) {
+        this.bingDailyLimit = bingDailyLimit;
     }
 
     Boolean getUseGoogle() {
@@ -81,12 +81,12 @@ class SettingsModel {
         this.googleDailyLimit = googleDailyLimit;
     }
 
-    String getFreeBingUrl() {
-        return freeBingUrl;
+    String getBingUrl() {
+        return bingUrl;
     }
 
-    void setFreeBingUrl(String freeBingUrl) {
-        this.freeBingUrl = freeBingUrl;
+    void setBingUrl(String bingUrl) {
+        this.bingUrl = bingUrl;
     }
 
     String getGoogleUrl() {

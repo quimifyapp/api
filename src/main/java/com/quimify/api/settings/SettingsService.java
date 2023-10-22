@@ -16,16 +16,16 @@ public class SettingsService {
 
     // Environmental variables:
 
-    @Value("${quimify.api.bing.free.key}")
-    private String freeBingKey;
+    @Value("${quimify.api.bing.key}")
+    private String bingKey;
 
     @Value("${quimify.api.google.key}")
     private String googleKey;
 
     // Secret:
 
-    public String getFreeBingKey() {
-        return freeBingKey;
+    public String getBingKey() {
+        return bingKey;
     }
 
     public String getGoogleKey() {
@@ -40,16 +40,16 @@ public class SettingsService {
 
     // Trivial:
 
-    public Boolean getUseFreeBing() {
-        return getSettings().getUseFreeBing();
+    public Boolean getUseBing() {
+        return getSettings().getUseBing();
     }
 
-    public String getFreeBingUrl() {
-        return getSettings().getFreeBingUrl();
+    public String getBingUrl() {
+        return getSettings().getBingUrl();
     }
 
-    public Integer getFreeBingDailyLimit() {
-        return getSettings().getFreeBingDailyLimit();
+    public Integer getBingDailyLimit() {
+        return getSettings().getBingDailyLimit();
     }
 
     public Boolean getUseGoogle() {

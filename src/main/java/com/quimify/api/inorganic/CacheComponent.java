@@ -1,5 +1,6 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.classification.ClassificationService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
@@ -34,6 +35,13 @@ class CacheComponent {
 
     // Updating:
 
+    @Autowired // TODO quitar
+    ClassificationService classificationService; // TODO quitar
+
+    List<String> noEncontrados = List.of( // TODO quitar
+
+    );
+
     @Scheduled(fixedDelay = 5 * 60 * 1000) // It's called at startup too
     private void tryUpdateCache() {
         try {
@@ -47,6 +55,11 @@ class CacheComponent {
 
                 for (String normalizedText : inorganicModel.getSearchTags())
                     cache.put(normalizedText, inorganicModel.getId()); // Already normalized
+            }
+
+            for (String query : noEncontrados) { // TODO quitar
+                System.out.println(classificationService.classify(query).toString() + ": \"" + query + "\"");
+                Thread.sleep(2000);
             }
 
             logger.info("Inorganic cache updated.");
