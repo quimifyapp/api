@@ -12,7 +12,6 @@ class NotFoundQueryModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
     private Integer id;
 
     @Lob // Large object in DB

@@ -11,8 +11,6 @@ class CorrectionModel {
     // Non-nullable:
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
     private Integer id;
 
     @Column(nullable = false)

@@ -14,7 +14,6 @@ class InorganicModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
     private Integer id;
 
     @Column(nullable = false)
@@ -39,7 +38,7 @@ class InorganicModel {
     @Column(columnDefinition = "INT default 1", nullable = false)
     private Integer searches = 1;
 
-    // Typed 'String' because no calculations will be performed:
+    // Stored as text because no calculations will be performed on them:
 
     private String molecularMass;   // (g)
     private String density;         // (g/cm3)
