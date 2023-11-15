@@ -8,20 +8,20 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "inorganic_search_tag")
-@Check(constraints = "REGEXP_LIKE(normalized_tag, '^[a-z0-9]+$', 'c')") // Case-sensitive matching
+@Check(constraints = "REGEXP_LIKE(normalized_text, '^[a-z0-9]+$', 'c')") // Case-sensitive matching
 class InorganicSearchTagModel {
 
     @Id
-    private String normalizedTag; // "hidruromagnesico" | "aguaoxigenada" | ...
+    private String normalizedText; // "hidruromagnesico", "aguaoxigenada"...
 
     // Getters and setters:
 
-    String getNormalizedTag() {
-        return normalizedTag;
+    String getNormalizedText() {
+        return normalizedText;
     }
 
-    void setNormalizedTag(String normalizedTag) {
-        this.normalizedTag = normalizedTag;
+    void setNormalizedText(String normalizedText) {
+        this.normalizedText = normalizedText;
     }
 
 }

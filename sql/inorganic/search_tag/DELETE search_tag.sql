@@ -1,2 +1,2 @@
 DELETE FROM inorganic_search_tag 
-WHERE id = ;
+WHERE normalized_text = "";
