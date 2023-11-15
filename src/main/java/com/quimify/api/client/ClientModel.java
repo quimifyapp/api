@@ -1,5 +1,7 @@
 package com.quimify.api.client;
 
+import org.hibernate.annotations.Check;
+
 import javax.persistence.*;
 
 // This class represents client versions and information.
@@ -7,6 +9,18 @@ import javax.persistence.*;
 @Entity
 @Table(name = "client")
 @IdClass(ClientId.class)
+@Check(constraints =
+        "(update_available != true OR " +
+                "(update_needed IS NOT NULL AND " +
+                "update_details IS NOT NULL)) AND " +
+        "(message_present != true OR " +
+                "(message_title IS NOT NULL AND " +
+                "message_details IS NOT NULL AND " +
+                "message_link_present IS NOT NULL)) AND " +
+        "(message_link_present != true OR " +
+                "(message_link_label IS NOT NULL AND " +
+                "message_link IS NOT NULL))"
+)
 class ClientModel {
 
     @Id
@@ -19,7 +33,6 @@ class ClientModel {
     private Boolean updateAvailable;
 
     // If updateAvailable = true:
-
     @Column()
     private Boolean updateNeeded;
     @Column()
@@ -29,19 +42,15 @@ class ClientModel {
     private Boolean messagePresent;
 
     // If messagePresent = true:
-
     @Column()
     private String messageTitle;
     @Column()
     private String messageDetails;
 
-    // If messagePresent = true:
-
     @Column()
     private Boolean messageLinkPresent;
 
     // If messageLinkPresent = true:
-
     @Column()
     private String messageLinkLabel;
     @Column()
