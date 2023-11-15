@@ -9,6 +9,7 @@ import javax.persistence.*;
 class SettingsModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer version;
 
     // External API settings:

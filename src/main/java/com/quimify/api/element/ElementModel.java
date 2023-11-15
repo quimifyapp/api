@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class ElementModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(nullable = false)

@@ -12,9 +12,21 @@ import javax.persistence.*;
 class InorganicSearchTagModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(unique = true, nullable = false)
     private String normalizedText; // "hidruromagnesico", "aguaoxigenada"...
 
     // Getters and setters:
+
+    Integer getId() {
+        return id;
+    }
+
+    void setId(Integer id) {
+        this.id = id;
+    }
 
     String getNormalizedText() {
         return normalizedText;

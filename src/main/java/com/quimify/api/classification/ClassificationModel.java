@@ -9,6 +9,7 @@ import javax.persistence.*;
 class ClassificationModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(nullable = false)
