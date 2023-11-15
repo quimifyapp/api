@@ -30,7 +30,7 @@ class InorganicModel {
 
     // Foreign key (one to many):
 
-    @JoinColumn(name = "inorganic_id")
+    @JoinColumn(name = "inorganic_id", nullable = false)
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Always created, deleted and fetched together
     private List<InorganicSearchTagModel> inorganicSearchTags = new ArrayList<>(); // "aguaoxigenada"
 
