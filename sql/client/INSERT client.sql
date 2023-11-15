@@ -1,4 +1,6 @@
-INSERT INTO access_data(client_version,
+INSERT INTO client(
+platform,
+version,
 update_available,
 update_needed,
 update_details,
@@ -9,7 +11,9 @@ message_link_present,
 message_link_label,
 message_link)
 
-VALUES(7, # Client version
+VALUES(
+, # Platform ("android", "ios"...)
+, # Version
 false, # Update available
 null, # Update needed
 null, # Update details

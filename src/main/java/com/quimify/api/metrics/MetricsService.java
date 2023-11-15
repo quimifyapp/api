@@ -1,6 +1,5 @@
 package com.quimify.api.metrics;
 
-import com.quimify.api.accessdata.AccessDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,7 @@ import java.util.Optional;
 public class MetricsService {
 
     @Autowired
-    MetricsRepository metricsRepository; 
+    MetricsRepository metricsRepository;
 
     // Day starts at 13:00 of Spain and 07:00 of Bolivia
     private static final Duration offSet = Duration.ofHours(-13);
@@ -68,11 +67,13 @@ public class MetricsService {
     }
 
     @Transactional
-    public void clientAccessed(Short platform) {
-        if (platform == AccessDataService.androidPlatform)
-            getTodayMetrics().incrementAndroidAccesses();
-        else if (platform == AccessDataService.iosPlatform)
-            getTodayMetrics().incrementIosAccesses();
+    public void androidClientAccessed() {
+        getTodayMetrics().incrementAndroidAccesses();
+    }
+
+    @Transactional
+    public void iosClientAccessed() {
+        getTodayMetrics().incrementIosAccesses();
     }
 
     @Transactional
