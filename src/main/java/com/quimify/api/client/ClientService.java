@@ -10,7 +10,7 @@ import java.util.Optional;
 // This class implements the logic behind HTTP methods in "/client".
 
 @Service
-public class ClientService {
+class ClientService {
 
     @Autowired
     ClientRepository clientRepository;
