@@ -64,16 +64,17 @@ class InorganicService {
     // TODO not found query
 
     InorganicResult search(String input) {
-        Optional<InorganicModel> searchedInMemory = fetch(input);
+        Optional<InorganicResult> inMemory = memorySearch(input);
 
-        metricsService.inorganicSearched(searchedInMemory.isPresent());
+        if(inMemory.isPresent())
+            return inMemory.get();
 
-        if (searchedInMemory.isPresent())
-            return new InorganicResult(searchedInMemory.get());
+        Optional<InorganicResult> corrected = correctionSearch(input);
 
-        logger.warn("Inorganic not in DB: \"" + input + "\".");
+        if (corrected.isPresent())
+            return corrected.get();
 
-        return correctionSearch(input).orElse(smartSearch(input));
+        return smartSearch(input);
     }
 
     InorganicResult smartSearch(String input) {
@@ -109,10 +110,10 @@ class InorganicService {
             metricsService.inorganicDeepSearchFound();
             logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
 
-            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion
+            return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
 
-        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion
+        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
     String complete(String input) {
@@ -148,30 +149,17 @@ class InorganicService {
 
     // Private:
 
-    private Optional<InorganicModel> fetch(String input) {
-        Optional<Integer> id = cacheComponent.find(Normalizer.get(input));
+    private Optional<InorganicResult> memorySearch(String input) {
+        Optional<InorganicModel> searchedInMemory = fetch(input);
 
-        if (id.isEmpty())
+        metricsService.inorganicSearched(searchedInMemory.isPresent());
+
+        if (searchedInMemory.isEmpty()) {
+            logger.warn("Inorganic not in DB: \"" + input + "\".");
             return Optional.empty();
+        }
 
-        Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id.get());
-
-        if (inorganicModel.isPresent())
-            inorganicModel.get().countSearch();
-        else logger.warn("Discrepancy between DB and cached ID: " + id.get());
-
-        return inorganicModel;
-    }
-
-    private Optional<InorganicResult> classificationSearch(String input) {
-        Optional<Classification> classifierResult = classificationService.classify(input);
-
-        metricsService.inorganicClassificationSearched(classifierResult.isPresent());
-
-        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
-            return Optional.of(new InorganicResult(classifierResult.get().toString()));
-
-        return Optional.empty();
+        return Optional.of(new InorganicResult(searchedInMemory.get()));
     }
 
     private Optional<InorganicResult> correctionSearch(String input) {
@@ -200,6 +188,32 @@ class InorganicService {
         metricsService.inorganicCorrectionSearched(inorganicResult.isPresent());
 
         return inorganicResult;
+    }
+
+    private Optional<InorganicResult> classificationSearch(String input) {
+        Optional<Classification> classifierResult = classificationService.classify(input);
+
+        metricsService.inorganicClassificationSearched(classifierResult.isPresent());
+
+        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
+            return Optional.of(new InorganicResult(classifierResult.get().toString()));
+
+        return Optional.empty();
+    }
+
+    private Optional<InorganicModel> fetch(String input) {
+        Optional<Integer> id = cacheComponent.find(Normalizer.get(input));
+
+        if (id.isEmpty())
+            return Optional.empty();
+
+        Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id.get());
+
+        if (inorganicModel.isPresent())
+            inorganicModel.get().countSearch();
+        else logger.warn("Discrepancy between DB and cached ID: " + id.get());
+
+        return inorganicModel;
     }
 
     private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
