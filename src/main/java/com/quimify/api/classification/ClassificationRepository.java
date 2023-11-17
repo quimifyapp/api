@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 interface ClassificationRepository extends CrudRepository<ClassificationModel, Integer> {
 
-    List<ClassificationModel> findAllByOrderByPriority();
-
 }

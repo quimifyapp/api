@@ -18,7 +18,7 @@ public class CorrectionService {
     // Internal:
 
     public String correct(String input) {
-        for(CorrectionModel correctionModel : correctionRepository.findAllByOrderByPriority()) {
+        for(CorrectionModel correctionModel : correctionRepository.findAll()) {
             if (input.contains(correctionModel.getMistake())) {
                 String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 

@@ -10,7 +10,5 @@ import java.util.List;
 @Repository
 interface CorrectionRepository extends CrudRepository<CorrectionModel, Integer> {
 
-    List<CorrectionModel> findAllByOrderByPriority();
-
 }
 
