@@ -34,24 +34,12 @@ public class ClassificationService {
     public Optional<Classification> classify(String input) {
         String adaptedInput = adaptInput(input);
 
-        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority()) {
-            String regexPattern = classificationModel.getRegexPattern();
+        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
+            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
+                logger.warn("Classified \"" + input + "\" with DB: " + classificationModel.getClassification() + ".");
 
-            if (adaptedInput.matches(regexPattern)) {
-                String name = classificationModel.getName();
-
-                Optional<Classification> classification = Classification.ofName(name);
-
-                if (classification.isEmpty()) {
-                    errorService.log("Invalid classification name from DB: " + name, regexPattern, getClass());
-                    return Optional.empty();
-                }
-
-                logger.warn("Classified \"" + input + "\" with DB: " + classification.get() + ".");
-
-                return filteredResult(input, classification.get());
+                return filteredResult(input, classificationModel.getClassification());
             }
-        }
 
         return classifyWithAi(input);
     }
@@ -78,16 +66,11 @@ public class ClassificationService {
                 return Optional.empty();
             }
 
-            Optional<Classification> classification = Classification.ofName(name);
+            Classification classification = Classification.valueOf(name);
 
-            if (classification.isEmpty()) {
-                errorService.log("Invalid classification name from AI " + name, input, getClass());
-                return Optional.empty();
-            }
+            logger.warn("Classified \"" + input + "\" with AI: " + classification + ".");
 
-            logger.warn("Classified \"" + input + "\" with AI: " + classification.get() + ".");
-
-            return filteredResult(input, classification.get());
+            return filteredResult(input, classification);
         } catch (Exception exception) {
             errorService.log("Exception calling Classifier AI for: " + input, exception.toString(), getClass());
         }
