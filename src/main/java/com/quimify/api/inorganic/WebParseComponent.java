@@ -57,7 +57,7 @@ class WebParseComponent {
         try {
             return Optional.of(parse(url));
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Exception parsing web: " + url + ". " + illegalArgumentException.getMessage());
+            logger.warn("Exception parsing web " + url + ": " + illegalArgumentException.getMessage());
             return Optional.empty();
         } catch (Exception exception) {
             errorService.log("Exception parsing web: " + url, exception.toString(), getClass());

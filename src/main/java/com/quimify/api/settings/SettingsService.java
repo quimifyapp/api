@@ -12,7 +12,7 @@ public class SettingsService {
     @Autowired
     SettingsRepository settingsRepository; 
 
-    private static final int apiVersion = 5;
+    private static final int currentVersion = 5;
 
     // Environmental variables:
 
@@ -35,7 +35,7 @@ public class SettingsService {
     // Private:
 
     private SettingsModel getSettings() {
-        return settingsRepository.findByVersion(apiVersion);
+        return settingsRepository.findByVersion(currentVersion);
     }
 
     // Trivial:
