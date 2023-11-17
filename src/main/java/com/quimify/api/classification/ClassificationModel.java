@@ -15,7 +15,7 @@ class ClassificationModel {
     private String regexPattern; // ".*gramo.*", ".*masa *molecular *de.*"...
 
     @Column()
-    private Classification classification; // Classification.organicFormula (1), null...
+    private String name; // "inorganic-formula", "chemical-problem", null...
 
     // Getters and setters:
 
@@ -35,12 +35,12 @@ class ClassificationModel {
         this.regexPattern = regexPattern;
     }
 
-    Classification getClassification() {
-        return classification;
+    String getName() {
+        return name;
     }
 
-    void setClassification(Classification classification) {
-        this.classification = classification;
+    void setName(String name) {
+        this.name = name;
     }
 
 }

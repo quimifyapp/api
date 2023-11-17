@@ -29,20 +29,29 @@ public class ClassificationService {
     @Autowired
     ErrorService errorService;
 
-    // Constants:
-
-    private static final int notFoundResultCode = -1;
-
     // Public:
 
     public Optional<Classification> classify(String input) {
         String adaptedInput = adaptInput(input);
 
-        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
-            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
-                logger.warn("Classified \"" + input + "\" with DB: " + classificationModel.getClassification() + ".");
-                return filteredResult(input, classificationModel.getClassification());
+        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority()) {
+            String regexPattern = classificationModel.getRegexPattern();
+
+            if (adaptedInput.matches(regexPattern)) {
+                String name = classificationModel.getName();
+
+                Optional<Classification> classification = Classification.ofName(name);
+
+                if (classification.isEmpty()) {
+                    errorService.log("Invalid classification name from DB: " + name, regexPattern, getClass());
+                    return Optional.empty();
+                }
+
+                logger.warn("Classified \"" + input + "\" with DB: " + classification.get() + ".");
+
+                return filteredResult(input, classification.get());
             }
+        }
 
         return classifyWithAi(input);
     }
@@ -62,15 +71,23 @@ public class ClassificationService {
 
     private Optional<Classification> classifyWithAi(String input) {
         try {
-            String response = new Connection(settingsService.getClassifierAiUrl(), input).getText();
-            int resultCode = Integer.parseInt(response);
+            String name = new Connection(settingsService.getClassifierAiUrl(), input).getText();
 
-            if (resultCode != notFoundResultCode) {
-                Classification classification = Classification.values()[resultCode];
-                logger.warn("Classified \"" + input + "\" with AI: " + classification + ".");
-                return filteredResult(input, classification);
+            if (name.isEmpty()) {
+                errorService.log("Classifier AI returned an empty response", input, getClass());
+                return Optional.empty();
             }
-            else errorService.log("Classifier AI returned " + notFoundResultCode, input, getClass());
+
+            Optional<Classification> classification = Classification.ofName(name);
+
+            if (classification.isEmpty()) {
+                errorService.log("Invalid classification name from AI " + name, input, getClass());
+                return Optional.empty();
+            }
+
+            logger.warn("Classified \"" + input + "\" with AI: " + classification.get() + ".");
+
+            return filteredResult(input, classification.get());
         } catch (Exception exception) {
             errorService.log("Exception calling Classifier AI for: " + input, exception.toString(), getClass());
         }
@@ -113,7 +130,7 @@ public class ClassificationService {
                 break;
         }
 
-        if(result.isEmpty() || !result.get().equals(classification))
+        if (result.isEmpty() || !result.get().equals(classification))
             logger.warn("Classification [" + classification + "] was filtered to: " + result + ".");
 
         return result;

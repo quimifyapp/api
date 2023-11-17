@@ -1,5 +1,7 @@
 package com.quimify.api.classification;
 
+import java.util.Optional;
+
 public enum Classification {
     inorganicFormula("inorganic-formula"), // 0 in DB
     organicFormula("organic-formula"), // 1 in DB
@@ -12,10 +14,18 @@ public enum Classification {
 
     private final String suggestion;
 
-    // Constructor:
+    // Constructors:
 
     Classification(String suggestion) {
         this.suggestion = suggestion;
+    }
+
+    static Optional<Classification> ofName(String name) {
+        for (Classification classification : Classification.values())
+            if(classification.suggestion.equals(name))
+                return Optional.of(classification);
+
+        return Optional.empty();
     }
 
     // Queries:
