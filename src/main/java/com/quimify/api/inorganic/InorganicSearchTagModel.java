@@ -8,25 +8,13 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "inorganic_search_tag")
-@Check(constraints = "REGEXP_LIKE(normalized_text, '^[a-z0-9]+$', 'c')") // Case-sensitive matching
+@Check(constraints = "REGEXP_LIKE(normalized_text, '^[a-z0-9]+$', 'c')") // Case-sensitive matching with 'c'
 class InorganicSearchTagModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(nullable = false, unique = true)
     private String normalizedText; // "hidruromagnesico", "aguaoxigenada"...
 
     // Getters and setters:
-
-    Integer getId() {
-        return id;
-    }
-
-    void setId(Integer id) {
-        this.id = id;
-    }
 
     String getNormalizedText() {
         return normalizedText;
