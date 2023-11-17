@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 // This class represent errors that occur during the execution of this project.
 
 @Entity
-@Table(name = "error") // In table 'error' of DB
+@Table(name = "error")
 class ErrorModel {
 
     @Id
@@ -16,18 +16,18 @@ class ErrorModel {
     @Column(nullable = false)
     private Timestamp dateAndTime;
 
-    @Lob // Large object in DB
+    @Lob // Large object
     @Column(nullable = false)
     private String title;
 
-    @Lob // Large object in DB
+    @Lob // Large object
     @Column(nullable = false)
     private String details;
 
     @Column(nullable = false)
     private String location;
 
-    // Getters y setters:
+    // Getters and setters:
 
     Integer getId() {
         return id;

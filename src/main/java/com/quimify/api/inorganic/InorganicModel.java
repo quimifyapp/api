@@ -20,8 +20,11 @@ class InorganicModel {
     @Column(nullable = false)
     private String formula; // "Ni2O3"
 
+    @Column(unique = true)
     private String stockName; // "óxido de níquel (III)"
+    @Column(unique = true)
     private String systematicName; // "trióxido de diníquel", "sodio"
+    @Column(unique = true)
     private String traditionalName; // "óxido niquélico"
 
     private String commonName; // "agua"

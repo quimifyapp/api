@@ -9,26 +9,22 @@ import javax.persistence.*;
 class ClassificationModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer priority; // "0", "1"... (order of appliance)
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String regexPattern; // ".*gramo.*", ".*masa *molecular *de.*"...
 
     @Column()
     private Classification classification; // Classification.organicFormula (1), null...
 
-    @Column(nullable = false)
-    private Integer priority; // "0", "1"... (order of appliance)
-
     // Getters and setters:
 
-    Integer getId() {
-        return id;
+    Integer getPriority() {
+        return priority;
     }
 
-    void setId(Integer id) {
-        this.id = id;
+    void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     String getRegexPattern() {
@@ -45,14 +41,6 @@ class ClassificationModel {
 
     void setClassification(Classification classification) {
         this.classification = classification;
-    }
-
-    Integer getPriority() {
-        return priority;
-    }
-
-    void setPriority(Integer priority) {
-        this.priority = priority;
     }
 
 }

@@ -8,20 +8,18 @@ import javax.persistence.*;
 @Table(name = "not_found_query")
 class NotFoundQueryModel {
 
-    // Non-nullable:
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Lob // Large object in DB
+    @Lob // Large object
     @Column(nullable = false)
     private String query;
 
     @Column(nullable = false)
     private String location;
 
-    // TODO frequency
+    // TODO frequency?
 
     // Getters and setters:
 

@@ -1,3 +1,3 @@
 UPDATE classification
 SET  = 
-WHERE id = ;
+WHERE priority = ;

@@ -8,29 +8,23 @@ import javax.persistence.*;
 @Table(name = "correction")
 class CorrectionModel {
 
-    // Non-nullable:
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer priority; // "0", "1"... (order of appliance)
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String mistake; // "fosfonio", "iato", "Ch"...
 
     @Column(nullable = false)
     private String correction; // "fosfanio", "ato", "CH"...
 
-    @Column(nullable = false)
-    private Integer priority; // "0", "1"... (order of appliance)
-
     // Getters and setters:
 
-    Integer getId() {
-        return id;
+    Integer getPriority() {
+        return priority;
     }
 
-    void setId(Integer id) {
-        this.id = id;
+    void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     String getMistake() {
@@ -47,14 +41,6 @@ class CorrectionModel {
 
     void setCorrection(String correction) {
         this.correction = correction;
-    }
-
-    Integer getPriority() {
-        return priority;
-    }
-
-    void setPriority(Integer priority) {
-        this.priority = priority;
     }
 
 }

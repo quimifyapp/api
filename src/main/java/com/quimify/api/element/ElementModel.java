@@ -12,7 +12,7 @@ public class ElementModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer atomicNumber;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String symbol; // "Mg"
 
     @Column(nullable = false)

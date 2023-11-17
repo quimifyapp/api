@@ -15,7 +15,7 @@ class InorganicSearchTagModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String normalizedText; // "hidruromagnesico", "aguaoxigenada"...
 
     // Getters and setters:

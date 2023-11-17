@@ -18,7 +18,7 @@ class ReportModel {
     @Column(nullable = false)
     private String context;
 
-    @Lob // Large object in DB
+    @Lob // Large object
     @Column(nullable = false)
     private String details;
 
