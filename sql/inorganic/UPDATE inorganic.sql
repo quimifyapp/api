@@ -1,3 +1,3 @@
 UPDATE inorganic
-SET =
+SET  = 
 WHERE id = ;

@@ -1,5 +1,7 @@
 package com.quimify.api.inorganic;
 
+import org.hibernate.annotations.Check;
+
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,9 +10,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "inorganic")
+@Check(constraints = "(stock_name IS NOT NULL OR systematic_name IS NOT NULL OR traditional_name IS NOT NULL)")
 class InorganicModel {
-
-    // Non-nullable:
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,8 +19,6 @@ class InorganicModel {
 
     @Column(nullable = false)
     private String formula; // "Ni2O3"
-
-    // With 'null' default value:
 
     private String stockName; // "óxido de níquel (III)"
     private String systematicName; // "trióxido de diníquel", "sodio"
@@ -29,14 +28,9 @@ class InorganicModel {
 
     // Foreign key (one to many):
 
-    @JoinColumn(name = "inorganic_id", nullable = false)
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Always created, deleted and fetched together
+    @JoinColumn(name = "inorganic_id", nullable = false, foreignKey = @ForeignKey(name = "fk_inorganic"))
     private List<InorganicSearchTagModel> inorganicSearchTags = new ArrayList<>(); // ("aguaoxigenada", "2ho2"...)
-
-    // With default value:
-
-    @Column(columnDefinition = "INT default 1", nullable = false)
-    private Integer searches = 1;
 
     // Stored as text because no calculations will be performed on them:
 
@@ -44,6 +38,9 @@ class InorganicModel {
     private String density;         // (g/cm3)
     private String meltingPoint;    // (K)
     private String boilingPoint;    // (K)
+
+    @Column(columnDefinition = "INT default 1", nullable = false)
+    private Integer searches = 1;
 
     // Modifiers:
 

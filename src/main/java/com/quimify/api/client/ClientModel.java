@@ -1,6 +1,5 @@
 package com.quimify.api.client;
 
-import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
 
@@ -9,18 +8,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "client")
 @IdClass(ClientId.class)
-@Check(constraints =
-        "(update_available != true OR " +
-                "(update_needed IS NOT NULL AND " +
-                "update_details IS NOT NULL)) AND " +
-        "(message_present != true OR " +
-                "(message_title IS NOT NULL AND " +
-                "message_details IS NOT NULL AND " +
-                "message_link_present IS NOT NULL)) AND " +
-        "(message_link_present != true OR " +
-                "(message_link_label IS NOT NULL AND " +
-                "message_link IS NOT NULL))"
-)
 class ClientModel {
 
     @Id
