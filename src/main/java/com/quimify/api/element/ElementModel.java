@@ -9,14 +9,13 @@ import javax.persistence.*;
 public class ElementModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer atomicNumber;
+    private Integer atomicNumber; // Also known as 'Z'
 
     @Column(nullable = false, unique = true)
     private String symbol; // "Mg"
 
     @Column(nullable = false)
-    private Float atomicMass;  // 24.305 (g / mol)
+    private Float atomicWeight; // 24.305 (g / mol)
 
     // Getters and setters:
 
@@ -36,11 +35,11 @@ public class ElementModel {
         this.symbol = symbol;
     }
 
-    public float getAtomicMass() {
-        return atomicMass;
+    public float getAtomicWeight() {
+        return atomicWeight;
     }
 
-    void setAtomicMass(float masa) {
-        this.atomicMass = masa;
+    void setAtomicWeight(float masa) {
+        this.atomicWeight = masa;
     }
 }

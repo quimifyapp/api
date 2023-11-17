@@ -229,7 +229,7 @@ public class MolecularMassService {
     }
 
     private Optional<Float> getMolecularMassOf(String symbol) {
-        return elementService.searchBySymbol(symbol).map(ElementModel::getAtomicMass);
+        return elementService.get(symbol).map(ElementModel::getAtomicWeight);
     }
 
 }

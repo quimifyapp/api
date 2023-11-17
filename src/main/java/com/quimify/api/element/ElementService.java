@@ -15,7 +15,7 @@ public class ElementService {
 
     // Public:
 
-    public Optional<ElementModel> searchBySymbol(String symbol) {
+    public Optional<ElementModel> get(String symbol) {
         return elementRepository.findBySymbol(symbol);
     }
 
