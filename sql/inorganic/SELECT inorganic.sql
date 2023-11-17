@@ -1,5 +1,5 @@
-SELECT * FROM inorganic
-# WHERE formula LIKE "C%"
+SELECT * FROM inorganic 
+# WHERE formula LIKE BINARY "%(O2)" AND systematic_name IS NULL
 
 # WHERE systematic_name LIKE "%teleruro%"
 # WHERE traditional_name LIKE "%ina"

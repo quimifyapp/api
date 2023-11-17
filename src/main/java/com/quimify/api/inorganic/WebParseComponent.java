@@ -157,10 +157,10 @@ class WebParseComponent {
     }
 
     private void correctPeroxide() {
-        parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's clearer
+        parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's more clear
         parsedInorganic.setSystematicName(null); // Systematic names for peroxides must NEVER include that word
 
-        errorService.log("Learned peroxide needs manual correction", parsedInorganic.toString(), getClass());
+        logger.warn("Learned peroxide might need manual correction: " +  parsedInorganic.toString());
     }
 
     private String correctName(String name) {
