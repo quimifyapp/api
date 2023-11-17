@@ -38,7 +38,7 @@ public class ClassificationService {
     public Optional<Classification> classify(String input) {
         String adaptedInput = adaptInput(input);
 
-        for (ClassificationModel classificationModel : classificationRepository.findAll())
+        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
             if (adaptedInput.matches(classificationModel.getRegexPattern())) {
                 logger.warn("Classified \"" + input + "\" with DB: " + classificationModel.getClassification() + ".");
                 return filteredResult(input, classificationModel.getClassification());
