@@ -23,8 +23,8 @@ class ClientService {
 
     // Constants:
 
-    public static final String androidPlatform = "android";
-    public static final String iosPlatform = "ios";
+    static final String androidPlatform = "android";
+    static final String iosPlatform = "ios";
 
     // Client:
 
