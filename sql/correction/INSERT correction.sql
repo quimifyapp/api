@@ -1,7 +1,7 @@
-INSERT INTO correction (mistake, correction, priority)
+INSERT INTO correction (priority, mistake, correction)
 
 VALUES (
 ,  # Priority
 , # Mistake
- # Correction
+  # Correction
 );
