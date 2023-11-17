@@ -1,4 +1,4 @@
-SELECT normalized_text, inorganic_id, formula, searches
+SELECT normalized_text, inorganic_id, formula, stock_name, systematic_name, traditional_name, searches
 FROM inorganic_search_tag
 INNER JOIN inorganic
 ON inorganic_search_tag.inorganic_id = inorganic.id
