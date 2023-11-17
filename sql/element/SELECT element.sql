@@ -1,2 +1,2 @@
-SELECT id, symbol, molecular_mass FROM element
-ORDER BY id DESC
+SELECT atomic_number, symbol, atomic_weight FROM element
+ORDER BY atomic_number ASC;

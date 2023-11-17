@@ -2,31 +2,30 @@ package com.quimify.api.element;
 
 import javax.persistence.*;
 
-// Esta clase representa los elementos químicos de la tabla periódica.
-// TODO translate comments
+// This class represents elements of the periodic table.
 
-@Entity // Es un modelo real
+@Entity
 @Table(name = "element")
 public class ElementModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer atomicNumber;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String symbol; // "Mg"
 
     @Column(nullable = false)
-    private Float molecularMass;  // 24.305 (g / mol)
+    private Float atomicMass;  // 24.305 (g / mol)
 
-    // Getters y setters:
+    // Getters and setters:
 
-    Integer getId() {
-        return id;
+    Integer getAtomicNumber() {
+        return atomicNumber;
     }
 
-    void setId(Integer id) {
-        this.id = id;
+    void setAtomicNumber(Integer id) {
+        this.atomicNumber = id;
     }
 
     String getSymbol() {
@@ -37,11 +36,11 @@ public class ElementModel {
         this.symbol = symbol;
     }
 
-    public float getMolecularMass() {
-        return molecularMass;
+    public float getAtomicMass() {
+        return atomicMass;
     }
 
-    void setMolecularMass(float masa) {
-        this.molecularMass = masa;
+    void setAtomicMass(float masa) {
+        this.atomicMass = masa;
     }
 }
