@@ -40,15 +40,14 @@ public class Connection {
 
     public String getText() throws IOException {
         BufferedReader download = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-        StringBuilder text = new StringBuilder();
 
-        String line;
-        while ((line = download.readLine()) != null)
+        StringBuilder text = new StringBuilder();
+        for (String line = download.readLine(); line != null; line = download.readLine())
             text.append(line);
 
         download.close();
 
-        httpURLConnection.disconnect();
+        httpURLConnection.disconnect(); // TODO are connections persisting?
 
         return text.toString();
     }

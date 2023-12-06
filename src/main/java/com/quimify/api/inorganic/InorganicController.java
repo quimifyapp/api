@@ -25,9 +25,12 @@ class InorganicController {
     // Client:
 
     @GetMapping("/completion")
-    @ResponseBody ResponseEntity<String> complete(@RequestParam("input") String input) {
+    @ResponseBody
+    ResponseEntity<String> complete(@RequestParam("input") String input) {
         String completion = inorganicService.complete(input);
+
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
+
         return ResponseEntity.ok().cacheControl(cacheHeader).body(completion); // Response has both header and body
     }
 
