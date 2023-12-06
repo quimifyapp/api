@@ -12,6 +12,9 @@ class CorrectionModel {
     private Integer priority; // "0", "1"... (order of appliance)
 
     @Column(nullable = false, unique = true)
+    private String regexPattern; // ".*teleruro.*", ".*[^h]ex.*"...
+
+    @Column(nullable = false, unique = true)
     private String mistake; // "fosfonio", "iato", "Ch"...
 
     @Column(nullable = false)
@@ -25,6 +28,14 @@ class CorrectionModel {
 
     void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    String getRegexPattern() {
+        return regexPattern;
+    }
+
+    void setRegexPattern(String regexPattern) {
+        this.regexPattern = regexPattern;
     }
 
     String getMistake() {

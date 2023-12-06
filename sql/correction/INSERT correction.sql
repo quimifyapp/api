@@ -1,7 +1,8 @@
-INSERT INTO correction (priority, mistake, correction)
+INSERT INTO correction (priority, regex_pattern, mistake, correction)
 
 VALUES (
-,  # Priority
+, # Priority
+, # Regex pattern
 , # Mistake
   # Correction
 );

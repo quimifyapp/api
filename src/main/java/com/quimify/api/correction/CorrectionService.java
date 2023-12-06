@@ -11,15 +11,13 @@ public class CorrectionService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    CorrectionRepository correctionRepository; 
-
-    // TODO metrics
+    CorrectionRepository correctionRepository;
 
     // Internal:
 
     public String correct(String input) {
         for(CorrectionModel correctionModel : correctionRepository.findAllByOrderByPriority()) {
-            if (input.contains(correctionModel.getMistake())) {
+            if (input.matches(correctionModel.getRegexPattern())) {
                 String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 
                 logger.warn("Corrected \"" + input + "\" to: \"" + correctedInput + "\".");
