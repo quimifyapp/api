@@ -15,6 +15,14 @@ class ClientResult {
     private String messageLinkLabel;
     private String messageLink;
 
+    private Boolean bannerAdPresent;
+    private String bannerAdUnitId;
+
+    private Boolean interstitialAdPresent;
+    private Integer interstitialAdPeriod;
+    private Integer interstitialAdOffset;
+    private String interstitialAdUnitId;
+
     // Constructors:
 
     ClientResult(ClientModel clientModel) {
@@ -27,6 +35,12 @@ class ClientResult {
         this.messageLinkPresent = clientModel.getMessageLinkPresent();
         this.messageLinkLabel = clientModel.getMessageLinkLabel();
         this.messageLink = clientModel.getMessageLink();
+        this.bannerAdPresent = clientModel.getBannerAdPresent();
+        this.bannerAdUnitId = clientModel.getBannerAdUnitId();
+        this.interstitialAdPresent = clientModel.getInterstitialAdPresent();
+        this.interstitialAdPeriod = clientModel.getInterstitialAdPeriod();
+        this.interstitialAdOffset = clientModel.getInterstitialAdOffset();
+        this.interstitialAdUnitId = clientModel.getInterstitialAdUnitId();
     }
 
     private ClientResult(boolean updateAvailable, boolean messagePresent) {
@@ -110,6 +124,62 @@ class ClientResult {
 
     public void setMessageLink(String messageLink) {
         this.messageLink = messageLink;
+    }
+
+    public boolean isUpdateAvailable() {
+        return updateAvailable;
+    }
+
+    public boolean isMessagePresent() {
+        return messagePresent;
+    }
+
+    public Boolean getBannerAdPresent() {
+        return bannerAdPresent;
+    }
+
+    public void setBannerAdPresent(Boolean bannerAdPresent) {
+        this.bannerAdPresent = bannerAdPresent;
+    }
+
+    public String getBannerAdUnitId() {
+        return bannerAdUnitId;
+    }
+
+    public void setBannerAdUnitId(String bannerAdUnitId) {
+        this.bannerAdUnitId = bannerAdUnitId;
+    }
+
+    public Boolean getInterstitialAdPresent() {
+        return interstitialAdPresent;
+    }
+
+    public void setInterstitialAdPresent(Boolean interstitialAdPresent) {
+        this.interstitialAdPresent = interstitialAdPresent;
+    }
+
+    public Integer getInterstitialAdPeriod() {
+        return interstitialAdPeriod;
+    }
+
+    public void setInterstitialAdPeriod(Integer interstitialAdPeriod) {
+        this.interstitialAdPeriod = interstitialAdPeriod;
+    }
+
+    public Integer getInterstitialAdOffset() {
+        return interstitialAdOffset;
+    }
+
+    public void setInterstitialAdOffset(Integer interstitialAdOffset) {
+        this.interstitialAdOffset = interstitialAdOffset;
+    }
+
+    public String getInterstitialAdUnitId() {
+        return interstitialAdUnitId;
+    }
+
+    public void setInterstitialAdUnitId(String interstitialAdUnitId) {
+        this.interstitialAdUnitId = interstitialAdUnitId;
     }
 
 }

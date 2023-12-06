@@ -43,6 +43,20 @@ class ClientModel {
     @Column()
     private String messageLink;
 
+    @Column(nullable = false)
+    private Boolean bannerAdPresent;
+
+    // If bannerAdPresent = true:
+    private String bannerAdUnitId;
+
+    @Column(nullable = false)
+    private Boolean interstitialAdPresent;
+
+    // If interstitialAdPresent = true:
+    private Integer interstitialAdPeriod;
+    private Integer interstitialAdOffset;
+    private String interstitialAdUnitId;
+
     // Getters and setters:
 
     String getPlatform() {
@@ -131,6 +145,54 @@ class ClientModel {
 
     void setMessageLink(String messageLink) {
         this.messageLink = messageLink;
+    }
+
+    public Boolean getBannerAdPresent() {
+        return bannerAdPresent;
+    }
+
+    void setBannerAdPresent(Boolean bannerAdPresent) {
+        this.bannerAdPresent = bannerAdPresent;
+    }
+
+    String getBannerAdUnitId() {
+        return bannerAdUnitId;
+    }
+
+    void setBannerAdUnitId(String bannerAdUnitId) {
+        this.bannerAdUnitId = bannerAdUnitId;
+    }
+
+    Boolean getInterstitialAdPresent() {
+        return interstitialAdPresent;
+    }
+
+    void setInterstitialAdPresent(Boolean interstitialAdPresent) {
+        this.interstitialAdPresent = interstitialAdPresent;
+    }
+
+    Integer getInterstitialAdPeriod() {
+        return interstitialAdPeriod;
+    }
+
+    void setInterstitialAdPeriod(Integer interstitialAdPeriod) {
+        this.interstitialAdPeriod = interstitialAdPeriod;
+    }
+
+    Integer getInterstitialAdOffset() {
+        return interstitialAdOffset;
+    }
+
+    void setInterstitialAdOffset(Integer interstitialAdOffset) {
+        this.interstitialAdOffset = interstitialAdOffset;
+    }
+
+    String getInterstitialAdUnitId() {
+        return interstitialAdUnitId;
+    }
+
+    void setInterstitialAdUnitId(String interstitialAdUnitId) {
+        this.interstitialAdUnitId = interstitialAdUnitId;
     }
 
 }
