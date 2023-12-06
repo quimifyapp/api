@@ -61,8 +61,6 @@ class InorganicService {
 
     // Client:
 
-    // TODO not found query
-
     InorganicResult search(String input) {
         Optional<InorganicResult> inMemory = memorySearch(input);
 
@@ -94,6 +92,8 @@ class InorganicService {
 
         if (url.isEmpty()) {
             metricsService.inorganicDeepSearchFailed();
+            notFoundQueryService.log(input, getClass());
+
             return InorganicResult.notFound();
         }
 
@@ -101,6 +101,8 @@ class InorganicService {
 
         if (parsedInorganic.isEmpty()) {
             metricsService.inorganicDeepSearchFailed();
+            notFoundQueryService.log(input, getClass());
+
             return InorganicResult.notFound();
         }
 
@@ -113,7 +115,7 @@ class InorganicService {
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
 
-        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
+        return learnParsedInorganic(input, parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
     String complete(String input) {
@@ -138,6 +140,8 @@ class InorganicService {
             inorganicResult = new InorganicResult(searchedInMemory.get());
         else {
             errorService.log("Completion not in DB", completion, getClass());
+            notFoundQueryService.log(completion, getClass());
+
             inorganicResult = InorganicResult.notFound();
         }
 
@@ -216,10 +220,11 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
+    private InorganicResult learnParsedInorganic(String input, InorganicModel parsedInorganic) {
         if (!hasInorganicName(parsedInorganic)) {
-            metricsService.inorganicDeepSearchFailed();
             logger.warn("Parsed inorganic " + parsedInorganic + " doesn't look like an inorganic.");
+            metricsService.inorganicDeepSearchFailed();
+            notFoundQueryService.log(input, getClass());
 
             return InorganicResult.notFound();
         }
