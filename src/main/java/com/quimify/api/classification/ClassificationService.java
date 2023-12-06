@@ -24,8 +24,6 @@ public class ClassificationService {
     @Autowired
     SettingsService settingsService;
 
-    // TODO metrics
-
     @Autowired
     ErrorService errorService;
 
@@ -51,7 +49,7 @@ public class ClassificationService {
     // Private:
 
     private String adaptInput(String input) {
-        input = input.replace("⁺", "+"); // TODO remove (client won't send ⁺ anymore)
+        input = input.replace("⁺", "+"); // TODO remove as soon as client stops sending '⁺'
         input = Normalizer.getWithSpacesAndSymbols(input);
 
         return input;
