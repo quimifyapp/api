@@ -15,30 +15,27 @@ class MolecularMassResult {
     private Float molecularMass;
     private Map<String, Float> elementToGrams;
     private Map<String, Integer> elementToMoles;
+
     private String error;
 
     // Constructors:
 
-    MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams, Map<String, Integer> elementToMoles,
-                        String suggestion) {
-        this.present = true;
+    MolecularMassResult(boolean present, Float molecularMass, Map<String, Float> elementToGrams,
+                        Map<String, Integer> elementToMoles, String suggestion) {
+        this.present = present;
         this.suggestion = suggestion;
         this.molecularMass = molecularMass;
         this.elementToGrams = elementToGrams;
         this.elementToMoles = elementToMoles;
     }
 
-    MolecularMassResult(Float molecularMass, Map<String, Float> elementToGrams, Map<String, Integer> elementToMoles) {
-        this(molecularMass, elementToGrams, elementToMoles, null);
-    }
-
     MolecularMassResult(String suggestion) {
         this.present = false;
-        this.error = suggestion;
+        this.suggestion = suggestion;
     }
 
     static MolecularMassResult error(String error) {
-        MolecularMassResult molecularMassResult = new MolecularMassResult(null, null, null);
+        MolecularMassResult molecularMassResult = new MolecularMassResult(false, null, null, null, null);
         molecularMassResult.error = error;
         return molecularMassResult;
     }
