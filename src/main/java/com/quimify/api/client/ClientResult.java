@@ -19,8 +19,8 @@ class ClientResult {
     private String bannerAdUnitId;
 
     private Boolean interstitialAdPresent;
-    private Integer interstitialAdPeriod;
-    private Integer interstitialAdOffset;
+    private Integer interstitialAdPeriod; // Minimum attempts before next one
+    private Integer interstitialAdOffset; // Minimum attempts before 1st one
     private String interstitialAdUnitId;
 
     // Constructors:
