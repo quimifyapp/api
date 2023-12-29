@@ -133,7 +133,7 @@ public class MolecularMassService {
             molecularMass += grams;
         }
 
-        return new MolecularMassResult(molecularMass, elementToGrams, elementToMoles.get());
+        return new MolecularMassResult(true, molecularMass, elementToGrams, elementToMoles.get(), null);
     }
 
     private Optional<Map<String, Integer>> getElementToMolesIn(String formula) { // TODO translate and improve code
