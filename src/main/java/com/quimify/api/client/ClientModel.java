@@ -1,6 +1,8 @@
 package com.quimify.api.client;
 
 
+import org.hibernate.annotations.Check;
+
 import javax.persistence.*;
 
 // This class represents client versions and information.
@@ -8,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "client")
 @IdClass(ClientId.class)
+@Check(constraints = "platform IN ('android', 'ios')")
 class ClientModel {
 
     @Id
