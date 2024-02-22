@@ -2,6 +2,8 @@ package com.quimify.api.inorganic;
 
 // This POJO class represents responses of inorganic compounds to the client.
 
+import com.quimify.api.classification.Classification;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,9 +12,13 @@ class InorganicResult {
 
     private boolean found;
 
-    private String suggestion; // "trióxido de diníquel" or an input kind like "organic-name"
+    // If not found:
+
+    private Classification classification; // "organicName"
 
     // If found:
+
+    private String suggestion; // "selenuro de potasio"
 
     private String formula; // "MgH2"
 
@@ -50,20 +56,31 @@ class InorganicResult {
         this(inorganicModel, null);
     }
 
-    InorganicResult(String suggestion) {
+    private InorganicResult(Classification classification) {
         this.found = false;
-        this.suggestion = suggestion;
+        this.classification = classification;
+    }
+
+    static InorganicResult classification(Classification classification) {
+        return new InorganicResult(classification);
+    }
+
+    private InorganicResult() {
+        this.found = false;
     }
 
     static InorganicResult notFound() {
-        return new InorganicResult((String) null);
+        return new InorganicResult((Classification) null);
     }
 
     // Text:
 
     @Override
-    public String toString() { // TODO remake or remove?
+    public String toString() {
         List<String> identifiers = new ArrayList<>();
+
+        identifiers.add(classification.toString());
+        identifiers.add(suggestion);
 
         identifiers.add(formula);
         identifiers.add(stockName);
@@ -84,6 +101,14 @@ class InorganicResult {
 
     public void setFound(boolean found) {
         this.found = found;
+    }
+
+    public Classification getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Classification classification) {
+        this.classification = classification;
     }
 
     public String getSuggestion() {

@@ -54,16 +54,6 @@ class InorganicController {
         return inorganicResult;
     }
 
-    @GetMapping("/smart")
-    InorganicResult smartSearch(@RequestParam("input") String input) {
-        InorganicResult inorganicResult = inorganicService.smartSearch(input);
-
-        if (inorganicResult.isFound())
-            logger.info(String.format(getInorganicMessage, "smart search", input, inorganicResult));
-
-        return inorganicResult;
-    }
-
     @GetMapping("/deep")
     InorganicResult deepSearch(@RequestParam("input") String input) {
         InorganicResult inorganicResult = inorganicService.deepSearch(input);

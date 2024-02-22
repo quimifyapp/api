@@ -91,15 +91,6 @@ public class MetricsService {
     }
 
     @Transactional
-    public void inorganicClassificationSearched(boolean found) {
-        MetricsModel todayMetrics = getTodayMetrics();
-
-        if (found)
-            todayMetrics.incrementInorganicFoundClassifications();
-        else todayMetrics.incrementInorganicFailedClassifications();
-    }
-
-    @Transactional
     public void inorganicCorrectionSearched(boolean found) {
         MetricsModel todayMetrics = getTodayMetrics();
 
@@ -115,6 +106,15 @@ public class MetricsService {
         if (found)
             todayMetrics.incrementInorganicFoundSimilaritySearches();
         else todayMetrics.incrementInorganicFailedSimilaritySearches();
+    }
+
+    @Transactional
+    public void inorganicClassificationSearched(boolean found) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if (found)
+            todayMetrics.incrementInorganicFoundClassifications();
+        else todayMetrics.incrementInorganicFailedClassifications();
     }
 
     @Transactional

@@ -62,27 +62,23 @@ class InorganicService {
     // Client:
 
     InorganicResult search(String input) {
-        Optional<InorganicResult> inMemory = memorySearch(input);
+        Optional<InorganicResult> stored = memorySearch(input);
 
-        if(inMemory.isPresent())
-            return inMemory.get();
+        if(stored.isPresent())
+            return stored.get();
 
         Optional<InorganicResult> corrected = correctionSearch(input);
 
         if (corrected.isPresent())
             return corrected.get();
 
-        return smartSearch(input);
-    }
-
-    InorganicResult smartSearch(String input) {
-        Optional<InorganicResult> filteredResult = classificationSearch(input);
-
-        if (filteredResult.isPresent())
-            return filteredResult.get();
-
         // TODO by similarity
         // TODO metricsService.inorganicSimilaritySearched(...);
+
+        Optional<InorganicResult> classified = classificationSearch(input);
+
+        if (classified.isPresent())
+            return classified.get();
 
         return deepSearch(input);
     }
@@ -195,12 +191,12 @@ class InorganicService {
     }
 
     private Optional<InorganicResult> classificationSearch(String input) {
-        Optional<Classification> classifierResult = classificationService.classify(input);
+        Optional<Classification> result = classificationService.classify(input);
 
-        metricsService.inorganicClassificationSearched(classifierResult.isPresent());
+        metricsService.inorganicClassificationSearched(result.isPresent());
 
-        if (classifierResult.isPresent() && !classificationService.isInorganic(classifierResult.get()))
-            return Optional.of(new InorganicResult(classifierResult.get().toString()));
+        if (result.isPresent() && !classificationService.isInorganic(result.get()))
+            return Optional.of(InorganicResult.classification(result.get()));
 
         return Optional.empty();
     }
