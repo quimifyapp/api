@@ -15,12 +15,13 @@ public class CorrectionService {
 
     // Internal:
 
-    public String correct(String input) {
-        for(CorrectionModel correctionModel : correctionRepository.findAllByOrderByPriority()) {
+    public String correct(String input, boolean silent) {
+        for (CorrectionModel correctionModel : correctionRepository.findAllByOrderByPriority()) {
             if (input.matches(correctionModel.getRegexPattern())) {
                 String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 
-                logger.warn("Corrected \"" + input + "\" to: \"" + correctedInput + "\".");
+                if (!silent)
+                    logger.warn("Corrected \"" + input + "\" to: \"" + correctedInput + "\".");
 
                 input = correctedInput;
             }

@@ -118,7 +118,7 @@ class InorganicService {
         String completion = completionComponent.tryComplete(input);
 
         if (completion.equals(CompletionComponent.notFound)) {
-            String correctedInput = correctionService.correct(input);
+            String correctedInput = correctionService.correct(input, true);
 
             if (!input.equals(correctedInput))
                 completion = completionComponent.tryComplete(correctedInput);
@@ -165,7 +165,7 @@ class InorganicService {
     private Optional<InorganicResult> correctionSearch(String input) {
         Optional<InorganicResult> inorganicResult = Optional.empty();
 
-        String correctedInput = correctionService.correct(input);
+        String correctedInput = correctionService.correct(input, false);
 
         if (!input.equals(correctedInput)) {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
