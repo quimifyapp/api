@@ -117,7 +117,7 @@ class WebParseComponent {
         else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
         // TODO optional get check
 
-        String correctedFormula = correctionService.correct(formula);
+        String correctedFormula = correctionService.correct(formula, false);
 
         parsedInorganic.setFormula(correctedFormula);
     }
@@ -170,7 +170,7 @@ class WebParseComponent {
         // Lowercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
         name = Pattern.compile(".(?![^(]*\\))").matcher(name).replaceAll(match -> match.group().toLowerCase());
 
-        return correctionService.correct(name);
+        return correctionService.correct(name, false);
     }
 
     private void parseAndSetProperties() {
