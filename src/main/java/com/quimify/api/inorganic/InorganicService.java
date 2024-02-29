@@ -30,7 +30,7 @@ class InorganicService {
     CacheComponent cacheComponent;
 
     @Autowired
-    ClassificationService classificationService; // TODO run all over DB once more
+    ClassificationService classificationService;
 
     @Autowired
     CorrectionService correctionService;

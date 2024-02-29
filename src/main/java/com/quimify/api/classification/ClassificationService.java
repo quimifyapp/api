@@ -30,7 +30,7 @@ public class ClassificationService {
     // Public:
 
     public Optional<Classification> classify(String input) {
-        String adaptedInput = adaptInput(input);
+        String adaptedInput = Normalizer.getWithSpacesAndSymbols(input);
 
         for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
             if (adaptedInput.matches(classificationModel.getRegexPattern())) {
@@ -47,13 +47,6 @@ public class ClassificationService {
     }
 
     // Private:
-
-    private String adaptInput(String input) {
-        input = input.replace("⁺", "+"); // TODO remove as soon as client stops sending '⁺'
-        input = Normalizer.getWithSpacesAndSymbols(input);
-
-        return input;
-    }
 
     private Optional<Classification> classifyWithAi(String input) {
         try {
@@ -102,7 +95,7 @@ public class ClassificationService {
                     result = Optional.empty();
                 break;
             case molecularMassProblem:
-                if (input.length() < 15 || input.length() > 125)
+                if (input.length() > 125)
                     result = Optional.of(Classification.chemicalProblem); // It's part of a greater chemical problem
                 break;
             case chemicalReaction:

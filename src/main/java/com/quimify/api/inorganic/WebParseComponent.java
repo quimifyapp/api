@@ -26,7 +26,7 @@ class WebParseComponent {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    CorrectionService correctionService; // TODO test this
+    CorrectionService correctionService;
 
     @Autowired
     SettingsService settingsService;
