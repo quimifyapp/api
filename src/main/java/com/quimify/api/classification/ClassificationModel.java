@@ -12,6 +12,7 @@ class ClassificationModel {
     private Integer priority; // "0", "1"... (order of appliance)
 
     @Column(nullable = false, unique = true)
+    @Lob // Large object
     private String regexPattern; // ".*gramo.*", ".*masa *molecular *de.*"...
 
     @Column()
