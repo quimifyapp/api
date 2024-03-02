@@ -79,7 +79,9 @@ class InorganicResult {
     public String toString() {
         List<String> identifiers = new ArrayList<>();
 
-        identifiers.add(classification.toString());
+        if (classification != null)
+            identifiers.add(classification.toString());
+
         identifiers.add(suggestion);
 
         identifiers.add(formula);
