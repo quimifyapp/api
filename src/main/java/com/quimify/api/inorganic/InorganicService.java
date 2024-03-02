@@ -170,8 +170,10 @@ class InorganicService {
         if (!input.equals(correctedInput)) {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
 
-            if (searchedInMemory.isPresent())
+            if (searchedInMemory.isPresent()) {
+                logger.info("Found corrected \"" + correctedInput + "\" from: \"" + input + "\".");
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
+            }
         }
 
         if (inorganicResult.isEmpty()) {
@@ -180,7 +182,7 @@ class InorganicService {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.warn("Successfully corrected \"" + input + "\" to : \"" + correctedInput + "\".");
+                logger.info("Found corrected \"" + correctedInput + "\" from: \"" + input + "\".");
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
             }
         }

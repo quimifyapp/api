@@ -170,7 +170,7 @@ class WebParseComponent {
         // Lowercase if not between parentheses, so oxidation numbers like "(IV)" stay uppercase:
         name = Pattern.compile(".(?![^(]*\\))").matcher(name).replaceAll(match -> match.group().toLowerCase());
 
-        return correctionService.correct(name, false);
+        return correctionService.correct(name, true);
     }
 
     private void parseAndSetProperties() {
