@@ -105,7 +105,7 @@ public class ClassificationService {
         }
 
         if (result.isEmpty() || !result.get().equals(classification))
-            logger.warn("Classification [" + classification + "] was filtered to: " + result + ".");
+            logger.warn("Classification of \"" + input + "\" was filtered: " + classification + " -> " + result + ".");
 
         return result;
     }
