@@ -34,7 +34,7 @@ class CacheComponent {
 
     // Updating:
 
-    @Scheduled(fixedDelay = 5 * 60 * 1000) // It's called at startup too
+    @Scheduled(fixedDelay = 30 * 60 * 1000) // It's called at startup too
     private void tryUpdateCache() {
         try {
             shadowCache = new LinkedHashMap<>(cache);
