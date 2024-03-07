@@ -64,7 +64,7 @@ class InorganicService {
     InorganicResult search(String input) {
         Optional<InorganicResult> stored = memorySearch(input);
 
-        if(stored.isPresent())
+        if (stored.isPresent())
             return stored.get();
 
         Optional<InorganicResult> corrected = correctionSearch(input);
@@ -238,7 +238,11 @@ class InorganicService {
         cacheComponent.add(parsedInorganic);
 
         metricsService.inorganicDeepSearchLearned();
+
         logger.warn("Learned inorganic: " + parsedInorganic);
+
+        if (parsedInorganic.toString().contains("peróxido")) // Any of its names
+            logger.warn("Learned peroxide might need manual correction: " + parsedInorganic);
 
         return new InorganicResult(parsedInorganic);
     }
