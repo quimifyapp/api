@@ -219,7 +219,7 @@ class InorganicService {
     }
 
     private InorganicResult learnParsedInorganic(String input, InorganicModel parsedInorganic) {
-        if (!hasInorganicName(parsedInorganic)) {
+        if (!looksLikeAnInorganic(parsedInorganic)) {
             logger.warn("Parsed inorganic " + parsedInorganic + " doesn't look like an inorganic.");
             metricsService.inorganicDeepSearchFailed();
             notFoundQueryService.log(input, getClass());
@@ -247,7 +247,12 @@ class InorganicService {
         return new InorganicResult(parsedInorganic);
     }
 
-    private boolean hasInorganicName(InorganicModel inorganicModel) {
+    private boolean looksLikeAnInorganic(InorganicModel inorganicModel) {
+        Optional<Classification> formulaClassification = classificationService.classify(inorganicModel.getFormula());
+
+        if (formulaClassification.isPresent() && formulaClassification.get() != Classification.inorganicFormula)
+            return false;
+
         String name = inorganicModel.getStockName();
 
         if (name == null)
@@ -256,9 +261,9 @@ class InorganicService {
         if (name == null)
             name = inorganicModel.getTraditionalName();
 
-        Optional<Classification> classifierResult = classificationService.classify(name);
+        Optional<Classification> nameClassification = classificationService.classify(name);
 
-        return classifierResult.isEmpty() || classificationService.isInorganic(classifierResult.get());
+        return nameClassification.isEmpty() || nameClassification.get() == Classification.inorganicName;
     }
 
 }
