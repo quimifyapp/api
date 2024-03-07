@@ -7,7 +7,7 @@
 		<java.version>11</java.version>
 		<!-- Needs to be manually updated: -->
 		<version>5</version>
-		<organic.version>3.2.1</organic.version>
+		<organic.version>3.2.2</organic.version>
 	</properties>
 
 	<parent>
