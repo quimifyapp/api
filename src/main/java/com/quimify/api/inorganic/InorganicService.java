@@ -248,22 +248,28 @@ class InorganicService {
     }
 
     private boolean looksLikeAnInorganic(InorganicModel inorganicModel) {
-        Optional<Classification> formulaClassification = classificationService.classify(inorganicModel.getFormula());
+        Optional<Classification> formulaResult = classificationService.classify(inorganicModel.getFormula());
 
-        if (formulaClassification.isPresent() && formulaClassification.get() != Classification.inorganicFormula)
-            return false;
+        boolean inorganicFormula = formulaResult.isEmpty() || formulaResult.get() == Classification.inorganicFormula;
 
-        String name = inorganicModel.getStockName();
+        List<Optional<Classification>> nameResults = new ArrayList<>();
 
-        if (name == null)
-            name = inorganicModel.getSystematicName();
+        if (inorganicModel.getStockName() != null)
+            nameResults.add(classificationService.classify(inorganicModel.getStockName()));
 
-        if (name == null)
-            name = inorganicModel.getTraditionalName();
+        if (inorganicModel.getSystematicName() != null)
+            nameResults.add(classificationService.classify(inorganicModel.getSystematicName()));
 
-        Optional<Classification> nameClassification = classificationService.classify(name);
+        if (inorganicModel.getTraditionalName() != null)
+            nameResults.add(classificationService.classify(inorganicModel.getTraditionalName()));
 
-        return nameClassification.isEmpty() || nameClassification.get() == Classification.inorganicName;
+        if (inorganicModel.getCommonName() != null)
+            nameResults.add(classificationService.classify(inorganicModel.getCommonName()));
+
+        boolean inorganicName = nameResults.stream().anyMatch(
+                classification -> classification.isEmpty() || classification.get() == Classification.inorganicName);
+
+        return inorganicFormula || inorganicName;
     }
 
 }
