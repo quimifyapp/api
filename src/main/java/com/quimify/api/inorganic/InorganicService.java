@@ -111,7 +111,7 @@ class InorganicService {
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
 
-        return learnParsedInorganic(input, parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
+        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
     String complete(String input) {
@@ -218,15 +218,7 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private InorganicResult learnParsedInorganic(String input, InorganicModel parsedInorganic) {
-        if (!looksLikeAnInorganic(parsedInorganic)) {
-            logger.warn("Parsed inorganic " + parsedInorganic + " doesn't look like an inorganic.");
-            metricsService.inorganicDeepSearchFailed();
-            notFoundQueryService.log(input, getClass());
-
-            return InorganicResult.notFound();
-        }
-
+    private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
         Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
 
         if (newMolecularMass.isPresent()) {
@@ -245,31 +237,6 @@ class InorganicService {
             logger.warn("Learned peroxide might need manual correction: " + parsedInorganic);
 
         return new InorganicResult(parsedInorganic);
-    }
-
-    private boolean looksLikeAnInorganic(InorganicModel inorganicModel) {
-        Optional<Classification> formulaResult = classificationService.classify(inorganicModel.getFormula());
-
-        boolean inorganicFormula = formulaResult.isEmpty() || formulaResult.get() == Classification.inorganicFormula;
-
-        List<Optional<Classification>> nameResults = new ArrayList<>();
-
-        if (inorganicModel.getStockName() != null)
-            nameResults.add(classificationService.classify(inorganicModel.getStockName()));
-
-        if (inorganicModel.getSystematicName() != null)
-            nameResults.add(classificationService.classify(inorganicModel.getSystematicName()));
-
-        if (inorganicModel.getTraditionalName() != null)
-            nameResults.add(classificationService.classify(inorganicModel.getTraditionalName()));
-
-        if (inorganicModel.getCommonName() != null)
-            nameResults.add(classificationService.classify(inorganicModel.getCommonName()));
-
-        boolean inorganicName = nameResults.stream().anyMatch(
-                classification -> classification.isEmpty() || classification.get() == Classification.inorganicName);
-
-        return inorganicFormula || inorganicName;
     }
 
 }

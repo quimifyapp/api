@@ -7,7 +7,6 @@ import com.quimify.api.settings.SettingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,8 +19,10 @@ import java.util.regex.Pattern;
 // This class parses inorganic compounds from FQ.com web pages.
 
 @Component
-@Scope("prototype") // New instance for each request, avoiding shared state
 class WebParseComponent {
+
+    // TODO optional checks
+    // TODO use HTML parser
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -34,28 +35,34 @@ class WebParseComponent {
     @Autowired
     ErrorService errorService;
 
-    private String htmlDocument;
-
-    private InorganicModel parsedInorganic;
-
     // Constants:
 
-    private final static String fqUrl = "https://www.formulacionquimica.com/";
+    private final static String baseUrl = "https://www.formulacionquimica.com/";
 
-    private final static List<String> invalidSubdirectories = List.of(
-            ".com/", "acidos-carboxilicos/", "alcanos/", "alcoholes/", "aldehidos/", "alquenos/", "alquinos/",
-            "amidas/", "aminas/", "anhidridos/", "anhidridos-organicos/", "aromaticos/", "buscador/", "cetonas/",
-            "cicloalquenos/", "ejemplos/", "ejercicios/", "esteres/", "eteres/", "halogenuros/", "hidracidos/",
-            "hidroxidos/", "hidruros/", "hidruros-volatiles/", "inorganica/", "nitrilos/", "organica/",
-            "oxidos-metalicos/", "oxidos/", "oxisales/", "oxoacidos/", "peroxidos/", "politica-privacidad/",
-            "sales-neutras/", "sales-volatiles/"
+    private final static List<String> organicSubdirectories = List.of(
+            "alcanos/", "alquenos/", "alquinos/", "cicloalcanos/", "cicloalquenos/", "aromaticos/",
+            "halogenuros/", "alcoholes/", "eteres/", "aldehidos/", "cetonas/", "acidos-carboxilicos/", "esteres/",
+            "anhidridos-organicos/", "aminas/", "amidas/", "nitrilos/"
+    );
+
+    private final static List<String> otherSubdirectories = List.of(
+            ".com/", "buscador/", "ejemplos/", "ejercicios/", "politica-privacidad/", "organica/",
+            "inorganica/", "anhidridos/", "hidracidos/", "hidroxidos/", "hidruros-volatiles/", "hidruros/", "oxidos/",
+            "oxisales/", "oxoacidos/", "peroxidos/", "sales-neutras/", "sales-volatiles/"
     );
 
     // Internal:
 
     Optional<InorganicModel> tryParse(String url) {
         try {
-            return Optional.of(parse(url));
+            String htmlDocument = getDocument(url);
+
+            if (doesNotLookLikeAnInorganic(htmlDocument)) {
+                logger.warn("Website " + url + " doesn't look like an inorganic.");
+                return Optional.empty();
+            }
+
+            return Optional.of(parse(htmlDocument));
         } catch (IllegalArgumentException illegalArgumentException) {
             logger.warn("Exception parsing web " + url + ": " + illegalArgumentException.getMessage());
             return Optional.empty();
@@ -67,30 +74,53 @@ class WebParseComponent {
 
     // Private:
 
-    private InorganicModel parse(String url) throws IOException {
-        if (!url.contains(fqUrl))
+    private String getDocument(String url) throws IOException {
+        if (!url.contains(baseUrl))
             throw new IllegalArgumentException("Invalid address.");
 
-        if (invalidSubdirectories.stream().anyMatch(url::endsWith))
+        if (invalidSubdirectory(url))
             throw new IllegalArgumentException("Invalid subdirectory.");
 
         Connection connection = new Connection(url);
         connection.setRequestProperty("User-Agent", settingsService.getUserAgent());
 
-        htmlDocument = connection.getText();
+        return connection.getText();
+    }
 
-        parsedInorganic = new InorganicModel();
+    private boolean doesNotLookLikeAnInorganic(String htmlDocument) {
+        Optional<Integer> firstIndex = indexAfterIn("Tipo de compuesto:</b> <a href=\"/", htmlDocument);
 
-        parseAndSetFormula();
-        parseAndSetNames();
-        parseAndSetProperties();
+        if (firstIndex.isEmpty())
+            return true; // Benefit of the doubt
 
-        fixNomenclatureMistakes();
+        String croppedHtmlDocument = htmlDocument.substring(firstIndex.get());
+
+        Optional<Integer> closingIndex = indexAfterIn("\"", croppedHtmlDocument);
+        String compoundType = croppedHtmlDocument.substring(0, closingIndex.get() - 1);
+
+        return organicSubdirectories.contains(compoundType);
+    }
+
+    private InorganicModel parse(String htmlDocument) {
+        InorganicModel parsedInorganic = new InorganicModel();
+
+        String formula = parseFormula(htmlDocument);
+        parsedInorganic.setFormula(formula);
+
+        parseAndSetNames(parsedInorganic, htmlDocument);
+        parseAndSetProperties(parsedInorganic, htmlDocument);
+
+        fixNomenclatureMistakes(parsedInorganic);
 
         return parsedInorganic;
     }
 
-    private void parseAndSetFormula() {
+    private boolean invalidSubdirectory(String url) {
+        return organicSubdirectories.stream().anyMatch(url::endsWith) ||
+                otherSubdirectories.stream().anyMatch(url::endsWith);
+    }
+
+    private String parseFormula(String htmlDocument) {
         String formula;
 
         Optional<Integer> headerIndex = indexAfterIn("<h1>", htmlDocument);
@@ -109,31 +139,28 @@ class WebParseComponent {
             if (slashIndex.isEmpty())
                 slashIndex = indexAfterIn("\"frm\">", header);
 
-            formula = header.substring(slashIndex.get()); // TODO optional get check
+            formula = header.substring(slashIndex.get());
             formula = formula.substring(0, formula.indexOf("</p>"));
 
             formula = formula.replaceAll("(</?sub>)|(</b>)| ", ""); // <sub> or </sub> or </b> or ' '
         }
         else formula = header.substring(0, slashIndex.get() - 2); // "Co2(CO3)3 / carbonato de cobalto(III)</h1>"
-        // TODO optional get check
 
-        String correctedFormula = correctionService.correct(formula, false);
-
-        parsedInorganic.setFormula(correctedFormula);
+        return correctionService.correct(formula, false);
     }
 
-    private void parseAndSetNames() {
+    private void parseAndSetNames(InorganicModel parsedInorganic, String htmlDocument) {
         Optional<Integer> index = indexAfterIn("sistemática:</b>", htmlDocument);
-        parsedInorganic.setSystematicName(parseName(index));
+        parsedInorganic.setSystematicName(parseName(index, htmlDocument));
 
         index = indexAfterIn("stock:</b>", htmlDocument);
-        parsedInorganic.setStockName(parseName(index));
+        parsedInorganic.setStockName(parseName(index, htmlDocument));
 
         index = indexAfterIn("tradicional:</b>", htmlDocument);
-        parsedInorganic.setTraditionalName(parseName(index));
+        parsedInorganic.setTraditionalName(parseName(index, htmlDocument));
     }
 
-    private String parseName(Optional<Integer> index) {
+    private String parseName(Optional<Integer> index, String htmlDocument) {
         if (index.isEmpty())
             return null;
 
@@ -141,22 +168,21 @@ class WebParseComponent {
         name = name.substring(0, name.indexOf("</p>"));
 
         // It happens with some organic compounds:
-        if (name.contains("br/>"))
-            name = name.replace("br/>", "");
+        if (name.contains("br/>")) name = name.replace("br/>", "");
 
         return name;
     }
 
-    private void fixNomenclatureMistakes() {
+    private void fixNomenclatureMistakes(InorganicModel parsedInorganic) {
         if (parsedInorganic.toString().contains("peróxido")) // Any of its names
-            correctPeroxide();
+            correctPeroxide(parsedInorganic);
 
         parsedInorganic.setStockName(correctName(parsedInorganic.getStockName()));
         parsedInorganic.setSystematicName(correctName(parsedInorganic.getSystematicName()));
         parsedInorganic.setTraditionalName(correctName(parsedInorganic.getTraditionalName()));
     }
 
-    private void correctPeroxide() {
+    private void correctPeroxide(InorganicModel parsedInorganic) {
         parsedInorganic.setFormula(parsedInorganic.getFormula().replaceAll("O2*$", "(O2)")); // It's more clear
         parsedInorganic.setSystematicName(null); // Systematic names for peroxides must NEVER include that word
     }
@@ -171,17 +197,18 @@ class WebParseComponent {
         return correctionService.correct(name, true);
     }
 
-    private void parseAndSetProperties() {
-        parsedInorganic.setMolecularMass(parseMolecularMass());
-        parsedInorganic.setDensity(parseDensity());
-        parsedInorganic.setMeltingPoint(parseTemperature("fusión"));
-        parsedInorganic.setBoilingPoint(parseTemperature("ebullición"));
+    private void parseAndSetProperties(InorganicModel parsedInorganic, String htmlDocument) {
+        parsedInorganic.setMolecularMass(parseMolecularMass(htmlDocument));
+        parsedInorganic.setDensity(parseDensity(htmlDocument));
+        parsedInorganic.setMeltingPoint(parseTemperature("fusión", htmlDocument));
+        parsedInorganic.setBoilingPoint(parseTemperature("ebullición", htmlDocument));
     }
 
-    private String parseMolecularMass() {
+    private String parseMolecularMass(String htmlDocument) {
         Optional<String> characteristic = parseCharacteristic(
                 List.of("Masa molar", "Masa Molar", "Peso Molecular"),
-                List.of("g")
+                List.of("g"),
+                htmlDocument
         );
 
         if (characteristic.isEmpty())
@@ -190,10 +217,11 @@ class WebParseComponent {
         return truncateToTwoDecimalPlaces(characteristic.get()); // Trailing zeros are kept
     }
 
-    private String parseTemperature(String temperatureLabel) {
+    private String parseTemperature(String temperatureLabel, String htmlDocument) {
         Optional<String> parsedCharacteristic = parseCharacteristic(
                 List.of("Punto de " + temperatureLabel, "Temperatura de " + temperatureLabel),
-                List.of("°", "º") // Similar yet different character
+                List.of("°", "º"), // Similar yet different character
+                htmlDocument
         );
 
         if (parsedCharacteristic.isEmpty())
@@ -209,7 +237,7 @@ class WebParseComponent {
         return temperature;
     }
 
-    private Optional<String> parseCharacteristic(List<String> labels, List<String> units) {
+    private Optional<String> parseCharacteristic(List<String> labels, List<String> units, String htmlDocument) {
         String characteristic;
 
         Optional<Integer> indexAfterLabel = Optional.empty();
@@ -245,7 +273,7 @@ class WebParseComponent {
         return Optional.of(characteristic);
     }
 
-    private String parseDensity() {
+    private String parseDensity(String htmlDocument) {
         String density;
 
         Optional<Integer> index = indexAfterIn("Densidad:", htmlDocument);
@@ -317,8 +345,7 @@ class WebParseComponent {
     private String truncateToTwoDecimalPlaces(String number) {
         Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
-        if (decimalPointIndex.isEmpty())
-            return number;
+        if (decimalPointIndex.isEmpty()) return number;
 
         int afterDecimalsIndex = decimalPointIndex.get() + 2;
 
@@ -326,10 +353,6 @@ class WebParseComponent {
             number = number.substring(0, afterDecimalsIndex);
 
         return number;
-
-        // TODO Regexp?
-        // Matcher matcher = Pattern.compile("^[^.]+\\.(\\d{0,2}).*$").matcher(number);
-        // return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     // I.e.: "13.450" -> "13.45"
@@ -342,27 +365,17 @@ class WebParseComponent {
     private String truncateToThreeSignificantDecimalPlaces(String number) {
         Optional<Integer> decimalPointIndex = indexAfterIn(".", number);
 
-        if (decimalPointIndex.isEmpty())
-            return number;
+        if (decimalPointIndex.isEmpty()) return number;
 
         for (int i = decimalPointIndex.get(), significantCount = 0; i < number.length() && significantCount < 3; i++)
-            if (number.charAt(i) != '0')
-                if (++significantCount == 3)
-                    number = number.substring(0, i + 1);
+            if (number.charAt(i) != '0') if (++significantCount == 3) number = number.substring(0, i + 1);
 
         return number;
-
-        // TODO Regexp?
-        // Matcher matcher = Pattern.compile("^([^.]+\\.[0]{0,3}[1-9]+).*$").matcher(number);
-        // return matcher.find() ? matcher.replaceFirst("$1") : number;
     }
 
     private Optional<Integer> indexAfterIn(String substring, String string) {
         int index = string.indexOf(substring);
-
-        return index != -1
-                ? Optional.of(index + substring.length())
-                : Optional.empty();
+        return index != -1 ? Optional.of(index + substring.length()) : Optional.empty();
     }
 
 }
