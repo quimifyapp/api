@@ -2,7 +2,7 @@ INSERT INTO settings(version, use_bing, bing_daily_limit, use_google, google_dai
 
 VALUES(
 , # Version
-true, 110, # Free Bing
+true, 33, # Free Bing
 true, 100, # Google
 "https://api.bing.microsoft.com/v7.0/search?count=1&q=site:www.formulacionquimica.com+", # Free Bing URL
 "https://www.googleapis.com/customsearch/v1/siterestrict?key=%s&cx=f475470fccb0e037e&num=1&q=", # Google URL
