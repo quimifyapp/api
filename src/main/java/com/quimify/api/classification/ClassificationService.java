@@ -79,11 +79,13 @@ public class ClassificationService {
 
         switch (classification) {
             case inorganicFormula:
-                if (input.length() > 14)
+                if (input.length() > 16)
                     result = Optional.empty();
                 break;
             case organicFormula:
-                if (input.length() < 3 || input.length() > 100)
+                if (input.length() < 2 || input.length() > 100)
+                    result = Optional.empty();
+                else if (!(input.contains("C") || input.contains("c")))
                     result = Optional.empty();
                 break;
             case inorganicName:
