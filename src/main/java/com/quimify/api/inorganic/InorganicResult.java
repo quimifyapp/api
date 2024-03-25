@@ -14,11 +14,11 @@ class InorganicResult {
 
     // If not found:
 
-    private Classification classification; // "organicName"
+    private Classification classification; // "organicName", null...
 
     // If found:
 
-    private String suggestion; // "selenuro de potasio"
+    private String suggestion; // "selenuro de potasio", null...
 
     private String formula; // "MgH2"
 

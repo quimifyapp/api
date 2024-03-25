@@ -1,5 +1,8 @@
 package com.quimify.api.organic;
 
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
+import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.metrics.MetricsService;
@@ -25,9 +28,11 @@ class OrganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    // TODO classifier, corrections
+    @Autowired
+    ClassificationService classificationService;
 
-    // TODO: Sugerencia con regex "^[a-zA-Z].*oxi.*o$" (afinar más) de "1-...", para "butoxidecano" por ejemplo
+    @Autowired
+    CorrectionService correctionService;
 
     @Autowired
     PubChemComponent pubChemComponent;
@@ -50,56 +55,39 @@ class OrganicService {
 
     // Client:
 
-    OrganicResult getFromName(String name) {
-        OrganicResult organicResult;
+    OrganicResult getFromName(String input) {
+        Optional<OrganicResult> result = tryGetFromName(input);
 
-        try {
-            Optional<Organic> organic = OrganicFactory.getFromName(name);
+        if (result.isEmpty())
+            result = getFromCorrectedName(input);
 
-            if (organic.isPresent()) {
-                organicResult = resolvePropertiesOf(organic.get());
+        if (result.isEmpty())
+            result = Optional.of(OrganicResult.notFound());
 
-                if (organic.get().getStructureException() != null) {
-                    // TODO classifier & menu suggestion
-                    Exception exception = organic.get().getStructureException();
-                    errorService.log("Exception solving name: " + name, exception.toString(), getClass());
-                }
-            }
-            else {
-                // TODO classifier & menu suggestion
-                logger.warn("Couldn't solve organic \"" + name + "\".");
-                organicResult = OrganicResult.notFound();
-            }
-        } catch (Exception exception) {
-            // TODO classifier & menu suggestion
-            errorService.log("Exception solving name: " + name, exception.toString(), getClass());
-            organicResult = OrganicResult.notFound();
-        } catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", name, getClass());
-            organicResult = OrganicResult.notFound();
-        }
+        if (!result.get().isFound() || result.get().getStructure() == null)
+            result = Optional.of(classifyName(input, result.get()));
 
-        if (!organicResult.isFound())
-            notFoundQueryService.log(name, getClass());
+        if (!result.get().isFound())
+            logger.warn("Couldn't solve organic \"" + input + "\".");
 
-        metricsService.organicFromNameQueried(organicResult.isFound());
+        metricsService.organicFromNameQueried(result.get().isFound());
 
-        return organicResult;
+        return result.get();
     }
 
-    OrganicResult getFromStructure(int[] inputSequence) {
+    OrganicResult tryGetFromStructure(int[] inputSequence) {
         OrganicResult organicResult;
 
         String sequenceToString = Arrays.toString(inputSequence); // For logging purposes
 
         try {
-            OpenChain openChain = getOpenChainFromStructure(inputSequence);
+            OpenChain openChain = getFromStructure(inputSequence);
             Organic organic = OrganicFactory.getFromOpenChain(openChain);
 
-            organicResult = resolvePropertiesOf(organic);
+            organicResult = completeSolved(organic);
         } catch (Exception exception) {
-            errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
             organicResult = OrganicResult.notFound();
+            errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
         }
 
         if (!organicResult.isFound())
@@ -112,7 +100,88 @@ class OrganicService {
 
     // Private:
 
-    private static OpenChain getOpenChainFromStructure(int[] inputSequence) {
+    Optional<OrganicResult> getFromCorrectedName(String input) {
+        Optional<OrganicResult> organicResult = Optional.empty();
+
+        String correctedInput = correctionService.correct(input, false);
+
+        if (!input.equals(correctedInput)) {
+            organicResult = tryGetFromName(correctedInput);
+
+            if (organicResult.isPresent() && organicResult.get().isFound()) {
+                organicResult.get().setSuggestion(correctedInput);
+                logger.info("Successfully corrected \"" + correctedInput + "\" from: \"" + input + "\".");
+            }
+        }
+
+        // TODO temp fix:
+
+        if (organicResult.isEmpty()) {
+            String acidCorrectedInput = "ácido " + correctedInput;
+
+            organicResult = tryGetFromName(acidCorrectedInput);
+
+            if (organicResult.isPresent()) {
+                organicResult.get().setSuggestion(acidCorrectedInput);
+                logger.info("Successfully corrected \"" + acidCorrectedInput + "\" from: \"" + input + "\".");
+            }
+        }
+
+        // TODO temp fix:
+
+        if (organicResult.isEmpty()) {
+            String locatorCorrectedInput = "1-" + correctedInput;
+
+            organicResult = tryGetFromName(locatorCorrectedInput);
+
+            if (organicResult.isPresent()) {
+                organicResult.get().setSuggestion(locatorCorrectedInput);
+                logger.info("Successfully corrected \"" + locatorCorrectedInput + "\" from: \"" + input + "\".");
+            }
+        }
+
+        // TODO metrics
+
+        return organicResult;
+    }
+
+    Optional<OrganicResult> tryGetFromName(String name) {
+        Optional<OrganicResult> result = Optional.empty();
+
+        try {
+            Optional<Organic> organic = OrganicFactory.getFromName(name);
+
+            if (organic.isPresent()) {
+                result = Optional.of(completeSolved(organic.get()));
+
+                if (organic.get().getStructureException() != null) {
+                    Exception exception = organic.get().getStructureException();
+                    errorService.log("Exception solving name: " + name, exception.toString(), getClass());
+                }
+            }
+        } catch (Exception exception) {
+            result = Optional.of(OrganicResult.notFound());
+            errorService.log("Exception solving name: " + name, exception.toString(), getClass());
+        } catch (StackOverflowError error) {
+            result = Optional.of(OrganicResult.notFound());
+            errorService.log("StackOverflow error", name, getClass());
+        }
+
+        return result;
+    }
+
+    private OrganicResult classifyName(String input, OrganicResult organicResult) { // TODO rename
+        Optional<Classification> classification = classificationService.classify(input);
+
+        // TODO metrics
+
+        if (classification.isPresent() && classification.get() != Classification.organicName)
+            organicResult.setClassification(classification.get());
+
+        return organicResult;
+    }
+
+    private OpenChain getFromStructure(int[] inputSequence) {
         OpenChain openChain = new Simple();
 
         for (int i = 0; i < inputSequence.length; i++) {
@@ -128,14 +197,13 @@ class OrganicService {
                 int carbonCount = inputSequence[++i];
 
                 openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-            }
-            else openChain = openChain.bond(group);
+            } else openChain = openChain.bond(group);
         }
 
         return openChain;
     }
 
-    private OrganicResult resolvePropertiesOf(Organic organic) {
+    private OrganicResult completeSolved(Organic organic) {
         if (organic.getSmiles() == null)
             return new OrganicResult(organic.getName(), organic.getStructure(), null, null);
 

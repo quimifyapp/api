@@ -111,7 +111,7 @@ class InorganicService {
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
 
-        return learnParsedInorganic(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
+        return learnParsed(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
     String complete(String input) {
@@ -171,19 +171,36 @@ class InorganicService {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.info("Found corrected \"" + correctedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"" + correctedInput + "\" from: \"" + input + "\".");
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
             }
         }
 
-        if (inorganicResult.isEmpty()) {
-            correctedInput = "ácido " + correctedInput;
+        // TODO temp fix:
 
-            Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
+        if (inorganicResult.isEmpty()) {
+            String acidCorrectedInput = "ácido " + correctedInput;
+
+            Optional<InorganicModel> searchedInMemory = fetch(acidCorrectedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.info("Found corrected \"" + correctedInput + "\" from: \"" + input + "\".");
-                inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
+                logger.info("Successfully corrected \"" + acidCorrectedInput + "\" from: \"" + input + "\".");
+                inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), acidCorrectedInput));
+            }
+        }
+
+        // TODO temp fix:
+
+        if (inorganicResult.isEmpty()) {
+            String monoCorrectedInput = "mono" + correctedInput;
+
+            monoCorrectedInput = monoCorrectedInput.replace("monoo", "mono");
+
+            Optional<InorganicModel> searchedInMemory = fetch(monoCorrectedInput);
+
+            if (searchedInMemory.isPresent()) {
+                logger.info("Successfully corrected \"" + monoCorrectedInput + "\" from: \"" + input + "\".");
+                inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), monoCorrectedInput));
             }
         }
 
@@ -197,10 +214,10 @@ class InorganicService {
 
         metricsService.inorganicClassificationSearched(result.isPresent());
 
-        if (result.isPresent() && !classificationService.isInorganic(result.get()))
-            return Optional.of(InorganicResult.classification(result.get()));
+        if (result.isEmpty() || classificationService.isInorganic(result.get()))
+            return Optional.empty();
 
-        return Optional.empty();
+        return Optional.of(InorganicResult.classification(result.get()));
     }
 
     private Optional<InorganicModel> fetch(String input) {
@@ -218,7 +235,7 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private InorganicResult learnParsedInorganic(InorganicModel parsedInorganic) {
+    private InorganicResult learnParsed(InorganicModel parsedInorganic) {
         Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
 
         if (newMolecularMass.isPresent()) {

@@ -2,41 +2,37 @@ package com.quimify.api.organic;
 
 // This POJO class represents responses of organic compounds to the client.
 
+import com.quimify.api.classification.Classification;
+
 class OrganicResult {
 
     private boolean found;
 
-    private String suggestion; // "hexano" or an input kind like "organic-formula"
+    private Classification classification; // "inorganicFormula", null...
 
-    // If present is true:
+    private String suggestion; // "hexano", null...
 
     private String name; // "2,2-dicloroetil metil éter"
     private String structure; // "CH3-O-CH2-CHCl2"
-    private Float molecularMass; // (g/mol)
+    private Float molecularMass; // "128.98" (g/mol)
     private String url2D; // "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?width=500&height=500&cid=118742"
 
     // Constructors:
 
-    OrganicResult(String name, String structure, Float molecularMass, String url2D, String suggestion) {
+    OrganicResult(String name, String structure, Float molecularMass, String url2D) {
         this.found = true;
-        this.suggestion = suggestion;
         this.name = name;
         this.structure = structure;
         this.molecularMass = molecularMass;
         this.url2D = url2D;
     }
 
-    OrganicResult(String name, String structure, Float molecularMass, String url2D) {
-        this(name, structure, molecularMass, url2D, null);
-    }
-
-    OrganicResult(String suggestion) {
+    private OrganicResult() {
         this.found = false;
-        this.suggestion = suggestion;
     }
 
     static OrganicResult notFound() {
-        return new OrganicResult(null);
+        return new OrganicResult();
     }
 
     // Getters and setters (must be public to enable JSON serialization):
@@ -47,6 +43,14 @@ class OrganicResult {
 
     public void setFound(boolean found) {
         this.found = found;
+    }
+
+    public Classification getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Classification classification) {
+        this.classification = classification;
     }
 
     public String getSuggestion() {

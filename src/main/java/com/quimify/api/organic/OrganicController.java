@@ -34,7 +34,7 @@ class OrganicController {
 
 	@GetMapping("/name")
 	OrganicResult getFromStructure(@RequestParam("structure-sequence") int[] structureSequence) {
-		OrganicResult result = organicService.getFromStructure(structureSequence);
+		OrganicResult result = organicService.tryGetFromStructure(structureSequence);
 
 		if(result.isFound())
 			logger.info(String.format(getOrganicMessage, "structure", result.getStructure(), result.getName()));
