@@ -27,9 +27,11 @@ class PubChemComponent {
     private static final String restUrl = url + "rest/pug/compound/";
 
     private static final String compoundIdUrl = restUrl + "smiles/%s/cids/TXT";
+
     private static final String smiles2DUrl = restUrl + "smiles/%s/PNG";
     private static final String compoundId2DUrl = url + "image/imagefly.cgi?width=500&height=500&cid=%s";
-    private static final String molecularMassUrl = restUrl + "cid/%s/property/molecularweight/TXT";
+    private static final String compoundId3DUrl = url + "compound/%s#section=3D-Conformer&fullscreen=true";
+    private static final String molecularMassIdUrl = restUrl + "cid/%s/property/molecularweight/TXT";
 
     // Queries:
 
@@ -53,6 +55,13 @@ class PubChemComponent {
         return String.format(compoundId2DUrl, compoundId); // 500 x 500 px
     }
 
+    String getUrl3D() {
+        if (invalidCompoundId())
+            return null;
+
+        return String.format(compoundId3DUrl, compoundId);
+    }
+
     Optional<Float> getMolecularMass() {
         if(invalidCompoundId())
             return Optional.empty();
@@ -60,7 +69,7 @@ class PubChemComponent {
         Optional<Float> molecularMass;
 
         try {
-            String text = new Connection(String.format(molecularMassUrl, compoundId)).getText();
+            String text = new Connection(String.format(molecularMassIdUrl, compoundId)).getText();
             molecularMass = Optional.of(Float.valueOf(text));
         } catch (Exception exception) {
             errorService.log("Exception getting mass for: " + compoundId, exception.toString(), getClass());

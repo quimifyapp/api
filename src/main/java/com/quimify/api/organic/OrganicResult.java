@@ -16,15 +16,17 @@ class OrganicResult {
     private String structure; // "CH3-O-CH2-CHCl2"
     private Float molecularMass; // "128.98" (g/mol)
     private String url2D; // "https://pubchem.ncbi.nlm.nih.gov/image/imagefly.cgi?width=500&height=500&cid=118742"
+    private String url3D; // "https://pubchem.ncbi.nlm.nih.gov/compound/118742#section=3D-Conformer&fullscreen=true"
 
     // Constructors:
 
-    OrganicResult(String name, String structure, Float molecularMass, String url2D) {
+    OrganicResult(String name, String structure, Float molecularMass, String url2D, String url3D) {
         this.found = true;
         this.name = name;
         this.structure = structure;
         this.molecularMass = molecularMass;
         this.url2D = url2D;
+        this.url3D = url3D;
     }
 
     private OrganicResult() {
@@ -91,6 +93,14 @@ class OrganicResult {
 
     public void setUrl2D(String url2D) {
         this.url2D = url2D;
+    }
+
+    public String getUrl3D() {
+        return url3D;
+    }
+
+    public void setUrl3D(String url3D) {
+        this.url3D = url3D;
     }
 
 }

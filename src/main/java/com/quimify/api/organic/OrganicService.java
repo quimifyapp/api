@@ -170,7 +170,7 @@ class OrganicService {
         return result;
     }
 
-    private OrganicResult classifyName(String input, OrganicResult organicResult) { // TODO rename
+    private OrganicResult classifyName(String input, OrganicResult organicResult) {
         Optional<Classification> classification = classificationService.classify(input);
 
         // TODO metrics
@@ -197,7 +197,8 @@ class OrganicService {
                 int carbonCount = inputSequence[++i];
 
                 openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-            } else openChain = openChain.bond(group);
+            }
+            else openChain = openChain.bond(group);
         }
 
         return openChain;
@@ -205,11 +206,9 @@ class OrganicService {
 
     private OrganicResult completeSolved(Organic organic) {
         if (organic.getSmiles() == null)
-            return new OrganicResult(organic.getName(), organic.getStructure(), null, null);
+            return new OrganicResult(organic.getName(), organic.getStructure(), null, null, null);
 
         pubChemComponent.resolveCompound(organic.getSmiles());
-
-        String url2D = pubChemComponent.getUrl2D();
 
         Optional<Float> molecularMass = Optional.empty();
 
@@ -219,7 +218,10 @@ class OrganicService {
         if (molecularMass.isEmpty())
             molecularMass = pubChemComponent.getMolecularMass();
 
-        return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D);
+        String url2D = pubChemComponent.getUrl2D();
+        String url3D = pubChemComponent.getUrl3D();
+
+        return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D, url3D);
     }
 
 }
