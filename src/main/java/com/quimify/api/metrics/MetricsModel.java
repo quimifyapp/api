@@ -87,6 +87,12 @@ class MetricsModel {
     @Column(columnDefinition = "INT default 0", nullable = false)
     private Integer molecularMassFailedQueries = 0;
 
+    // Their sum is the total of client balance equation queried:
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer balanceEquationFoundQueries = 0;
+    @Column(columnDefinition = "INT default 0", nullable = false)
+    private Integer balanceEquationFailedQueries = 0;
+
     // Constructors:
 
     MetricsModel(Date date) {
@@ -197,12 +203,16 @@ class MetricsModel {
         organicFromStructureFailedQueries += 1;
     }
 
-    void incrementMolecularMassFoundQueries() {
-        molecularMassFoundQueries += 1;
-    }
+    void incrementMolecularMassFoundQueries() { molecularMassFoundQueries += 1; }
 
     void incrementMolecularMassFailedQueries() {
         molecularMassFailedQueries += 1;
+    }
+
+    void incrementBalanceEquationFoundQueries() { balanceEquationFoundQueries += 1; }
+
+    void incrementBalanceEquationFailedQueries() {
+        balanceEquationFailedQueries += 1;
     }
 
     // Getters and setters:
@@ -431,4 +441,15 @@ class MetricsModel {
         this.molecularMassFailedQueries = molecularMassFailedQueries;
     }
 
+    Integer getBalanceEquationFoundQueries() { return balanceEquationFoundQueries; }
+
+    void setBalanceEquationFoundQueries(Integer balanceEquationFoundQueries) {
+        this.balanceEquationFoundQueries = balanceEquationFoundQueries;
+    }
+
+    Integer getBalanceEquationFailedQueries() { return balanceEquationFailedQueries; }
+
+    void setBalanceEquationFailedQueries(Integer balanceEquationFailedQueries) {
+        this.balanceEquationFailedQueries = balanceEquationFailedQueries;
+    }
 }

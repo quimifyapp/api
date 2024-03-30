@@ -177,4 +177,13 @@ public class MetricsService {
         else todayMetrics.incrementMolecularMassFailedQueries();
     }
 
+    @Transactional
+    public void balanceEquationQueried(boolean succeeded) {
+        MetricsModel todayMetrics = getTodayMetrics();
+
+        if (succeeded)
+            todayMetrics.incrementMolecularMassFoundQueries();
+        else todayMetrics.incrementMolecularMassFailedQueries();
+    }
+
 }
