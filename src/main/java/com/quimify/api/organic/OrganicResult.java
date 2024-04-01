@@ -20,13 +20,10 @@ class OrganicResult {
 
     // Constructors:
 
-    OrganicResult(String name, String structure, Float molecularMass, String url2D, String url3D) {
+    OrganicResult(String name, String structure) {
         this.found = true;
         this.name = name;
         this.structure = structure;
-        this.molecularMass = molecularMass;
-        this.url2D = url2D;
-        this.url3D = url3D;
     }
 
     private OrganicResult() {

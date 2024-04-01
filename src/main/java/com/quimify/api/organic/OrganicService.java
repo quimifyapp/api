@@ -84,7 +84,7 @@ class OrganicService {
             OpenChain openChain = getFromStructure(inputSequence);
             Organic organic = OrganicFactory.getFromOpenChain(openChain);
 
-            organicResult = completeSolved(organic);
+            organicResult = processSolved(organic);
         } catch (Exception exception) {
             organicResult = OrganicResult.notFound();
             errorService.log("Exception naming: " + sequenceToString, exception.toString(), getClass());
@@ -152,7 +152,7 @@ class OrganicService {
             Optional<Organic> organic = OrganicFactory.getFromName(name);
 
             if (organic.isPresent()) {
-                result = Optional.of(completeSolved(organic.get()));
+                result = Optional.of(processSolved(organic.get()));
 
                 if (organic.get().getStructureException() != null) {
                     Exception exception = organic.get().getStructureException();
@@ -204,24 +204,21 @@ class OrganicService {
         return openChain;
     }
 
-    private OrganicResult completeSolved(Organic organic) {
-        if (organic.getSmiles() == null)
-            return new OrganicResult(organic.getName(), organic.getStructure(), null, null, null);
+    private OrganicResult processSolved(Organic organic) {
+        OrganicResult result = new OrganicResult(organic.getName(), organic.getStructure());
 
-        pubChemComponent.resolveCompound(organic.getSmiles());
+        if (organic.getSmiles() != null)
+            pubChemComponent.setProperties(result, organic.getSmiles());
 
-        Optional<Float> molecularMass = Optional.empty();
+        if (organic.getStructure() != null) {
+            // Calculated molecular mass is preferred for consistency over PubChem's
+            Optional<Float> calculatedMolecularMass = molecularMassService.get(organic.getStructure());
 
-        if (organic.getStructure() != null)
-            molecularMass = molecularMassService.get(organic.getStructure());
+            if (calculatedMolecularMass.isPresent())
+                result.setMolecularMass(calculatedMolecularMass.get());
+        }
 
-        if (molecularMass.isEmpty())
-            molecularMass = pubChemComponent.getMolecularMass();
-
-        String url2D = pubChemComponent.getUrl2D();
-        String url3D = pubChemComponent.getUrl3D();
-
-        return new OrganicResult(organic.getName(), organic.getStructure(), molecularMass.orElse(null), url2D, url3D);
+        return result;
     }
 
 }
