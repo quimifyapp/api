@@ -12,6 +12,12 @@ public class BalancerResult {
         this.balancedEquation = balancedEquation;
     }
 
+    static BalancerResult error(String error) {
+        BalancerResult balancerResult = new BalancerResult(false, null,  null);
+        balancerResult.error = error;
+        return balancerResult;
+    }
+
     public String getOriginalEquation() {
         return originalEquation;
     }
@@ -32,10 +38,8 @@ public class BalancerResult {
         return present;
     }
 
-    static BalancerResult error(String error) {
-        BalancerResult molecularMassResult = new BalancerResult(false, null,  null);
-        molecularMassResult.error = error;
-        return molecularMassResult;
+    public void setPresent(boolean present) {
+        this.present = present;
     }
 
     public String getError() {

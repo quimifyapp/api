@@ -2,8 +2,7 @@ package com.quimify.api.balancer;
 
 import org.springframework.stereotype.Component;
 
-// El código está en proceso de adaptación de un programa main a llamada API
-// The code is in the process of translation from a main program tu an API call
+
 @Component
 public class MatrixComponent {
     public FractionComponent[][] matrix;
@@ -24,42 +23,12 @@ public class MatrixComponent {
         }
     }
 
-    public MatrixComponent(boolean augment){
-        System.out.println("Enter Size of Matrix" + (augment? " without Augmented Side: ": ""));
-        System.out.print("Columns: ");
-        int dimension1=sc.nextInt();
-        System.out.print("Rows: ");
-        int dimension2=sc.nextInt();
-        System.out.println("Enter matrix" + (augment?" with augmented matrix. In other words, get all equations into x+y+z+...=3 form.": "."));
-        this.matrix = new FractionComponent[dimension1][augment? dimension2+1: dimension2];
-        for(int i=0; i<dimension1*((augment? dimension2+1: dimension2)); i++){
-            int position1 = i/(augment? dimension2+1: dimension2);
-            int position2 = i%(augment? dimension2+1: dimension2);
-            System.out.println("\nPosition ("+(position1+1)+", "+(position2+1)+")");
-            System.out.print("Fraction: ");
-            String fractionString = sc.next();
-            Integer numerator = null;
-            Integer denominator = null;
-            if(fractionString.contains("/")){
-                String[] splitString = fractionString.split("/");
-                numerator = Integer.parseInt(splitString[0]);
-                denominator = Integer.parseInt(splitString[1]);
-            }else{
-                numerator = Integer.parseInt(fractionString);
-                denominator = 1;
-            }
-            this.matrix[position1][position2] = new FractionComponent(numerator, denominator);
-        }
-    }
-
     public MatrixComponent(FractionComponent[][] matrix){
         this.matrix = matrix;
     }
 
     /**
      * Simple Function that swaps rows
-     * @param row1 Row Index 1
-     * @param row2 Row Index 2
      */
     public void rowSwap(int row1, int row2){
         FractionComponent[] temp = this.matrix[row1-1];
@@ -69,8 +38,6 @@ public class MatrixComponent {
 
     /**
      * Simple Function that adds 2 rows
-     * @param row1 Row Index 1
-     * @param row2 Row Index 2 (Result is stored in this row)
      */
     public void rowAddition(int row1, int row2){
         FractionComponent[] addedRow = new FractionComponent[this.matrix[row1-1].length];
@@ -82,8 +49,6 @@ public class MatrixComponent {
 
     /**
      * Simple Function that multiplies 2 rows
-     * @param scalar Fraction scalar
-     * @param row Row Index
      */
     public void rowMultiplication(FractionComponent scalar, int row){
         for(int i=0; i<this.matrix[row-1].length; i++){
@@ -95,10 +60,11 @@ public class MatrixComponent {
     /**
      * Custom Implementation of a Gaussian Elimination Algorithm. Note matrix does not need to be square.
      */
-    public void gaussianElimination() throws MatrixError {
+    public void gaussianElimination() {
         if(this.isEmpty()){
-            throw new MatrixError("Matrix Error: Cannot solve empty matrix.");
+            System.out.println("Matrix Error: Cannot solve empty matrix.");
         }
+
         int rowIndex = 0;
         for(int columnIndex = 0; columnIndex < this.matrix[0].length; columnIndex++){
             Integer nonZero = null;
@@ -135,28 +101,10 @@ public class MatrixComponent {
         }
     }
 
-    public void gaussianWithBackSubstitution(){
-        try {
-            this.gaussianElimination();
-        } catch (MatrixError matrixError) {
-            matrixError.printStackTrace();
-            System.exit(0);
-        }
-        AlgebraEquation.setSize(this.matrix[0].length+1);
-        for(int i=this.matrix.length-1; i>=0; i--) {
-            //Iterating through reverse
-            AlgebraEquation newAlgebraEquation = new AlgebraEquation(this.matrix[i]);
-        }
-    }
-
     public void gaussjordanElimination() {
-        try {
-            this.gaussianElimination();
-        } catch (MatrixError matrixError) {
-            matrixError.printStackTrace();
-            System.exit(0);
-        }
+        this.gaussianElimination();
         int rowIndex = 0;
+
         for(int columnIndex = 0; columnIndex < this.matrix[0].length; columnIndex++){
             if(this.matrix[rowIndex][columnIndex].equals(new FractionComponent(1,1))) {
                 for (int i = 0; i < rowIndex; i++) {
@@ -175,62 +123,6 @@ public class MatrixComponent {
         }
     }
 
-    public FractionComponent determinant() throws MatrixError{
-        if(!this.isSquare()){
-            throw new MatrixError("Determinant Error: Matrix is not square!");
-        }
-        if(this.matrix.length==2 && this.matrix[0].length==2){
-            return FractionComponent.add(FractionComponent.multiply(this.matrix[0][0], this.matrix[1][1]), FractionComponent.negate(FractionComponent.multiply(this.matrix[1][0], this.matrix[0][1])));
-        }else{
-            FractionComponent determinant = new FractionComponent(0,1);
-            for(int i=0; i<this.matrix.length; i++){
-                FractionComponent component = this.matrix[i][0];
-                FractionComponent[][] subArr = new FractionComponent[this.matrix.length-1][this.matrix[0].length-1];
-                int insertIndex=0;
-                for(int i1=0; i1<this.matrix.length; i1++){
-                    for(int i2=0; i2<this.matrix[i1].length; i2++){
-                        if(i != i1 && i2 != 0){
-                            subArr[insertIndex/(this.matrix.length-1)][insertIndex%(this.matrix[0].length-1)]=this.matrix[i1][i2];
-                            insertIndex++;
-                        }
-                    }
-                }
-                MatrixComponent subMatrix = new MatrixComponent(subArr);
-                component=FractionComponent.multiply(component, subMatrix.determinant());
-                if(i%2==1){component=FractionComponent.negate(component);}
-                determinant=FractionComponent.add(determinant, component);
-            }
-            return determinant;
-        }
-    }
-
-    public MatrixComponent inverse() throws MatrixError {
-        if(!this.isSquare()){
-            throw new MatrixError("Inverse Error: Matrix is not square!");
-        }
-        FractionComponent[][] solutionArr = new FractionComponent[this.matrix.length][this.matrix.length*2];
-        for(int i=0; i<this.matrix.length; i++){
-            for(int j=0; j<this.matrix.length*2; j++){
-                if(j<this.matrix.length){
-                    solutionArr[i][j]=this.matrix[i][j];
-                }else{
-                    solutionArr[i][j]=(j-this.matrix.length==i? new FractionComponent(1, 1): new FractionComponent(0, 1));
-                }
-            }
-        }
-        MatrixComponent solutionMatrix = new MatrixComponent(solutionArr);
-        solutionMatrix.gaussjordanElimination();
-        FractionComponent[][] inverseArr = new FractionComponent[this.matrix.length][this.matrix.length];
-        for(int i=0; i<this.matrix.length; i++){
-            for(int j=this.matrix.length; j<this.matrix.length*2; j++){
-                inverseArr[i][j-this.matrix.length] = solutionMatrix.matrix[i][j];
-            }
-        }
-        return new MatrixComponent(inverseArr);
-    }
-
-    public boolean isSquare(){return this.matrix.length==this.matrix[0].length;}
-
     public boolean isEmpty() {
         if(this.matrix.length == 0){
             return true;
@@ -242,9 +134,9 @@ public class MatrixComponent {
         return false;
     }
 
-    public static MatrixComponent add(MatrixComponent matrix1, MatrixComponent matrix2) throws MatrixError{
+    public static MatrixComponent add(MatrixComponent matrix1, MatrixComponent matrix2) {
         if(matrix1.matrix.length != matrix2.matrix.length || matrix1.matrix[0].length != matrix2.matrix[0].length){
-            throw new MatrixError("Addition Error: Matrix Addition not computable due to dimensions!");
+            System.out.println("Addition Error: Matrix Addition not computable due to dimensions!");
         }
         FractionComponent[][] sum = new FractionComponent[matrix1.matrix.length][matrix1.matrix[0].length];
         for(int i=0; i<matrix1.matrix.length; i++){
@@ -269,9 +161,9 @@ public class MatrixComponent {
         return MatrixComponent.multiply(new FractionComponent(-1, 1), matrix);
     }
 
-    public static MatrixComponent multiply(MatrixComponent matrix1, MatrixComponent matrix2) throws MatrixError {
+    public static MatrixComponent multiply(MatrixComponent matrix1, MatrixComponent matrix2) {
         if(matrix1.matrix[0].length != matrix2.matrix.length){
-            throw new MatrixError("Multiplication Error: Matrix Multiplication not computable due to dimensions!");
+            System.out.println("Multiplication Error: Matrix Multiplication not computable due to dimensions!");
         }
         FractionComponent[][] productArr = new FractionComponent[matrix1.matrix.length][matrix2.matrix[0].length];
         for(int i=0; i<matrix1.matrix.length; i++){

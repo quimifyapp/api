@@ -2,8 +2,6 @@ package com.quimify.api.balancer;
 
 import org.springframework.stereotype.Component;
 
-// El código está en proceso de adaptación de un programa main a llamada API
-// The code is in the process of translation from a main program tu an API call
 
 /**
  * Custom Fraction class with all basic operations(adding, multiplying, negating, simplifying, scaling) performed
