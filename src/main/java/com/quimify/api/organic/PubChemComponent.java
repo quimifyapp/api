@@ -76,8 +76,6 @@ class PubChemComponent {
         if (isInvalid(compoundId))
             return null;
 
-        // TODO check if there's 3D diagram or not
-
         return String.format(compoundIdTo3DUrl, compoundId);
     }
 

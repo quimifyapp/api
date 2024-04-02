@@ -111,7 +111,16 @@ class InorganicService {
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
 
-        return learnParsed(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
+        Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.get().getFormula());
+
+        if (newMolecularMass.isPresent()) {
+            String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
+            parsedInorganic.get().setMolecularMass(molecularMass);
+        }
+
+        learnParsed(parsedInorganic.get());
+
+        return new InorganicResult(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
     String complete(String input) {
@@ -235,25 +244,15 @@ class InorganicService {
         return inorganicModel;
     }
 
-    private InorganicResult learnParsed(InorganicModel parsedInorganic) {
-        Optional<Float> newMolecularMass = molecularMassService.get(parsedInorganic.getFormula());
-
-        if (newMolecularMass.isPresent()) {
-            String molecularMass = String.format("%.2f", newMolecularMass.get()).replace(",", ".");
-            parsedInorganic.setMolecularMass(molecularMass);
-        }
-
+    private void learnParsed(InorganicModel parsedInorganic) {
         inorganicRepository.save(parsedInorganic);
-        cacheComponent.add(parsedInorganic);
+        cacheComponent.save(parsedInorganic);
 
         metricsService.inorganicDeepSearchLearned();
-
         logger.warn("Learned inorganic: " + parsedInorganic);
 
         if (parsedInorganic.toString().contains("peróxido")) // Any of its names
             logger.warn("Learned peroxide might need manual correction: " + parsedInorganic);
-
-        return new InorganicResult(parsedInorganic);
     }
 
 }

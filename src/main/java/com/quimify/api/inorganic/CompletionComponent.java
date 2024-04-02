@@ -36,7 +36,7 @@ class CompletionComponent {
     String tryComplete(String input) {
         try {
             String normalizedInput = Normalizer.get(input);
-            Optional<Integer> id = cacheComponent.findStartingWith(normalizedInput);
+            Optional<Integer> id = cacheComponent.findCompletion(normalizedInput);
 
             if (id.isPresent())
                 return findNormalizedTextIn(normalizedInput, id.get());

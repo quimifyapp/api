@@ -22,34 +22,33 @@ class CacheComponent {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicRepository inorganicRepository; 
+    InorganicRepository inorganicRepository;
 
     @Autowired
     ErrorService errorService; // API errors logic
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Avoids reading main cache while writing
 
     private final Map<String, Integer> cache = new LinkedHashMap<>(); // Ordered by searches
-
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Avoids reading main cache while writing
     private Map<String, Integer> shadowCache; // Read while main one is being modified
 
     // Updating:
 
     @Scheduled(fixedDelay = 30 * 60 * 1000) // It's called at startup too
     private void tryUpdateCache() {
+        shadowCache = new LinkedHashMap<>(cache);
+
+        readWriteLock.writeLock().lock();
+
         try {
-            shadowCache = new LinkedHashMap<>(cache);
-            readWriteLock.writeLock().lock();
+            logger.info("Updating inorganic cache...");
 
             cache.clear();
-
             for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc()) {
                 add(inorganicModel);
 
-                for (String normalizedText : inorganicModel.getSearchTags())
-                    cache.put(normalizedText, inorganicModel.getId()); // Already normalized
             }
 
-            logger.info("Inorganic cache updated.");
+            logger.info("Updated inorganic cache.");
         } catch (Exception exception) {
             errorService.log("Exception updating cache", exception.toString(), getClass());
         } finally {
@@ -59,7 +58,42 @@ class CacheComponent {
 
     // Internal:
 
-    void add(InorganicModel inorganicModel) {
+    void save(InorganicModel inorganicModel) {
+        if (!readWriteLock.readLock().tryLock())
+            return; // It's already being added to it while it's updated
+
+        try {
+            add(inorganicModel);
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
+    Optional<Integer> find(String normalizedInput) {
+        if (!readWriteLock.readLock().tryLock())
+            return findIn(normalizedInput, shadowCache); // Main one is being written
+
+        try {
+            return findIn(normalizedInput, cache);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    Optional<Integer> findCompletion(String normalizedInput) {
+        if (!readWriteLock.readLock().tryLock())
+            return findCompletionIn(normalizedInput, shadowCache); // Main one is being written
+
+        try {
+            return findCompletionIn(normalizedInput, cache);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    // Private:
+
+    private void add(InorganicModel inorganicModel) {
         Integer id = inorganicModel.getId();
 
         addNormalized(inorganicModel.getFormula(), id);
@@ -67,30 +101,10 @@ class CacheComponent {
         addNormalized(inorganicModel.getSystematicName(), id);
         addNormalized(inorganicModel.getTraditionalName(), id);
         addNormalized(inorganicModel.getCommonName(), id);
+
+        for (String normalizedText : inorganicModel.getSearchTags())
+            cache.put(normalizedText, inorganicModel.getId()); // Already normalized
     }
-
-    Optional<Integer> find(String normalizedInput) {
-        if (!readWriteLock.readLock().tryLock())
-            return findIn(normalizedInput, shadowCache); // Main one is being written
-        try {
-            return findIn(normalizedInput, cache);
-        } finally {
-            readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
-        }
-    }
-
-    Optional<Integer> findStartingWith(String normalizedInput) {
-        if (!readWriteLock.readLock().tryLock())
-            return findStartingWithIn(normalizedInput, shadowCache); // Main one is being written
-
-        try {
-            return findStartingWithIn(normalizedInput, cache);
-        } finally {
-            readWriteLock.readLock().unlock(); // Only executed if the lock was acquired
-        }
-    }
-
-    // Private:
 
     private void addNormalized(String text, Integer id) {
         if (text != null)
@@ -101,7 +115,7 @@ class CacheComponent {
         return Optional.ofNullable(cache.get(normalizedInput));
     }
 
-    private Optional<Integer> findStartingWithIn(String normalizedInput, Map<String, Integer> cache) {
+    private Optional<Integer> findCompletionIn(String normalizedInput, Map<String, Integer> cache) {
         for (Map.Entry<String, Integer> entry : cache.entrySet())
             if (entry.getKey().startsWith(normalizedInput))
                 return Optional.of(entry.getValue());
