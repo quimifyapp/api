@@ -132,9 +132,11 @@ public class BalancerService {
         this.matrix.gaussjordanElimination();
         FractionComponent[] solutions = new FractionComponent[this.matrix.matrix[0].length];
 
+        int j = 0;
         for (int i = 0; i < this.matrix.matrix.length; i++) {
             if (!this.matrix.matrix[i][this.matrix.matrix[i].length - 1].equals(new FractionComponent(0, 1))) {
-                solutions[i] = this.matrix.matrix[i][this.matrix.matrix[0].length - 1];
+                solutions[j] = this.matrix.matrix[i][this.matrix.matrix[0].length - 1];
+                j++;
             }
         }
 

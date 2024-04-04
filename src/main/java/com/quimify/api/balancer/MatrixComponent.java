@@ -3,7 +3,6 @@ package com.quimify.api.balancer;
 import org.springframework.stereotype.Component;
 
 
-@Component
 public class MatrixComponent {
     public FractionComponent[][] matrix;
     public boolean print=true;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * Custom Fraction class with all basic operations(adding, multiplying, negating, simplifying, scaling) performed
  * during gaussian elimination. Fractions are made to be immutable in this class. Note all Fractions are simplified after any operation.
  */
-@Component
+
 public class FractionComponent {
     public int numerator;
     public int denominator;
