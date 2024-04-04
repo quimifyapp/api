@@ -29,40 +29,16 @@ class ErrorModel {
 
     // Getters and setters:
 
-    Integer getId() {
-        return id;
-    }
-
-    void setId(Integer id) {
-        this.id = id;
-    }
-
-    Timestamp getDateAndTime() {
-        return dateAndTime;
-    }
-
     void setDateAndTime(Timestamp dateAndTime) {
         this.dateAndTime = dateAndTime;
-    }
-
-    String getTitle() {
-        return title;
     }
 
     void setTitle(String title) {
         this.title = title;
     }
 
-    String getDetails() {
-        return details;
-    }
-
     void setDetails(String details) {
         this.details = details;
-    }
-
-    String getLocation() {
-        return location;
     }
 
     void setLocation(String location) {

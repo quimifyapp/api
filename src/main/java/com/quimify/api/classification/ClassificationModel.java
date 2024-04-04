@@ -21,28 +21,12 @@ class ClassificationModel {
 
     // Getters and setters:
 
-    Integer getPriority() {
-        return priority;
-    }
-
-    void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
     String getRegexPattern() {
         return regexPattern;
     }
 
-    void setRegexPattern(String regexPattern) {
-        this.regexPattern = regexPattern;
-    }
-
     Classification getClassification() {
         return classification;
-    }
-
-    void setClassification(Classification classification) {
-        this.classification = classification;
     }
 
 }

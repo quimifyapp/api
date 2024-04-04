@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-// This class holds a cache of all inorganics in the DB.
+// This Spring bean handles the runtime cache of all inorganics stored in DB.
 
 @Component
 @EnableScheduling
@@ -43,10 +43,8 @@ class CacheComponent {
             logger.info("Updating inorganic cache...");
 
             cache.clear();
-            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc()) {
+            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc())
                 add(inorganicModel);
-
-            }
 
             logger.info("Updated inorganic cache.");
         } catch (Exception exception) {

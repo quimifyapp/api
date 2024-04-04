@@ -19,27 +19,8 @@ public class ElementModel {
 
     // Getters and setters:
 
-    Integer getAtomicNumber() {
-        return atomicNumber;
-    }
-
-    void setAtomicNumber(Integer id) {
-        this.atomicNumber = id;
-    }
-
-    String getSymbol() {
-        return symbol;
-    }
-
-    void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
     public float getAtomicWeight() {
         return atomicWeight;
     }
 
-    void setAtomicWeight(float masa) {
-        this.atomicWeight = masa;
-    }
 }

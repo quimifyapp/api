@@ -29,48 +29,20 @@ class ReportModel {
 
     // Getters and setters:
 
-    Integer getId() {
-        return id;
-    }
-
-    void setId(Integer id) {
-        this.id = id;
-    }
-
-    Timestamp getDateAndTime() {
-        return dateAndTime;
-    }
-
     void setDateAndTime(Timestamp dateAndTime) {
         this.dateAndTime = dateAndTime;
-    }
-
-    String getContext() {
-        return context;
     }
 
     void setContext(String context) {
         this.context = context;
     }
 
-    String getDetails() {
-        return details;
-    }
-
     void setDetails(String details) {
         this.details = details;
     }
 
-    String getUserMessage() {
-        return userMessage;
-    }
-
     void setUserMessage(String userMessage) {
         this.userMessage = userMessage;
-    }
-
-    Integer getClientVersion() {
-        return clientVersion;
     }
 
     void setClientVersion(Integer clientVersion) {

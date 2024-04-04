@@ -62,140 +62,64 @@ class ClientModel {
 
     // Getters and setters:
 
-    String getPlatform() {
-        return platform;
-    }
-
-    void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    Integer getVersion() {
-        return version;
-    }
-
-    void setVersion(Integer version) {
-        this.version = version;
-    }
-
     Boolean getUpdateAvailable() {
         return updateAvailable;
-    }
-
-    void setUpdateAvailable(Boolean updateAvailable) {
-        this.updateAvailable = updateAvailable;
     }
 
     Boolean getUpdateNeeded() {
         return updateNeeded;
     }
 
-    void setUpdateNeeded(Boolean updateNeeded) {
-        this.updateNeeded = updateNeeded;
-    }
-
     String getUpdateDetails() {
         return updateDetails;
-    }
-
-    void setUpdateDetails(String updateDetails) {
-        this.updateDetails = updateDetails;
     }
 
     Boolean getMessagePresent() {
         return messagePresent;
     }
 
-    void setMessagePresent(Boolean messagePresent) {
-        this.messagePresent = messagePresent;
-    }
-
     String getMessageTitle() {
         return messageTitle;
-    }
-
-    void setMessageTitle(String messageTitle) {
-        this.messageTitle = messageTitle;
     }
 
     String getMessageDetails() {
         return messageDetails;
     }
 
-    void setMessageDetails(String messageDetails) {
-        this.messageDetails = messageDetails;
-    }
-
     Boolean getMessageLinkPresent() {
         return messageLinkPresent;
-    }
-
-    void setMessageLinkPresent(Boolean messageLinkPresent) {
-        this.messageLinkPresent = messageLinkPresent;
     }
 
     String getMessageLinkLabel() {
         return messageLinkLabel;
     }
 
-    void setMessageLinkLabel(String messageLinkLabel) {
-        this.messageLinkLabel = messageLinkLabel;
-    }
-
     String getMessageLink() {
         return messageLink;
     }
 
-    void setMessageLink(String messageLink) {
-        this.messageLink = messageLink;
-    }
-
-    public Boolean getBannerAdPresent() {
+    Boolean getBannerAdPresent() {
         return bannerAdPresent;
-    }
-
-    void setBannerAdPresent(Boolean bannerAdPresent) {
-        this.bannerAdPresent = bannerAdPresent;
     }
 
     String getBannerAdUnitId() {
         return bannerAdUnitId;
     }
 
-    void setBannerAdUnitId(String bannerAdUnitId) {
-        this.bannerAdUnitId = bannerAdUnitId;
-    }
-
     Boolean getInterstitialAdPresent() {
         return interstitialAdPresent;
-    }
-
-    void setInterstitialAdPresent(Boolean interstitialAdPresent) {
-        this.interstitialAdPresent = interstitialAdPresent;
     }
 
     Integer getInterstitialAdPeriod() {
         return interstitialAdPeriod;
     }
 
-    void setInterstitialAdPeriod(Integer interstitialAdPeriod) {
-        this.interstitialAdPeriod = interstitialAdPeriod;
-    }
-
     Integer getInterstitialAdOffset() {
         return interstitialAdOffset;
     }
 
-    void setInterstitialAdOffset(Integer interstitialAdOffset) {
-        this.interstitialAdOffset = interstitialAdOffset;
-    }
-
     String getInterstitialAdUnitId() {
         return interstitialAdUnitId;
-    }
-
-    void setInterstitialAdUnitId(String interstitialAdUnitId) {
-        this.interstitialAdUnitId = interstitialAdUnitId;
     }
 
 }

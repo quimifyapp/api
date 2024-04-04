@@ -19,32 +19,13 @@ class NotFoundQueryModel {
     @Column(nullable = false)
     private String location;
 
-    // TODO frequency?
+    // Constructors:
 
-    // Getters and setters:
-
-    Integer getId() {
-        return id;
-    }
-
-    void setId(Integer id) {
-        this.id = id;
-    }
-
-    String getQuery() {
-        return query;
-    }
-
-    void setQuery(String input) {
-        this.query = input;
-    }
-
-    String getLocation() {
-        return location;
-    }
-
-    void setLocation(String location) {
+    NotFoundQueryModel(String query, String location) {
+        this.query = query;
         this.location = location;
     }
+
+    protected NotFoundQueryModel() {} // Needed by JPA, don't touch
 
 }

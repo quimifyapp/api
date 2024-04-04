@@ -9,17 +9,14 @@ import org.springframework.stereotype.Service;
 public class NotFoundQueryService {
 
     @Autowired
-    NotFoundQueryRepository notFoundQueryRepository; 
+    NotFoundQueryRepository notFoundQueryRepository;
 
     // Internal:
 
     public void log(String query, Class<?> location) {
-        NotFoundQueryModel notFoundQueryModel = new NotFoundQueryModel();
-
         String locationName = location.getName().replaceAll(".*\\.", "");
 
-        notFoundQueryModel.setQuery(query);
-        notFoundQueryModel.setLocation(locationName);
+        NotFoundQueryModel notFoundQueryModel = new NotFoundQueryModel(query, locationName);
 
         notFoundQueryRepository.save(notFoundQueryModel);
     }

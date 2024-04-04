@@ -70,7 +70,7 @@ class InorganicResult {
     }
 
     static InorganicResult notFound() {
-        return new InorganicResult((Classification) null);
+        return new InorganicResult();
     }
 
     // Text:
@@ -95,100 +95,124 @@ class InorganicResult {
         return identifiers.toString();
     }
 
-    // Getters and setters (must be public to enable JSON serialization):
+    // Getters and setters (must be defined and public to enable JSON serialization):
 
+    @SuppressWarnings("unused")
     public boolean isFound() {
         return found;
     }
 
+    @SuppressWarnings("unused")
     public void setFound(boolean found) {
         this.found = found;
     }
 
+    @SuppressWarnings("unused")
     public Classification getClassification() {
         return classification;
     }
 
+    @SuppressWarnings("unused")
     public void setClassification(Classification classification) {
         this.classification = classification;
     }
 
+    @SuppressWarnings("unused")
     public String getSuggestion() {
         return suggestion;
     }
 
+    @SuppressWarnings("unused")
     public void setSuggestion(String suggestion) {
         this.suggestion = suggestion;
     }
 
+    @SuppressWarnings("unused")
     public String getFormula() {
         return formula;
     }
 
+    @SuppressWarnings("unused")
     public void setFormula(String formula) {
         this.formula = formula;
     }
 
+    @SuppressWarnings("unused")
     public String getStockName() {
         return stockName;
     }
 
+    @SuppressWarnings("unused")
     public void setStockName(String stockName) {
         this.stockName = stockName;
     }
 
+    @SuppressWarnings("unused")
     public String getSystematicName() {
         return systematicName;
     }
 
+    @SuppressWarnings("unused")
     public void setSystematicName(String systematicName) {
         this.systematicName = systematicName;
     }
 
+    @SuppressWarnings("unused")
     public String getTraditionalName() {
         return traditionalName;
     }
 
+    @SuppressWarnings("unused")
     public void setTraditionalName(String traditionalName) {
         this.traditionalName = traditionalName;
     }
 
+    @SuppressWarnings("unused")
     public String getCommonName() {
         return commonName;
     }
 
+    @SuppressWarnings("unused")
     public void setCommonName(String commonName) {
         this.commonName = commonName;
     }
 
+    @SuppressWarnings("unused")
     public String getMolecularMass() {
         return molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public void setMolecularMass(String molecularMass) {
         this.molecularMass = molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public String getDensity() {
         return density;
     }
 
+    @SuppressWarnings("unused")
     public void setDensity(String density) {
         this.density = density;
     }
 
+    @SuppressWarnings("unused")
     public String getMeltingPoint() {
         return meltingPoint;
     }
 
+    @SuppressWarnings("unused")
     public void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
+    @SuppressWarnings("unused")
     public String getBoilingPoint() {
         return boilingPoint;
     }
 
+    @SuppressWarnings("unused")
     public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }

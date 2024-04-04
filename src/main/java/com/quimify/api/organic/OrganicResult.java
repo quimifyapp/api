@@ -24,6 +24,7 @@ class OrganicResult {
         this.found = true;
         this.name = name;
         this.structure = structure;
+        // TODO
     }
 
     private OrganicResult() {
@@ -34,68 +35,84 @@ class OrganicResult {
         return new OrganicResult();
     }
 
-    // Getters and setters (must be public to enable JSON serialization):
+    // Getters and setters (must be defined and public to enable JSON serialization):
 
+    @SuppressWarnings("unused")
     public boolean isFound() {
         return found;
     }
 
+    @SuppressWarnings("unused")
     public void setFound(boolean found) {
         this.found = found;
     }
 
+    @SuppressWarnings("unused")
     public Classification getClassification() {
         return classification;
     }
 
+    @SuppressWarnings("unused")
     public void setClassification(Classification classification) {
         this.classification = classification;
     }
 
+    @SuppressWarnings("unused")
     public String getSuggestion() {
         return suggestion;
     }
 
+    @SuppressWarnings("unused")
     public void setSuggestion(String suggestion) {
         this.suggestion = suggestion;
     }
 
+    @SuppressWarnings("unused")
     public String getName() {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public void setName(String name) {
         this.name = name;
     }
 
+    @SuppressWarnings("unused")
     public String getStructure() {
         return structure;
     }
 
+    @SuppressWarnings("unused")
     public void setStructure(String structure) {
         this.structure = structure;
     }
 
+    @SuppressWarnings("unused")
     public Float getMolecularMass() {
         return molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public void setMolecularMass(Float molecularMass) {
         this.molecularMass = molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public String getUrl2D() {
         return url2D;
     }
 
+    @SuppressWarnings("unused")
     public void setUrl2D(String url2D) {
         this.url2D = url2D;
     }
 
+    @SuppressWarnings("unused")
     public String getUrl3D() {
         return url3D;
     }
 
+    @SuppressWarnings("unused")
     public void setUrl3D(String url3D) {
         this.url3D = url3D;
     }

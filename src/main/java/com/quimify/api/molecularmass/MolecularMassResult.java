@@ -27,6 +27,7 @@ class MolecularMassResult {
         this.molecularMass = molecularMass;
         this.elementToGrams = elementToGrams;
         this.elementToMoles = elementToMoles;
+        // TODO
     }
 
     MolecularMassResult(String suggestion) {
@@ -40,44 +41,54 @@ class MolecularMassResult {
         return molecularMassResult;
     }
 
-    // Getters and setters (must be public to enable JSON serialization):
+    // Getters and setters (must be defined and public to enable JSON serialization):
 
+    @SuppressWarnings("unused")
     public boolean isPresent() {
         return present;
     }
 
+    @SuppressWarnings("unused")
     public void setPresent(boolean present) {
         this.present = present;
     }
 
+    @SuppressWarnings("unused")
     public Float getMolecularMass() {
         return molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public void setMolecularMass(Float molecularMass) {
         this.molecularMass = molecularMass;
     }
 
+    @SuppressWarnings("unused")
     public Map<String, Float> getElementToGrams() {
         return elementToGrams;
     }
 
+    @SuppressWarnings("unused")
     public void setElementToGrams(Map<String, Float> elementToGrams) {
         this.elementToGrams = elementToGrams;
     }
 
+    @SuppressWarnings("unused")
     public Map<String, Integer> getElementToMoles() {
         return elementToMoles;
     }
 
+    @SuppressWarnings("unused")
     public void setElementToMoles(Map<String, Integer> elementToMoles) {
         this.elementToMoles = elementToMoles;
     }
 
+    @SuppressWarnings("unused")
     public String getError() {
         return error;
     }
 
+    @SuppressWarnings("unused")
     public void setError(String error) {
         this.error = error;
     }

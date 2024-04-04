@@ -80,10 +80,6 @@ class InorganicModel {
         return id;
     }
 
-    void setId(Integer id) {
-        this.id = id;
-    }
-
     String getFormula() {
         return formula;
     }
@@ -118,26 +114,6 @@ class InorganicModel {
 
     String getCommonName() {
         return commonName;
-    }
-
-    void setCommonName(String otherName) {
-        this.commonName = otherName;
-    }
-
-    List<InorganicSearchTagModel> getInorganicSearchTags() {
-        return inorganicSearchTags;
-    }
-
-    void setInorganicSearchTags(List<InorganicSearchTagModel> inorganicSearchTags) {
-        this.inorganicSearchTags = inorganicSearchTags;
-    }
-
-    Integer getSearches() {
-        return searches;
-    }
-
-    void setSearches(Integer searchCount) {
-        this.searches = searchCount;
     }
 
     String getMolecularMass() {
