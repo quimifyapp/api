@@ -5,7 +5,6 @@ import com.quimify.api.error.ErrorService;
 
 import java.util.*;
 
-import com.quimify.api.balancer.BalancerResult;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
 import org.slf4j.Logger;
@@ -203,23 +202,44 @@ public class BalancerService {
     private List<Object> parseString(String inputString) {
         LinkedList<String> compoundStringTable = new LinkedList<>();
         Hashtable<Integer, Hashtable<String, Integer>> compoundTable = new Hashtable<>();
-        String storeString = "";
+        StringBuilder storeString = new StringBuilder();
         Integer index = 0;
-        for (int j = 0; j < inputString.length(); j++) {
-            if (Character.toString(inputString.charAt(j)).equals("+")) {
-                compoundStringTable.add(storeString);
-                compoundTable.put(index, parseCompound(storeString));
-                storeString = "";
-                index = index + 1;
+        Integer coefficient = 1; // Default coefficient
+        StringBuilder coefficientBuilder = new StringBuilder(); // To handle multi-digit coefficients
 
+        for (int j = 0; j < inputString.length(); j++) {
+            char c = inputString.charAt(j);
+            if (Character.toString(c).equals("+")) {
+                if (storeString.length() > 0) {
+                    compoundStringTable.add(storeString.toString());
+                    // Parse the coefficient
+                    if (coefficientBuilder.length() > 0) {
+                        coefficient = Integer.parseInt(coefficientBuilder.toString());
+                        coefficientBuilder = new StringBuilder(); // Reset for next coefficient
+                    }
+                    compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
+                    storeString = new StringBuilder();
+                    index++;
+                    coefficient = 1; // Reset coefficient after processing a compound
+                }
+            } else if (Character.isDigit(c) && storeString.length() == 0) {
+                // If the character is a digit and storeString is empty, we're reading a coefficient
+                coefficientBuilder.append(c);
             } else {
-                storeString = storeString.concat(Character.toString(inputString.charAt(j)));
+                storeString.append(c);
             }
         }
-        compoundStringTable.add(storeString);
-        compoundTable.put(index, parseCompound(storeString));
+        if (storeString.length() > 0) {
+            if (coefficientBuilder.length() > 0) {
+                coefficient = Integer.parseInt(coefficientBuilder.toString());
+            }
+            compoundStringTable.add(storeString.toString());
+            compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
+        }
         return Arrays.asList(compoundTable, compoundStringTable);
     }
+
+
 
     /**
      * Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")
@@ -246,7 +266,7 @@ public class BalancerService {
     /**
      * Parses each compound to get Hashtable of elements and quantities in compound
      */
-    private static Hashtable<String, Integer> parseCompound(String inputString) {
+    private static Hashtable<String, Integer> parseCompound(String inputString, Integer coefficient) {
         Hashtable<String, Integer> dictionary = new Hashtable<>();
         String symbol = "";
         String numString = "";
@@ -263,18 +283,16 @@ public class BalancerService {
                         //This is uppercase
                         if (!symbol.equals("")) {
                             //Symbol is filled and needs to be dumped
-                            if (!dictionary.containsKey(symbol)) {
-                                try {
-                                    dictionary.put(symbol, Integer.valueOf(numString));
-                                } catch (NumberFormatException exception) {
-                                    dictionary.put(symbol, 1);
-                                }
+                            int quantity = numString.equals("") ? 1 : Integer.parseInt(numString);
+                            // Apply the coefficient here
+                            quantity *= coefficient;
+
+                            if (dictionary.containsKey(symbol)) {
+                                // If the symbol is already in the dictionary, add the quantity
+                                dictionary.put(symbol, dictionary.get(symbol) + quantity);
                             } else {
-                                try {
-                                    dictionary.put(symbol, Integer.valueOf(numString) + dictionary.get(symbol));
-                                } catch (NumberFormatException exception) {
-                                    dictionary.put(symbol, 1 + dictionary.get(symbol));
-                                }
+                                // Otherwise, just put the new quantity in the dictionary
+                                dictionary.put(symbol, quantity);
                             }
                             symbol = "";
                             numString = "";
@@ -283,7 +301,7 @@ public class BalancerService {
                     } else if (parenthesesOn && !parenthesesEnd) {
                         paranthesesStoreString.append(character);
                     } else if (parenthesesEnd) {
-                        Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString());
+                        Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
                         if (parenthesesScaler.equals(""))
                             parenthesesScaler = "1";
                         for (String key : parenthesesParse.keySet()) {
@@ -333,7 +351,7 @@ public class BalancerService {
                     symbol = "";
                     numString = "";
                 } else {
-                    Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString());
+                    Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
                     if (parenthesesScaler.equals(""))
                         parenthesesScaler = "1";
                     for (String key : parenthesesParse.keySet()) {
@@ -364,7 +382,7 @@ public class BalancerService {
                 dictionary.put(symbol, Integer.valueOf(numString) + dictionary.get(symbol));
             }
         } else {
-            Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString());
+            Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
             if (parenthesesScaler.equals(""))
                 parenthesesScaler = "1";
             for (String key : parenthesesParse.keySet()) {
