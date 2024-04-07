@@ -157,6 +157,9 @@ public class BalancerService {
         return new BalancerResult(true, equation,
                 formatSolution(backupReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(backupProductsString, finalSolution.get(1)));
     }
+
+    //TODO handle when suffix coefficient is not there, meaning = 1
+    //TODO check bug for multiple digit coefficients
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
         int coefficient = 1;
