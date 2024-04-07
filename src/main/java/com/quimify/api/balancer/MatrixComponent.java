@@ -133,6 +133,16 @@ public class MatrixComponent {
         return false;
     }
 
+    public static MatrixComponent multiply(FractionComponent f, MatrixComponent m){
+        FractionComponent[][] product = new FractionComponent[m.matrix.length][m.matrix[0].length];
+        for(int i=0; i<m.matrix.length; i++){
+            for(int j=0; j<m.matrix[0].length; j++){
+                product[i][j]=FractionComponent.multiply(m.matrix[i][j], f);
+            }
+        }
+        return new MatrixComponent(product);
+    }
+
     public static MatrixComponent add(MatrixComponent matrix1, MatrixComponent matrix2) {
         if(matrix1.matrix.length != matrix2.matrix.length || matrix1.matrix[0].length != matrix2.matrix[0].length){
             System.out.println("Addition Error: Matrix Addition not computable due to dimensions!");
@@ -144,16 +154,6 @@ public class MatrixComponent {
             }
         }
         return new MatrixComponent(sum);
-    }
-
-    public static MatrixComponent multiply(FractionComponent f, MatrixComponent m){
-        FractionComponent[][] product = new FractionComponent[m.matrix.length][m.matrix[0].length];
-        for(int i=0; i<m.matrix.length; i++){
-            for(int j=0; j<m.matrix[0].length; j++){
-                product[i][j]=FractionComponent.multiply(m.matrix[i][j], f);
-            }
-        }
-        return new MatrixComponent(product);
     }
 
     public static MatrixComponent negate(MatrixComponent matrix){

@@ -3,7 +3,9 @@ package com.quimify.api.balancer;
 import com.quimify.api.element.ElementService;
 import com.quimify.api.error.ErrorService;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -76,16 +78,18 @@ public class BalancerService {
         } else {
             // Algun tipo de error.service diciendo que falta parte de la ecuacion
         }
+        String normalizedReactantString = normalizeEquation(originalReactantsString);
+        String normalizedProductString = normalizeEquation(originalProductsString);
 
         this.backupReactantsString = originalReactantsString;
         this.backupProductsString = originalProductsString;
 
         //Process Input
-        List<Object> parseReactants = parseString(originalReactantsString);
+        List<Object> parseReactants = parseString(normalizedReactantString);
         reactants = (Hashtable<Integer, Hashtable<String, Integer>>) parseReactants.get(0);
         stringReactants = (LinkedList<String>) parseReactants.get(1);
 
-        List<Object> parseProducts = parseString(originalProductsString);
+        List<Object> parseProducts = parseString(normalizedProductString);
         products = (Hashtable<Integer, Hashtable<String, Integer>>) parseProducts.get(0);
         stringProducts = (LinkedList<String>) parseProducts.get(1);
 
@@ -153,7 +157,58 @@ public class BalancerService {
         return new BalancerResult(true, equation,
                 formatSolution(backupReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(backupProductsString, finalSolution.get(1)));
     }
+    private static String normalizeEquation(String equation) {
+        StringBuilder normalizedEquation = new StringBuilder();
+        int coefficient = 1;
+        String multiDigitCoefficient = "";
+        boolean isCoefficient = true;
+        int contador = 0;
 
+        for (int i = 0; i < equation.length(); i++) {
+            char character = equation.charAt(i);
+
+            if (Character.isDigit(character) && isCoefficient) {
+                while (Character.isDigit(character)){
+                    multiDigitCoefficient = multiDigitCoefficient.concat(String.valueOf(character));
+                    character = equation.charAt(contador + 1);
+                    contador++;
+                }
+                contador = 0;
+                // Accumulate coefficient value if it's multi-digit
+                coefficient = Integer.parseInt(multiDigitCoefficient);
+            } else {
+                // Handle different scenarios based on the character encountered
+                switch (character) {
+                    case '+':
+                        // Reset for the next part of the equation
+                        isCoefficient = true;
+                        coefficient = 1;
+                        normalizedEquation.append(character);
+                        break;
+                    case ')':
+                        isCoefficient = false;
+                        normalizedEquation.append(character);
+                        while (Character.isDigit(equation.charAt(i + 1))){
+                            character = equation.charAt(i + 1);
+                            normalizedEquation.append(character);
+                            i++;
+                        }
+                        break;
+                    default:
+                        // Apply coefficient to each element or compound
+                        isCoefficient = false;
+                        if (Character.isDigit(character)) {
+                            normalizedEquation.append(coefficient * Character.getNumericValue(character));
+                        }
+                        else
+                            normalizedEquation.append(character);
+                        break;
+                }
+            }
+        }
+
+        return normalizedEquation.toString();
+    }
 
     /**
      * Converts FractionComponents into integers for final formatting for either reactant or product side.
@@ -266,68 +321,132 @@ public class BalancerService {
      */
     private static Hashtable<String, Integer> parseCompound(String inputString, Integer coefficient) {
         Hashtable<String, Integer> dictionary = new Hashtable<>();
-        StringBuilder symbol = new StringBuilder();
-        StringBuilder numString = new StringBuilder();
-        StringBuilder parenthesesContent = new StringBuilder();
-        int parenthesesCoefficient = 1;
-        boolean inParentheses = false;
-
+        String symbol = "";
+        String numString = "";
+        StringBuilder paranthesesStoreString = new StringBuilder();
+        boolean parenthesesOn = false;
+        boolean parenthesesEnd = false;
+        String parenthesesScaler = "";
         for (int i = 0; i < inputString.length(); i++) {
             char character = inputString.charAt(i);
             if (Character.isLetter(character)) {
-                if (Character.isUpperCase(character)) {
-                    if (!inParentheses && symbol.length() > 0) {
-                        addToDictionary(dictionary, symbol.toString(), numString.toString(), coefficient);
-                        symbol = new StringBuilder();
-                        numString = new StringBuilder();
+                //Checks that this is a letter
+                if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
+                    if (!parenthesesOn && !parenthesesEnd) {
+                        //This is uppercase
+                        if (!symbol.equals("")) {
+                            //Symbol is filled and needs to be dumped
+                            int quantity = numString.equals("") ? 1 : Integer.parseInt(numString);
+                            // Apply the coefficient here
+                            quantity *= coefficient;
+
+                            if (dictionary.containsKey(symbol)) {
+                                // If the symbol is already in the dictionary, add the quantity
+                                dictionary.put(symbol, dictionary.get(symbol) + quantity);
+                            } else {
+                                // Otherwise, just put the new quantity in the dictionary
+                                dictionary.put(symbol, quantity);
+                            }
+                            symbol = "";
+                            numString = "";
+                        }
+                        symbol = symbol.concat(String.valueOf(character));
+                    } else if (parenthesesOn && !parenthesesEnd) {
+                        paranthesesStoreString.append(character);
+                    } else {
+                        Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
+                        if (parenthesesScaler.equals(""))
+                            parenthesesScaler = "1";
+                        for (String key : parenthesesParse.keySet()) {
+                            if (!dictionary.containsKey(key)) {
+                                dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
+                            } else {
+                                dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
+                            }
+                        }
+                        paranthesesStoreString = new StringBuilder();
+                        parenthesesEnd = false;
+                        parenthesesScaler = "";
+                        symbol = symbol.concat(String.valueOf(character));
                     }
-                    symbol.append(character);
-                } else { // Lowercase letter, part of an element symbol
-                    symbol.append(character);
+                } else {
+                    if (!parenthesesOn)
+                        symbol = symbol.concat(String.valueOf(character));
+                    else
+                        paranthesesStoreString.append(character);
                 }
             } else if (Character.isDigit(character)) {
-                if (inParentheses || symbol.length() == 0) {
-                    // Digit belongs to parentheses scaling factor or is part of quantity for the element
-                    numString.append(character);
-                } else {
-                    // Digit immediately after a symbol outside parentheses
-                    addToDictionary(dictionary, symbol.toString(), numString.toString() + character, coefficient);
-                    symbol = new StringBuilder();
-                    numString = new StringBuilder();
+                //This is a number
+                if (!parenthesesOn && !parenthesesEnd) {
+                    numString = numString.concat(String.valueOf(character));
+                } else if (parenthesesEnd && !parenthesesOn) {
+                    parenthesesScaler += character;
+                } else if (!parenthesesEnd) {
+                    paranthesesStoreString.append(character);
                 }
             } else if (character == '(') {
-                if (inParentheses) {
-                    // Nested parentheses not supported; reset or throw error as appropriate
-                    parenthesesContent = new StringBuilder();
-                    parenthesesCoefficient = 1;
+                //Start Statement
+                if (!parenthesesEnd) {
+                    parenthesesOn = true;
+                    if (!dictionary.containsKey(symbol)) {
+                        try {
+                            dictionary.put(symbol, Integer.valueOf(numString));
+                        } catch (NumberFormatException exception) {
+                            dictionary.put(symbol, 1);
+                        }
+                    } else {
+                        try {
+                            dictionary.put(symbol, Integer.parseInt(numString) + dictionary.get(symbol));
+                        } catch (NumberFormatException exception) {
+                            dictionary.put(symbol, 1 + dictionary.get(symbol));
+                        }
+                    }
+                    symbol = "";
+                    numString = "";
+                } else {
+                    Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
+                    if (parenthesesScaler.equals(""))
+                        parenthesesScaler = "1";
+                    for (String key : parenthesesParse.keySet()) {
+                        if (!dictionary.containsKey(key)) {
+                            dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
+                        } else {
+                            dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
+                        }
+                    }
+                    paranthesesStoreString = new StringBuilder();
+                    parenthesesOn = true;
+                    parenthesesEnd = false;
+                    parenthesesScaler = "";
                 }
-                inParentheses = true;
             } else if (character == ')') {
-                inParentheses = false;
-                // Apply coefficient to contents within parentheses
-                int scale = numString.length() > 0 ? Integer.parseInt(numString.toString()) : 1;
-                Hashtable<String, Integer> subDictionary = parseCompound(parenthesesContent.toString(), coefficient * scale);
-                for (String key : subDictionary.keySet()) {
-                    dictionary.put(key, dictionary.getOrDefault(key, 0) + subDictionary.get(key));
-                }
-                // Reset for next potential parentheses group
-                parenthesesContent = new StringBuilder();
-                numString = new StringBuilder();
-            } else if (inParentheses) {
-                parenthesesContent.append(character);
+                //End statement
+                parenthesesEnd = true;
+                parenthesesOn = false;
             }
         }
-
-        if (symbol.length() > 0) { // Handle last symbol/quantity outside parentheses
-            addToDictionary(dictionary, symbol.toString(), numString.toString(), coefficient);
+        if (!parenthesesEnd) {
+            if (numString.equals("")) {
+                numString = "1";
+            }
+            if (!dictionary.containsKey(symbol)) {
+                dictionary.put(symbol, Integer.valueOf(numString));
+            } else {
+                dictionary.put(symbol, Integer.parseInt(numString) + dictionary.get(symbol));
+            }
+        } else {
+            Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
+            if (parenthesesScaler.equals(""))
+                parenthesesScaler = "1";
+            for (String key : parenthesesParse.keySet()) {
+                if (!dictionary.containsKey(key)) {
+                    dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
+                } else {
+                    dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
+                }
+            }
         }
-
         return dictionary;
-    }
-
-    private static void addToDictionary(Hashtable<String, Integer> dictionary, String symbol, String quantityStr, Integer coefficient) {
-        int quantity = quantityStr.equals("") ? 1 : Integer.parseInt(quantityStr);
-        dictionary.put(symbol, dictionary.getOrDefault(symbol, 0) + quantity * coefficient);
     }
 
 }
