@@ -78,6 +78,10 @@ public class BalancerService {
         } else {
             // Algun tipo de error.service diciendo que falta parte de la ecuacion
         }
+
+        String removedCoefficientsReactantString = removeCoefficients(originalReactantsString);
+        String removedCoefficientsProductString = removeCoefficients(originalProductsString);
+
         String normalizedReactantString = normalizeEquation(originalReactantsString);
         String normalizedProductString = normalizeEquation(originalProductsString);
 
@@ -155,20 +159,52 @@ public class BalancerService {
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
         return new BalancerResult(true, equation,
-                formatSolution(backupReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(backupProductsString, finalSolution.get(1)));
+                formatSolution(removedCoefficientsReactantString, finalSolution.get(0)) + " ---> " + formatSolution(removedCoefficientsProductString, finalSolution.get(1)));
+    }
+
+    private static String removeCoefficients(String equation) {
+        StringBuilder removedCoefficients = new StringBuilder();
+        int contador = 0;
+        boolean isCoefficient = true;
+
+        while (contador < equation.length()) {
+            char character = equation.charAt(contador);
+
+            if (Character.isDigit(character) && isCoefficient) {
+                while (Character.isDigit(character)) {
+                    character = equation.charAt(contador + 1);
+                    contador++;
+                }
+            }
+
+            else {
+                // Handle different scenarios based on the character encountered
+                if (character == '+') {// Reset for the next part of the equation
+                    isCoefficient = true;
+                    removedCoefficients.append(character);
+                }
+                else {
+                    isCoefficient = false;
+                    removedCoefficients.append(character);
+                }
+                contador++;
+            }
+        }
+
+        return removedCoefficients.toString();
     }
 
     //TODO handle when suffix coefficient is not there, meaning = 1
-    //TODO check bug for multiple digit coefficients
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
         int coefficient = 1;
         String multiDigitCoefficient = "";
+        String multiDigitSuffix = "";
         boolean isCoefficient = true;
         int contador = 0;
 
-        for (int i = 0; i < equation.length(); i++) {
-            char character = equation.charAt(i);
+        while (contador < equation.length()) {
+            char character = equation.charAt(contador);
 
             if (Character.isDigit(character) && isCoefficient) {
                 while (Character.isDigit(character)){
@@ -176,10 +212,10 @@ public class BalancerService {
                     character = equation.charAt(contador + 1);
                     contador++;
                 }
-                contador = 0;
                 // Accumulate coefficient value if it's multi-digit
                 coefficient = Integer.parseInt(multiDigitCoefficient);
-            } else {
+            }
+            else {
                 // Handle different scenarios based on the character encountered
                 switch (character) {
                     case '+':
@@ -187,24 +223,62 @@ public class BalancerService {
                         isCoefficient = true;
                         coefficient = 1;
                         normalizedEquation.append(character);
+                        contador++;
+                        break;
+                    case '(':
+                        normalizedEquation.append(character);
+                        character = equation.charAt(contador + 1);
+                        while (character != ')'){
+                            normalizedEquation.append(character);
+                            contador++;
+                            character = equation.charAt(contador + 1);
+                        }
+                        contador++;
                         break;
                     case ')':
                         isCoefficient = false;
                         normalizedEquation.append(character);
-                        while (Character.isDigit(equation.charAt(i + 1))){
-                            character = equation.charAt(i + 1);
-                            normalizedEquation.append(character);
-                            i++;
+
+                        while (Character.isDigit(equation.charAt(contador + 1))){
+                            character = equation.charAt(contador + 1);
+
+                            //Por si el sufijo tiene más de un caracter
+                            multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
+                            contador++;
+
+                            if (contador + 1 == equation.length()) {
+                                break;
+                            }
                         }
+                        normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
+                        contador++;
+                        multiDigitSuffix = "";
                         break;
                     default:
                         // Apply coefficient to each element or compound
                         isCoefficient = false;
                         if (Character.isDigit(character)) {
-                            normalizedEquation.append(coefficient * Character.getNumericValue(character));
+                            multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
+                            if (contador + 1 != equation.length()) {
+                                while (Character.isDigit(equation.charAt(contador + 1))){
+                                    character = equation.charAt(contador + 1);
+
+                                    //Por si el sufijo tiene más de un caracter
+                                    multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
+                                    contador++;
+
+                                    if (contador + 1 == equation.length()) {
+                                        break;
+                                    }
+                                }
+                            }
+
+                            normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
+                            multiDigitSuffix = "";
                         }
                         else
                             normalizedEquation.append(character);
+                        contador++;
                         break;
                 }
             }
