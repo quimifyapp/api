@@ -213,7 +213,6 @@ public class BalancerService {
         StringBuilder normalizedEquation = new StringBuilder();
         equation= equation.concat("++");
         int coefficient = 1;
-        String multiDigitCoefficient = "";
         String multiDigitSuffix = "";
         boolean isCoefficient = true;
         int contador = 0;
@@ -222,6 +221,7 @@ public class BalancerService {
             char character = equation.charAt(contador);
 
             if (Character.isDigit(character) && isCoefficient) {
+                String multiDigitCoefficient = "";
                 while (Character.isDigit(character)){
                     multiDigitCoefficient = multiDigitCoefficient.concat(String.valueOf(character));
                     character = equation.charAt(contador + 1);
