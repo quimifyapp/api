@@ -161,7 +161,7 @@ public class BalancerService {
         return new BalancerResult(true, equation,
                 formatSolution(removedCoefficientsReactantString, finalSolution.get(0)) + " ---> " + formatSolution(removedCoefficientsProductString, finalSolution.get(1)));
     }
-
+    // TODO when outputting final solution initial prefix coefficients always turn to 1, fix it.
     private static String removeCoefficients(String equation) {
         StringBuilder removedCoefficients = new StringBuilder();
         int contador = 0;
@@ -194,7 +194,6 @@ public class BalancerService {
         return removedCoefficients.toString();
     }
 
-    //TODO handle when suffix coefficient is not there, meaning coefficient = 1
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
         equation= equation.concat("++");
