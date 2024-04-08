@@ -1,9 +1,7 @@
 package com.quimify.api.balancer;
 
-import com.quimify.api.element.ElementService;
 import com.quimify.api.error.ErrorService;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -426,7 +424,6 @@ public class BalancerService {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
         String coefficientHandler = "";
-        int newCoefficient;
 
         for (int i = 0; i < solutions.size(); i++) {
             if (Character.isDigit(arr[i].charAt(0))){
@@ -436,15 +433,33 @@ public class BalancerService {
                     j++;
                 }
                 arr[i] = arr[i].substring(j);
-                newCoefficient = Integer.parseInt(coefficientHandler) * solutions.get(i);
+                int newCoefficient = Integer.parseInt(coefficientHandler) * solutions.get(i);
                 s.append(newCoefficient);
+
+                if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
+                    s.append('(');
+
                 s.append(arr[i]);
+
+                if (arr[i].length() > 1 && arr[i].length() == arr[i].indexOf(arr[i].charAt(arr[i].length() - 1)) + 1)
+                    s.append(')');
+
                 if (i < solutions.size() - 1)
                     s.append(" + ");
+
+                coefficientHandler = "";
             }
             else{
                 s.append(solutions.get(i));
+
+                if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
+                    s.append('(');
+
                 s.append(arr[i]);
+
+                if (arr[i].length() > 1 && arr[i].length() == arr[i].indexOf(arr[i].charAt(arr[i].length() - 1)) + 1)
+                    s.append(')');
+
                 if (i < solutions.size() - 1)
                     s.append(" + ");
             }
@@ -584,36 +599,71 @@ public class BalancerService {
         }
         return dictionary;
     }
-    /*
-    private static boolean equationTest(){
-        int correctCounter = 0;
-        boolean allCorrect = false;
-        BalancerResult test = new BalancerResult();
-        /*
-        "2H + O = H3O"
-        "H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O"
-        "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O"
-        "__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O "
-        "_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O"
-        " Al(OH)3 + ___ H2SO4 = ___ Al2(SO4)3 + ___ H2O"
-        " H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O"
-        "Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P "
-        "2NH3+H2SO4=(NH4)2SO4"
-        "2KClO3=KCl+O2"
-        "2H2+O2=H2O"
-        "2C6H14+O2=CO2+H2O"
-        "Fe+2HCl=FeCl2+H"
-        "C2H5OH+3O2=2CO2+3H2O"
-        "C3H8+5O2=CO2+H2O"
-         *//*
-        if(tryBalance("___ Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O") == "2Al(OH)3 + 3H2CO3 ---> 1Al2(CO3)3 + 6H2O")
-            correctCounter++;
 
-        if (correctCounter == 20)
-            allCorrect = true;
+    String testTemporal() {
+        // 1
+        if (!balance("2H + O = H3O").equals("resultado"))
+            return "2H + O = H3O";
+        // 2
+        if (!balance("H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O").equals("resultado"))
+            return "H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O";
+        // 3
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").equals("resultado"))
+            return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
+        // 4
+        if (!balance("__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ").equals("resultado"))
+            return "__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ";
+        // 5
+        if (!balance("_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O").equals("resultado"))
+            return "_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O";
+        // 6
+        if (!balance(" H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O").equals("resultado"))
+            return " H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O";
+        // 7
+        if (!balance("Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ").equals("resultado"))
+            return "Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ";
+        // 8
+        if (!balance("2NH3+H2SO4=(NH4)2SO4").equals("resultado"))
+            return "2NH3+H2SO4=(NH4)2SO4";
+        // 9
+        if (!balance("2KClO3=KCl+O2").equals("resultado"))
+            return "2KClO3=KCl+O2";
+        // 10
+        if (!balance("2H2+O2=H2O").equals("resultado"))
+            return "2H2+O2=H2O";
+        // 12
+        if (!balance("2C6H14+O2=CO2+H2O").equals("resultado"))
+            return "2C6H14+O2=CO2+H2O";
+        // 12
+        if (!balance("Fe+2HCl=FeCl2+H").equals("resultado"))
+            return "Fe+2HCl=FeCl2+H";
+        // 13
+        if (!balance("C2H5OH+3O2=2CO2+3H2O").equals("resultado"))
+            return "C2H5OH+3O2=2CO2+3H2O";
+        // 14
+        if (!balance("C3H8+5O2=CO2+H2O").equals("resultado"))
+            return "C3H8+5O2=CO2+H2O";
+        // 15
+        if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P").equals("resultado"))
+            return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
+        // 16
+        if (!balance("H2+O2 = H2O+O3").equals(null))
+            return "H2+O2 = H2O+O3";
+        // 17
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").equals("resultado"))
+            return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
+        // 18
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").equals("resultado"))
+            return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
+        // 19
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").equals("resultado"))
+            return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
+        // 20
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").equals("resultado"))
+            return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
 
-        return allCorrect;
-    }*/
+        return "OK";
+    }
 
 }
 
