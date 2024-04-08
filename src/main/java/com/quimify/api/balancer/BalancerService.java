@@ -197,13 +197,14 @@ public class BalancerService {
     //TODO handle when suffix coefficient is not there, meaning coefficient = 1
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
+        equation= equation.concat("++");
         int coefficient = 1;
         String multiDigitCoefficient = "";
         String multiDigitSuffix = "";
         boolean isCoefficient = true;
         int contador = 0;
 
-        while (contador < equation.length()) {
+        while (contador < equation.length() - 2) {
             char character = equation.charAt(contador);
 
             if (Character.isDigit(character) && isCoefficient) {
@@ -281,7 +282,8 @@ public class BalancerService {
                             // Si un caracter es mayuscula y el siguiente también, en medio hay un coeficiente = 1
                             // si un caracter es mayuscula, caracter + 1 minuscula y caracter + 2 mayusucla => coeficiente = 1
                             if (Character.isUpperCase(character)
-                                    && (Character.isUpperCase(equation.charAt(contador + 1)) || equation.charAt(contador + 1) == '+')
+                                    && (Character.isUpperCase(equation.charAt(contador + 1)) || equation.charAt(contador + 1) == '+'
+                                    || equation.charAt(contador + 1) == '(' || equation.charAt(contador + 1) == ')')
                                     /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()*/){
                                 if (coefficient != 1){
                                     normalizedEquation.append(coefficient);
@@ -289,7 +291,8 @@ public class BalancerService {
                             }
                             else if (Character.isUpperCase(character)
                                     && Character.isLowerCase(equation.charAt(contador + 1))
-                                    && (Character.isUpperCase(equation.charAt(contador + 2)) || equation.charAt(contador + 2) == '+')
+                                    && (Character.isUpperCase(equation.charAt(contador + 2)) || equation.charAt(contador + 2) == '+'
+                                    || equation.charAt(contador + 2) == '(' || equation.charAt(contador + 2) == ')')
                                     /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()
                                     && (contador + 2 <= equation.length()) || contador + 2 >= equation.length()*/){
                                 contador++;
