@@ -194,7 +194,7 @@ public class BalancerService {
         return removedCoefficients.toString();
     }
 
-    //TODO handle when suffix coefficient is not there, meaning = 1
+    //TODO handle when suffix coefficient is not there, meaning coefficient = 1
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
         int coefficient = 1;
@@ -276,8 +276,30 @@ public class BalancerService {
                             normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
                             multiDigitSuffix = "";
                         }
-                        else
+                        else {
                             normalizedEquation.append(character);
+                            // Si un caracter es mayuscula y el siguiente también, en medio hay un coeficiente = 1
+                            // si un caracter es mayuscula, caracter + 1 minuscula y caracter + 2 mayusucla => coeficiente = 1
+                            if (Character.isUpperCase(character)
+                                    && (Character.isUpperCase(equation.charAt(contador + 1)) || equation.charAt(contador + 1) == '+')
+                                    /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()*/){
+                                if (coefficient != 1){
+                                    normalizedEquation.append(coefficient);
+                                }
+                            }
+                            else if (Character.isUpperCase(character)
+                                    && Character.isLowerCase(equation.charAt(contador + 1))
+                                    && (Character.isUpperCase(equation.charAt(contador + 2)) || equation.charAt(contador + 2) == '+')
+                                    /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()
+                                    && (contador + 2 <= equation.length()) || contador + 2 >= equation.length()*/){
+                                contador++;
+                                character = equation.charAt(contador);
+                                normalizedEquation.append(character);
+                                if (coefficient != 1){
+                                    normalizedEquation.append(coefficient);
+                                }
+                            }
+                        }
                         contador++;
                         break;
                 }
