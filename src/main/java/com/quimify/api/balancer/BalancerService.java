@@ -159,9 +159,26 @@ public class BalancerService {
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
         return new BalancerResult(true, equation,
-                formatSolution(removedCoefficientsReactantString, finalSolution.get(0)) + " ---> " + formatSolution(removedCoefficientsProductString, finalSolution.get(1)));
+                formatSolution(originalReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(originalProductsString, finalSolution.get(1)));
     }
-    // TODO when outputting final solution initial prefix coefficients always turn to 1, fix it.
+
+    private static boolean coefficientsExist (String equation){
+        boolean isCoefficient = false;
+
+        for (int i = 0; i < equation.length(); i++){
+            char character = equation.charAt(i);
+            if (Character.isDigit(character) && isCoefficient){
+                return true;
+            }
+            else isCoefficient = character == '+';
+        }
+        return isCoefficient;
+    }
+    /**
+     * This function is used to solve the bug of initial prefix coefficients always turning to 1 when outputting the solution
+     * it gets the position and the value of the coefficient to later switch it in the output.
+     */
+
     private static String removeCoefficients(String equation) {
         StringBuilder removedCoefficients = new StringBuilder();
         int contador = 0;
@@ -408,11 +425,29 @@ public class BalancerService {
     private static String formatSolution(String originalString, LinkedList<Integer> solutions) {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
+        String coefficientHandler = "";
+        int newCoefficient;
+
         for (int i = 0; i < solutions.size(); i++) {
-            s.append(solutions.get(i));
-            s.append(arr[i]);
-            if (i < solutions.size() - 1)
-                s.append(" + ");
+            if (Character.isDigit(arr[i].charAt(0))){
+                int j = 0;
+                while (Character.isDigit(arr[i].charAt(j))){
+                    coefficientHandler = coefficientHandler.concat(String.valueOf(arr[i].charAt(j)));
+                    j++;
+                }
+                arr[i] = arr[i].substring(j);
+                newCoefficient = Integer.parseInt(coefficientHandler) * solutions.get(i);
+                s.append(newCoefficient);
+                s.append(arr[i]);
+                if (i < solutions.size() - 1)
+                    s.append(" + ");
+            }
+            else{
+                s.append(solutions.get(i));
+                s.append(arr[i]);
+                if (i < solutions.size() - 1)
+                    s.append(" + ");
+            }
         }
         return s.toString();
     }
@@ -549,5 +584,36 @@ public class BalancerService {
         }
         return dictionary;
     }
+    /*
+    private static boolean equationTest(){
+        int correctCounter = 0;
+        boolean allCorrect = false;
+        BalancerResult test = new BalancerResult();
+        /*
+        "2H + O = H3O"
+        "H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O"
+        "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O"
+        "__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O "
+        "_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O"
+        " Al(OH)3 + ___ H2SO4 = ___ Al2(SO4)3 + ___ H2O"
+        " H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O"
+        "Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P "
+        "2NH3+H2SO4=(NH4)2SO4"
+        "2KClO3=KCl+O2"
+        "2H2+O2=H2O"
+        "2C6H14+O2=CO2+H2O"
+        "Fe+2HCl=FeCl2+H"
+        "C2H5OH+3O2=2CO2+3H2O"
+        "C3H8+5O2=CO2+H2O"
+         *//*
+        if(tryBalance("___ Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O") == "2Al(OH)3 + 3H2CO3 ---> 1Al2(CO3)3 + 6H2O")
+            correctCounter++;
+
+        if (correctCounter == 20)
+            allCorrect = true;
+
+        return allCorrect;
+    }*/
 
 }
+
