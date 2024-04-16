@@ -28,4 +28,9 @@ public class BalancerController {
 
         return balancerResult;
     }
+
+    @GetMapping("/test")
+    String testTemporal() {
+        return balancerService.testTemporal();
+    }
 }
