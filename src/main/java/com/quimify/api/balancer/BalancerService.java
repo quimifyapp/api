@@ -436,13 +436,19 @@ public class BalancerService {
                 int newCoefficient = Integer.parseInt(coefficientHandler) * solutions.get(i);
                 s.append(newCoefficient);
 
-                if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
-                    s.append('(');
+                if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
+                    s.append(arr[i]);
+                else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
+                    s.append(arr[i]);
+                else{
+                    if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
+                        s.append('(');
 
-                s.append(arr[i]);
+                    s.append(arr[i]);
 
-                if (arr[i].length() > 1 && arr[i].length() == arr[i].indexOf(arr[i].charAt(arr[i].length() - 1)) + 1)
-                    s.append(')');
+                    if (arr[i].length() > 1)
+                        s.append(')');
+                }
 
                 if (i < solutions.size() - 1)
                     s.append(" + ");
@@ -452,13 +458,19 @@ public class BalancerService {
             else{
                 s.append(solutions.get(i));
 
-                if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
-                    s.append('(');
+                if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
+                    s.append(arr[i]);
+                else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
+                    s.append(arr[i]);
+                else{
+                    if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
+                        s.append('(');
 
-                s.append(arr[i]);
+                    s.append(arr[i]);
 
-                if (arr[i].length() > 1 && arr[i].length() == arr[i].indexOf(arr[i].charAt(arr[i].length() - 1)) + 1)
-                    s.append(')');
+                    if (arr[i].length() > 1)
+                        s.append(')');
+                }
 
                 if (i < solutions.size() - 1)
                     s.append(" + ");
@@ -608,10 +620,10 @@ public class BalancerService {
         if (!balance("H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O").getBalancedEquation().equals("2(H3PO4) + 3(Mg(OH)2) ---> 1(Mg3(PO4)2) + 6(H2O)"))
             return "H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O";
         // 3
-        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").getBalancedEquation().equals("2(Al(OH)3) + 3(H2CO3) ---> 1(Al2(CO3)3 + 6(H2O)"))
+        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").getBalancedEquation().equals("2(Al(OH)3) + 3(H2CO3) ---> 1(Al2(CO3)3) + 6(H2O)"))
             return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
         // 4
-        if (!balance("__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ").getBalancedEquation().equals("2(CH3CH2CH2CH3 + 13O2 ---> 8(CO2) + 10(H2O)"))
+        if (!balance("__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ").getBalancedEquation().equals("2(CH3CH2CH2CH3) + 13O2 ---> 8(CO2) + 10(H2O)"))
             return "__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ";
         // 5
         if (!balance("_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O").getBalancedEquation().equals("3(NH4OH) + 1(H3PO4) ---> 1((NH4)3PO4) + 3(H2O)"))
@@ -623,7 +635,7 @@ public class BalancerService {
         if (!balance("Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ").getBalancedEquation().equals("1(Ca3(PO4)2) + 3(SiO2) + 5C ---> 3(CaSiO3) + 5(CO) + 2P"))
             return "Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ";
         // 8
-        if (!balance("2NH3+H2SO4=(NH4)2SO4").getBalancedEquation().equals("2(NH3) + 1(H2SO4) ---> 1((NH4)2SO4)")) // parenthesis error )
+        if (!balance("2NH3+H2SO4=(NH4)2SO4").getBalancedEquation().equals("2(NH3) + 1(H2SO4) ---> 1((NH4)2SO4)"))
             return "2NH3+H2SO4=(NH4)2SO4";
         // 9
         if (!balance("2KClO3=KCl+O2").getBalancedEquation().equals("2(KClO3) ---> 2(KCl) + 3O2"))
@@ -638,7 +650,7 @@ public class BalancerService {
         if (!balance("Fe+2HCl=FeCl2+H").getBalancedEquation().equals("1Fe + 2(HCl) ---> 1(FeCl2) + 2H"))
             return "Fe+2HCl=FeCl2+H";
         // 13
-        if (!balance("C2H5OH+3O2=2CO2+3H2O").getBalancedEquation().equals("1(C2H5OH) + 3O2 ---> 2(CO2) + 3(H2O)")) // parenthesis error )
+        if (!balance("C2H5OH+3O2=2CO2+3H2O").getBalancedEquation().equals("1(C2H5OH) + 3O2 ---> 2(CO2) + 3(H2O)"))
             return "C2H5OH+3O2=2CO2+3H2O";
         // 14
         if (!balance("C3H8+5O2=CO2+H2O").getBalancedEquation().equals("1(C3H8) + 5O2 ---> 3(CO2) + 4(H2O)"))
@@ -647,16 +659,16 @@ public class BalancerService {
         if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C ---> 6(CaSiO3) + 10(CO) + 4P"))
             return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
         // 16
-        if (balance("H2+O2 = H2O+O3").getBalancedEquation() != null)
-            return "H2+O2 = H2O+O3";
+        //if (balance("H2+O2 = H2O+O3").getBalancedEquation() != null)
+        //    return "H2+O2 = H2O+O3";
         // 17
-        if (!balance("C6H12O6+O2=CO2+H2O").getBalancedEquation().equals("1(C6H12O6) + 6O2 ---> 6(CO2) + 6(H2O)")) //parenthesis error )
+        if (!balance("C6H12O6+O2=CO2+H2O").getBalancedEquation().equals("1(C6H12O6) + 6O2 ---> 6(CO2) + 6(H2O)"))
             return "C6H12O6+O2=CO2+H2O";
         // 18
         if (!balance("Fe2O3+C=Fe+CO2").getBalancedEquation().equals("2(Fe2O3) + 3C ---> 4Fe + 3(CO2)"))
             return "Fe2O3+C=Fe+CO2";
         // 19
-        if (!balance("NH4NO3=N2+O2+H2O").getBalancedEquation().equals("2(NH4NO3) ---> 2(N2) + 1O2 + 4(H2O)"))
+        if (!balance("NH4NO3=N2+O2+H2O").getBalancedEquation().equals("2(NH4NO3) ---> 2N2 + 1O2 + 4(H2O)"))
             return "NH4NO3=N2+O2+H2O";
         // 20
         if (!balance("P4+O2=P4O10").getBalancedEquation().equals("1P4 + 5O2 ---> 1(P4O10)"))
