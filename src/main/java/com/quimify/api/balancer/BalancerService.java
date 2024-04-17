@@ -208,7 +208,7 @@ public class BalancerService {
 
         return removedCoefficients.toString();
     }
-
+    //TODO remove parenthesis if client provides it
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
         equation= equation.concat("++");
@@ -265,6 +265,9 @@ public class BalancerService {
                                 break;
                             }
                         }
+                        if (multiDigitSuffix.equals(""))
+                            multiDigitSuffix = "1";
+
                         normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
                         contador++;
                         multiDigitSuffix = "";
@@ -416,7 +419,7 @@ public class BalancerService {
     private static String removeUnnecessaryCharacters(String currentString) {
         return currentString.replaceAll("[^a-zA-Z0-9()+]", "");
     }
-
+    //TODO bug al introducir fórmula acabada en +
     /**
      * String formatting of solution
      */
@@ -611,7 +614,7 @@ public class BalancerService {
         }
         return dictionary;
     }
-    //TODO fix parenthesis when it's only one element with a suffix coefficient or 2 letter element
+
     String testTemporal() {
         // 1
         if (!balance("2H + O = H3O").getBalancedEquation().equals("6H + 2O ---> 2(H3O)"))
@@ -673,6 +676,15 @@ public class BalancerService {
         // 20
         if (!balance("P4+O2=P4O10").getBalancedEquation().equals("1P4 + 5O2 ---> 1(P4O10)"))
             return "P4+O2=P4O10";
+        //21
+        if (!balance("Cl + 2OP= Cl2O + P").getBalancedEquation().equals("4Cl + 2(OP) ---> 2(Cl2O) + 2P")) //parenthesis error
+            return "Cl + 2(OP)= Cl2O + P";
+        //22
+        if (!balance("NH4NO3 + Cl = N2+O+H2O + Cl2").getBalancedEquation().equals("1(NH4NO3) + 2Cl ---> 1N2 + 1O + 2(H2O) + 1Cl2"))
+            return "NH4NO3 + Cl = N2+O+H2O + Cl2";
+        //23
+        if (!balance("NH4NO3 + Cl += N2+O+H2O + Cl2+").getBalancedEquation().equals("1(NH4NO3) + 2Cl ---> 1N2 + 1O + 2(H2O) + 1Cl2"))
+            return "NH4NO3 + Cl += N2+O+H2O + Cl2+";
 
         return "OK";
     }
