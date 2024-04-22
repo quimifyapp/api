@@ -421,12 +421,53 @@ public class BalancerService {
         currentString = currentString.replaceAll("\\++", "+");
         // Remove '+' at the beginning and end of the string, if present
         currentString = currentString.replaceAll("^\\++|\\++$", "");
-        // Remove any other non-essential characters
+        // Remove any other non-essential characters except parentheses for balance check
         currentString = currentString.replaceAll("[^a-zA-Z0-9()+=]", "");
-        return currentString;
+
+        // Stack to hold the index and content status of unmatched opening parentheses
+        Stack<Integer> stack = new Stack<>();
+        StringBuilder sb = new StringBuilder();
+        boolean[] hasContent = new boolean[currentString.length()];  // Tracks content between parentheses
+
+        for (int i = 0; i < currentString.length(); i++) {
+            char ch = currentString.charAt(i);
+            if (ch == '(') {
+                // Push the current length (position of '(') onto the stack and assume no content initially
+                stack.push(sb.length());
+                hasContent[sb.length()] = false;  // Default to no content
+                sb.append(ch);
+            } else if (ch == ')') {
+                if (stack.isEmpty()) {
+                    // There's a closing parenthesis without a matching opening, ignore it
+                    continue;
+                }
+                // Check if there was content
+                int openPos = stack.pop();
+                if (!hasContent[openPos]) {
+                    // No content between the parentheses, remove the opening parenthesis
+                    sb.deleteCharAt(openPos);
+                } else {
+                    // Valid content found, append closing parenthesis
+                    sb.append(ch);
+                }
+            } else {
+                // Append other characters directly
+                sb.append(ch);
+                if (!stack.isEmpty()) {
+                    // Mark that there has been content since the last '('
+                    hasContent[stack.peek()] = true;
+                }
+            }
+        }
+
+        // Any remaining '(' in the stack are unmatched, remove them
+        while (!stack.isEmpty()) {
+            sb.deleteCharAt(stack.pop());
+        }
+
+        return sb.toString();
     }
 
-    //TODO parentesis abierto sin cerrar
     /**
      * String formatting of solution
      */
@@ -687,8 +728,11 @@ public class BalancerService {
         if (!balance("Cl + 2OP= Cl2O + P").getBalancedEquation().equals("4Cl + 2(OP) ---> 2(Cl2O) + 2P"))
             return "Cl + 2(OP)= Cl2O + P";
 
-        //if (!balance("++++Cl +++ 2OP++++= +++Cl2O + P+").getBalancedEquation().equals("4Cl + 2(OP) ---> 2(Cl2O) + 2P"))
-        //    return "++++Cl +++ 2OP++++= +++Cl2O + P+";
+        if (!balance("++++Cl +++ 2OP++++= +++Cl2O + P+").getBalancedEquation().equals("4Cl + 2(OP) ---> 2(Cl2O) + 2P"))
+            return "++++Cl +++ 2OP++++= +++Cl2O + P+";
+
+        if (!balance("((P4+O2=P()4O))10)").getBalancedEquation().equals("1P4 + 5O2 ---> 1(P4O10)"))
+            return "P4+O2=P4O10";
 
         //System.out.println(balance("H2+O2 = H2O+O3").getBalancedEquation());
         return "OK";
