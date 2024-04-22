@@ -74,7 +74,7 @@ public class BalancerService {
             originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
             originalProductsString = removeUnnecessaryCharacters(arr[1].replace(" ", ""));
         } else {
-            // Algun tipo de error.service diciendo que falta parte de la ecuacion
+            return BalancerResult.error("Error: Reactants or Products are missing");
         }
 
         String removedCoefficientsReactantString = removeCoefficients(originalReactantsString);
@@ -127,12 +127,11 @@ public class BalancerService {
             finalSolution = new Hashtable<>();
 
         } else {
-            // error.service...
-            System.out.println("Error: Same elements need to be on both sides of the equation.");
-            System.exit(0);
+            return BalancerResult.error("Error: Same elements need to be on both sides of the equation.");
         }
 
         this.matrix.gaussjordanElimination();
+
         FractionComponent[] solutions = new FractionComponent[this.matrix.matrix[0].length];
 
         int j = 0;
@@ -144,6 +143,12 @@ public class BalancerService {
         }
 
         solutions[this.matrix.matrix[0].length - 1] = new FractionComponent(1, 1);
+
+        // Check if the equation is balanceable.
+        if (!isBalanceable(solutions)) {
+            return BalancerResult.error("Error: Equation cannot be balanced.");
+        }
+
         int lcm = 1;
 
         for (FractionComponent f : solutions) {
@@ -158,6 +163,23 @@ public class BalancerService {
 
         return new BalancerResult(true, equation,
                 formatSolution(originalReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(originalProductsString, finalSolution.get(1)));
+    }
+
+    private boolean isBalanceable(FractionComponent[] solutions) {
+        if (solutions == null || solutions.length == 0) {
+            // If the solutions array is null or empty, it's not balanceable.
+            return false;
+        }
+
+        for (FractionComponent solution : solutions) {
+            if (solution == null) {
+                // If any solution in the array is null, it's not balanceable.
+                return false;
+            }
+        }
+
+        // If we haven't encountered any nulls, the solutions are complete, hence balanceable.
+        return true;
     }
 
     private static boolean coefficientsExist (String equation){
@@ -710,8 +732,8 @@ public class BalancerService {
         if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C ---> 6(CaSiO3) + 10(CO) + 4P"))
             return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
         // 16
-        //if (balance("H2+O2 = H2O+O3").getBalancedEquation() != null)
-        //    return "H2+O2 = H2O+O3";
+        if (balance("H2+O2 = H2O+O3").getBalancedEquation() != null)
+            return "H2+O2 = H2O+O3";
         // 17
         if (!balance("C6H12O6+O2=CO2+H2O").getBalancedEquation().equals("1(C6H12O6) + 6O2 ---> 6(CO2) + 6(H2O)"))
             return "C6H12O6+O2=CO2+H2O";
@@ -734,7 +756,6 @@ public class BalancerService {
         if (!balance("((P4+O2=P()4O))10)").getBalancedEquation().equals("1P4 + 5O2 ---> 1(P4O10)"))
             return "P4+O2=P4O10";
 
-        //System.out.println(balance("H2+O2 = H2O+O3").getBalancedEquation());
         return "OK";
     }
 
