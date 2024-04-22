@@ -133,6 +133,23 @@ public class MatrixComponent {
         return false;
     }
 
+    public static MatrixComponent multiply(MatrixComponent matrix1, MatrixComponent matrix2) {
+        if(matrix1.matrix[0].length != matrix2.matrix.length){
+            System.out.println("Multiplication Error: Matrix Multiplication not computable due to dimensions!");
+        }
+        FractionComponent[][] productArr = new FractionComponent[matrix1.matrix.length][matrix2.matrix[0].length];
+        for(int i=0; i<matrix1.matrix.length; i++){
+            for(int j=0; j<matrix2.matrix[0].length; j++){
+                FractionComponent sum = new FractionComponent(0, 1);
+                for(int k=0; k<matrix2.matrix.length; k++){
+                    sum=FractionComponent.add(sum, FractionComponent.multiply(matrix1.matrix[i][k], matrix2.matrix[k][j]));
+                }
+                productArr[i][j] = sum;
+            }
+        }
+        return new MatrixComponent(productArr);
+    }
+
     public static MatrixComponent multiply(FractionComponent f, MatrixComponent m){
         FractionComponent[][] product = new FractionComponent[m.matrix.length][m.matrix[0].length];
         for(int i=0; i<m.matrix.length; i++){
@@ -160,21 +177,6 @@ public class MatrixComponent {
         return MatrixComponent.multiply(new FractionComponent(-1, 1), matrix);
     }
 
-    public static MatrixComponent multiply(MatrixComponent matrix1, MatrixComponent matrix2) {
-        if(matrix1.matrix[0].length != matrix2.matrix.length){
-            System.out.println("Multiplication Error: Matrix Multiplication not computable due to dimensions!");
-        }
-        FractionComponent[][] productArr = new FractionComponent[matrix1.matrix.length][matrix2.matrix[0].length];
-        for(int i=0; i<matrix1.matrix.length; i++){
-            for(int j=0; j<matrix2.matrix[0].length; j++){
-                FractionComponent sum = new FractionComponent(0, 1);
-                for(int k=0; k<matrix2.matrix.length; k++){
-                    sum=FractionComponent.add(sum, FractionComponent.multiply(matrix1.matrix[i][k], matrix2.matrix[k][j]));
-                }
-                productArr[i][j] = sum;
-            }
-        }
-        return new MatrixComponent(productArr);
-    }
+
 
 }
