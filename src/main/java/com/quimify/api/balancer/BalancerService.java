@@ -69,6 +69,7 @@ public class BalancerService {
      * Last, the lcm of all the denominators are multiplied to give the simplified solution.
      */
     public BalancerResult balance(String equation) {
+        equation = equation.replaceAll("=+", "=");
         if (equation.contains("=")) {
             String[] arr = equation.split("=");
             originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
@@ -162,7 +163,7 @@ public class BalancerService {
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
         return new BalancerResult(true, equation,
-                formatSolution(originalReactantsString, finalSolution.get(0)) + " ---> " + formatSolution(originalProductsString, finalSolution.get(1)));
+                formatSolution(originalReactantsString, finalSolution.get(0)) + " ⟶ " + formatSolution(originalProductsString, finalSolution.get(1)));
     }
 
     private boolean isBalanceable(FractionComponent[] solutions) {
