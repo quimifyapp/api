@@ -68,7 +68,7 @@ class OrganicService {
             result = Optional.of(classifyName(input, result.get()));
 
         if (!result.get().isFound())
-            logger.warn("Couldn't solve organic \"" + input + "\".");
+            logger.warn("Couldn't solve organic \"{}\".", input);
 
         metricsService.organicFromNameQueried(result.get().isFound());
 
@@ -110,7 +110,7 @@ class OrganicService {
 
             if (organicResult.isPresent() && organicResult.get().isFound()) {
                 organicResult.get().setSuggestion(correctedInput);
-                logger.info("Successfully corrected \"" + correctedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", correctedInput, input);
             }
         }
 
@@ -123,7 +123,7 @@ class OrganicService {
 
             if (organicResult.isPresent()) {
                 organicResult.get().setSuggestion(acidCorrectedInput);
-                logger.info("Successfully corrected \"" + acidCorrectedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", acidCorrectedInput, input);
             }
         }
 
@@ -136,7 +136,7 @@ class OrganicService {
 
             if (organicResult.isPresent()) {
                 organicResult.get().setSuggestion(locatorCorrectedInput);
-                logger.info("Successfully corrected \"" + locatorCorrectedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", locatorCorrectedInput, input);
             }
         }
 
@@ -214,8 +214,7 @@ class OrganicService {
             // Calculated molecular mass is preferred for consistency over PubChem's
             Optional<Float> calculatedMolecularMass = molecularMassService.get(organic.getStructure());
 
-            if (calculatedMolecularMass.isPresent())
-                result.setMolecularMass(calculatedMolecularMass.get());
+            calculatedMolecularMass.ifPresent(result::setMolecularMass);
         }
 
         return result;

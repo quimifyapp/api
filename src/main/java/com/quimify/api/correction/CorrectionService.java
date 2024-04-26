@@ -21,7 +21,7 @@ public class CorrectionService {
                 String correctedInput = input.replace(correctionModel.getMistake(), correctionModel.getCorrection());
 
                 if (!silent)
-                    logger.warn("Corrected \"" + input + "\" to: \"" + correctedInput + "\".");
+                    logger.warn("Corrected \"{}\" to: \"{}\".", input, correctedInput);
 
                 input = correctedInput;
             }

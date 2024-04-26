@@ -58,13 +58,13 @@ class WebParseComponent {
             String htmlDocument = getDocument(url);
 
             if (doesNotLookLikeAnInorganic(htmlDocument)) {
-                logger.warn("Website " + url + " doesn't look like an inorganic.");
+                logger.warn("Website {} doesn't look like an inorganic.", url);
                 return Optional.empty();
             }
 
             return Optional.of(parse(htmlDocument));
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Exception parsing web " + url + ": " + illegalArgumentException.getMessage());
+            logger.warn("Exception parsing web {}: {}", url, illegalArgumentException.getMessage());
             return Optional.empty();
         } catch (Exception exception) {
             errorService.log("Exception parsing web: " + url, exception.toString(), getClass());

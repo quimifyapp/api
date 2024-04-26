@@ -17,7 +17,7 @@ public class ErrorService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    ErrorRepository errorRepository; 
+    ErrorRepository errorRepository;
 
     @Autowired
     MetricsService metricsService;
@@ -36,10 +36,10 @@ public class ErrorService {
 
         try {
             errorRepository.save(errorModel);
-            LoggerFactory.getLogger(location).error(title + ". Details saved in database.");
+            LoggerFactory.getLogger(location).error("{}. Details saved in database.", title);
         } catch (Exception exception) {
-            logger.error("Exception saving error in DB. " + "Location: " + locationName + ". " + "Exception: \"" +
-                    exception + "\". " + "Title: \"" + title + "\". " + "Details: \"" + details + "\". ");
+            logger.error("Exception saving error in DB. Location: {}. Exception: \"{}\". Title: \"{}\". " +
+                    "Details: \"{}\". ", locationName, exception, title, details);
         }
 
         metricsService.errorOccurred();

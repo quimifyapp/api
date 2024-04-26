@@ -34,7 +34,7 @@ public class ClassificationService {
 
         for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
             if (adaptedInput.matches(classificationModel.getRegexPattern())) {
-                logger.warn("Classified \"" + input + "\" with DB: " + classificationModel.getClassification() + ".");
+                logger.warn("Classified \"{}\" with DB: {}.", input, classificationModel.getClassification());
 
                 return filteredResult(input, classificationModel.getClassification());
             }
@@ -59,7 +59,7 @@ public class ClassificationService {
 
             Classification classification = Classification.valueOf(name);
 
-            logger.warn("Classified \"" + input + "\" with AI: " + classification + ".");
+            logger.warn("Classified \"{}\" with AI: {}.", input, classification);
 
             return filteredResult(input, classification);
         } catch (Exception exception) {
@@ -107,7 +107,7 @@ public class ClassificationService {
         }
 
         if (result.isEmpty() || !result.get().equals(classification))
-            logger.warn("Classification of \"" + input + "\" was filtered: " + classification + " -> " + result + ".");
+            logger.warn("Classification of \"{}\" was filtered: {} -> {}.", input, classification, result);
 
         return result;
     }

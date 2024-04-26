@@ -71,7 +71,7 @@ class WebSearchComponent {
 
                 address = Optional.ofNullable(firstResult.getString("url"));
             }
-            else logger.warn("Couldn't find \"" + input + "\" on Bing");
+            else logger.warn("Couldn't find \"{}\" on Bing", input);
 
             metricsService.bingQueried(address.isPresent());
         } catch (Exception exception) {
@@ -112,7 +112,7 @@ class WebSearchComponent {
 
                 address = Optional.ofNullable(firstResult.getString("formattedUrl"));
             }
-            else logger.warn("Couldn't find \"" + input + "\" on Google.");
+            else logger.warn("Couldn't find \"{}\" on Google.", input);
 
             metricsService.googleQueried(address.isPresent());
         } catch (Exception exception) {

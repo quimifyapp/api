@@ -71,7 +71,7 @@ public class MolecularMassService {
             molecularMassResult = calculate(query);
 
             if (!molecularMassResult.isPresent())
-                logger.warn("Couldn't calculate \"" + query + "\". " + "RESULT: " + molecularMassResult.getError());
+                logger.warn("Couldn't calculate \"{}\". RESULT: {}", query, molecularMassResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", query, getClass());
             molecularMassResult = MolecularMassResult.error("La fórmula es demasiado larga.");
@@ -161,7 +161,7 @@ public class MolecularMassService {
                         Matcher matcher = Pattern.compile("^(\\d+)").matcher(digitos);
                         if (matcher.find()) {
                             digitos = matcher.group(1);
-                            moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
+                            moles = !digitos.isEmpty() ? Integer.parseInt(digitos) : 1;
                         }
                         else moles = 1;
                     }
@@ -200,7 +200,7 @@ public class MolecularMassService {
         // Procesa lo que no va entre paréntesis:
 
         if (balance == 0 && !(formula.contains("(") || formula.contains(")"))) { // No queda ningún paréntesis suelto
-            if (!formula.equals("")) { // Puede pasar con fórmulas como "(NaCl)3" -> "()3"
+            if (!formula.isEmpty()) { // Puede pasar con fórmulas como "(NaCl)3" -> "()3"
                 String[] partes = formula.split("(?=[A-Z])"); // "Aa11Bb22" -> ("Aa11", "Bb22")
 
                 // Se registran los elementos y sus moles:
@@ -208,7 +208,7 @@ public class MolecularMassService {
                 for (String parte : partes) {
                     String simbolo = parte.replaceAll("\\d", "");
                     String digitos = parte.replaceAll("[A-Za-z]", "");
-                    int moles = digitos.length() > 0 ? Integer.parseInt(digitos) : 1;
+                    int moles = !digitos.isEmpty() ? Integer.parseInt(digitos) : 1;
 
                     addInMap(simbolo, moles, elemento_a_moles); // Registra el elemento
                 }

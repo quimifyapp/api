@@ -6,7 +6,6 @@ import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
-import com.quimify.api.settings.SettingsService;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.utils.Normalizer;
 import org.slf4j.Logger;
@@ -46,9 +45,6 @@ class InorganicService {
 
     @Autowired
     MolecularMassService molecularMassService;
-
-    @Autowired
-    SettingsService settingsService;
 
     @Autowired
     NotFoundQueryService notFoundQueryService;
@@ -106,7 +102,7 @@ class InorganicService {
 
         if (searchedInMemory.isPresent()) {
             metricsService.inorganicDeepSearchFound();
-            logger.warn("Parsed inorganic \"" + input + "\" was already: " + searchedInMemory.get());
+            logger.warn("Parsed inorganic \"{}\" was already: {}", input, searchedInMemory.get());
 
             return new InorganicResult(searchedInMemory.get()); // TODO with suggestion + evaluate max similarity
         }
@@ -164,7 +160,7 @@ class InorganicService {
         metricsService.inorganicSearched(searchedInMemory.isPresent());
 
         if (searchedInMemory.isEmpty()) {
-            logger.warn("Inorganic not in DB: \"" + input + "\".");
+            logger.warn("Inorganic not in DB: \"{}\".", input);
             return Optional.empty();
         }
 
@@ -180,7 +176,7 @@ class InorganicService {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.info("Successfully corrected \"" + correctedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", correctedInput, input);
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), correctedInput));
             }
         }
@@ -193,7 +189,7 @@ class InorganicService {
             Optional<InorganicModel> searchedInMemory = fetch(acidCorrectedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.info("Successfully corrected \"" + acidCorrectedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", acidCorrectedInput, input);
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), acidCorrectedInput));
             }
         }
@@ -208,7 +204,7 @@ class InorganicService {
             Optional<InorganicModel> searchedInMemory = fetch(monoCorrectedInput);
 
             if (searchedInMemory.isPresent()) {
-                logger.info("Successfully corrected \"" + monoCorrectedInput + "\" from: \"" + input + "\".");
+                logger.info("Successfully corrected \"{}\" from: \"{}\".", monoCorrectedInput, input);
                 inorganicResult = Optional.of(new InorganicResult(searchedInMemory.get(), monoCorrectedInput));
             }
         }
@@ -239,7 +235,7 @@ class InorganicService {
 
         if (inorganicModel.isPresent())
             inorganicModel.get().countSearch();
-        else logger.warn("Discrepancy between DB and cached ID: " + id.get());
+        else logger.warn("Discrepancy between DB and cached ID: {}", id.get());
 
         return inorganicModel;
     }
@@ -249,10 +245,10 @@ class InorganicService {
         cacheComponent.save(parsedInorganic);
 
         metricsService.inorganicDeepSearchLearned();
-        logger.warn("Learned inorganic: " + parsedInorganic);
+        logger.warn("Learned inorganic: {}", parsedInorganic);
 
         if (parsedInorganic.toString().contains("peróxido")) // Any of its names
-            logger.warn("Learned peroxide might need manual correction: " + parsedInorganic);
+            logger.warn("Learned peroxide might need manual correction: {}", parsedInorganic);
     }
 
 }

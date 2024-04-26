@@ -53,7 +53,7 @@ class CompletionComponent {
         Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
 
         if (inorganicModel.isEmpty()) {
-            logger.warn("Discrepancy between DB and cached ID: " + id);
+            logger.warn("Discrepancy between DB and cached ID: {}", id);
             return notFound;
         }
 
