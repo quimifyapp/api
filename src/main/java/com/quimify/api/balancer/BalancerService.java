@@ -163,7 +163,7 @@ public class BalancerService {
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
         return new BalancerResult(true, equation,
-                formatSolution(originalReactantsString, finalSolution.get(0)) + " ⟶ " + formatSolution(originalProductsString, finalSolution.get(1)));
+                formatSolution(originalReactantsString, finalSolution.get(0)) + " = " + formatSolution(originalProductsString, finalSolution.get(1)));
     }
 
     private boolean isBalanceable(FractionComponent[] solutions) {

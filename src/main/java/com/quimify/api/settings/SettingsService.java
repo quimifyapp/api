@@ -12,7 +12,7 @@ public class SettingsService {
     @Autowired
     SettingsRepository settingsRepository; 
 
-    private static final int currentVersion = 5;
+    private static final int currentVersion = 6 ;
 
     // Environmental variables:
 
