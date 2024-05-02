@@ -4,16 +4,23 @@ public class BalancerResult {
     private boolean present;
     private String originalEquation;
     private String balancedEquation;
+
+    private String balancedReactants;
+
+
+    private String balancedProducts;
     private String error;
 
-    BalancerResult(boolean present, String originalEquation, String balancedEquation){
+    BalancerResult(boolean present, String originalEquation, String balancedEquation, String balancedReactants, String balancedProducts) {
         this.present = present;
         this.originalEquation = originalEquation;
         this.balancedEquation = balancedEquation;
+        this.balancedReactants = balancedReactants;
+        this.balancedProducts = balancedProducts;
     }
 
     static BalancerResult error(String error) {
-        BalancerResult balancerResult = new BalancerResult(false, null,  null);
+        BalancerResult balancerResult = new BalancerResult(false, null, null, null, null);
         balancerResult.error = error;
         return balancerResult;
     }
@@ -48,5 +55,21 @@ public class BalancerResult {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getBalancedReactants() {
+        return balancedReactants;
+    }
+
+    public void setBalancedReactants(String balancedReactants) {
+        this.balancedReactants = balancedReactants;
+    }
+
+    public String getBalancedProducts() {
+        return balancedProducts;
+    }
+
+    public void setBalancedProducts(String balancedProducts) {
+        this.balancedProducts = balancedProducts;
     }
 }
