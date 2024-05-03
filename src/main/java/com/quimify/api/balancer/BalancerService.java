@@ -162,7 +162,7 @@ public class BalancerService {
         finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
-        return new BalancerResult(true, equation,
+        return new BalancerResult(true, equation, originalReactantsString, originalProductsString,
                 formatSolution(originalReactantsString, finalSolution.get(0)) + " = " + formatSolution(originalProductsString, finalSolution.get(1)),
                         formatSolution(originalReactantsString, finalSolution.get(0)), formatSolution(originalProductsString, finalSolution.get(1)));
     }
