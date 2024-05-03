@@ -495,6 +495,7 @@ public class BalancerService {
     /**
      * String formatting of solution
      */
+    //TODO when input has coefficient and isn't changed it is detected as value equal to 1 so it is not putting parenthesis
     private static String formatSolution(String originalString, LinkedList<Integer> solutions) {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
@@ -514,41 +515,41 @@ public class BalancerService {
                     s.append(newCoefficient);
                 }
 
-                appendElement(arr, i, s);
-
-                if (i < solutions.size() - 1)
-                    s.append(" + ");
+                appendElement(arr, i, s, solutions);
 
                 coefficientHandler = "";
             }
             else{
-                s.append(solutions.get(i));
+                if (solutions.get(i) != 1) { // Only append if coefficient is not 1
+                    s.append(solutions.get(i));
+                }
 
-                appendElement(arr, i, s);
+                appendElement(arr, i, s, solutions);
 
-                if (i < solutions.size() - 1)
-                    s.append(" + ");
             }
         }
         return s.toString();
     }
 
-    private static void appendElement(String[] arr, int i, StringBuilder s) {
+    private static void appendElement(String[] arr, int i, StringBuilder s, LinkedList<Integer> solutions) {
+
         if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
             s.append(arr[i]);
         else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
             s.append(arr[i]);
         else{
-            if (arr[i].length() > 1 && 0 == arr[i].indexOf(arr[i].charAt(0)))
+            if (arr[i].length() > 1 && solutions.get(i) != 1)
                 s.append('(');
 
             s.append(arr[i]);
 
-            if (arr[i].length() > 1)
+            if (arr[i].length() > 1 && solutions.get(i) != 1)
                 s.append(')');
         }
-    }
 
+        if (i < solutions.size() - 1)
+            s.append(" + ");
+    }
 
 
     /**
