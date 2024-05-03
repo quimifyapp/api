@@ -495,7 +495,6 @@ public class BalancerService {
     /**
      * String formatting of solution
      */
-    //TODO when input has coefficient and isn't changed it is detected as value equal to 1 so it is not putting parenthesis
     private static String formatSolution(String originalString, LinkedList<Integer> solutions) {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
@@ -515,7 +514,7 @@ public class BalancerService {
                     s.append(newCoefficient);
                 }
 
-                appendElement(arr, i, s, solutions);
+                appendElement(arr, i, s, solutions, newCoefficient);
 
                 coefficientHandler = "";
             }
@@ -524,26 +523,26 @@ public class BalancerService {
                     s.append(solutions.get(i));
                 }
 
-                appendElement(arr, i, s, solutions);
+                appendElement(arr, i, s, solutions, solutions.get(i));
 
             }
         }
         return s.toString();
     }
 
-    private static void appendElement(String[] arr, int i, StringBuilder s, LinkedList<Integer> solutions) {
+    private static void appendElement(String[] arr, int i, StringBuilder s, LinkedList<Integer> solutions, int newCoefficient) {
 
         if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
             s.append(arr[i]);
         else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
             s.append(arr[i]);
         else{
-            if (arr[i].length() > 1 && solutions.get(i) != 1)
+            if (arr[i].length() > 1 && newCoefficient != 1)
                 s.append('(');
 
             s.append(arr[i]);
 
-            if (arr[i].length() > 1 && solutions.get(i) != 1)
+            if (arr[i].length() > 1 && newCoefficient != 1)
                 s.append(')');
         }
 
