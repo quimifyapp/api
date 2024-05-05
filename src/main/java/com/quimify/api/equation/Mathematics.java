@@ -1,6 +1,5 @@
 package com.quimify.api.equation;
 
-
 class Mathematics {
 
     // Internal:
