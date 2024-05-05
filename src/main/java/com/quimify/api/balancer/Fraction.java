@@ -10,6 +10,9 @@ class Fraction {
     // Constructors:
 
     Fraction(int numerator, int denominator) {
+        if (denominator == 0)
+            throw new IllegalArgumentException("Denominator can't be zero.");
+
         this.numerator = numerator;
         this.denominator = denominator;
 
@@ -19,6 +22,14 @@ class Fraction {
     Fraction(int scalar) {
         this.numerator = scalar;
         this.denominator = 1;
+    }
+
+    static Fraction zero() {
+        return new Fraction(0);
+    }
+
+    static Fraction one() {
+        return new Fraction(1);
     }
 
     private Fraction() {}
@@ -48,10 +59,18 @@ class Fraction {
         return new Fraction(newNumerator, newDenominator);
     }
 
-    static Fraction minus(Fraction fraction) {
-        return unsimplified(-fraction.numerator, fraction.denominator);
+    Fraction negative() {
+        return unsimplified(-numerator, denominator);
     }
 
+    Fraction inverse() {
+        if (numerator == 0)
+            throw new IllegalStateException("Fraction zero has no inverse.");
+
+        return unsimplified(denominator, numerator);
+    }
+
+    // TODO take outside
     static int leastCommonMultiple(int number1, int number2) {
         return (Math.abs(number1 * number2) / Fraction.greatestCommonDivisor(number1, number2));
     }
@@ -59,19 +78,14 @@ class Fraction {
     // Private:
 
     private void simplify() {
-        if (numerator == 0) {
-            denominator = 1;
-            return;
+        if (denominator < 0) {
+            numerator *= -1;
+            denominator *= -1;
         }
 
         int greatestCommonDivisor = Fraction.greatestCommonDivisor(numerator, denominator);
         numerator /= greatestCommonDivisor;
         denominator /= greatestCommonDivisor;
-
-        if (denominator < 0) {
-            numerator *= -1;
-            denominator *= -1;
-        }
     }
 
     private int rebasedNumerator(Integer newDenominator) {
@@ -82,6 +96,7 @@ class Fraction {
         return newNumerator;
     }
 
+    // TODO take outside
     private static int greatestCommonDivisor(int number1, int number2) {
         if (number1 == 0 || number2 == 0)
             return number1 + number2;

@@ -60,7 +60,7 @@ class BalancerService {
         Hashtable<Integer, Hashtable<String, Integer>> reactants;
         Hashtable<Integer, Hashtable<String, Integer>> products;
 
-        MatrixComponent matrix;
+        Matrix matrix;
         Hashtable<Integer, LinkedList<Integer>> finalSolution;
 
         equation = equation.replaceAll("=+", "=");
@@ -73,9 +73,6 @@ class BalancerService {
         } else {
             return BalancerResult.error("Error: Falta una parte de la reacción");
         }
-
-        String removedCoefficientsReactantString = removeCoefficients(originalReactantsString);
-        String removedCoefficientsProductString = removeCoefficients(originalProductsString);
 
         String normalizedReactantString = normalizeEquation(originalReactantsString);
         String normalizedProductString = normalizeEquation(originalProductsString);
@@ -115,26 +112,26 @@ class BalancerService {
                 currentIndex += 1;
             }
 
-            matrix = new MatrixComponent(intMatrix);
+            matrix = new Matrix(intMatrix);
             finalSolution = new Hashtable<>();
 
         } else {
             return BalancerResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
         }
 
-        matrix.gaussjordanElimination();
+        matrix.gaussJordanElimination();
 
-        Fraction[] solutions = new Fraction[matrix.matrix[0].length];
+        Fraction[] solutions = new Fraction[matrix.columns()];
 
         int j = 0;
-        for (int i = 0; i < matrix.matrix.length; i++) {
-            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new Fraction(0))) {
-                solutions[j] = matrix.matrix[i][matrix.matrix[0].length - 1];
+        for (int i = 0; i < matrix.rows(); i++) {
+            if (!matrix.get(i, matrix.columns() - 1).equals(Fraction.zero())) {
+                solutions[j] = matrix.get(i, matrix.columns() - 1);
                 j++;
             }
         }
 
-        solutions[matrix.matrix[0].length - 1] = new Fraction(1);
+        solutions[matrix.columns() - 1] = Fraction.one();
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
@@ -159,20 +156,10 @@ class BalancerService {
     }
 
     private boolean isBalanceable(Fraction[] solutions) {
-        if (solutions == null || solutions.length == 0) {
-            // If the solutions array is null or empty, it's not balanceable.
+        if (solutions == null || solutions.length == 0)
             return false;
-        }
 
-        for (Fraction solution : solutions) {
-            if (solution == null) {
-                // If any solution in the array is null, it's not balanceable.
-                return false;
-            }
-        }
-
-        // If we haven't encountered any nulls, the solutions are complete, hence balanceable.
-        return true;
+        return Arrays.stream(solutions).noneMatch(Objects::isNull);
     }
 
     /**
