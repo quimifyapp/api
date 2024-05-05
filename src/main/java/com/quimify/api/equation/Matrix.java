@@ -1,4 +1,4 @@
-package com.quimify.api.balancer;
+package com.quimify.api.equation;
 
 class Matrix {
 

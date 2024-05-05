@@ -1,4 +1,4 @@
-package com.quimify.api.balancer;
+package com.quimify.api.equation;
 
 import com.quimify.api.error.ErrorService;
 
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-class BalancerService {
+class EquationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -34,30 +34,30 @@ class BalancerService {
     // **********************************************************************************************************
     // **********************************************************************************************************
 
-    BalancerResult tryBalance(String reactants, String products) {
-        BalancerResult balancerResult;
+    EquationResult tryBalance(String reactants, String products) {
+        EquationResult equationResult;
 
         String equation = reactants + " = " + products; // TODO not like this
 
         try {
-            balancerResult = balance(equation);
+            equationResult = balance(equation);
 
-            if (!balancerResult.isPresent())
-                logger.warn("Couldn't calculate \"" + equation + "\". " + "RESULT: " + balancerResult.getError());
+            if (!equationResult.isPresent())
+                logger.warn("Couldn't calculate \"" + equation + "\". " + "RESULT: " + equationResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", equation, getClass());
-            balancerResult = BalancerResult.error("La reacción es demasiado larga.");
+            equationResult = EquationResult.error("La reacción es demasiado larga.");
         } catch (Exception exception) {
             errorService.log("Exception calculating: " + equation, exception.toString(), getClass());
-            balancerResult = BalancerResult.notPresent();
+            equationResult = EquationResult.notPresent();
         }
 
-        if (!balancerResult.isPresent())
+        if (!equationResult.isPresent())
             notFoundQueryService.log(equation, getClass());
 
-        metricsService.balanceEquationQueried(balancerResult.isPresent());
+        metricsService.balanceEquationQueried(equationResult.isPresent());
 
-        return balancerResult;
+        return equationResult;
     }
 
     /**
@@ -67,7 +67,7 @@ class BalancerService {
      */
 
     // TODO handle reactants & products separately
-    BalancerResult balance(String equation) {
+    EquationResult balance(String equation) {
         Hashtable<Integer, Hashtable<String, Integer>> reactants;
         Hashtable<Integer, Hashtable<String, Integer>> products;
 
@@ -82,7 +82,7 @@ class BalancerService {
             originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
             originalProductsString = removeUnnecessaryCharacters(arr[1].replace(" ", ""));
         } else {
-            return BalancerResult.error("Error: Falta una parte de la reacción");
+            return EquationResult.error("Error: Falta una parte de la reacción");
         }
 
         String normalizedReactantString = normalizeEquation(originalReactantsString);
@@ -127,7 +127,7 @@ class BalancerService {
             finalSolution = new Hashtable<>();
 
         } else {
-            return BalancerResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
+            return EquationResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
         }
 
         Mathematics.gaussJordanElimination(matrix); // TODO rename?
@@ -145,7 +145,7 @@ class BalancerService {
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
-            return BalancerResult.error("Error: La reacción no es balanceable");
+            return EquationResult.error("Error: La reacción no es balanceable");
         }
 
         int lcm = 1;
@@ -160,7 +160,7 @@ class BalancerService {
         finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
-        return new BalancerResult(formatSolution(originalReactantsString, finalSolution.get(0)),
+        return new EquationResult(formatSolution(originalReactantsString, finalSolution.get(0)),
                 formatSolution(originalProductsString, finalSolution.get(1)));
     }
 

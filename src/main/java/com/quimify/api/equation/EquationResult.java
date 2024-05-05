@@ -1,8 +1,8 @@
-package com.quimify.api.balancer;
+package com.quimify.api.equation;
 
 // This POJO class represents responses of balanced equations to the client.
 
-class BalancerResult {
+class EquationResult {
     private boolean present;
 
     private String balancedReactants;
@@ -10,23 +10,23 @@ class BalancerResult {
 
     private String error;
 
-    BalancerResult(String balancedReactants, String balancedProducts) {
+    EquationResult(String balancedReactants, String balancedProducts) {
         this.present = true;
         this.balancedReactants = balancedReactants;
         this.balancedProducts = balancedProducts;
     }
 
-    private BalancerResult(String error) {
+    private EquationResult(String error) {
         this.present = false;
         this.error = error;
     }
 
-    static BalancerResult error(String error) {
-        return new BalancerResult(error);
+    static EquationResult error(String error) {
+        return new EquationResult(error);
     }
 
-    static BalancerResult notPresent() {
-        return new BalancerResult(null);
+    static EquationResult notPresent() {
+        return new EquationResult(null);
     }
 
     // TODO remove
