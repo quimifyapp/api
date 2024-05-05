@@ -124,17 +124,17 @@ class BalancerService {
 
         matrix.gaussjordanElimination();
 
-        FractionComponent[] solutions = new FractionComponent[matrix.matrix[0].length];
+        Fraction[] solutions = new Fraction[matrix.matrix[0].length];
 
         int j = 0;
         for (int i = 0; i < matrix.matrix.length; i++) {
-            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new FractionComponent(0, 1))) {
+            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new Fraction(0, 1))) {
                 solutions[j] = matrix.matrix[i][matrix.matrix[0].length - 1];
                 j++;
             }
         }
 
-        solutions[matrix.matrix[0].length - 1] = new FractionComponent(1, 1);
+        solutions[matrix.matrix[0].length - 1] = new Fraction(1, 1);
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
@@ -143,11 +143,11 @@ class BalancerService {
 
         int lcm = 1;
 
-        for (FractionComponent f : solutions) {
-            lcm = FractionComponent.lcm(lcm, f.denominator);
+        for (Fraction f : solutions) {
+            lcm = Fraction.lcm(lcm, f.getDenominator());
         }
         for (int i = 0; i < solutions.length; i++) {
-            solutions[i] = FractionComponent.multiply(new FractionComponent(lcm, 1), solutions[i]);
+            solutions[i] = Fraction.multiply(new Fraction(lcm, 1), solutions[i]);
         }
 
         finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
@@ -158,13 +158,13 @@ class BalancerService {
                         formatSolution(originalReactantsString, finalSolution.get(0)), formatSolution(originalProductsString, finalSolution.get(1)));
     }
 
-    private boolean isBalanceable(FractionComponent[] solutions) {
+    private boolean isBalanceable(Fraction[] solutions) {
         if (solutions == null || solutions.length == 0) {
             // If the solutions array is null or empty, it's not balanceable.
             return false;
         }
 
-        for (FractionComponent solution : solutions) {
+        for (Fraction solution : solutions) {
             if (solution == null) {
                 // If any solution in the array is null, it's not balanceable.
                 return false;
@@ -335,10 +335,10 @@ class BalancerService {
     /**
      * Converts FractionComponents into integers for final formatting for either reactant or product side.
      */
-    private static LinkedList<Integer> implementSubstitution(FractionComponent[] arr) {
+    private static LinkedList<Integer> implementSubstitution(Fraction[] arr) {
         LinkedList<Integer> finalCoefficients = new LinkedList<>();
-        for (FractionComponent f : arr) {
-            finalCoefficients.addLast(f.numerator);
+        for (Fraction f : arr) {
+            finalCoefficients.addLast(f.getNumerator());
         }
         return finalCoefficients;
     }

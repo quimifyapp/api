@@ -1,25 +1,25 @@
 package com.quimify.api.balancer;
 
 class MatrixComponent {
-    public FractionComponent[][] matrix;
+    public Fraction[][] matrix;
     public boolean print=true;
 
     /**
      * Matrix Initializer that converts int array into fraction array
      */
     public MatrixComponent(int[][] matrix){
-        this.matrix = new FractionComponent[matrix.length][matrix[0].length];
+        this.matrix = new Fraction[matrix.length][matrix[0].length];
         for(int j=0; j<matrix.length; j++) {
             int[] row = matrix[j];
-            FractionComponent[] fractionRow = new FractionComponent[row.length];
+            Fraction[] fractionRow = new Fraction[row.length];
             for(int i=0; i<fractionRow.length; i++) {
-                fractionRow[i] = new FractionComponent(row[i], 1);
+                fractionRow[i] = new Fraction(row[i], 1);
             }
             this.matrix[j] = fractionRow;
         }
     }
 
-    public MatrixComponent(FractionComponent[][] matrix){
+    public MatrixComponent(Fraction[][] matrix){
         this.matrix = matrix;
     }
 
@@ -27,7 +27,7 @@ class MatrixComponent {
      * Simple Function that swaps rows
      */
     public void rowSwap(int row1, int row2){
-        FractionComponent[] temp = this.matrix[row1-1];
+        Fraction[] temp = this.matrix[row1-1];
         this.matrix[row1-1] = this.matrix[row2-1];
         this.matrix[row2-1] = temp;
     }
@@ -36,9 +36,9 @@ class MatrixComponent {
      * Simple Function that adds 2 rows
      */
     public void rowAddition(int row1, int row2){
-        FractionComponent[] addedRow = new FractionComponent[this.matrix[row1-1].length];
+        Fraction[] addedRow = new Fraction[this.matrix[row1-1].length];
         for(int i=0; i<this.matrix[row1-1].length; i++){
-            addedRow[i] = FractionComponent.add(this.matrix[row1-1][i], this.matrix[row2-1][i]);
+            addedRow[i] = Fraction.add(this.matrix[row1-1][i], this.matrix[row2-1][i]);
         }
         this.matrix[row2-1] = addedRow;
     }
@@ -46,10 +46,10 @@ class MatrixComponent {
     /**
      * Simple Function that multiplies 2 rows
      */
-    public void rowMultiplication(FractionComponent scalar, int row){
+    public void rowMultiplication(Fraction scalar, int row){
         for(int i=0; i<this.matrix[row-1].length; i++){
-            FractionComponent f = this.matrix[row-1][i];
-            this.matrix[row-1][i] = FractionComponent.multiply(f, scalar);
+            Fraction f = this.matrix[row-1][i];
+            this.matrix[row-1][i] = Fraction.multiply(f, scalar);
         }
     }
 
@@ -66,10 +66,10 @@ class MatrixComponent {
             Integer nonZero = null;
             Integer one = null;
             for(int i = rowIndex; i < this.matrix.length; i++){
-                if(nonZero == null && !this.matrix[i][columnIndex].equals(new FractionComponent(0,1 ))){
+                if(nonZero == null && !this.matrix[i][columnIndex].equals(new Fraction(0,1 ))){
                     nonZero = i;
                 }
-                if(one == null && this.matrix[i][columnIndex].equals(new FractionComponent(1,1 ))){
+                if(one == null && this.matrix[i][columnIndex].equals(new Fraction(1,1 ))){
                     one = i;
                 }
             }
@@ -77,15 +77,15 @@ class MatrixComponent {
                 if(one != null){
                     this.rowSwap(rowIndex+1, one+1);
                 }else{
-                    this.rowMultiplication(new FractionComponent(this.matrix[nonZero][columnIndex].denominator, this.matrix[nonZero][columnIndex].numerator), nonZero+1);
+                    this.rowMultiplication(new Fraction(this.matrix[nonZero][columnIndex].getDenominator(), this.matrix[nonZero][columnIndex].getNumerator()), nonZero+1);
                     this.rowSwap(rowIndex+1, nonZero+1);
                 }
                 if(this.print){System.out.println(this.toString());}
                 for(int i = rowIndex + 1; i < this.matrix.length; i++){
-                    if(!this.matrix[i][columnIndex].equals(new FractionComponent(0, 1))){
-                        this.rowMultiplication(FractionComponent.negate(this.matrix[i][columnIndex]), rowIndex+1);
+                    if(!this.matrix[i][columnIndex].equals(new Fraction(0, 1))){
+                        this.rowMultiplication(Fraction.negate(this.matrix[i][columnIndex]), rowIndex+1);
                         this.rowAddition(rowIndex + 1, i + 1);
-                        this.rowMultiplication(new FractionComponent(this.matrix[rowIndex][columnIndex].denominator, this.matrix[rowIndex][columnIndex].numerator), rowIndex+1);
+                        this.rowMultiplication(new Fraction(this.matrix[rowIndex][columnIndex].getDenominator(), this.matrix[rowIndex][columnIndex].getNumerator()), rowIndex+1);
                         if(this.print){System.out.println(this.toString());}
                     }
                 }
@@ -102,12 +102,12 @@ class MatrixComponent {
         int rowIndex = 0;
 
         for(int columnIndex = 0; columnIndex < this.matrix[0].length; columnIndex++){
-            if(this.matrix[rowIndex][columnIndex].equals(new FractionComponent(1,1))) {
+            if(this.matrix[rowIndex][columnIndex].equals(new Fraction(1,1))) {
                 for (int i = 0; i < rowIndex; i++) {
-                    if(!this.matrix[i][columnIndex].equals(new FractionComponent(0, 1))){
-                        this.rowMultiplication(FractionComponent.negate(this.matrix[i][columnIndex]), rowIndex + 1);
+                    if(!this.matrix[i][columnIndex].equals(new Fraction(0, 1))){
+                        this.rowMultiplication(Fraction.negate(this.matrix[i][columnIndex]), rowIndex + 1);
                         this.rowAddition(rowIndex + 1, i + 1);
-                        this.rowMultiplication(new FractionComponent(this.matrix[rowIndex][columnIndex].denominator, this.matrix[rowIndex][columnIndex].numerator), rowIndex + 1);
+                        this.rowMultiplication(new Fraction(this.matrix[rowIndex][columnIndex].getDenominator(), this.matrix[rowIndex][columnIndex].getNumerator()), rowIndex + 1);
                         if (this.print) {System.out.println(this.toString());}
                     }
                 }
@@ -134,12 +134,12 @@ class MatrixComponent {
         if(matrix1.matrix[0].length != matrix2.matrix.length){
             System.out.println("Multiplication Error: Matrix Multiplication not computable due to dimensions!");
         }
-        FractionComponent[][] productArr = new FractionComponent[matrix1.matrix.length][matrix2.matrix[0].length];
+        Fraction[][] productArr = new Fraction[matrix1.matrix.length][matrix2.matrix[0].length];
         for(int i=0; i<matrix1.matrix.length; i++){
             for(int j=0; j<matrix2.matrix[0].length; j++){
-                FractionComponent sum = new FractionComponent(0, 1);
+                Fraction sum = new Fraction(0, 1);
                 for(int k=0; k<matrix2.matrix.length; k++){
-                    sum=FractionComponent.add(sum, FractionComponent.multiply(matrix1.matrix[i][k], matrix2.matrix[k][j]));
+                    sum= Fraction.add(sum, Fraction.multiply(matrix1.matrix[i][k], matrix2.matrix[k][j]));
                 }
                 productArr[i][j] = sum;
             }
@@ -147,11 +147,11 @@ class MatrixComponent {
         return new MatrixComponent(productArr);
     }
 
-    public static MatrixComponent multiply(FractionComponent f, MatrixComponent m){
-        FractionComponent[][] product = new FractionComponent[m.matrix.length][m.matrix[0].length];
+    public static MatrixComponent multiply(Fraction f, MatrixComponent m){
+        Fraction[][] product = new Fraction[m.matrix.length][m.matrix[0].length];
         for(int i=0; i<m.matrix.length; i++){
             for(int j=0; j<m.matrix[0].length; j++){
-                product[i][j]=FractionComponent.multiply(m.matrix[i][j], f);
+                product[i][j]= Fraction.multiply(m.matrix[i][j], f);
             }
         }
         return new MatrixComponent(product);
@@ -161,17 +161,17 @@ class MatrixComponent {
         if(matrix1.matrix.length != matrix2.matrix.length || matrix1.matrix[0].length != matrix2.matrix[0].length){
             System.out.println("Addition Error: Matrix Addition not computable due to dimensions!");
         }
-        FractionComponent[][] sum = new FractionComponent[matrix1.matrix.length][matrix1.matrix[0].length];
+        Fraction[][] sum = new Fraction[matrix1.matrix.length][matrix1.matrix[0].length];
         for(int i=0; i<matrix1.matrix.length; i++){
             for(int j=0; j<matrix1.matrix[0].length; j++){
-                sum[i][j]=FractionComponent.add(matrix1.matrix[i][j], matrix2.matrix[i][j]);
+                sum[i][j]= Fraction.add(matrix1.matrix[i][j], matrix2.matrix[i][j]);
             }
         }
         return new MatrixComponent(sum);
     }
 
     public static MatrixComponent negate(MatrixComponent matrix){
-        return MatrixComponent.multiply(new FractionComponent(-1, 1), matrix);
+        return MatrixComponent.multiply(new Fraction(-1, 1), matrix);
     }
 
 

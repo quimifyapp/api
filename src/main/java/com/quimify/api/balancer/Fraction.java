@@ -5,14 +5,14 @@ package com.quimify.api.balancer;
  * during gaussian elimination. Fractions are made to be immutable in this class. Note all Fractions are simplified after any operation.
  */
 
-class FractionComponent {
-    public int numerator;
-    public int denominator;
+class Fraction {
+    private int numerator;
+    private int denominator;
 
     /**
      * Basic Initialization of a Fraction
      */
-    public FractionComponent(int numerator, int denominator) {
+    public Fraction(int numerator, int denominator) {
         this.numerator = numerator;
         this.denominator = denominator;
     }
@@ -20,52 +20,52 @@ class FractionComponent {
     /**
      * Scaling of a Fraction that can be used to make a common denominator before adding
      */
-    public FractionComponent scaleDenominator(Integer newDenominator) {
+    public Fraction scaleDenominator(Integer newDenominator) {
         numerator *= Double.valueOf(newDenominator) / (double) this.denominator;
         denominator = newDenominator;
-        return new FractionComponent(numerator, denominator);
+        return new Fraction(numerator, denominator);
     }
 
     /**
      * Simple Function that adds two Fractions
      */
-    public static FractionComponent add(FractionComponent f1, FractionComponent f2) {
+    public static Fraction add(Fraction f1, Fraction f2) {
         //Find LCM of denominator
-        int lcm = FractionComponent.lcm(f1.denominator, f2.denominator);
-        FractionComponent scaledF1 = f1.scaleDenominator(lcm);
-        FractionComponent scaledF2 = f2.scaleDenominator(lcm);
-        return FractionComponent.simplify(new FractionComponent(scaledF1.numerator + scaledF2.numerator, lcm));
+        int lcm = Fraction.lcm(f1.denominator, f2.denominator);
+        Fraction scaledF1 = f1.scaleDenominator(lcm);
+        Fraction scaledF2 = f2.scaleDenominator(lcm);
+        return Fraction.simplify(new Fraction(scaledF1.numerator + scaledF2.numerator, lcm));
     }
 
     /**
      * Simple function that negates a Fraction
      */
-    public static FractionComponent negate(FractionComponent f) {
-        return new FractionComponent(-f.numerator, f.denominator);
+    public static Fraction negate(Fraction f) {
+        return new Fraction(-f.numerator, f.denominator);
     }
 
     /**
      * Simple Function that multiplies two Fractions
      */
-    public static FractionComponent multiply(FractionComponent f1, FractionComponent f2) {
+    public static Fraction multiply(Fraction f1, Fraction f2) {
         int numerator = f1.numerator * f2.numerator;
         int denominator = f1.denominator * f2.denominator;
-        return FractionComponent.simplify(new FractionComponent(numerator, denominator));
+        return Fraction.simplify(new Fraction(numerator, denominator));
     }
 
     /**
      * Simple Function to simplify and standardize(0/5 -> 0/1) Fractions
      */
-    public static FractionComponent simplify(FractionComponent f) {
+    public static Fraction simplify(Fraction f) {
         if (f.denominator < 0) {
             f.numerator *= -1;
             f.denominator *= -1;
         }
         if (f.numerator == 0) {
-            return new FractionComponent(0, 1);
+            return new Fraction(0, 1);
         } else {
-            int gcd = FractionComponent.gcd(f.numerator, f.denominator);
-            return new FractionComponent(f.numerator / gcd, f.denominator / gcd);
+            int gcd = Fraction.gcd(f.numerator, f.denominator);
+            return new Fraction(f.numerator / gcd, f.denominator / gcd);
         }
     }
 
@@ -87,7 +87,7 @@ class FractionComponent {
     /**
      * Comparison of 2 Fractions
      */
-    public boolean equals(FractionComponent f) {
+    public boolean equals(Fraction f) {
         return f.numerator == this.numerator && f.denominator == this.denominator;
     }
 
@@ -95,6 +95,18 @@ class FractionComponent {
      * Simple LCM algorithm based on Euclidean GCD algorithm
      */
     public static int lcm(int number1, int number2) {
-        return (Math.abs(number1 * number2) / FractionComponent.gcd(number1, number2));
+        return (Math.abs(number1 * number2) / Fraction.gcd(number1, number2));
     }
+
+    // Getters:
+
+
+    int getNumerator() {
+        return numerator;
+    }
+
+    int getDenominator() {
+        return denominator;
+    }
+
 }
