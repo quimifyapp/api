@@ -4,63 +4,36 @@ package com.quimify.api.balancer;
 
 class BalancerResult {
     private boolean present;
-    private String originalEquation;
-    private String originalReactants;
-    private String originalProducts;
-    private String balancedEquation;
+
     private String balancedReactants;
     private String balancedProducts;
+
     private String error;
 
-    BalancerResult(boolean present, String originalEquation, String originalReactants, String originalProducts,
-                   String balancedEquation, String balancedReactants, String balancedProducts) {
-        this.present = present;
-        this.originalEquation = originalEquation;
-        this.originalReactants = originalReactants;
-        this.originalProducts = originalProducts;
-        this.balancedEquation = balancedEquation;
+    BalancerResult(String balancedReactants, String balancedProducts) {
+        this.present = true;
         this.balancedReactants = balancedReactants;
         this.balancedProducts = balancedProducts;
     }
 
+    private BalancerResult(String error) {
+        this.present = false;
+        this.error = error;
+    }
+
     static BalancerResult error(String error) {
-        BalancerResult balancerResult = new BalancerResult(false, null, null, null, null, null, null);
-        balancerResult.error = error;
-        return balancerResult;
+        return new BalancerResult(error);
+    }
+
+    static BalancerResult notPresent() {
+        return new BalancerResult(null);
     }
 
     // Getters and setters (must be public to enable JSON serialization):
 
-    public String getOriginalEquation() {
-        return originalEquation;
-    }
-
-    public void setOriginalEquation(String originalEquation) {
-        this.originalEquation = originalEquation;
-    }
-
-    public void setBalancedEquation(String balancedEquation) {
-        this.balancedEquation = balancedEquation;
-    }
-
-    public String getOriginalReactants() {
-        return originalReactants;
-    }
-
-    public void setOriginalReactants(String originalReactants) {
-        this.originalReactants = originalReactants;
-    }
-
-    public String getOriginalProducts() {
-        return originalProducts;
-    }
-
-    public void setOriginalProducts(String originalProducts) {
-        this.originalProducts = originalProducts;
-    }
-
-    public String getBalancedEquation() {
-        return balancedEquation;
+    // TODO remove
+    String getBalancedEquation() {
+        return balancedReactants + " = " + balancedProducts;
     }
 
     public boolean isPresent() {
@@ -69,14 +42,6 @@ class BalancerResult {
 
     public void setPresent(boolean present) {
         this.present = present;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
     }
 
     public String getBalancedReactants() {
@@ -94,4 +59,13 @@ class BalancerResult {
     public void setBalancedProducts(String balancedProducts) {
         this.balancedProducts = balancedProducts;
     }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
 }

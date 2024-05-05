@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 class BalancerService {
 
@@ -27,6 +26,14 @@ class BalancerService {
     @Autowired
     MetricsService metricsService;
 
+    // **********************************************************************************************************
+    // **********************************************************************************************************
+    // **********************************************************************************************************
+    // TODO rewrite this awful code from the internet
+    // **********************************************************************************************************
+    // **********************************************************************************************************
+    // **********************************************************************************************************
+
     BalancerResult tryBalance(String equation) {
         BalancerResult balancerResult;
 
@@ -37,10 +44,10 @@ class BalancerService {
                 logger.warn("Couldn't calculate \"" + equation + "\". " + "RESULT: " + balancerResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", equation, getClass());
-            balancerResult = BalancerResult.error("Error: La reacción es demasiado larga.");
+            balancerResult = BalancerResult.error("La reacción es demasiado larga.");
         } catch (Exception exception) {
             errorService.log("Exception calculating: " + equation, exception.toString(), getClass());
-            balancerResult = BalancerResult.error("Error: Excepción en el cálculo");
+            balancerResult = BalancerResult.notPresent();
         }
 
         if (!balancerResult.isPresent())
@@ -150,9 +157,8 @@ class BalancerService {
         finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
         finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
 
-        return new BalancerResult(true, equation, originalReactantsString, originalProductsString,
-                formatSolution(originalReactantsString, finalSolution.get(0)) + " = " + formatSolution(originalProductsString, finalSolution.get(1)),
-                        formatSolution(originalReactantsString, finalSolution.get(0)), formatSolution(originalProductsString, finalSolution.get(1)));
+        return new BalancerResult(formatSolution(originalReactantsString, finalSolution.get(0)),
+                formatSolution(originalProductsString, finalSolution.get(1)));
     }
 
     private boolean isBalanceable(Fraction[] solutions) {
@@ -162,46 +168,9 @@ class BalancerService {
         return Arrays.stream(solutions).noneMatch(Objects::isNull);
     }
 
-    /**
-     * This function is used to solve the bug of initial prefix coefficients always turning to 1 when outputting the solution
-     * it gets the position and the value of the coefficient to later switch it in the output.
-     */
-
-    private static String removeCoefficients(String equation) {
-        StringBuilder removedCoefficients = new StringBuilder();
-        int contador = 0;
-        boolean isCoefficient = true;
-
-        while (contador < equation.length()) {
-            char character = equation.charAt(contador);
-
-            if (Character.isDigit(character) && isCoefficient) {
-                while (Character.isDigit(character)) {
-                    character = equation.charAt(contador + 1);
-                    contador++;
-                }
-            }
-
-            else {
-                // Handle different scenarios based on the character encountered
-                if (character == '+') {// Reset for the next part of the equation
-                    isCoefficient = true;
-                    removedCoefficients.append(character);
-                }
-                else {
-                    isCoefficient = false;
-                    removedCoefficients.append(character);
-                }
-                contador++;
-            }
-        }
-
-        return removedCoefficients.toString();
-    }
-
     private static String normalizeEquation(String equation) {
         StringBuilder normalizedEquation = new StringBuilder();
-        equation= equation.concat("++");
+        equation = equation.concat("++");
         int coefficient = 1;
         String multiDigitSuffix = "";
         boolean isCoefficient = true;
@@ -212,15 +181,14 @@ class BalancerService {
 
             if (Character.isDigit(character) && isCoefficient) {
                 String multiDigitCoefficient = "";
-                while (Character.isDigit(character)){
+                while (Character.isDigit(character)) {
                     multiDigitCoefficient = multiDigitCoefficient.concat(String.valueOf(character));
                     character = equation.charAt(contador + 1);
                     contador++;
                 }
                 // Accumulate coefficient value if it's multi-digit
                 coefficient = Integer.parseInt(multiDigitCoefficient);
-            }
-            else {
+            } else {
                 // Handle different scenarios based on the character encountered
                 switch (character) {
                     case '+':
@@ -233,7 +201,7 @@ class BalancerService {
                     case '(':
                         normalizedEquation.append(character);
                         character = equation.charAt(contador + 1);
-                        while (character != ')'){
+                        while (character != ')') {
                             normalizedEquation.append(character);
                             contador++;
                             character = equation.charAt(contador + 1);
@@ -244,7 +212,7 @@ class BalancerService {
                         isCoefficient = false;
                         normalizedEquation.append(character);
 
-                        while (Character.isDigit(equation.charAt(contador + 1))){
+                        while (Character.isDigit(equation.charAt(contador + 1))) {
                             character = equation.charAt(contador + 1);
 
                             //Por si el sufijo tiene más de un caracter
@@ -255,7 +223,7 @@ class BalancerService {
                                 break;
                             }
                         }
-                        if (multiDigitSuffix.equals(""))
+                        if (multiDigitSuffix.isEmpty())
                             multiDigitSuffix = "1";
 
                         normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
@@ -268,7 +236,7 @@ class BalancerService {
                         if (Character.isDigit(character)) {
                             multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
                             if (contador + 1 != equation.length()) {
-                                while (Character.isDigit(equation.charAt(contador + 1))){
+                                while (Character.isDigit(equation.charAt(contador + 1))) {
                                     character = equation.charAt(contador + 1);
 
                                     //Por si el sufijo tiene más de un caracter
@@ -283,29 +251,27 @@ class BalancerService {
 
                             normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
                             multiDigitSuffix = "";
-                        }
-                        else {
+                        } else {
                             normalizedEquation.append(character);
                             // Si un caracter es mayuscula y el siguiente también, en medio hay un coeficiente = 1
                             // si un caracter es mayuscula, caracter + 1 minuscula y caracter + 2 mayusucla => coeficiente = 1
                             if (Character.isUpperCase(character)
                                     && (Character.isUpperCase(equation.charAt(contador + 1)) || equation.charAt(contador + 1) == '+'
                                     || equation.charAt(contador + 1) == '(' || equation.charAt(contador + 1) == ')')
-                                    /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()*/){
-                                if (coefficient != 1){
+                                /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()*/) {
+                                if (coefficient != 1) {
                                     normalizedEquation.append(coefficient);
                                 }
-                            }
-                            else if (Character.isUpperCase(character)
+                            } else if (Character.isUpperCase(character)
                                     && Character.isLowerCase(equation.charAt(contador + 1))
                                     && (Character.isUpperCase(equation.charAt(contador + 2)) || equation.charAt(contador + 2) == '+'
                                     || equation.charAt(contador + 2) == '(' || equation.charAt(contador + 2) == ')')
                                     /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()
-                                    && (contador + 2 <= equation.length()) || contador + 2 >= equation.length()*/){
+                                    && (contador + 2 <= equation.length()) || contador + 2 >= equation.length()*/) {
                                 contador++;
                                 character = equation.charAt(contador);
                                 normalizedEquation.append(character);
-                                if (coefficient != 1){
+                                if (coefficient != 1) {
                                     normalizedEquation.append(coefficient);
                                 }
                             }
@@ -341,7 +307,7 @@ class BalancerService {
             character = inputString.charAt(i);
             if (Character.isLetter(character)) {
                 if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
-                    if (!elementString.equals("")) {
+                    if (!elementString.isEmpty()) {
                         elements.add(elementString);
                         elementString = "";
                     }
@@ -352,7 +318,7 @@ class BalancerService {
                 elementString = "";
             }
         }
-        if (!Character.toString(character).equals("")) {
+        if (!Character.toString(character).isEmpty()) {
             elements.add(elementString);
         }
         return elements;
@@ -400,7 +366,6 @@ class BalancerService {
         }
         return Arrays.asList(compoundTable, compoundStringTable);
     }
-
 
 
     /**
@@ -467,9 +432,9 @@ class BalancerService {
         String coefficientHandler = "";
 
         for (int i = 0; i < solutions.size(); i++) {
-            if (Character.isDigit(arr[i].charAt(0))){
+            if (Character.isDigit(arr[i].charAt(0))) {
                 int j = 0;
-                while (Character.isDigit(arr[i].charAt(j))){
+                while (Character.isDigit(arr[i].charAt(j))) {
                     coefficientHandler = coefficientHandler.concat(String.valueOf(arr[i].charAt(j)));
                     j++;
                 }
@@ -483,8 +448,7 @@ class BalancerService {
                 appendElement(arr, i, s, solutions, newCoefficient);
 
                 coefficientHandler = "";
-            }
-            else{
+            } else {
                 if (solutions.get(i) != 1) { // Only append if coefficient is not 1
                     s.append(solutions.get(i));
                 }
@@ -502,7 +466,7 @@ class BalancerService {
             s.append(arr[i]);
         else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
             s.append(arr[i]);
-        else{
+        else {
             if (arr[i].length() > 1 && newCoefficient != 1)
                 s.append('(');
 
@@ -535,9 +499,9 @@ class BalancerService {
                 if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
                     if (!parenthesesOn && !parenthesesEnd) {
                         //This is uppercase
-                        if (!symbol.equals("")) {
+                        if (!symbol.isEmpty()) {
                             //Symbol is filled and needs to be dumped
-                            int quantity = numString.equals("") ? 1 : Integer.parseInt(numString);
+                            int quantity = numString.isEmpty() ? 1 : Integer.parseInt(numString);
                             // Apply the coefficient here
                             quantity *= coefficient;
 
@@ -556,7 +520,7 @@ class BalancerService {
                         paranthesesStoreString.append(character);
                     } else {
                         Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-                        if (parenthesesScaler.equals(""))
+                        if (parenthesesScaler.isEmpty())
                             parenthesesScaler = "1";
                         for (String key : parenthesesParse.keySet()) {
                             if (!dictionary.containsKey(key)) {
@@ -606,7 +570,7 @@ class BalancerService {
                     numString = "";
                 } else {
                     Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-                    if (parenthesesScaler.equals(""))
+                    if (parenthesesScaler.isEmpty())
                         parenthesesScaler = "1";
                     for (String key : parenthesesParse.keySet()) {
                         if (!dictionary.containsKey(key)) {
@@ -627,7 +591,7 @@ class BalancerService {
             }
         }
         if (!parenthesesEnd) {
-            if (numString.equals("")) {
+            if (numString.isEmpty()) {
                 numString = "1";
             }
             if (!dictionary.containsKey(symbol)) {
@@ -637,7 +601,7 @@ class BalancerService {
             }
         } else {
             Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-            if (parenthesesScaler.equals(""))
+            if (parenthesesScaler.isEmpty())
                 parenthesesScaler = "1";
             for (String key : parenthesesParse.keySet()) {
                 if (!dictionary.containsKey(key)) {
@@ -650,6 +614,7 @@ class BalancerService {
         return dictionary;
     }
 
+    // TODO remove
     String testTemporal() {
         // 1
         if (!balance("2H + O = H3O").getBalancedEquation().equals("6H + 2O = 2(H3O)"))
@@ -697,7 +662,7 @@ class BalancerService {
         if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C = 6(CaSiO3) + 10(CO) + 4P"))
             return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
         // 16
-        if (balance("H2+O2 = H2O+O3").getBalancedEquation() != null)
+        if (balance("H2+O2 = H2O+O3").isPresent())
             return "H2+O2 = H2O+O3";
         // 17
         if (!balance("C6H12O6+O2=CO2+H2O").getBalancedEquation().equals("C6H12O6 + 6O2 = 6(CO2) + 6(H2O)"))

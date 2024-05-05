@@ -70,7 +70,7 @@ class Fraction {
         return unsimplified(denominator, numerator);
     }
 
-    // TODO take outside
+    // TODO take it out
     static int leastCommonMultiple(int number1, int number2) {
         return (Math.abs(number1 * number2) / Fraction.greatestCommonDivisor(number1, number2));
     }
@@ -96,7 +96,7 @@ class Fraction {
         return newNumerator;
     }
 
-    // TODO take outside
+    // TODO take it out
     private static int greatestCommonDivisor(int number1, int number2) {
         if (number1 == 0 || number2 == 0)
             return number1 + number2;

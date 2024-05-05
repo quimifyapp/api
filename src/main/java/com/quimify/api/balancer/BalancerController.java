@@ -1,4 +1,5 @@
 package com.quimify.api.balancer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +16,25 @@ class BalancerController {
 
     // Constants:
 
-    private static final String getBalancedEquationMessage = "GET balanced equation: \"%s\". RESULT: %s.";
+    private static final String getBalancedEquationMessage = "GET equation: \"%s -> %s\". RESULT: %s -> %s.";
 
     // Client:
 
     @GetMapping()
-    BalancerResult balance(@RequestParam("equation") String equation) {
-        BalancerResult balancerResult = balancerService.tryBalance(equation);
+    BalancerResult balance(@RequestParam("reactants") String reactants, @RequestParam("products") String products) {
+        BalancerResult balancerResult = balancerService.tryBalance(reactants + " = " + products); // TODO not like this
 
-        if(balancerResult.isPresent())
-            logger.info(String.format(getBalancedEquationMessage, equation, balancerResult.getBalancedEquation()));
+        if (balancerResult.isPresent())
+            logger.info(String.format(getBalancedEquationMessage, reactants, products,
+                    balancerResult.getBalancedReactants(), balancerResult.getBalancedProducts()));
 
         return balancerResult;
     }
 
+    // TODO remove
     @GetMapping("/test")
     String testTemporal() {
         return balancerService.testTemporal();
     }
+
 }
