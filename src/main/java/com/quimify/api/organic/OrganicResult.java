@@ -24,7 +24,6 @@ class OrganicResult {
         this.found = true;
         this.name = name;
         this.structure = structure;
-        // TODO
     }
 
     private OrganicResult() {

@@ -140,8 +140,6 @@ class OrganicService {
             }
         }
 
-        // TODO metrics
-
         return organicResult;
     }
 
@@ -172,8 +170,6 @@ class OrganicService {
 
     private OrganicResult classifyName(String input, OrganicResult organicResult) {
         Optional<Classification> classification = classificationService.classify(input);
-
-        // TODO metrics
 
         if (classification.isPresent() && classification.get() != Classification.organicName)
             organicResult.setClassification(classification.get());
