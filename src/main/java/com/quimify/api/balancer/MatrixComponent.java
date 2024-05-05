@@ -1,9 +1,6 @@
 package com.quimify.api.balancer;
 
-import org.springframework.stereotype.Component;
-
-
-public class MatrixComponent {
+class MatrixComponent {
     public FractionComponent[][] matrix;
     public boolean print=true;
 

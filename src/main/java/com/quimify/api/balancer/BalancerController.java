@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/balance")
-public class BalancerController {
+class BalancerController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

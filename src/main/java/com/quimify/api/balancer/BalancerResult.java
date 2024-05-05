@@ -1,6 +1,8 @@
 package com.quimify.api.balancer;
 
-public class BalancerResult {
+// This POJO class represents responses of balanced equations to the client.
+
+class BalancerResult {
     private boolean present;
     private String originalEquation;
     private String originalReactants;
@@ -26,6 +28,8 @@ public class BalancerResult {
         balancerResult.error = error;
         return balancerResult;
     }
+
+    // Getters and setters (must be public to enable JSON serialization):
 
     public String getOriginalEquation() {
         return originalEquation;

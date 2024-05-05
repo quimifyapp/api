@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class BalancerService {
+class BalancerService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -26,18 +26,6 @@ public class BalancerService {
 
     @Autowired
     MetricsService metricsService;
-
-    private String originalReactantsString;
-    private String originalProductsString;
-    public String backupReactantsString;
-    public String backupProductsString;
-    public Hashtable<Integer, Hashtable<String, Integer>> reactants;
-    public Hashtable<Integer, Hashtable<String, Integer>> products;
-    public LinkedList<String> stringReactants;
-    public LinkedList<String> stringProducts;
-    public MatrixComponent matrix;
-    public Hashtable<Integer, LinkedList<Integer>> finalSolution;
-
 
     BalancerResult tryBalance(String equation) {
         BalancerResult balancerResult;
@@ -68,8 +56,16 @@ public class BalancerService {
      * Then, reduced matrix is made into algebraic equations and solved for variables in terms of last variable(n-1 x n matrix).
      * Last, the lcm of all the denominators are multiplied to give the simplified solution.
      */
-    public BalancerResult balance(String equation) {
+    BalancerResult balance(String equation) {
+        Hashtable<Integer, Hashtable<String, Integer>> reactants;
+        Hashtable<Integer, Hashtable<String, Integer>> products;
+
+        MatrixComponent matrix;
+        Hashtable<Integer, LinkedList<Integer>> finalSolution;
+
         equation = equation.replaceAll("=+", "=");
+        String originalReactantsString;
+        String originalProductsString;
         if (equation.contains("=")) {
             String[] arr = equation.split("=");
             originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
@@ -84,17 +80,12 @@ public class BalancerService {
         String normalizedReactantString = normalizeEquation(originalReactantsString);
         String normalizedProductString = normalizeEquation(originalProductsString);
 
-        this.backupReactantsString = originalReactantsString;
-        this.backupProductsString = originalProductsString;
-
         //Process Input
         List<Object> parseReactants = parseString(normalizedReactantString);
         reactants = (Hashtable<Integer, Hashtable<String, Integer>>) parseReactants.get(0);
-        stringReactants = (LinkedList<String>) parseReactants.get(1);
 
         List<Object> parseProducts = parseString(normalizedProductString);
         products = (Hashtable<Integer, Hashtable<String, Integer>>) parseProducts.get(0);
-        stringProducts = (LinkedList<String>) parseProducts.get(1);
 
         LinkedHashSet<String> reactantsElements = getElements(originalReactantsString); //elementService.get(originalProductsString)
         LinkedHashSet<String> productsElements = getElements(originalProductsString); //elementService.get(originalReactantsString)
@@ -124,26 +115,26 @@ public class BalancerService {
                 currentIndex += 1;
             }
 
-            this.matrix = new MatrixComponent(intMatrix);
+            matrix = new MatrixComponent(intMatrix);
             finalSolution = new Hashtable<>();
 
         } else {
             return BalancerResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
         }
 
-        this.matrix.gaussjordanElimination();
+        matrix.gaussjordanElimination();
 
-        FractionComponent[] solutions = new FractionComponent[this.matrix.matrix[0].length];
+        FractionComponent[] solutions = new FractionComponent[matrix.matrix[0].length];
 
         int j = 0;
-        for (int i = 0; i < this.matrix.matrix.length; i++) {
-            if (!this.matrix.matrix[i][this.matrix.matrix[i].length - 1].equals(new FractionComponent(0, 1))) {
-                solutions[j] = this.matrix.matrix[i][this.matrix.matrix[0].length - 1];
+        for (int i = 0; i < matrix.matrix.length; i++) {
+            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new FractionComponent(0, 1))) {
+                solutions[j] = matrix.matrix[i][matrix.matrix[0].length - 1];
                 j++;
             }
         }
 
-        solutions[this.matrix.matrix[0].length - 1] = new FractionComponent(1, 1);
+        solutions[matrix.matrix[0].length - 1] = new FractionComponent(1, 1);
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
@@ -184,18 +175,6 @@ public class BalancerService {
         return true;
     }
 
-    private static boolean coefficientsExist (String equation){
-        boolean isCoefficient = false;
-
-        for (int i = 0; i < equation.length(); i++){
-            char character = equation.charAt(i);
-            if (Character.isDigit(character) && isCoefficient){
-                return true;
-            }
-            else isCoefficient = character == '+';
-        }
-        return isCoefficient;
-    }
     /**
      * This function is used to solve the bug of initial prefix coefficients always turning to 1 when outputting the solution
      * it gets the position and the value of the coefficient to later switch it in the output.
