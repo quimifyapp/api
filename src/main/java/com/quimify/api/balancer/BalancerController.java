@@ -22,7 +22,7 @@ class BalancerController {
 
     @GetMapping()
     BalancerResult balance(@RequestParam("reactants") String reactants, @RequestParam("products") String products) {
-        BalancerResult balancerResult = balancerService.tryBalance(reactants + " = " + products); // TODO not like this
+        BalancerResult balancerResult = balancerService.tryBalance(reactants, products);
 
         if (balancerResult.isPresent())
             logger.info(String.format(getBalancedEquationMessage, reactants, products,

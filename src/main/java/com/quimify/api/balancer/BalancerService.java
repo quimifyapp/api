@@ -34,8 +34,10 @@ class BalancerService {
     // **********************************************************************************************************
     // **********************************************************************************************************
 
-    BalancerResult tryBalance(String equation) {
+    BalancerResult tryBalance(String reactants, String products) {
         BalancerResult balancerResult;
+
+        String equation = reactants + " = " + products; // TODO not like this
 
         try {
             balancerResult = balance(equation);
@@ -63,6 +65,8 @@ class BalancerService {
      * Then, reduced matrix is made into algebraic equations and solved for variables in terms of last variable(n-1 x n matrix).
      * Last, the lcm of all the denominators are multiplied to give the simplified solution.
      */
+
+    // TODO handle reactants & products separately
     BalancerResult balance(String equation) {
         Hashtable<Integer, Hashtable<String, Integer>> reactants;
         Hashtable<Integer, Hashtable<String, Integer>> products;
