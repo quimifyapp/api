@@ -128,13 +128,13 @@ class BalancerService {
 
         int j = 0;
         for (int i = 0; i < matrix.matrix.length; i++) {
-            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new Fraction(0, 1))) {
+            if (!matrix.matrix[i][matrix.matrix[i].length - 1].equals(new Fraction(0))) {
                 solutions[j] = matrix.matrix[i][matrix.matrix[0].length - 1];
                 j++;
             }
         }
 
-        solutions[matrix.matrix[0].length - 1] = new Fraction(1, 1);
+        solutions[matrix.matrix[0].length - 1] = new Fraction(1);
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
@@ -144,10 +144,10 @@ class BalancerService {
         int lcm = 1;
 
         for (Fraction f : solutions) {
-            lcm = Fraction.lcm(lcm, f.getDenominator());
+            lcm = Fraction.leastCommonMultiple(lcm, f.getDenominator());
         }
         for (int i = 0; i < solutions.length; i++) {
-            solutions[i] = Fraction.multiply(new Fraction(lcm, 1), solutions[i]);
+            solutions[i] = solutions[i].times(new Fraction(lcm));
         }
 
         finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
