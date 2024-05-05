@@ -126,9 +126,8 @@ class BalancerService {
             return BalancerResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
         }
 
-        matrix.gaussJordanElimination();
-
-        Fraction[] solutions = new Fraction[matrix.columns()];
+        Mathematics.gaussJordanElimination(matrix); // TODO rename?
+        Fraction[] solutions = new Fraction[matrix.columns()]; // TODO get this instead
 
         int j = 0;
         for (int i = 0; i < matrix.rows(); i++) {
@@ -148,7 +147,7 @@ class BalancerService {
         int lcm = 1;
 
         for (Fraction f : solutions) {
-            lcm = Fraction.leastCommonMultiple(lcm, f.getDenominator());
+            lcm = Mathematics.leastCommonMultiple(lcm, f.getDenominator());
         }
         for (int i = 0; i < solutions.length; i++) {
             solutions[i] = solutions[i].times(new Fraction(lcm));

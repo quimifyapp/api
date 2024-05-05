@@ -46,7 +46,7 @@ class Fraction {
     // Internal:
 
     Fraction plus(Fraction other) {
-        int newDenominator = Fraction.leastCommonMultiple(denominator, other.denominator);
+        int newDenominator = Mathematics.leastCommonMultiple(denominator, other.denominator);
         int newNumerator = rebasedNumerator(newDenominator) + other.rebasedNumerator(newDenominator);
 
         return new Fraction(newNumerator, newDenominator);
@@ -70,11 +70,6 @@ class Fraction {
         return unsimplified(denominator, numerator);
     }
 
-    // TODO take it out
-    static int leastCommonMultiple(int number1, int number2) {
-        return (Math.abs(number1 * number2) / Fraction.greatestCommonDivisor(number1, number2));
-    }
-
     // Private:
 
     private void simplify() {
@@ -83,7 +78,7 @@ class Fraction {
             denominator *= -1;
         }
 
-        int greatestCommonDivisor = Fraction.greatestCommonDivisor(numerator, denominator);
+        int greatestCommonDivisor = Mathematics.greatestCommonDivisor(numerator, denominator);
         numerator /= greatestCommonDivisor;
         denominator /= greatestCommonDivisor;
     }
@@ -94,20 +89,6 @@ class Fraction {
         newNumerator /= denominator;
 
         return newNumerator;
-    }
-
-    // TODO take it out
-    private static int greatestCommonDivisor(int number1, int number2) {
-        if (number1 == 0 || number2 == 0)
-            return number1 + number2;
-
-        int absNumber1 = Math.abs(number1);
-        int absNumber2 = Math.abs(number2);
-
-        int greater = Math.max(absNumber1, absNumber2);
-        int lesser = Math.min(absNumber1, absNumber2);
-
-        return greatestCommonDivisor(greater % lesser, lesser);
     }
 
     // Overridden:

@@ -29,12 +29,12 @@ class BalancerResult {
         return new BalancerResult(null);
     }
 
-    // Getters and setters (must be public to enable JSON serialization):
-
     // TODO remove
     String getBalancedEquation() {
         return balancedReactants + " = " + balancedProducts;
     }
+
+    // Getters and setters (must be public to enable JSON serialization):
 
     public boolean isPresent() {
         return present;
