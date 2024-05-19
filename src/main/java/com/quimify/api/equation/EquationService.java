@@ -135,13 +135,13 @@ class EquationService {
 
         int j = 0;
         for (int i = 0; i < matrix.rows(); i++) {
-            if (!matrix.get(i, matrix.columns() - 1).equals(Fraction.zero())) {
+            if (!matrix.get(i, matrix.columns() - 1).equals(Fraction.ZERO)) {
                 solutions[j] = matrix.get(i, matrix.columns() - 1);
                 j++;
             }
         }
 
-        solutions[matrix.columns() - 1] = Fraction.one();
+        solutions[matrix.columns() - 1] = Fraction.ONE;
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {

@@ -21,73 +21,73 @@ class Mathematics {
         return greatestCommonDivisor(greater % lesser, lesser);
     }
 
-    // TODO rewrite this method from the internet
     static void gaussJordanElimination(Matrix matrix) {
-        gaussianElimination(matrix);
+        reduceToEchelonReducedForm(matrix);
 
-        int rowIndex = 0;
-
-        for (int columnIndex = 0; columnIndex < matrix.columns(); columnIndex++) {
-            if (!matrix.get(rowIndex, columnIndex).equals(Fraction.one()))
+        for (int column = 0, row = 0; column < matrix.columns() && row < matrix.rows(); column++) {
+            if (!matrix.get(row, column).equals(Fraction.ONE))
                 continue;
 
-            for (int i = 0; i < rowIndex; i++) {
-                if (!matrix.get(i, columnIndex).equals(Fraction.zero())) {
-                    matrix.multiplyRow(rowIndex, matrix.get(i, columnIndex).negative());
-                    matrix.addRowTo(rowIndex, i);
-                    matrix.multiplyRow(rowIndex, matrix.get(rowIndex, columnIndex).inverse());
-                }
-            }
+            for (int i = 0; i < row; i++)
+                makeZero(matrix, i, column);
 
-            rowIndex++;
-
-            if (rowIndex >= matrix.rows())
-                break;
+            row++;
         }
     }
 
     // Private:
 
-    // TODO rewrite this method from the internet
-    private static void gaussianElimination(Matrix matrix) {
+    private static void reduceToEchelonReducedForm(Matrix matrix) {
         if (matrix.isEmpty())
             throw new IllegalArgumentException("Can't solve empty matrix.");
 
-        int rowIndex = 0;
-        for (int columnIndex = 0; columnIndex < matrix.columns(); columnIndex++) {
-            Integer nonZero = null;
-            Integer one = null;
+        for (int column = 0, row = 0; column < matrix.columns() && row < matrix.rows(); column++) {
+            int nonZero = findFirstNonZeroInColumn(matrix, column, row);
 
-            for (int i = rowIndex; i < matrix.rows(); i++) {
-                if (nonZero == null && !matrix.get(i, columnIndex).equals(Fraction.zero()))
-                    nonZero = i;
+            if (nonZero == -1)
+                continue;
 
-                if (one == null && matrix.get(i, columnIndex).equals(Fraction.one()))
-                    one = i;
-            }
+            int one = findFirstOneInColumn(matrix, column, row);
 
-            if (nonZero != null) {
-                if (one != null) {
-                    matrix.swapRows(rowIndex, one);
-                } else {
-                    matrix.multiplyRow(nonZero, matrix.get(nonZero, columnIndex).inverse());
-                    matrix.swapRows(rowIndex, nonZero);
-                }
+            if (one == -1) {
+                Fraction inverse = matrix.get(nonZero, column).inverse();
+                matrix.multiplyRow(nonZero, inverse);
+                matrix.swapRows(row, nonZero);
+            } else matrix.swapRows(row, one);
 
-                for (int i = rowIndex + 1; i < matrix.rows(); i++) {
-                    if (!matrix.get(i, columnIndex).equals(Fraction.zero())) {
-                        matrix.multiplyRow(rowIndex, matrix.get(i, columnIndex).negative());
-                        matrix.addRowTo(rowIndex, i);
-                        matrix.multiplyRow(rowIndex, matrix.get(rowIndex, columnIndex).inverse());
-                    }
-                }
+            for (int i = row + 1; i < matrix.rows(); i++)
+                makeZero(matrix, i, column);
 
-                rowIndex++;
-
-                if (rowIndex >= matrix.rows())
-                    break;
-            }
+            row++;
         }
+    }
+
+    private static int findFirstNonZeroInColumn(Matrix matrix, int column, int startRow) {
+        for (int i = startRow; i < matrix.rows(); i++)
+            if (!matrix.get(i, column).equals(Fraction.ZERO))
+                return i;
+
+        return -1;
+    }
+
+    private static int findFirstOneInColumn(Matrix matrix, int column, int startRow) {
+        for (int i = startRow; i < matrix.rows(); i++)
+            if (matrix.get(i, column).equals(Fraction.ONE))
+                return i;
+
+        return -1;
+    }
+
+    private static void makeZero(Matrix matrix, int row, int column) {
+        if (matrix.get(row, column).equals(Fraction.ZERO))
+            return;
+
+        Fraction multiple = matrix.get(row, column).negative();
+        matrix.multiplyRow(column, multiple);
+        matrix.addRowTo(column, row);
+
+        Fraction inverse = matrix.get(column, column).inverse();
+        matrix.multiplyRow(column, inverse);
     }
 
 }

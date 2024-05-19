@@ -7,6 +7,11 @@ class Fraction {
     private int numerator;
     private int denominator;
 
+    // Constants:
+
+    static final Fraction ZERO = new Fraction(0);
+    static final Fraction ONE = new Fraction(1);
+
     // Constructors:
 
     Fraction(int numerator, int denominator) {
@@ -24,15 +29,8 @@ class Fraction {
         this.denominator = 1;
     }
 
-    static Fraction zero() {
-        return new Fraction(0);
+    private Fraction() {
     }
-
-    static Fraction one() {
-        return new Fraction(1);
-    }
-
-    private Fraction() {}
 
     private static Fraction unsimplified(int numerator, int denominator) {
         Fraction unsimplified = new Fraction();

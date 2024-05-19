@@ -14,6 +14,7 @@ class Matrix {
                 this.matrix[i][j] = new Fraction(matrix[i][j]);
     }
 
+
     // Internal:
 
     int rows() {
