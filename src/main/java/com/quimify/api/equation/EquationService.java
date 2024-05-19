@@ -82,7 +82,7 @@ class EquationService {
             originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
             originalProductsString = removeUnnecessaryCharacters(arr[1].replace(" ", ""));
         } else {
-            return EquationResult.error("Error: Falta una parte de la reacción");
+            return EquationResult.error("Falta una parte de la reacción.");
         }
 
         String normalizedReactantString = normalizeEquation(originalReactantsString);
@@ -127,7 +127,7 @@ class EquationService {
             finalSolution = new Hashtable<>();
 
         } else {
-            return EquationResult.error("Error: Deben aparecer los mismos elementos en ambas partes de la reacción");
+            return EquationResult.error("Deben aparecer los mismos elementos en ambas partes de la reacción.");
         }
 
         Mathematics.gaussJordanElimination(matrix); // TODO rename?
@@ -145,7 +145,7 @@ class EquationService {
 
         // Check if the equation is balanceable.
         if (!isBalanceable(solutions)) {
-            return EquationResult.error("Error: La reacción no es balanceable");
+            return EquationResult.error("La reacción no es balanceable.");
         }
 
         int lcm = 1;
