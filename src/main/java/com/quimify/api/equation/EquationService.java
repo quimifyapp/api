@@ -689,6 +689,9 @@ class EquationService {
         if (!balance("((P4+O2=P()4O))10)").getBalancedEquation().equals("P4 + 5O2 = P4O10"))
             return "P4+O2=P4O10";
 
+        if (!balance("H2S + O4 = H + S + O").getBalancedEquation().equals("H2S + O4 = 2H + S + 4O"))
+            return "H2S + O4 = H + S + O";
+
         return "OK";
     }
 
