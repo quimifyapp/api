@@ -1,24 +1,26 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.classification.Classification;
-import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.correction.CorrectionService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.molecularmass.MolecularMassService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.utils.Normalizer;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
+import com.quimify.api.correction.CorrectionService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.health.HealthResult;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.molecularmass.MolecularMassService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
+import com.quimify.api.utils.Normalizer;
 
 // This class implements the logic behind HTTP methods in "/inorganic".
 
 @Service
-class InorganicService {
+public class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -77,6 +79,21 @@ class InorganicService {
             return classified.get();
 
         return deepSearch(input);
+    }
+
+    public HealthResult healthCheck() {
+        try {
+            Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
+            if (cachedId.isEmpty()) {
+                throw new RuntimeException("Error al acceder al caché de inorgánicos");
+            }
+
+            return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
+
+        } catch (Exception e) {
+            logger.error("Error en la comprobación de salud de inorgánicos", e);
+            return new HealthResult(false, e.getMessage());
+        }
     }
 
     InorganicResult deepSearch(String input) {

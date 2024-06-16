@@ -1,15 +1,17 @@
 package com.quimify.api.classification;
 
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.settings.SettingsService;
-import com.quimify.api.utils.Connection;
-import com.quimify.api.utils.Normalizer;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.health.HealthResult;
+import com.quimify.api.settings.SettingsService;
+import com.quimify.api.utils.Connection;
+import com.quimify.api.utils.Normalizer;
 
 // This class classifies input and handles calls to the Quimify Classifier AI API when necessary.
 
@@ -44,6 +46,24 @@ public class ClassificationService {
 
     public boolean isInorganic(Classification classification) {
         return classification == Classification.inorganicFormula || classification == Classification.inorganicName;
+    }
+
+    public HealthResult healthCheck() {
+        try {
+            String testFormula = "h2o";
+
+            Optional<Classification> inorganicFormulaResult = classify(testFormula);
+
+            if (inorganicFormulaResult.isEmpty() || inorganicFormulaResult.get() != Classification.inorganicFormula) {
+                throw new RuntimeException("Error classifying inorganic formula: " + testFormula);
+            }
+
+            return new HealthResult(true, "Classification health check successful");
+
+        } catch (Exception e) {
+            logger.error("Error in classification health check", e);
+            return new HealthResult(false, e.getMessage());
+        }
     }
 
     // Private:

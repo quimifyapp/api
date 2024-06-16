@@ -1,19 +1,23 @@
 package com.quimify.api.molecularmass;
 
-import com.quimify.api.element.ElementModel;
-import com.quimify.api.element.ElementService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.quimify.api.element.ElementModel;
+import com.quimify.api.element.ElementService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.health.HealthResult;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
 
 // Esta clase procesa las masas moleculares.
 
@@ -88,6 +92,21 @@ public class MolecularMassService {
         return molecularMassResult;
     }
 
+    public HealthResult healthCheck() {
+        try {
+            String testFormula = "H"; // Expected ~1.00794
+            MolecularMassResult result1 = tryCalculate(testFormula);
+            if (!result1.isPresent()) {
+                throw new RuntimeException("Error calculating molecular mass: " + testFormula);
+            }
+
+            return new HealthResult(true, "Molecular mass health check successful");
+
+        } catch (Exception e) {
+            logger.error("Error in molecular mass health check", e);
+            return new HealthResult(false, e.getMessage());
+        }
+    }
     // Private:
 
     private MolecularMassResult calculate(String formula) { // TODO translate code

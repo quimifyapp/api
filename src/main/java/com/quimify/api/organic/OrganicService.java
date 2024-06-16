@@ -1,30 +1,32 @@
 package com.quimify.api.organic;
 
-import com.quimify.api.classification.Classification;
-import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.correction.CorrectionService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.molecularmass.MolecularMassService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
-import com.quimify.organic.OrganicFactory;
-import com.quimify.organic.Organic;
-import com.quimify.organic.components.Group;
-import com.quimify.organic.components.Substituent;
-import com.quimify.organic.molecules.openchain.OpenChain;
-import com.quimify.organic.molecules.openchain.Simple;
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Optional;
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
+import com.quimify.api.correction.CorrectionService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.health.HealthResult;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.molecularmass.MolecularMassService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
+import com.quimify.organic.Organic;
+import com.quimify.organic.OrganicFactory;
+import com.quimify.organic.components.Group;
+import com.quimify.organic.components.Substituent;
+import com.quimify.organic.molecules.openchain.OpenChain;
+import com.quimify.organic.molecules.openchain.Simple;
 
 // This class implements the logic behind HTTP methods in "/organic".
 
 @Service
-class OrganicService {
+public class OrganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -96,6 +98,32 @@ class OrganicService {
         metricsService.organicFromStructureQueried(organicResult.isFound());
 
         return organicResult;
+    }
+
+    public HealthResult healthCheck() {
+        try {
+            String testCompoundName = "metano";
+            // TODO: Change to a valid compound Structure
+            int[] testCompoundStructure = { 0, 0, 0, 0, 0 };
+
+            // 1. Check name-to-structure resolution
+            Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
+            if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
+                throw new RuntimeException("Error resolving organic compound from name: " + testCompoundName);
+            }
+
+            // 2. Check structure-to-name resolution
+            OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
+            if (!resultFromStructure.isFound()) {
+                throw new RuntimeException( "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
+            }
+
+            return new HealthResult(true, "Organic health check successful");
+
+        } catch (Exception e) {
+            logger.error("Error in organic health check", e);
+            return new HealthResult(false, e.getMessage());
+        }
     }
 
     // Private:
