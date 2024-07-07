@@ -48,7 +48,7 @@ public class ClassificationService {
         return classification == Classification.inorganicFormula || classification == Classification.inorganicName;
     }
 
-    public HealthResult healthCheck() {
+    public HealthResult checkHealth() {
         try {
             String testFormula = "h2o";
 

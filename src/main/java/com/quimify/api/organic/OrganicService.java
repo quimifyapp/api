@@ -55,6 +55,34 @@ public class OrganicService {
 
     static final int carbonInputCode = -1;
 
+    // Internal:
+
+    public HealthResult checkHealth() {
+        try {
+            String testCompoundName = "metano";
+            int[] testCompoundStructure = { 0, 18 };
+
+            // 1. Check name-to-structure resolution
+            Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
+            if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
+                throw new RuntimeException("Error resolving organic compound from name: " + testCompoundName);
+            }
+
+            // 2. Check structure-to-name resolution
+            OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
+            if (!resultFromStructure.isFound()) {
+                throw new RuntimeException(
+                        "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
+            }
+
+            return new HealthResult(true, "Organic health check successful");
+
+        } catch (Exception e) {
+            logger.error("Error in organic health check", e);
+            return new HealthResult(false, e.getMessage());
+        }
+    }
+
     // Client:
 
     OrganicResult getFromName(String input) {
@@ -98,32 +126,6 @@ public class OrganicService {
         metricsService.organicFromStructureQueried(organicResult.isFound());
 
         return organicResult;
-    }
-
-    public HealthResult healthCheck() {
-        try {
-            String testCompoundName = "metano";
-            // TODO: Change to a valid compound Structure
-            int[] testCompoundStructure = { 0, 0, 0, 0, 0 };
-
-            // 1. Check name-to-structure resolution
-            Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
-            if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
-                throw new RuntimeException("Error resolving organic compound from name: " + testCompoundName);
-            }
-
-            // 2. Check structure-to-name resolution
-            OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
-            if (!resultFromStructure.isFound()) {
-                throw new RuntimeException( "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
-            }
-
-            return new HealthResult(true, "Organic health check successful");
-
-        } catch (Exception e) {
-            logger.error("Error in organic health check", e);
-            return new HealthResult(false, e.getMessage());
-        }
     }
 
     // Private:
@@ -221,8 +223,8 @@ public class OrganicService {
                 int carbonCount = inputSequence[++i];
 
                 openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-            }
-            else openChain = openChain.bond(group);
+            } else
+                openChain = openChain.bond(group);
         }
 
         return openChain;

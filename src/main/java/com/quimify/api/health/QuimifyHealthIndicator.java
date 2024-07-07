@@ -2,14 +2,16 @@ package com.quimify.api.health;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 // Spring boot Health Indicator for Quimify API (native + custom health check)
 
+@Primary
 @Component
 class QuimifyHealthIndicator implements HealthIndicator {
 
-    private final HealthService healthService; 
+    private final HealthService healthService;
 
     public QuimifyHealthIndicator(HealthService healthService) {
         this.healthService = healthService;
@@ -17,7 +19,7 @@ class QuimifyHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        HealthResult healthResult = healthService.checkOverallHealth();
+        HealthResult healthResult = healthService.health();
 
         if (healthResult.isPresent()) {
             return new Health.Builder()
@@ -27,9 +29,8 @@ class QuimifyHealthIndicator implements HealthIndicator {
         } else {
             return new Health.Builder()
                     .down()
-                    .withDetail("error", healthResult.getMessage()) 
+                    .withDetail("error", healthResult.getMessage())
                     .build();
         }
     }
 }
-

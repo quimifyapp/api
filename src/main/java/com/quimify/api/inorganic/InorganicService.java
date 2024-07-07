@@ -57,6 +57,23 @@ public class InorganicService {
     @Autowired
     ErrorService errorService;
 
+    // Internal:
+
+    public HealthResult checkHealth() {
+        try {
+            Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
+            if (cachedId.isEmpty()) {
+                throw new RuntimeException("Error al acceder al caché de inorgánicos");
+            }
+
+            return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
+
+        } catch (Exception e) {
+            logger.error("Error en la comprobación de salud de inorgánicos", e);
+            return new HealthResult(false, e.getMessage());
+        }
+    }
+
     // Client:
 
     InorganicResult search(String input) {
@@ -79,21 +96,6 @@ public class InorganicService {
             return classified.get();
 
         return deepSearch(input);
-    }
-
-    public HealthResult healthCheck() {
-        try {
-            Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
-            if (cachedId.isEmpty()) {
-                throw new RuntimeException("Error al acceder al caché de inorgánicos");
-            }
-
-            return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
-
-        } catch (Exception e) {
-            logger.error("Error en la comprobación de salud de inorgánicos", e);
-            return new HealthResult(false, e.getMessage());
-        }
     }
 
     InorganicResult deepSearch(String input) {
@@ -252,7 +254,8 @@ public class InorganicService {
 
         if (inorganicModel.isPresent())
             inorganicModel.get().countSearch();
-        else logger.warn("Discrepancy between DB and cached ID: {}", id.get());
+        else
+            logger.warn("Discrepancy between DB and cached ID: {}", id.get());
 
         return inorganicModel;
     }

@@ -66,6 +66,22 @@ public class MolecularMassService {
         return molecularMass;
     }
 
+    public HealthResult checkHealth() {
+        try {
+            String testFormula = "H"; // Expected ~1.00794
+            MolecularMassResult result1 = tryCalculate(testFormula);
+            if (!result1.isPresent()) {
+                throw new RuntimeException("Error calculating molecular mass: " + testFormula);
+            }
+
+            return new HealthResult(true, "Molecular mass health check successful");
+
+        } catch (Exception e) {
+            logger.error("Error in molecular mass health check", e);
+            return new HealthResult(false, e.getMessage());
+        }
+    }
+
     // Client:
 
     MolecularMassResult tryCalculate(String query) {
@@ -90,22 +106,6 @@ public class MolecularMassService {
         metricsService.molecularMassQueried(molecularMassResult.isPresent());
 
         return molecularMassResult;
-    }
-
-    public HealthResult healthCheck() {
-        try {
-            String testFormula = "H"; // Expected ~1.00794
-            MolecularMassResult result1 = tryCalculate(testFormula);
-            if (!result1.isPresent()) {
-                throw new RuntimeException("Error calculating molecular mass: " + testFormula);
-            }
-
-            return new HealthResult(true, "Molecular mass health check successful");
-
-        } catch (Exception e) {
-            logger.error("Error in molecular mass health check", e);
-            return new HealthResult(false, e.getMessage());
-        }
     }
     // Private:
 
@@ -181,10 +181,10 @@ public class MolecularMassService {
                         if (matcher.find()) {
                             digitos = matcher.group(1);
                             moles = !digitos.isEmpty() ? Integer.parseInt(digitos) : 1;
-                        }
-                        else moles = 1;
-                    }
-                    else moles = 1;
+                        } else
+                            moles = 1;
+                    } else
+                        moles = 1;
 
                     addInMap(anidada.toString(), moles, anidada_a_moles); // Registra la fórmula anidada
 
@@ -213,7 +213,8 @@ public class MolecularMassService {
             if (anidados.isPresent())
                 for (Map.Entry<String, Integer> elemento : anidados.get().entrySet())
                     addInMap(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
-            else return Optional.empty();
+            else
+                return Optional.empty();
         }
 
         // Procesa lo que no va entre paréntesis:
@@ -234,7 +235,8 @@ public class MolecularMassService {
             }
 
             resultado = Optional.of(elemento_a_moles);
-        } else resultado = Optional.empty();
+        } else
+            resultado = Optional.empty();
 
         return resultado;
     }
@@ -244,7 +246,8 @@ public class MolecularMassService {
 
         if (found != null)
             map.replace(key, found + value); // It was present, values are added
-        else map.put(key, value); // New element
+        else
+            map.put(key, value); // New element
     }
 
     private Optional<Float> getMolecularMassOf(String symbol) {
