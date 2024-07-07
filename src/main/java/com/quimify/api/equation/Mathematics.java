@@ -42,7 +42,7 @@ class Mathematics {
                 continue;
 
             for (int i = 0; i < row; i++)
-                makeZero(matrix, i, column);
+                makeZeroIn(matrix, i, column);
 
             row++;
         }
@@ -50,43 +50,44 @@ class Mathematics {
 
     private static void reduceToEchelonForm(Matrix matrix) {
         for (int column = 0, row = 0; column < matrix.columns() && row < matrix.rows(); column++) {
-            int nonZero = findFirstNonZeroInColumn(matrix, column, row);
+            int nonZero = firstNonZeroRowInColumnAfter(matrix, column, row);
 
             if (nonZero == -1)
                 continue;
 
-            int one = findFirstOneInColumn(matrix, column, row);
+            int one = firstOneRowInColumnAfter(matrix, column, row);
 
             if (one == -1) {
                 Fraction inverse = matrix.get(nonZero, column).inverse();
                 matrix.multiplyRow(nonZero, inverse);
                 matrix.swapRows(row, nonZero);
-            } else matrix.swapRows(row, one);
+            }
+            else matrix.swapRows(row, one);
 
             for (int i = row + 1; i < matrix.rows(); i++)
-                makeZero(matrix, i, column);
+                makeZeroIn(matrix, i, column);
 
             row++;
         }
     }
 
-    private static int findFirstNonZeroInColumn(Matrix matrix, int column, int startRow) {
-        for (int i = startRow; i < matrix.rows(); i++)
-            if (!matrix.get(i, column).equals(Fraction.ZERO))
-                return i;
+    private static int firstNonZeroRowInColumnAfter(Matrix matrix, int column, int startRow) {
+        for (int row = startRow; row < matrix.rows(); row++)
+            if (!matrix.get(row, column).equals(Fraction.ZERO))
+                return row;
 
         return -1;
     }
 
-    private static int findFirstOneInColumn(Matrix matrix, int column, int startRow) {
-        for (int i = startRow; i < matrix.rows(); i++)
-            if (matrix.get(i, column).equals(Fraction.ONE))
-                return i;
+    private static int firstOneRowInColumnAfter(Matrix matrix, int column, int startRow) {
+        for (int row = startRow; row < matrix.rows(); row++)
+            if (matrix.get(row, column).equals(Fraction.ONE))
+                return row;
 
         return -1;
     }
 
-    private static void makeZero(Matrix matrix, int row, int column) {
+    private static void makeZeroIn(Matrix matrix, int row, int column) {
         if (matrix.get(row, column).equals(Fraction.ZERO))
             return;
 
