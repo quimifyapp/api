@@ -6,20 +6,16 @@ class Matrix {
 
     // Constructors:
 
-    Matrix(int[][] matrix) {
-        this.matrix = new Fraction[matrix.length][matrix[0].length];
-
-        for (int i = 0; i < rows(); i++)
-            for (int j = 0; j < columns(); j++)
-                this.matrix[i][j] = new Fraction(matrix[i][j]);
+    Matrix(int rows, int columns) {
+        this.matrix = new Fraction[rows][columns];
     }
 
     Matrix(Matrix other) {
         this.matrix = new Fraction[other.rows()][other.columns()];
 
-        for (int i = 0; i < rows(); i++)
-            for (int j = 0; j < columns(); j++)
-                this.matrix[i][j] = new Fraction(other.get(i, j));
+        for (int row = 0; row < rows(); row++)
+            for (int column = 0; column < columns(); column++)
+                this.matrix[row][column] = new Fraction(other.get(row, column));
     }
 
     // Internal:
@@ -34,6 +30,10 @@ class Matrix {
 
     Fraction get(int row, int column) {
         return matrix[row][column];
+    }
+
+    void set(int row, int column, Fraction fraction) {
+        matrix[row][column] = fraction;
     }
 
     // Private:

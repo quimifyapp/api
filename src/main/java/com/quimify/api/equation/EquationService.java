@@ -59,20 +59,14 @@ class EquationService {
         return equationResult;
     }
 
-    /**
-     * Driver Method of Solving Algorithm. Ties up use of all classes. First, matrix is solved using gaussian elimination algorithm.
-     * Then, reduced matrix is made into algebraic equations and solved for variables in terms of last variable(n-1 x n matrix).
-     * Last, the lcm of all the denominators are multiplied to give the simplified solution.
-     */
+    // Private:
 
-    // TODO handle reactants & products separately
-    EquationResult balance(String reactantsText, String productsText) {
-        // TODO make this code block a separate method:
-
+    // TODO split in different methods
+    private EquationResult balance(String reactantsText, String productsText) {
         reactantsText = removeUnnecessaryCharacters(reactantsText);
         productsText = removeUnnecessaryCharacters(productsText);
 
-        LinkedHashSet<String> reactantsElements = getElements(reactantsText);
+        LinkedHashSet<String> reactantsElements = getElements(reactantsText); // TODO type?
         LinkedHashSet<String> productsElements = getElements(productsText);
 
         if (!reactantsElements.equals(productsElements))
@@ -81,46 +75,20 @@ class EquationService {
         String normalizedReactantString = normalizeEquation(reactantsText);
         String normalizedProductString = normalizeEquation(productsText);
 
-        Hashtable<Integer, Hashtable<String, Integer>> reactants = parseString(normalizedReactantString);
+        Hashtable<Integer, Hashtable<String, Integer>> reactants = parseString(normalizedReactantString); // TODO use Formula class?
         Hashtable<Integer, Hashtable<String, Integer>> products = parseString(normalizedProductString);
 
-        // TODO make this code block a separate method:
-
-        //Making Matrix
-        int[][] intMatrix = new int[reactantsElements.size()][reactants.size() + products.size()]; // TODO use Matrix class?
-        int currentIndex = 0;
-
-        for (String element : reactantsElements) {
-            int currentRowIndex = 0;
-            int[] intMatrixRow = new int[reactants.size() + products.size()];
-
-            for (int i = 0; i < reactants.size(); i++) {
-                Hashtable<String, Integer> results = reactants.get(i);
-                intMatrixRow[currentRowIndex] = (results.getOrDefault(element, 0));
-                currentRowIndex += 1;
-            }
-
-            for (int i = 0; i < products.size(); i++) {
-                Hashtable<String, Integer> results = products.get(i);
-                intMatrixRow[currentRowIndex] = ((products.size() - 1 == i ? 1 : -1) * results.getOrDefault(element, 0));
-                currentRowIndex += 1;
-            }
-
-            intMatrix[currentIndex] = intMatrixRow;
-            currentIndex += 1;
-        }
-
-        Matrix matrix = new Matrix(intMatrix);
+        Matrix matrix = equationMatrix(reactants, products, reactantsElements);
         Fraction[] solutions = Mathematics.solve(matrix);
 
         if (!isBalanceable(solutions))
             return EquationResult.error("La reacción no es balanceable.");
 
-        // TODO make this code block a separate method:
-
         Fraction[] solutionsAndOne = new Fraction[solutions.length + 1]; // TODO why?
         System.arraycopy(solutions, 0, solutionsAndOne, 0, solutions.length);
         solutionsAndOne[solutionsAndOne.length - 1] = Fraction.ONE;
+
+        // "Last, the lcm of all the denominators are multiplied to give the simplified solution."
 
         int lcm = 1;
 
@@ -135,6 +103,34 @@ class EquationService {
         String resultProducts = formatSolution(productsText, implementSubstitution(Arrays.copyOfRange(solutionsAndOne, reactants.size(), solutionsAndOne.length)));
 
         return new EquationResult(resultReactants, resultProducts);
+    }
+
+    // TODO fix all these methods:
+
+    private Matrix equationMatrix(Hashtable<Integer, Hashtable<String, Integer>> reactants, Hashtable<Integer, Hashtable<String, Integer>> products, LinkedHashSet<String> elements) {
+        Matrix matrix = new Matrix(elements.size(), reactants.size() + products.size());
+
+        int currentIndex = 0;
+
+        for (String element : elements) {
+            int currentRowIndex = 0;
+
+            for (int i = 0; i < reactants.size(); i++) {
+                Hashtable<String, Integer> results = reactants.get(i);
+                matrix.set(currentIndex, currentRowIndex, new Fraction(results.getOrDefault(element, 0)));
+                currentRowIndex += 1;
+            }
+
+            for (int i = 0; i < products.size(); i++) {
+                Hashtable<String, Integer> results = products.get(i);
+                matrix.set(currentIndex, currentRowIndex, new Fraction(((products.size() - 1 == i ? 1 : -1) * results.getOrDefault(element, 0))));
+                currentRowIndex += 1;
+            }
+
+            currentIndex += 1;
+        }
+
+        return matrix;
     }
 
     private boolean isBalanceable(Fraction[] solutions) {
@@ -261,11 +257,15 @@ class EquationService {
     /**
      * Converts FractionComponents into integers for final formatting for either reactant or product side.
      */
+    // TODO type?
     private static LinkedList<Integer> implementSubstitution(Fraction[] arr) {
         LinkedList<Integer> finalCoefficients = new LinkedList<>();
+
         for (Fraction f : arr) {
+            // TODO check denominator is 1
             finalCoefficients.addLast(f.getNumerator());
         }
+
         return finalCoefficients;
     }
 
@@ -661,4 +661,3 @@ class EquationService {
     }
 
 }
-
