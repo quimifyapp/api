@@ -4,16 +4,16 @@ class Mathematics {
 
     // Internal:
 
-    static int leastCommonMultiple(int number1, int number2) {
-        return (Math.abs(number1 * number2) / greatestCommonDivisor(number1, number2));
+    static int leastCommonMultiple(int a, int b) {
+        return (Math.abs(a * b) / greatestCommonDivisor(a, b));
     }
 
-    static int greatestCommonDivisor(int number1, int number2) {
-        if (number1 == 0 || number2 == 0)
-            return number1 + number2;
+    static int greatestCommonDivisor(int a, int b) {
+        if (a == 0 || b == 0)
+            return a + b;
 
-        int absNumber1 = Math.abs(number1);
-        int absNumber2 = Math.abs(number2);
+        int absNumber1 = Math.abs(a);
+        int absNumber2 = Math.abs(b);
 
         int greater = Math.max(absNumber1, absNumber2);
         int lesser = Math.min(absNumber1, absNumber2);
@@ -21,8 +21,33 @@ class Mathematics {
         return greatestCommonDivisor(greater % lesser, lesser);
     }
 
-    static void gaussJordanElimination(Matrix matrix) {
-        reduceToEchelonReducedForm(matrix);
+    // TODO handle non solutions or infinite solutions
+    static Fraction[] solve(Matrix matrix) {
+        Matrix reducedMatrix = new Matrix(matrix);
+        applyGaussJordanElimination(reducedMatrix);
+
+        Fraction[] solutions = new Fraction[reducedMatrix.columns() - 1];
+
+        // TODO fix this code block:
+
+        int j = 0;
+        for (int i = 0; i < reducedMatrix.rows(); i++) {
+            if (reducedMatrix.get(i, reducedMatrix.columns() - 1).equals(Fraction.ZERO))
+                continue;
+
+            solutions[j++] = reducedMatrix.get(i, reducedMatrix.columns() - 1);
+        }
+
+        return solutions;
+    }
+
+    // Private:
+
+    private static void applyGaussJordanElimination(Matrix matrix) {
+        if (matrix.isEmpty())
+            throw new IllegalArgumentException("Can't solve empty matrix.");
+
+        reduceToEchelonForm(matrix);
 
         for (int column = 0, row = 0; column < matrix.columns() && row < matrix.rows(); column++) {
             if (!matrix.get(row, column).equals(Fraction.ONE))
@@ -35,12 +60,7 @@ class Mathematics {
         }
     }
 
-    // Private:
-
-    private static void reduceToEchelonReducedForm(Matrix matrix) {
-        if (matrix.isEmpty())
-            throw new IllegalArgumentException("Can't solve empty matrix.");
-
+    private static void reduceToEchelonForm(Matrix matrix) {
         for (int column = 0, row = 0; column < matrix.columns() && row < matrix.rows(); column++) {
             int nonZero = findFirstNonZeroInColumn(matrix, column, row);
 
@@ -53,7 +73,8 @@ class Mathematics {
                 Fraction inverse = matrix.get(nonZero, column).inverse();
                 matrix.multiplyRow(nonZero, inverse);
                 matrix.swapRows(row, nonZero);
-            } else matrix.swapRows(row, one);
+            }
+            else matrix.swapRows(row, one);
 
             for (int i = row + 1; i < matrix.rows(); i++)
                 makeZero(matrix, i, column);

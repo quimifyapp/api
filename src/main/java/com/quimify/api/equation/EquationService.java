@@ -3,7 +3,6 @@ package com.quimify.api.equation;
 import com.quimify.api.error.ErrorService;
 
 import java.util.*;
-import java.util.List;
 
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -37,10 +36,10 @@ class EquationService {
     EquationResult tryBalance(String reactants, String products) {
         EquationResult equationResult;
 
-        String equation = reactants + " = " + products; // TODO not like this
+        String equation = reactants + " = " + products;
 
         try {
-            equationResult = balance(equation);
+            equationResult = balance(reactants, products);
 
             if (!equationResult.isPresent())
                 logger.warn("Couldn't calculate \"" + equation + "\". " + "RESULT: " + equationResult.getError());
@@ -67,101 +66,72 @@ class EquationService {
      */
 
     // TODO handle reactants & products separately
-    EquationResult balance(String equation) {
-        Hashtable<Integer, Hashtable<String, Integer>> reactants;
-        Hashtable<Integer, Hashtable<String, Integer>> products;
+    EquationResult balance(String reactantsText, String productsText) {
+        reactantsText = removeUnnecessaryCharacters(reactantsText);
+        productsText = removeUnnecessaryCharacters(productsText);
 
-        Matrix matrix;
-        Hashtable<Integer, LinkedList<Integer>> finalSolution;
+        LinkedHashSet<String> reactantsElements = getElements(reactantsText);
+        LinkedHashSet<String> productsElements = getElements(productsText);
 
-        equation = equation.replaceAll("=+", "=");
-        String originalReactantsString;
-        String originalProductsString;
-        if (equation.contains("=")) {
-            String[] arr = equation.split("=");
-            originalReactantsString = removeUnnecessaryCharacters(arr[0].replace(" ", ""));
-            originalProductsString = removeUnnecessaryCharacters(arr[1].replace(" ", ""));
-        } else {
-            return EquationResult.error("Falta una parte de la reacción.");
-        }
-
-        String normalizedReactantString = normalizeEquation(originalReactantsString);
-        String normalizedProductString = normalizeEquation(originalProductsString);
-
-        //Process Input
-        List<Object> parseReactants = parseString(normalizedReactantString);
-        reactants = (Hashtable<Integer, Hashtable<String, Integer>>) parseReactants.get(0);
-
-        List<Object> parseProducts = parseString(normalizedProductString);
-        products = (Hashtable<Integer, Hashtable<String, Integer>>) parseProducts.get(0);
-
-        LinkedHashSet<String> reactantsElements = getElements(originalReactantsString); //elementService.get(originalProductsString)
-        LinkedHashSet<String> productsElements = getElements(originalProductsString); //elementService.get(originalReactantsString)
-
-        if (reactantsElements.equals(productsElements)) {
-            //Making Matrix
-            int[][] intMatrix = new int[reactantsElements.size()][reactants.size() + products.size()];
-            int currentIndex = 0;
-
-            for (String element : reactantsElements) {
-                int currentRowIndex = 0;
-                int[] intMatrixRow = new int[reactants.size() + products.size()];
-
-                for (int i = 0; i < reactants.size(); i++) {
-                    Hashtable<String, Integer> results = reactants.get(i);
-                    intMatrixRow[currentRowIndex] = (results.getOrDefault(element, 0));
-                    currentRowIndex += 1;
-                }
-
-                for (int i = 0; i < products.size(); i++) {
-                    Hashtable<String, Integer> results = products.get(i);
-                    intMatrixRow[currentRowIndex] = ((products.size() - 1 == i ? 1 : -1) * results.getOrDefault(element, 0));
-                    currentRowIndex += 1;
-                }
-
-                intMatrix[currentIndex] = intMatrixRow;
-                currentIndex += 1;
-            }
-
-            matrix = new Matrix(intMatrix);
-            finalSolution = new Hashtable<>();
-
-        } else {
+        if (!reactantsElements.equals(productsElements))
             return EquationResult.error("Deben aparecer los mismos elementos en ambas partes de la reacción.");
-        }
 
-        Mathematics.gaussJordanElimination(matrix); // TODO rename?
-        Fraction[] solutions = new Fraction[matrix.columns()]; // TODO get this instead
+        String normalizedReactantString = normalizeEquation(reactantsText);
+        String normalizedProductString = normalizeEquation(productsText);
 
-        int j = 0;
-        for (int i = 0; i < matrix.rows(); i++) {
-            if (!matrix.get(i, matrix.columns() - 1).equals(Fraction.ZERO)) {
-                solutions[j] = matrix.get(i, matrix.columns() - 1);
-                j++;
+        Hashtable<Integer, Hashtable<String, Integer>> reactants = parseString(normalizedReactantString);
+        Hashtable<Integer, Hashtable<String, Integer>> products = parseString(normalizedProductString);
+
+        // TODO make this code block a separate method:
+
+        //Making Matrix
+        int[][] intMatrix = new int[reactantsElements.size()][reactants.size() + products.size()]; // TODO use Matrix class?
+        int currentIndex = 0;
+
+        for (String element : reactantsElements) {
+            int currentRowIndex = 0;
+            int[] intMatrixRow = new int[reactants.size() + products.size()];
+
+            for (int i = 0; i < reactants.size(); i++) {
+                Hashtable<String, Integer> results = reactants.get(i);
+                intMatrixRow[currentRowIndex] = (results.getOrDefault(element, 0));
+                currentRowIndex += 1;
             }
+
+            for (int i = 0; i < products.size(); i++) {
+                Hashtable<String, Integer> results = products.get(i);
+                intMatrixRow[currentRowIndex] = ((products.size() - 1 == i ? 1 : -1) * results.getOrDefault(element, 0));
+                currentRowIndex += 1;
+            }
+
+            intMatrix[currentIndex] = intMatrixRow;
+            currentIndex += 1;
         }
 
-        solutions[matrix.columns() - 1] = Fraction.ONE;
+        Matrix matrix = new Matrix(intMatrix);
+        Fraction[] solutions = Mathematics.solve(matrix);
+
+        Fraction[] solutionsAndOne = new Fraction[solutions.length + 1]; // TODO why?
+        System.arraycopy(solutions, 0, solutionsAndOne, 0, solutions.length);
+        solutionsAndOne[solutionsAndOne.length - 1] = Fraction.ONE;
 
         // Check if the equation is balanceable.
-        if (!isBalanceable(solutions)) {
+        if (!isBalanceable(solutionsAndOne))
             return EquationResult.error("La reacción no es balanceable.");
-        }
 
         int lcm = 1;
 
-        for (Fraction f : solutions) {
+        for (Fraction f : solutionsAndOne) {
             lcm = Mathematics.leastCommonMultiple(lcm, f.getDenominator());
         }
-        for (int i = 0; i < solutions.length; i++) {
-            solutions[i] = solutions[i].times(new Fraction(lcm));
+        for (int i = 0; i < solutionsAndOne.length; i++) {
+            solutionsAndOne[i] = solutionsAndOne[i].times(new Fraction(lcm));
         }
 
-        finalSolution.put(0, implementSubstitution(Arrays.copyOfRange(solutions, 0, reactants.size())));
-        finalSolution.put(1, implementSubstitution(Arrays.copyOfRange(solutions, reactants.size(), solutions.length)));
+        String resultReactants = formatSolution(reactantsText, implementSubstitution(Arrays.copyOfRange(solutionsAndOne, 0, reactants.size())));
+        String resultProducts = formatSolution(productsText, implementSubstitution(Arrays.copyOfRange(solutionsAndOne, reactants.size(), solutionsAndOne.length)));
 
-        return new EquationResult(formatSolution(originalReactantsString, finalSolution.get(0)),
-                formatSolution(originalProductsString, finalSolution.get(1)));
+        return new EquationResult(resultReactants, resultProducts);
     }
 
     private boolean isBalanceable(Fraction[] solutions) {
@@ -330,7 +300,7 @@ class EquationService {
     /**
      * Parses string to get Hashtable representation of a side of a chemical equation.
      */
-    private List<Object> parseString(String inputString) {
+    private Hashtable<Integer, Hashtable<String, Integer>> parseString(String inputString) {
         LinkedList<String> compoundStringTable = new LinkedList<>();
         Hashtable<Integer, Hashtable<String, Integer>> compoundTable = new Hashtable<>();
         StringBuilder storeString = new StringBuilder();
@@ -367,7 +337,7 @@ class EquationService {
             compoundStringTable.add(storeString.toString());
             compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
         }
-        return Arrays.asList(compoundTable, compoundStringTable);
+        return compoundTable;
     }
 
 
@@ -375,11 +345,9 @@ class EquationService {
      * Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")
      */
     private static String removeUnnecessaryCharacters(String currentString) {
-        // Replace multiple '+' signs with a single '+'
+        currentString = currentString.replaceAll("\\s", "");
         currentString = currentString.replaceAll("\\++", "+");
-        // Remove '+' at the beginning and end of the string, if present
         currentString = currentString.replaceAll("^\\++|\\++$", "");
-        // Remove any other non-essential characters except parentheses for balance check
         currentString = currentString.replaceAll("[^a-zA-Z0-9()+=]", "");
 
         // Stack to hold the index and content status of unmatched opening parentheses
@@ -620,76 +588,76 @@ class EquationService {
     // TODO remove
     String testTemporal() {
         // 1
-        if (!balance("2H + O = H3O").getBalancedEquation().equals("6H + 2O = 2(H3O)"))
+        if (!balance("2H + O", "H3O").getBalancedEquation().equals("6H + 2O = 2(H3O)"))
             return "2H + O = H3O";
         // 2
-        if (!balance("H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O").getBalancedEquation().equals("2(H3PO4) + 3(Mg(OH)2) = Mg3(PO4)2 + 6(H2O)"))
+        if (!balance("H3PO4 + ___ Mg(OH)2", "___ Mg3(PO4)2 + ___ H2O").getBalancedEquation().equals("2(H3PO4) + 3(Mg(OH)2) = Mg3(PO4)2 + 6(H2O)"))
             return "H3PO4 + ___ Mg(OH)2 = ___ Mg3(PO4)2 + ___ H2O";
         // 3
-        if (!balance("Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O").getBalancedEquation().equals("2(Al(OH)3) + 3(H2CO3) = Al2(CO3)3 + 6(H2O)"))
+        if (!balance("Al (OH)3 + ___ H2CO3", "___ Al2(CO3)3 + ___ H2O").getBalancedEquation().equals("2(Al(OH)3) + 3(H2CO3) = Al2(CO3)3 + 6(H2O)"))
             return "Al (OH)3 + ___ H2CO3 = ___ Al2(CO3)3 + ___ H2O";
         // 4
-        if (!balance("__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ").getBalancedEquation().equals("2(CH3CH2CH2CH3) + 13O2 = 8(CO2) + 10(H2O)"))
+        if (!balance("__ CH3CH2CH2CH3 + ___ O2", "___ CO2 + ___ H2O ").getBalancedEquation().equals("2(CH3CH2CH2CH3) + 13O2 = 8(CO2) + 10(H2O)"))
             return "__ CH3CH2CH2CH3 + ___ O2 = ___ CO2 + ___ H2O ";
         // 5
-        if (!balance("_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O").getBalancedEquation().equals("3(NH4OH) + H3PO4 = (NH4)3PO4 + 3(H2O)"))
+        if (!balance("_ NH4OH + ___ H3PO4", "___ (NH4)3PO4 + ___ H2O").getBalancedEquation().equals("3(NH4OH) + H3PO4 = (NH4)3PO4 + 3(H2O)"))
             return "_ NH4OH + ___ H3PO4 = ___ (NH4)3PO4 + ___ H2O";
         // 6
-        if (!balance(" H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O").getBalancedEquation().equals("2(H3PO4) + 3(Ca(OH)2) = Ca3(PO4)2 + 6(H2O)"))
+        if (!balance(" H3PO4 + ___ Ca(OH)2", "___ Ca3(PO4)2 + ___ H2O").getBalancedEquation().equals("2(H3PO4) + 3(Ca(OH)2) = Ca3(PO4)2 + 6(H2O)"))
             return " H3PO4 + ___ Ca(OH)2 = ___ Ca3(PO4)2 + ___ H2O";
         // 7
-        if (!balance("Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ").getBalancedEquation().equals("Ca3(PO4)2 + 3(SiO2) + 5C = 3(CaSiO3) + 5(CO) + 2P"))
+        if (!balance("Ca3(PO4)2 + ___ SiO2 + ___ C", "___ CaSiO3 + ___ CO + ___ P ").getBalancedEquation().equals("Ca3(PO4)2 + 3(SiO2) + 5C = 3(CaSiO3) + 5(CO) + 2P"))
             return "Ca3(PO4)2 + ___ SiO2 + ___ C = ___ CaSiO3 + ___ CO + ___ P ";
         // 8
-        if (!balance("2NH3+H2SO4=(NH4)2SO4").getBalancedEquation().equals("2(NH3) + H2SO4 = (NH4)2SO4"))
+        if (!balance("2NH3+H2SO4", "(NH4)2SO4").getBalancedEquation().equals("2(NH3) + H2SO4 = (NH4)2SO4"))
             return "2NH3+H2SO4=(NH4)2SO4";
         // 9
-        if (!balance("2KClO3=KCl+O2").getBalancedEquation().equals("2(KClO3) = 2(KCl) + 3O2"))
+        if (!balance("2KClO3", "KCl+O2").getBalancedEquation().equals("2(KClO3) = 2(KCl) + 3O2"))
             return "2KClO3=KCl+O2";
         // 10
-        if (!balance("2H2+O2=H2O").getBalancedEquation().equals("2H2 + O2 = 2(H2O)"))
+        if (!balance("2H2+O2", "H2O").getBalancedEquation().equals("2H2 + O2 = 2(H2O)"))
             return "2H2+O2=H2O";
         // 12
-        if (!balance("2C6H14+O2=CO2+H2O").getBalancedEquation().equals("2(C6H14) + 19O2 = 12(CO2) + 14(H2O)"))
+        if (!balance("2C6H14+O2", "CO2+H2O").getBalancedEquation().equals("2(C6H14) + 19O2 = 12(CO2) + 14(H2O)"))
             return "2C6H14+O2=CO2+H2O";
         // 12
-        if (!balance("Fe+2HCl=FeCl2+H").getBalancedEquation().equals("Fe + 2(HCl) = FeCl2 + 2H"))
+        if (!balance("Fe+2HCl", "FeCl2+H").getBalancedEquation().equals("Fe + 2(HCl) = FeCl2 + 2H"))
             return "Fe+2HCl=FeCl2+H";
         // 13
-        if (!balance("C2H5OH+3O2=2CO2+3H2O").getBalancedEquation().equals("C2H5OH + 3O2 = 2(CO2) + 3(H2O)"))
+        if (!balance("C2H5OH+3O2", "2CO2+3H2O").getBalancedEquation().equals("C2H5OH + 3O2 = 2(CO2) + 3(H2O)"))
             return "C2H5OH+3O2=2CO2+3H2O";
         // 14
-        if (!balance("C3H8+5O2=CO2+H2O").getBalancedEquation().equals("C3H8 + 5O2 = 3(CO2) + 4(H2O)"))
+        if (!balance("C3H8+5O2", "CO2+H2O").getBalancedEquation().equals("C3H8 + 5O2 = 3(CO2) + 4(H2O)"))
             return "C3H8+5O2=CO2+H2O";
         // 15
-        if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C = 6(CaSiO3) + 10(CO) + 4P"))
+        if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C", "___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C = 6(CaSiO3) + 10(CO) + 4P"))
             return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
         // 16
-        if (balance("H2+O2 = H2O+O3").isPresent())
+        if (balance("H2+O2", "H2O+O3").isPresent())
             return "H2+O2 = H2O+O3";
         // 17
-        if (!balance("C6H12O6+O2=CO2+H2O").getBalancedEquation().equals("C6H12O6 + 6O2 = 6(CO2) + 6(H2O)"))
+        if (!balance("C6H12O6+O2", "CO2+H2O").getBalancedEquation().equals("C6H12O6 + 6O2 = 6(CO2) + 6(H2O)"))
             return "C6H12O6+O2=CO2+H2O";
         // 18
-        if (!balance("Fe2O3+C=Fe+CO2").getBalancedEquation().equals("2(Fe2O3) + 3C = 4Fe + 3(CO2)"))
+        if (!balance("Fe2O3+C", "Fe+CO2").getBalancedEquation().equals("2(Fe2O3) + 3C = 4Fe + 3(CO2)"))
             return "Fe2O3+C=Fe+CO2";
         // 19
-        if (!balance("NH4NO3=N2+O2+H2O").getBalancedEquation().equals("2(NH4NO3) = 2N2 + O2 + 4(H2O)"))
+        if (!balance("NH4NO3", "N2+O2+H2O").getBalancedEquation().equals("2(NH4NO3) = 2N2 + O2 + 4(H2O)"))
             return "NH4NO3=N2+O2+H2O";
         // 20
-        if (!balance("P4+O2=P4O10").getBalancedEquation().equals("P4 + 5O2 = P4O10"))
+        if (!balance("P4+O2", "P4O10").getBalancedEquation().equals("P4 + 5O2 = P4O10"))
             return "P4+O2=P4O10";
         //21
-        if (!balance("Cl + 2OP= Cl2O + P").getBalancedEquation().equals("4Cl + 2(OP) = 2(Cl2O) + 2P"))
+        if (!balance("Cl + 2OP", "Cl2O + P").getBalancedEquation().equals("4Cl + 2(OP) = 2(Cl2O) + 2P"))
             return "Cl + 2(OP)= Cl2O + P";
 
-        if (!balance("++++Cl +++ 2OP++++= +++Cl2O + P+").getBalancedEquation().equals("4Cl + 2(OP) = 2(Cl2O) + 2P"))
+        if (!balance("++++Cl +++ 2OP++++", "+++Cl2O + P+").getBalancedEquation().equals("4Cl + 2(OP) = 2(Cl2O) + 2P"))
             return "++++Cl +++ 2OP++++= +++Cl2O + P+";
 
-        if (!balance("((P4+O2=P()4O))10)").getBalancedEquation().equals("P4 + 5O2 = P4O10"))
+        if (!balance("((P4+O2", "P()4O))10)").getBalancedEquation().equals("P4 + 5O2 = P4O10"))
             return "P4+O2=P4O10";
 
-        if (!balance("H2S + O4 = H + S + O").getBalancedEquation().equals("H2S + O4 = 2H + S + 4O"))
+        if (!balance("H2S + O4", "H + S + O").getBalancedEquation().equals("H2S + O4 = 2H + S + 4O"))
             return "H2S + O4 = H + S + O";
 
         return "OK";

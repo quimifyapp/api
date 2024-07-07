@@ -14,6 +14,13 @@ class Matrix {
                 this.matrix[i][j] = new Fraction(matrix[i][j]);
     }
 
+    Matrix(Matrix other) {
+        this.matrix = new Fraction[other.rows()][other.columns()];
+
+        for (int i = 0; i < rows(); i++)
+            for (int j = 0; j < columns(); j++)
+                this.matrix[i][j] = new Fraction(other.get(i, j));
+    }
 
     // Internal:
 

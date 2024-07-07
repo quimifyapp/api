@@ -29,6 +29,11 @@ class Fraction {
         this.denominator = 1;
     }
 
+    Fraction(Fraction other) {
+        this.numerator = other.numerator;
+        this.denominator = other.denominator;
+    }
+
     private Fraction() {
     }
 
@@ -81,7 +86,7 @@ class Fraction {
         denominator /= greatestCommonDivisor;
     }
 
-    private int rebasedNumerator(Integer newDenominator) {
+    private int rebasedNumerator(int newDenominator) {
         int newNumerator = numerator;
         newNumerator *= newDenominator;
         newNumerator /= denominator;
