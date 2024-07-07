@@ -21,24 +21,12 @@ class Mathematics {
         return greatestCommonDivisor(greater % lesser, lesser);
     }
 
-    // TODO handle non solutions or infinite solutions
     static Fraction[] solve(Matrix matrix) {
         Matrix reducedMatrix = new Matrix(matrix);
+
         applyGaussJordanElimination(reducedMatrix);
 
-        Fraction[] solutions = new Fraction[reducedMatrix.columns() - 1];
-
-        // TODO fix this code block:
-
-        int j = 0;
-        for (int i = 0; i < reducedMatrix.rows(); i++) {
-            if (reducedMatrix.get(i, reducedMatrix.columns() - 1).equals(Fraction.ZERO))
-                continue;
-
-            solutions[j++] = reducedMatrix.get(i, reducedMatrix.columns() - 1);
-        }
-
-        return solutions;
+        return solutionsFrom(reducedMatrix);
     }
 
     // Private:
@@ -73,8 +61,7 @@ class Mathematics {
                 Fraction inverse = matrix.get(nonZero, column).inverse();
                 matrix.multiplyRow(nonZero, inverse);
                 matrix.swapRows(row, nonZero);
-            }
-            else matrix.swapRows(row, one);
+            } else matrix.swapRows(row, one);
 
             for (int i = row + 1; i < matrix.rows(); i++)
                 makeZero(matrix, i, column);
@@ -109,6 +96,21 @@ class Mathematics {
 
         Fraction inverse = matrix.get(column, column).inverse();
         matrix.multiplyRow(column, inverse);
+    }
+
+    private static Fraction[] solutionsFrom(Matrix reducedMatrix) {
+        Fraction[] solutions = new Fraction[reducedMatrix.columns() - 1];
+
+        for (int row = 0, i = 0; row < reducedMatrix.rows(); row++) {
+            Fraction solution = reducedMatrix.get(row, reducedMatrix.columns() - 1);
+
+            if (solution.equals(Fraction.ZERO))
+                continue;
+
+            solutions[i++] = solution;
+        }
+
+        return solutions;
     }
 
 }

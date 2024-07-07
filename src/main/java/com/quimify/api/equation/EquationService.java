@@ -67,6 +67,8 @@ class EquationService {
 
     // TODO handle reactants & products separately
     EquationResult balance(String reactantsText, String productsText) {
+        // TODO make this code block a separate method:
+
         reactantsText = removeUnnecessaryCharacters(reactantsText);
         productsText = removeUnnecessaryCharacters(productsText);
 
@@ -111,13 +113,14 @@ class EquationService {
         Matrix matrix = new Matrix(intMatrix);
         Fraction[] solutions = Mathematics.solve(matrix);
 
+        if (!isBalanceable(solutions))
+            return EquationResult.error("La reacción no es balanceable.");
+
+        // TODO make this code block a separate method:
+
         Fraction[] solutionsAndOne = new Fraction[solutions.length + 1]; // TODO why?
         System.arraycopy(solutions, 0, solutionsAndOne, 0, solutions.length);
         solutionsAndOne[solutionsAndOne.length - 1] = Fraction.ONE;
-
-        // Check if the equation is balanceable.
-        if (!isBalanceable(solutionsAndOne))
-            return EquationResult.error("La reacción no es balanceable.");
 
         int lcm = 1;
 
@@ -135,9 +138,6 @@ class EquationService {
     }
 
     private boolean isBalanceable(Fraction[] solutions) {
-        if (solutions == null || solutions.length == 0)
-            return false;
-
         return Arrays.stream(solutions).noneMatch(Objects::isNull);
     }
 
@@ -301,7 +301,6 @@ class EquationService {
      * Parses string to get Hashtable representation of a side of a chemical equation.
      */
     private Hashtable<Integer, Hashtable<String, Integer>> parseString(String inputString) {
-        LinkedList<String> compoundStringTable = new LinkedList<>();
         Hashtable<Integer, Hashtable<String, Integer>> compoundTable = new Hashtable<>();
         StringBuilder storeString = new StringBuilder();
         Integer index = 0;
@@ -312,7 +311,6 @@ class EquationService {
             char c = inputString.charAt(j);
             if (Character.toString(c).equals("+")) {
                 if (storeString.length() > 0) {
-                    compoundStringTable.add(storeString.toString());
                     // Parse the coefficient
                     if (coefficientBuilder.length() > 0) {
                         coefficient = Integer.parseInt(coefficientBuilder.toString());
@@ -334,7 +332,6 @@ class EquationService {
             if (coefficientBuilder.length() > 0) {
                 coefficient = Integer.parseInt(coefficientBuilder.toString());
             }
-            compoundStringTable.add(storeString.toString());
             compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
         }
         return compoundTable;
