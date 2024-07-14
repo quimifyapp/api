@@ -20,6 +20,11 @@ class Formula {
         this.elementToMoles = elementToMoles;
     }
 
+    int molesOf(String element) {
+        Integer moles = elementToMoles.get(element);
+        return moles != null ? moles : 0;
+    }
+
     // Private:
 
     private static Map<String, Integer> parseFormula(String formula) {

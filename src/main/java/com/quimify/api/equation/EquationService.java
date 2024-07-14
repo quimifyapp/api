@@ -66,22 +66,19 @@ class EquationService {
         reactantsText = removeUnnecessaryCharacters(reactantsText);
         productsText = removeUnnecessaryCharacters(productsText);
 
-        LinkedHashSet<String> reactantsElements = getElements(reactantsText); // TODO type?
-        LinkedHashSet<String> productsElements = getElements(productsText);
+        Set<String> reactantsElements = elementsInSumOfFormulas(reactantsText);
+        Set<String> productsElements = elementsInSumOfFormulas(productsText);
 
         if (!reactantsElements.equals(productsElements))
             return EquationResult.error("Deben aparecer los mismos elementos en ambas partes de la reacción.");
 
-        String normalizedReactantString = normalizeEquation(reactantsText);
-        String normalizedProductString = normalizeEquation(productsText);
-
-        List<Hashtable<String, Integer>> reactants = parseString(normalizedReactantString); // TODO use Formula class?
-        List<Hashtable<String, Integer>> products = parseString(normalizedProductString);
+        List<Formula> reactants = separateFormulasInSumOfFormulas(reactantsText);
+        List<Formula> products = separateFormulasInSumOfFormulas(productsText);
 
         Matrix matrix = equationMatrix(reactants, products, reactantsElements);
         Fraction[] solutions = Mathematics.solve(matrix);
 
-        if (!isBalanceable(solutions))
+        if (notBalanceable(solutions))
             return EquationResult.error("La reacción no es balanceable.");
 
         Fraction[] solutionsAndOne = new Fraction[solutions.length + 1]; // TODO why?
@@ -107,151 +104,42 @@ class EquationService {
 
     // TODO fix all these methods:
 
-    private Matrix equationMatrix(List<Hashtable<String, Integer>> reactants, List<Hashtable<String, Integer>> products, LinkedHashSet<String> elements) {
+    private Matrix equationMatrix(List<Formula> reactants, List<Formula> products, Set<String> elements) {
         Matrix matrix = new Matrix(elements.size(), reactants.size() + products.size());
 
-        int currentIndex = 0;
+        // TODO just turn all products except last one into negative at the end of each iteration
 
+        int row = 0;
         for (String element : elements) {
-            int currentRowIndex = 0;
+            int column = 0;
 
-            for (int i = 0; i < reactants.size(); i++) {
-                Hashtable<String, Integer> results = reactants.get(i);
-                matrix.set(currentIndex, currentRowIndex, new Fraction(results.getOrDefault(element, 0)));
-                currentRowIndex += 1;
+            for (Formula formula : reactants) {
+                int moles = formula.molesOf(element);
+                Fraction fraction = new Fraction(moles);
+
+                matrix.set(row, column, fraction);
+                column++;
             }
 
-            for (int i = 0; i < products.size(); i++) {
-                Hashtable<String, Integer> results = products.get(i);
-                matrix.set(currentIndex, currentRowIndex, new Fraction(((products.size() - 1 == i ? 1 : -1) * results.getOrDefault(element, 0))));
-                currentRowIndex += 1;
+            for (Formula formula : products) {
+                int moles = formula.molesOf(element);
+                Fraction fraction = new Fraction(moles).negative(); // TODO why?
+
+                matrix.set(row, column, fraction);
+                column++;
             }
 
-            currentIndex += 1;
+            Fraction last = matrix.get(row, column - 1);
+            matrix.set(row, column - 1, last.negative()); // TODO why?
+
+            row++;
         }
 
         return matrix;
     }
 
-    private boolean isBalanceable(Fraction[] solutions) {
-        return Arrays.stream(solutions).noneMatch(Objects::isNull);
-    }
-
-    private static String normalizeEquation(String equation) {
-        StringBuilder normalizedEquation = new StringBuilder();
-        equation = equation.concat("++");
-        int coefficient = 1;
-        String multiDigitSuffix = "";
-        boolean isCoefficient = true;
-        int contador = 0;
-
-        while (contador < equation.length() - 2) {
-            char character = equation.charAt(contador);
-
-            if (Character.isDigit(character) && isCoefficient) {
-                String multiDigitCoefficient = "";
-                while (Character.isDigit(character)) {
-                    multiDigitCoefficient = multiDigitCoefficient.concat(String.valueOf(character));
-                    character = equation.charAt(contador + 1);
-                    contador++;
-                }
-                // Accumulate coefficient value if it's multi-digit
-                coefficient = Integer.parseInt(multiDigitCoefficient);
-            } else {
-                // Handle different scenarios based on the character encountered
-                switch (character) {
-                    case '+':
-                        // Reset for the next part of the equation
-                        isCoefficient = true;
-                        coefficient = 1;
-                        normalizedEquation.append(character);
-                        contador++;
-                        break;
-                    case '(':
-                        normalizedEquation.append(character);
-                        character = equation.charAt(contador + 1);
-                        while (character != ')') {
-                            normalizedEquation.append(character);
-                            contador++;
-                            character = equation.charAt(contador + 1);
-                        }
-                        contador++;
-                        break;
-                    case ')':
-                        isCoefficient = false;
-                        normalizedEquation.append(character);
-
-                        while (Character.isDigit(equation.charAt(contador + 1))) {
-                            character = equation.charAt(contador + 1);
-
-                            //Por si el sufijo tiene más de un caracter
-                            multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
-                            contador++;
-
-                            if (contador + 1 == equation.length()) {
-                                break;
-                            }
-                        }
-                        if (multiDigitSuffix.isEmpty())
-                            multiDigitSuffix = "1";
-
-                        normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
-                        contador++;
-                        multiDigitSuffix = "";
-                        break;
-                    default:
-                        // Apply coefficient to each element or compound
-                        isCoefficient = false;
-                        if (Character.isDigit(character)) {
-                            multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
-                            if (contador + 1 != equation.length()) {
-                                while (Character.isDigit(equation.charAt(contador + 1))) {
-                                    character = equation.charAt(contador + 1);
-
-                                    //Por si el sufijo tiene más de un caracter
-                                    multiDigitSuffix = multiDigitSuffix.concat(String.valueOf(character));
-                                    contador++;
-
-                                    if (contador + 1 == equation.length()) {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            normalizedEquation.append(coefficient * Integer.parseInt(multiDigitSuffix));
-                            multiDigitSuffix = "";
-                        } else {
-                            normalizedEquation.append(character);
-                            // Si un caracter es mayuscula y el siguiente también, en medio hay un coeficiente = 1
-                            // si un caracter es mayuscula, caracter + 1 minuscula y caracter + 2 mayusucla => coeficiente = 1
-                            if (Character.isUpperCase(character)
-                                    && (Character.isUpperCase(equation.charAt(contador + 1)) || equation.charAt(contador + 1) == '+'
-                                    || equation.charAt(contador + 1) == '(' || equation.charAt(contador + 1) == ')')
-                                /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()*/) {
-                                if (coefficient != 1) {
-                                    normalizedEquation.append(coefficient);
-                                }
-                            } else if (Character.isUpperCase(character)
-                                    && Character.isLowerCase(equation.charAt(contador + 1))
-                                    && (Character.isUpperCase(equation.charAt(contador + 2)) || equation.charAt(contador + 2) == '+'
-                                    || equation.charAt(contador + 2) == '(' || equation.charAt(contador + 2) == ')')
-                                    /*&& (contador + 1 <= equation.length()) || contador + 1 >= equation.length()
-                                    && (contador + 2 <= equation.length()) || contador + 2 >= equation.length()*/) {
-                                contador++;
-                                character = equation.charAt(contador);
-                                normalizedEquation.append(character);
-                                if (coefficient != 1) {
-                                    normalizedEquation.append(coefficient);
-                                }
-                            }
-                        }
-                        contador++;
-                        break;
-                }
-            }
-        }
-
-        return normalizedEquation.toString();
+    private boolean notBalanceable(Fraction[] solutions) {
+        return Arrays.stream(solutions).anyMatch(Objects::isNull);
     }
 
     /**
@@ -272,7 +160,7 @@ class EquationService {
     /**
      * Gets all elements used on a side an equation
      */
-    private static LinkedHashSet<String> getElements(String inputString) {
+    private static LinkedHashSet<String> elementsInSumOfFormulas(String inputString) {
         LinkedHashSet<String> elements = new LinkedHashSet<>();
         String elementString = "";
         char character = 0;
@@ -300,43 +188,14 @@ class EquationService {
     /**
      * Parses string to get Hashtable representation of a side of a chemical equation.
      */
-    private List<Hashtable<String, Integer>> parseString(String inputString) {
-        List<Hashtable<String, Integer>> compoundTable = new ArrayList<>();
+    private List<Formula> separateFormulasInSumOfFormulas(String sumOfFormulas) {
+        List<Formula> formulas = new ArrayList<>();
 
-        int coefficient = 1; // Default coefficient
+        for(String formula : sumOfFormulas.split("\\+"))
+            formulas.add(new Formula(formula));
 
-        StringBuilder coefficientBuilder = new StringBuilder(); // To handle multi-digit coefficients
-        StringBuilder storeString = new StringBuilder();
-
-        for (char c : inputString.toCharArray()) {
-
-            if (Character.toString(c).equals("+")) {
-                if (storeString.length() > 0) {
-                    // Parse the coefficient
-                    if (coefficientBuilder.length() > 0) {
-                        coefficient = Integer.parseInt(coefficientBuilder.toString());
-                        coefficientBuilder = new StringBuilder(); // Reset for next coefficient
-                    }
-                    compoundTable.add(parseCompound(storeString.toString(), coefficient));
-                    storeString = new StringBuilder();
-                    coefficient = 1; // Reset coefficient after processing a compound
-                }
-            } else if (Character.isDigit(c) && storeString.length() == 0) {
-                // If the character is a digit and storeString is empty, we're reading a coefficient
-                coefficientBuilder.append(c);
-            } else {
-                storeString.append(c);
-            }
-        }
-        if (storeString.length() > 0) {
-            if (coefficientBuilder.length() > 0) {
-                coefficient = Integer.parseInt(coefficientBuilder.toString());
-            }
-            compoundTable.add(parseCompound(storeString.toString(), coefficient));
-        }
-        return compoundTable;
+        return formulas;
     }
-
 
     /**
      * Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")
@@ -446,140 +305,6 @@ class EquationService {
 
         if (i < solutions.size() - 1)
             s.append(" + ");
-    }
-
-
-    /**
-     * Parses each compound to get Hashtable of elements and quantities in compound
-     */
-    private static Hashtable<String, Integer> parseCompound(String inputString, Integer coefficient) {
-        Hashtable<String, Integer> dictionary = new Hashtable<>();
-        String symbol = "";
-        String numString = "";
-        StringBuilder paranthesesStoreString = new StringBuilder();
-        boolean parenthesesOn = false;
-        boolean parenthesesEnd = false;
-        String parenthesesScaler = "";
-        for (int i = 0; i < inputString.length(); i++) {
-            char character = inputString.charAt(i);
-            if (Character.isLetter(character)) {
-                //Checks that this is a letter
-                if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
-                    if (!parenthesesOn && !parenthesesEnd) {
-                        //This is uppercase
-                        if (!symbol.isEmpty()) {
-                            //Symbol is filled and needs to be dumped
-                            int quantity = numString.isEmpty() ? 1 : Integer.parseInt(numString);
-                            // Apply the coefficient here
-                            quantity *= coefficient;
-
-                            if (dictionary.containsKey(symbol)) {
-                                // If the symbol is already in the dictionary, add the quantity
-                                dictionary.put(symbol, dictionary.get(symbol) + quantity);
-                            } else {
-                                // Otherwise, just put the new quantity in the dictionary
-                                dictionary.put(symbol, quantity);
-                            }
-                            symbol = "";
-                            numString = "";
-                        }
-                        symbol = symbol.concat(String.valueOf(character));
-                    } else if (parenthesesOn && !parenthesesEnd) {
-                        paranthesesStoreString.append(character);
-                    } else {
-                        Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-                        if (parenthesesScaler.isEmpty())
-                            parenthesesScaler = "1";
-                        for (String key : parenthesesParse.keySet()) {
-                            if (!dictionary.containsKey(key)) {
-                                dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
-                            } else {
-                                dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
-                            }
-                        }
-                        paranthesesStoreString = new StringBuilder();
-                        parenthesesEnd = false;
-                        parenthesesScaler = "";
-                        symbol = symbol.concat(String.valueOf(character));
-                    }
-                } else {
-                    if (!parenthesesOn)
-                        symbol = symbol.concat(String.valueOf(character));
-                    else
-                        paranthesesStoreString.append(character);
-                }
-            } else if (Character.isDigit(character)) {
-                //This is a number
-                if (!parenthesesOn && !parenthesesEnd) {
-                    numString = numString.concat(String.valueOf(character));
-                } else if (parenthesesEnd && !parenthesesOn) {
-                    parenthesesScaler += character;
-                } else if (!parenthesesEnd) {
-                    paranthesesStoreString.append(character);
-                }
-            } else if (character == '(') {
-                //Start Statement
-                if (!parenthesesEnd) {
-                    parenthesesOn = true;
-                    if (!dictionary.containsKey(symbol)) {
-                        try {
-                            dictionary.put(symbol, Integer.valueOf(numString));
-                        } catch (NumberFormatException exception) {
-                            dictionary.put(symbol, 1);
-                        }
-                    } else {
-                        try {
-                            dictionary.put(symbol, Integer.parseInt(numString) + dictionary.get(symbol));
-                        } catch (NumberFormatException exception) {
-                            dictionary.put(symbol, 1 + dictionary.get(symbol));
-                        }
-                    }
-                    symbol = "";
-                    numString = "";
-                } else {
-                    Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-                    if (parenthesesScaler.isEmpty())
-                        parenthesesScaler = "1";
-                    for (String key : parenthesesParse.keySet()) {
-                        if (!dictionary.containsKey(key)) {
-                            dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
-                        } else {
-                            dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
-                        }
-                    }
-                    paranthesesStoreString = new StringBuilder();
-                    parenthesesOn = true;
-                    parenthesesEnd = false;
-                    parenthesesScaler = "";
-                }
-            } else if (character == ')') {
-                //End statement
-                parenthesesEnd = true;
-                parenthesesOn = false;
-            }
-        }
-        if (!parenthesesEnd) {
-            if (numString.isEmpty()) {
-                numString = "1";
-            }
-            if (!dictionary.containsKey(symbol)) {
-                dictionary.put(symbol, Integer.valueOf(numString));
-            } else {
-                dictionary.put(symbol, Integer.parseInt(numString) + dictionary.get(symbol));
-            }
-        } else {
-            Hashtable<String, Integer> parenthesesParse = parseCompound(paranthesesStoreString.toString(), coefficient);
-            if (parenthesesScaler.isEmpty())
-                parenthesesScaler = "1";
-            for (String key : parenthesesParse.keySet()) {
-                if (!dictionary.containsKey(key)) {
-                    dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler));
-                } else {
-                    dictionary.put(key, parenthesesParse.get(key) * Integer.parseInt(parenthesesScaler) + dictionary.get(key));
-                }
-            }
-        }
-        return dictionary;
     }
 
     // TODO remove
