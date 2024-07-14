@@ -3,6 +3,7 @@ package com.quimify.api.equation;
 import com.quimify.api.error.ErrorService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -28,7 +29,7 @@ class EquationService {
     // **********************************************************************************************************
     // **********************************************************************************************************
     // **********************************************************************************************************
-    // TODO rewrite this awful code from the internet
+    // TODO rewrite this awful code from the internet (in progress)
     // **********************************************************************************************************
     // **********************************************************************************************************
     // **********************************************************************************************************
@@ -61,7 +62,7 @@ class EquationService {
 
     // Private:
 
-    // TODO split in different methods
+    // TODO clean this code:
     private EquationResult balance(String reactantsText, String productsText) {
         reactantsText = removeUnnecessaryCharacters(reactantsText);
         productsText = removeUnnecessaryCharacters(productsText);
@@ -102,8 +103,7 @@ class EquationService {
         return new EquationResult(resultReactants, resultProducts);
     }
 
-    // TODO fix all these methods:
-
+    // TODO clean this code:
     private Matrix equationMatrix(List<Formula> reactants, List<Formula> products, Set<String> elements) {
         Matrix matrix = new Matrix(elements.size(), reactants.size() + products.size());
 
@@ -142,30 +142,31 @@ class EquationService {
         return Arrays.stream(solutions).anyMatch(Objects::isNull);
     }
 
+    // TODO clean this code:
     /**
      * Converts FractionComponents into integers for final formatting for either reactant or product side.
      */
-    // TODO type?
-    private static LinkedList<Integer> implementSubstitution(Fraction[] arr) {
-        LinkedList<Integer> finalCoefficients = new LinkedList<>();
+    private static List<Integer> implementSubstitution(Fraction[] arr) {
+        List<Integer> finalCoefficients = new ArrayList<>();
 
         for (Fraction f : arr) {
             // TODO check denominator is 1
-            finalCoefficients.addLast(f.getNumerator());
+            finalCoefficients.add(f.getNumerator());
         }
 
         return finalCoefficients;
     }
 
+    // TODO clean this code:
     /**
      * Gets all elements used on a side an equation
      */
-    private static LinkedHashSet<String> elementsInSumOfFormulas(String inputString) {
+    private static Set<String> elementsInSumOfFormulas(String sumOfFormulas) {
         LinkedHashSet<String> elements = new LinkedHashSet<>();
         String elementString = "";
         char character = 0;
-        for (int i = 0; i < inputString.length(); i++) {
-            character = inputString.charAt(i);
+        for (int i = 0; i < sumOfFormulas.length(); i++) {
+            character = sumOfFormulas.charAt(i);
             if (Character.isLetter(character)) {
                 if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
                     if (!elementString.isEmpty()) {
@@ -185,18 +186,11 @@ class EquationService {
         return elements;
     }
 
-    /**
-     * Parses string to get Hashtable representation of a side of a chemical equation.
-     */
     private List<Formula> separateFormulasInSumOfFormulas(String sumOfFormulas) {
-        List<Formula> formulas = new ArrayList<>();
-
-        for(String formula : sumOfFormulas.split("\\+"))
-            formulas.add(new Formula(formula));
-
-        return formulas;
+        return Arrays.stream(sumOfFormulas.split("\\+")).map(Formula::new).collect(Collectors.toList());
     }
 
+    // TODO clean this code:
     /**
      * Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")
      */
@@ -250,10 +244,11 @@ class EquationService {
         return sb.toString();
     }
 
+    // TODO clean this code:
     /**
      * String formatting of solution
      */
-    private static String formatSolution(String originalString, LinkedList<Integer> solutions) {
+    private static String formatSolution(String originalString, List<Integer> solutions) {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
         String coefficientHandler = "";
@@ -287,7 +282,8 @@ class EquationService {
         return s.toString();
     }
 
-    private static void appendElement(String[] arr, int i, StringBuilder s, LinkedList<Integer> solutions, int newCoefficient) {
+    // TODO clean this code:
+    private static void appendElement(String[] arr, int i, StringBuilder s, List<Integer> solutions, int newCoefficient) {
 
         if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
             s.append(arr[i]);
@@ -307,7 +303,7 @@ class EquationService {
             s.append(" + ");
     }
 
-    // TODO remove
+    // TODO remove:
     String testTemporal() {
         // 1
         if (!balance("2H + O", "H3O").getBalancedEquation().equals("6H + 2O = 2(H3O)"))
