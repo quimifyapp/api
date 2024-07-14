@@ -75,8 +75,8 @@ class EquationService {
         String normalizedReactantString = normalizeEquation(reactantsText);
         String normalizedProductString = normalizeEquation(productsText);
 
-        Hashtable<Integer, Hashtable<String, Integer>> reactants = parseString(normalizedReactantString); // TODO use Formula class?
-        Hashtable<Integer, Hashtable<String, Integer>> products = parseString(normalizedProductString);
+        List<Hashtable<String, Integer>> reactants = parseString(normalizedReactantString); // TODO use Formula class?
+        List<Hashtable<String, Integer>> products = parseString(normalizedProductString);
 
         Matrix matrix = equationMatrix(reactants, products, reactantsElements);
         Fraction[] solutions = Mathematics.solve(matrix);
@@ -107,7 +107,7 @@ class EquationService {
 
     // TODO fix all these methods:
 
-    private Matrix equationMatrix(Hashtable<Integer, Hashtable<String, Integer>> reactants, Hashtable<Integer, Hashtable<String, Integer>> products, LinkedHashSet<String> elements) {
+    private Matrix equationMatrix(List<Hashtable<String, Integer>> reactants, List<Hashtable<String, Integer>> products, LinkedHashSet<String> elements) {
         Matrix matrix = new Matrix(elements.size(), reactants.size() + products.size());
 
         int currentIndex = 0;
@@ -300,15 +300,16 @@ class EquationService {
     /**
      * Parses string to get Hashtable representation of a side of a chemical equation.
      */
-    private Hashtable<Integer, Hashtable<String, Integer>> parseString(String inputString) {
-        Hashtable<Integer, Hashtable<String, Integer>> compoundTable = new Hashtable<>();
-        StringBuilder storeString = new StringBuilder();
-        Integer index = 0;
-        int coefficient = 1; // Default coefficient
-        StringBuilder coefficientBuilder = new StringBuilder(); // To handle multi-digit coefficients
+    private List<Hashtable<String, Integer>> parseString(String inputString) {
+        List<Hashtable<String, Integer>> compoundTable = new ArrayList<>();
 
-        for (int j = 0; j < inputString.length(); j++) {
-            char c = inputString.charAt(j);
+        int coefficient = 1; // Default coefficient
+
+        StringBuilder coefficientBuilder = new StringBuilder(); // To handle multi-digit coefficients
+        StringBuilder storeString = new StringBuilder();
+
+        for (char c : inputString.toCharArray()) {
+
             if (Character.toString(c).equals("+")) {
                 if (storeString.length() > 0) {
                     // Parse the coefficient
@@ -316,9 +317,8 @@ class EquationService {
                         coefficient = Integer.parseInt(coefficientBuilder.toString());
                         coefficientBuilder = new StringBuilder(); // Reset for next coefficient
                     }
-                    compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
+                    compoundTable.add(parseCompound(storeString.toString(), coefficient));
                     storeString = new StringBuilder();
-                    index++;
                     coefficient = 1; // Reset coefficient after processing a compound
                 }
             } else if (Character.isDigit(c) && storeString.length() == 0) {
@@ -332,7 +332,7 @@ class EquationService {
             if (coefficientBuilder.length() > 0) {
                 coefficient = Integer.parseInt(coefficientBuilder.toString());
             }
-            compoundTable.put(index, parseCompound(storeString.toString(), coefficient));
+            compoundTable.add(parseCompound(storeString.toString(), coefficient));
         }
         return compoundTable;
     }
