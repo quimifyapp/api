@@ -67,19 +67,13 @@ public class MolecularMassService {
     }
 
     public HealthResult checkHealth() {
-        try {
-            String testFormula = "H"; // Expected ~1.00794
-            MolecularMassResult result1 = tryCalculate(testFormula);
-            if (!result1.isPresent()) {
-                throw new RuntimeException("Error calculating molecular mass: " + testFormula);
-            }
-
-            return new HealthResult(true, "Molecular mass health check successful");
-
-        } catch (Exception e) {
-            logger.error("Error in molecular mass health check", e);
-            return new HealthResult(false, e.getMessage());
+        String testFormula = "H"; // Expected ~1.00794
+        MolecularMassResult result1 = tryCalculate(testFormula);
+        if (!result1.isPresent()) {
+            return new HealthResult(false, "Error calculating molecular mass: " + testFormula);
         }
+
+        return new HealthResult(true, "Molecular mass health check successful");
     }
 
     // Client:

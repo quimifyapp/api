@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HealthResult {
-    private boolean present;
+    private boolean healthy;
     private String message;
     private List<String> errors;
 
-    public HealthResult(boolean present, String message) {
-        this.present = present;
+    public HealthResult(boolean healthy, String message) {
+        this.healthy = healthy;
         this.message = message;
         this.errors = new ArrayList<>();
     }
 
-    public HealthResult(boolean present, String message, String error) {
-        this(present, message);
+    public HealthResult(boolean healthy, String message, String error) {
+        this(healthy, message);
         this.errors.add(error);
     }
 
@@ -24,13 +24,13 @@ public class HealthResult {
     }
 
     // Getters
-    public boolean isPresent() {
-        return present && errors.isEmpty(); // Check both conditions Just in case
+    public boolean isHealthy() {
+        return healthy && errors.isEmpty(); // Check both conditions Just in case
     }
 
-    public boolean setPresent(boolean present) {
-        this.present = present;
-        return this.present;
+    public boolean setHealthy(boolean healthy) {
+        this.healthy = healthy;
+        return this.healthy;
     }
 
     public String setMessage(String message) {

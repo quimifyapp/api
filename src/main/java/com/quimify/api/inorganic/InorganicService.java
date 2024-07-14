@@ -60,18 +60,12 @@ public class InorganicService {
     // Internal:
 
     public HealthResult checkHealth() {
-        try {
-            Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
-            if (cachedId.isEmpty()) {
-                throw new RuntimeException("Error al acceder al caché de inorgánicos");
-            }
-
-            return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
-
-        } catch (Exception e) {
-            logger.error("Error en la comprobación de salud de inorgánicos", e);
-            return new HealthResult(false, e.getMessage());
+        Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
+        if (cachedId.isEmpty()) {
+            return new HealthResult(false, "Error al acceder al caché de inorgánicos");
         }
+
+        return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
     }
 
     // Client:

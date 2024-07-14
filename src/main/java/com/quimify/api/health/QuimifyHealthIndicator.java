@@ -21,7 +21,7 @@ class QuimifyHealthIndicator implements HealthIndicator {
     public Health health() {
         HealthResult healthResult = healthService.health();
 
-        if (healthResult.isPresent()) {
+        if (healthResult.isHealthy()) {
             return new Health.Builder()
                     .up()
                     .withDetail("message", healthResult.getMessage())

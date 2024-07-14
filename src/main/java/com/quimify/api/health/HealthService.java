@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.error.ErrorService;
 import com.quimify.api.inorganic.InorganicService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.organic.OrganicService;
@@ -14,21 +13,17 @@ import com.quimify.api.organic.OrganicService;
 @RequestScope // For doing unique every Health Request and errors, then deleting everything
 class HealthService {
 
-    public final InorganicService inorganicService;
-    public final OrganicService organicService;
-    public final MolecularMassService molecularMassService;
-    public final ClassificationService classificatService;
+    @Autowired
+    public InorganicService inorganicService;
 
     @Autowired
-    ErrorService errorService;
+    public OrganicService organicService;
 
-    public HealthService(InorganicService inorganicService, OrganicService organicService,
-            MolecularMassService molecularMassService, ClassificationService classificationService) {
-        this.inorganicService = inorganicService;
-        this.organicService = organicService;
-        this.molecularMassService = molecularMassService;
-        this.classificatService = classificationService;
-    }
+    @Autowired
+    public MolecularMassService molecularMassService;
+
+    @Autowired
+    public ClassificationService classificatService;
 
     public HealthResult health() {
         HealthResult overallHealth = new HealthResult(false, ""); // Start pessimistic, no errors yet
@@ -41,7 +36,7 @@ class HealthService {
 
         // Update the final message and overall status
         if (overallHealth.getErrors().isEmpty()) {
-            overallHealth.setPresent(true);
+            overallHealth.setHealthy(true);
             overallHealth.setMessage("All systems operational");
         } else {
             overallHealth.setMessage("System errors detected: " + overallHealth.getErrors()); // Include errors in
@@ -52,10 +47,9 @@ class HealthService {
     }
 
     private void checkAndAggregateErrors(HealthResult overallHealth, HealthResult subSystemHealth) {
-        if (!subSystemHealth.isPresent()) {
-            overallHealth.setPresent(false);
+        if (!subSystemHealth.isHealthy()) {
+            overallHealth.setHealthy(false);
             overallHealth.addError(subSystemHealth.getMessage());
-            ;
         }
     }
 }

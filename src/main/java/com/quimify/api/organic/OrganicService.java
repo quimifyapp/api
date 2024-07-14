@@ -58,29 +58,23 @@ public class OrganicService {
     // Internal:
 
     public HealthResult checkHealth() {
-        try {
-            String testCompoundName = "metano";
-            int[] testCompoundStructure = { 0, 18 };
+        String testCompoundName = "metano";
+        int[] testCompoundStructure = { 0, 18 };
 
-            // 1. Check name-to-structure resolution
-            Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
-            if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
-                throw new RuntimeException("Error resolving organic compound from name: " + testCompoundName);
-            }
-
-            // 2. Check structure-to-name resolution
-            OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
-            if (!resultFromStructure.isFound()) {
-                throw new RuntimeException(
-                        "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
-            }
-
-            return new HealthResult(true, "Organic health check successful");
-
-        } catch (Exception e) {
-            logger.error("Error in organic health check", e);
-            return new HealthResult(false, e.getMessage());
+        // 1. Check name-to-structure resolution
+        Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
+        if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
+            return new HealthResult(false, "Error resolving organic compound from name: " + testCompoundName);
         }
+
+        // 2. Check structure-to-name resolution
+        OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
+        if (!resultFromStructure.isFound()) {
+            return new HealthResult(false,
+                    "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
+        }
+
+        return new HealthResult(true, "Organic health check successful");
     }
 
     // Client:

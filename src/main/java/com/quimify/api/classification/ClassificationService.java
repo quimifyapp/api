@@ -49,21 +49,15 @@ public class ClassificationService {
     }
 
     public HealthResult checkHealth() {
-        try {
-            String testFormula = "h2o";
+        String testFormula = "h2o";
 
-            Optional<Classification> inorganicFormulaResult = classify(testFormula);
+        Optional<Classification> inorganicFormulaResult = classify(testFormula);
 
-            if (inorganicFormulaResult.isEmpty() || inorganicFormulaResult.get() != Classification.inorganicFormula) {
-                throw new RuntimeException("Error classifying inorganic formula: " + testFormula);
-            }
-
-            return new HealthResult(true, "Classification health check successful");
-
-        } catch (Exception e) {
-            logger.error("Error in classification health check", e);
-            return new HealthResult(false, e.getMessage());
+        if (inorganicFormulaResult.isEmpty() || inorganicFormulaResult.get() != Classification.inorganicFormula) {
+            return new HealthResult(false, "Error classifying inorganic formula: " + testFormula);
         }
+
+        return new HealthResult(true, "Classification health check successful");
     }
 
     // Private:
