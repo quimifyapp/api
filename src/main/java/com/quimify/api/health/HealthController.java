@@ -1,5 +1,7 @@
 package com.quimify.api.health;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +19,8 @@ public class HealthController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @GetMapping
-    public HealthResult getHealth() {
-        HealthResult healthResult = healthService.health();
+    public Map<String, Object> getHealth() {
+        Map<String, Object> healthResult = healthService.health();
         logger.info("Health Check: {}", healthResult);
         return healthResult;
     }

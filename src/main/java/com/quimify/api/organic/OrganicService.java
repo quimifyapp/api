@@ -12,7 +12,7 @@ import com.quimify.api.classification.Classification;
 import com.quimify.api.classification.ClassificationService;
 import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthResult;
+import com.quimify.api.health.HealthCheck;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -26,7 +26,7 @@ import com.quimify.organic.molecules.openchain.Simple;
 // This class implements the logic behind HTTP methods in "/organic".
 
 @Service
-public class OrganicService {
+public class OrganicService implements HealthCheck {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -57,24 +57,24 @@ public class OrganicService {
 
     // Internal:
 
-    public HealthResult checkHealth() {
+    public String checkHealth() {
         String testCompoundName = "metano";
         int[] testCompoundStructure = { 0, 18 };
 
         // 1. Check name-to-structure resolution
         Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
         if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
-            return new HealthResult(false, "Error resolving organic compound from name: " + testCompoundName);
+            return "Error resolving organic compound from name: " + testCompoundName;
         }
 
-        // 2. Check structure-to-name resolution
+        // 2. Check structure-to-name resolution (only if name-to-structure was
+        // successful)
         OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
         if (!resultFromStructure.isFound()) {
-            return new HealthResult(false,
-                    "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure));
+            return "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure);
         }
 
-        return new HealthResult(true, "Organic health check successful");
+        return null;
     }
 
     // Client:

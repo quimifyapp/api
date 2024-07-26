@@ -1,5 +1,9 @@
 package com.quimify.api.health;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -13,6 +17,8 @@ import com.quimify.api.organic.OrganicService;
 @RequestScope // For doing unique every Health Request and errors, then deleting everything
 class HealthService {
 
+    private final List<HealthCheck> healthChecks;
+
     @Autowired
     public InorganicService inorganicService;
 
@@ -25,31 +31,27 @@ class HealthService {
     @Autowired
     public ClassificationService classificatService;
 
-    public HealthResult health() {
-        HealthResult overallHealth = new HealthResult(false, ""); // Start pessimistic, no errors yet
-
-        // Check all systems
-        checkAndAggregateErrors(overallHealth, inorganicService.checkHealth());
-        checkAndAggregateErrors(overallHealth, organicService.checkHealth());
-        checkAndAggregateErrors(overallHealth, molecularMassService.checkHealth());
-        checkAndAggregateErrors(overallHealth, classificatService.checkHealth());
-
-        // Update the final message and overall status
-        if (overallHealth.getErrors().isEmpty()) {
-            overallHealth.setHealthy(true);
-            overallHealth.setMessage("All systems operational");
-        } else {
-            overallHealth.setMessage("System errors detected: " + overallHealth.getErrors()); // Include errors in
-                                                                                              // message
-        }
-
-        return overallHealth;
+    public HealthService(List<HealthCheck> healthChecks) { // Inject all HealthCheck implementations
+        this.healthChecks = healthChecks;
     }
 
-    private void checkAndAggregateErrors(HealthResult overallHealth, HealthResult subSystemHealth) {
-        if (!subSystemHealth.isHealthy()) {
-            overallHealth.setHealthy(false);
-            overallHealth.addError(subSystemHealth.getMessage());
+    public Map<String, Object> health() {
+        HealthResult overallHealth = new HealthResult();
+
+        for (HealthCheck check : healthChecks) {
+            String errorMessage = check.checkHealth();
+            if (errorMessage != null) {
+                overallHealth.addError(errorMessage);
+            }
         }
+
+        // Construct the response map directly
+        Map<String, Object> response = new HashMap<>();
+        response.put("healthy", overallHealth.isHealthy());
+        if (!overallHealth.isHealthy()) {
+            response.put("errors", overallHealth.getErrors());
+        }
+
+        return response;
     }
 }

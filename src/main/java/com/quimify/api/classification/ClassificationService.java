@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthResult;
+import com.quimify.api.health.HealthCheck;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.utils.Connection;
 import com.quimify.api.utils.Normalizer;
@@ -16,7 +16,7 @@ import com.quimify.api.utils.Normalizer;
 // This class classifies input and handles calls to the Quimify Classifier AI API when necessary.
 
 @Service
-public class ClassificationService {
+public class ClassificationService implements HealthCheck {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,16 +48,16 @@ public class ClassificationService {
         return classification == Classification.inorganicFormula || classification == Classification.inorganicName;
     }
 
-    public HealthResult checkHealth() {
+    public String checkHealth() {
         String testFormula = "h2o";
 
         Optional<Classification> inorganicFormulaResult = classify(testFormula);
 
         if (inorganicFormulaResult.isEmpty() || inorganicFormulaResult.get() != Classification.inorganicFormula) {
-            return new HealthResult(false, "Error classifying inorganic formula: " + testFormula);
+            return "Error classifying inorganic formula: " + testFormula;
         }
 
-        return new HealthResult(true, "Classification health check successful");
+        return null;
     }
 
     // Private:

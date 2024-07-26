@@ -15,14 +15,14 @@ import org.springframework.util.StringUtils;
 import com.quimify.api.element.ElementModel;
 import com.quimify.api.element.ElementService;
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthResult;
+import com.quimify.api.health.HealthCheck;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
 
 // Esta clase procesa las masas moleculares.
 
 @Service
-public class MolecularMassService {
+public class MolecularMassService implements HealthCheck {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,14 +66,10 @@ public class MolecularMassService {
         return molecularMass;
     }
 
-    public HealthResult checkHealth() {
+    public String checkHealth() {
         String testFormula = "H"; // Expected ~1.00794
         MolecularMassResult result1 = tryCalculate(testFormula);
-        if (!result1.isPresent()) {
-            return new HealthResult(false, "Error calculating molecular mass: " + testFormula);
-        }
-
-        return new HealthResult(true, "Molecular mass health check successful");
+        return !result1.isPresent() ? "Error calculating molecular mass: " + testFormula : null;
     }
 
     // Client:

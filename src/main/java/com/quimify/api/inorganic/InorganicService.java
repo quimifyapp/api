@@ -11,7 +11,7 @@ import com.quimify.api.classification.Classification;
 import com.quimify.api.classification.ClassificationService;
 import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthResult;
+import com.quimify.api.health.HealthCheck;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -20,7 +20,7 @@ import com.quimify.api.utils.Normalizer;
 // This class implements the logic behind HTTP methods in "/inorganic".
 
 @Service
-public class InorganicService {
+public class InorganicService implements HealthCheck {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -58,14 +58,9 @@ public class InorganicService {
     ErrorService errorService;
 
     // Internal:
-
-    public HealthResult checkHealth() {
+    public String checkHealth() {
         Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
-        if (cachedId.isEmpty()) {
-            return new HealthResult(false, "Error al acceder al caché de inorgánicos");
-        }
-
-        return new HealthResult(true, "Comprobación de salud de inorgánicos exitosa");
+        return cachedId.isEmpty() ? "Error accessing inorganic cache" : null;
     }
 
     // Client:
