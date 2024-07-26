@@ -8,7 +8,7 @@ class HealthResult {
     private List<String> errors;
 
     // Constructor defaults to healthy with no errors
-    private HealthResult() {
+    HealthResult() {
         this.healthy = true;
         this.errors = new ArrayList<>();
     }
