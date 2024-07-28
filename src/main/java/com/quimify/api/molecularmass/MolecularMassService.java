@@ -1,21 +1,22 @@
 package com.quimify.api.molecularmass;
 
-import com.quimify.api.element.ElementModel;
-import com.quimify.api.element.ElementService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-// Esta clase procesa las masas moleculares.
+import com.quimify.api.element.ElementModel;
+import com.quimify.api.element.ElementService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
 
 @Service
 public class MolecularMassService {
@@ -37,6 +38,12 @@ public class MolecularMassService {
     MetricsService metricsService;
 
     // Internal:
+
+    public boolean isHealthy() {
+        String testFormula = "H"; // Expected ~1.00794
+        MolecularMassResult result = tryCalculate(testFormula);
+        return result.isPresent();
+    }
 
     public Optional<Float> get(String formula) { // TODO just use tryCalculate?
         Optional<Float> molecularMass;
@@ -87,7 +94,6 @@ public class MolecularMassService {
 
         return molecularMassResult;
     }
-
     // Private:
 
     private MolecularMassResult calculate(String formula) { // TODO translate code
@@ -162,10 +168,10 @@ public class MolecularMassService {
                         if (matcher.find()) {
                             digitos = matcher.group(1);
                             moles = !digitos.isEmpty() ? Integer.parseInt(digitos) : 1;
-                        }
-                        else moles = 1;
-                    }
-                    else moles = 1;
+                        } else
+                            moles = 1;
+                    } else
+                        moles = 1;
 
                     addInMap(anidada.toString(), moles, anidada_a_moles); // Registra la fórmula anidada
 
@@ -194,7 +200,8 @@ public class MolecularMassService {
             if (anidados.isPresent())
                 for (Map.Entry<String, Integer> elemento : anidados.get().entrySet())
                     addInMap(elemento.getKey(), elemento.getValue() * anidada.getValue(), elemento_a_moles);
-            else return Optional.empty();
+            else
+                return Optional.empty();
         }
 
         // Procesa lo que no va entre paréntesis:
@@ -215,7 +222,8 @@ public class MolecularMassService {
             }
 
             resultado = Optional.of(elemento_a_moles);
-        } else resultado = Optional.empty();
+        } else
+            resultado = Optional.empty();
 
         return resultado;
     }
@@ -225,7 +233,8 @@ public class MolecularMassService {
 
         if (found != null)
             map.replace(key, found + value); // It was present, values are added
-        else map.put(key, value); // New element
+        else
+            map.put(key, value); // New element
     }
 
     private Optional<Float> getMolecularMassOf(String symbol) {

@@ -1,30 +1,31 @@
 package com.quimify.api.organic;
 
-import com.quimify.api.classification.Classification;
-import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.correction.CorrectionService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.molecularmass.MolecularMassService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
-import com.quimify.organic.OrganicFactory;
-import com.quimify.organic.Organic;
-import com.quimify.organic.components.Group;
-import com.quimify.organic.components.Substituent;
-import com.quimify.organic.molecules.openchain.OpenChain;
-import com.quimify.organic.molecules.openchain.Simple;
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Optional;
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
+import com.quimify.api.correction.CorrectionService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.molecularmass.MolecularMassService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
+import com.quimify.organic.Organic;
+import com.quimify.organic.OrganicFactory;
+import com.quimify.organic.components.Group;
+import com.quimify.organic.components.Substituent;
+import com.quimify.organic.molecules.openchain.OpenChain;
+import com.quimify.organic.molecules.openchain.Simple;
 
 // This class implements the logic behind HTTP methods in "/organic".
 
 @Service
-class OrganicService {
+public class OrganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,6 +53,24 @@ class OrganicService {
     // Constants:
 
     static final int carbonInputCode = -1;
+
+    // Internal:
+
+    public boolean isHealthy() {
+        return checkStructureToNameHealth() && checkNameToStructureHealth();
+    }
+
+    private boolean checkStructureToNameHealth() {
+        int[] testInputSequence = {0, 18};
+        OrganicResult resultFromStructure = tryGetFromStructure(testInputSequence);
+        return resultFromStructure.isFound();
+    }
+
+    private boolean checkNameToStructureHealth() {
+        String testName = "metano";
+        Optional<OrganicResult> resultFromName = tryGetFromName(testName);
+        return resultFromName.isPresent() && resultFromName.get().isFound();
+    }
 
     // Client:
 
@@ -193,8 +212,8 @@ class OrganicService {
                 int carbonCount = inputSequence[++i];
 
                 openChain = openChain.bond(Substituent.radical(carbonCount, iso));
-            }
-            else openChain = openChain.bond(group);
+            } else
+                openChain = openChain.bond(group);
         }
 
         return openChain;

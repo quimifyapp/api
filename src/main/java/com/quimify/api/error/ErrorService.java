@@ -27,19 +27,19 @@ public class ErrorService {
     public void log(String title, String details, Class<?> location) {
         ErrorModel errorModel = new ErrorModel();
 
-        String locationName = location.getName().replaceAll(".*\\.", "");
+        String locationNameWithoutPackages = location.getName().replaceAll(".*\\.", "");
 
         errorModel.setDateAndTime(Timestamp.from(Instant.now()));
         errorModel.setTitle(title);
         errorModel.setDetails(details);
-        errorModel.setLocation(locationName);
+        errorModel.setLocation(locationNameWithoutPackages);
 
         try {
             errorRepository.save(errorModel);
             LoggerFactory.getLogger(location).error("{}. Details saved in database.", title);
         } catch (Exception exception) {
             logger.error("Exception saving error in DB. Location: {}. Exception: \"{}\". Title: \"{}\". " +
-                    "Details: \"{}\". ", locationName, exception, title, details);
+                    "Details: \"{}\". ", locationNameWithoutPackages, exception, title, details);
         }
 
         metricsService.errorOccurred();

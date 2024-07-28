@@ -1,17 +1,16 @@
 package com.quimify.api.classification;
 
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.settings.SettingsService;
-import com.quimify.api.utils.Connection;
-import com.quimify.api.utils.Normalizer;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
-// This class classifies input and handles calls to the Quimify Classifier AI API when necessary.
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.settings.SettingsService;
+import com.quimify.api.utils.Connection;
+import com.quimify.api.utils.Normalizer;
 
 @Service
 public class ClassificationService {
@@ -27,19 +26,19 @@ public class ClassificationService {
     @Autowired
     ErrorService errorService;
 
+    // Internal:
+
+    public boolean isHealthy() {
+        String testInput = "h2o";
+        Classification testResult = Classification.inorganicFormula;
+        Optional<Classification> result = classify(testInput, true);
+        return result.isPresent() && result.get() == testResult;
+    }
+
     // Public:
 
     public Optional<Classification> classify(String input) {
-        String adaptedInput = Normalizer.getWithSpacesAndSymbols(input);
-
-        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
-            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
-                logger.warn("Classified \"{}\" with DB: {}.", input, classificationModel.getClassification());
-
-                return filteredResult(input, classificationModel.getClassification());
-            }
-
-        return classifyWithAi(input);
+        return classify(input, false);
     }
 
     public boolean isInorganic(Classification classification) {
@@ -48,7 +47,21 @@ public class ClassificationService {
 
     // Private:
 
-    private Optional<Classification> classifyWithAi(String input) {
+    private Optional<Classification> classify(String input, boolean silent) {
+        String adaptedInput = Normalizer.getWithSpacesAndSymbols(input);
+
+        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
+            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
+                if(!silent)
+                    logger.warn("Classified \"{}\" with DB: {}.", input, classificationModel.getClassification());
+
+                return filteredResult(input, classificationModel.getClassification());
+            }
+
+        return classifyWithAi(input, silent);
+    }
+
+    private Optional<Classification> classifyWithAi(String input, boolean silent) {
         try {
             String name = new Connection(settingsService.getClassifierAiUrl(), input).getText();
 
@@ -59,7 +72,8 @@ public class ClassificationService {
 
             Classification classification = Classification.valueOf(name);
 
-            logger.warn("Classified \"{}\" with AI: {}.", input, classification);
+            if(!silent)
+                logger.warn("Classified \"{}\" with AI: {}.", input, classification);
 
             return filteredResult(input, classification);
         } catch (Exception exception) {

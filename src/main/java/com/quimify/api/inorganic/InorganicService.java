@@ -1,24 +1,23 @@
 package com.quimify.api.inorganic;
 
-import com.quimify.api.classification.Classification;
-import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.correction.CorrectionService;
-import com.quimify.api.error.ErrorService;
-import com.quimify.api.molecularmass.MolecularMassService;
-import com.quimify.api.notfoundquery.NotFoundQueryService;
-import com.quimify.api.metrics.MetricsService;
-import com.quimify.api.utils.Normalizer;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-// This class implements the logic behind HTTP methods in "/inorganic".
+import com.quimify.api.classification.Classification;
+import com.quimify.api.classification.ClassificationService;
+import com.quimify.api.correction.CorrectionService;
+import com.quimify.api.error.ErrorService;
+import com.quimify.api.metrics.MetricsService;
+import com.quimify.api.molecularmass.MolecularMassService;
+import com.quimify.api.notfoundquery.NotFoundQueryService;
+import com.quimify.api.utils.Normalizer;
 
 @Service
-class InorganicService {
+public class InorganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -54,6 +53,13 @@ class InorganicService {
 
     @Autowired
     ErrorService errorService;
+
+    // Internal:
+
+    public boolean isHealthy() {
+        Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
+        return cachedId.isPresent();
+    }
 
     // Client:
 
@@ -235,7 +241,8 @@ class InorganicService {
 
         if (inorganicModel.isPresent())
             inorganicModel.get().countSearch();
-        else logger.warn("Discrepancy between DB and cached ID: {}", id.get());
+        else
+            logger.warn("Discrepancy between DB and cached ID: {}", id.get());
 
         return inorganicModel;
     }
