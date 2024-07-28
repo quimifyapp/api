@@ -1,9 +1,9 @@
 package com.quimify.api.health;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.quimify.api.error.ErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -14,44 +14,47 @@ import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.organic.OrganicService;
 
 @Service
-@RequestScope // For doing unique every Health Request and errors, then deleting everything
+@RequestScope
 class HealthService {
 
-    private final List<HealthCheck> healthChecks;
+    @Autowired
+    InorganicService inorganicService;
 
     @Autowired
-    public InorganicService inorganicService;
+    OrganicService organicService;
 
     @Autowired
-    public OrganicService organicService;
+    MolecularMassService molecularMassService;
 
     @Autowired
-    public MolecularMassService molecularMassService;
+    ClassificationService classificationService;
 
     @Autowired
-    public ClassificationService classificatService;
+    ErrorService errorService;
 
-    public HealthService(List<HealthCheck> healthChecks) { // Inject all HealthCheck implementations
-        this.healthChecks = healthChecks;
+    // Public:
+
+    public HealthResult checkHealth() {
+        List<String> errors = new ArrayList<>();
+
+        addErrorIfUnhealthy(inorganicService.isHealthy(), inorganicService.getClass().getName(), errors);
+        addErrorIfUnhealthy(organicService.isHealthy(), organicService.getClass().getName(), errors);
+        addErrorIfUnhealthy(molecularMassService.isHealthy(), molecularMassService.getClass().getName(), errors);
+        addErrorIfUnhealthy(classificationService.isHealthy(), classificationService.getClass().getName(), errors);
+
+        if (!errors.isEmpty())
+            errorService.log("Unhealthy services", errors.toString(), getClass());
+
+        return new HealthResult(errors.isEmpty(), errors);
     }
 
-    public Map<String, Object> health() {
-        HealthResult overallHealth = new HealthResult();
+    // Private:
 
-        for (HealthCheck check : healthChecks) {
-            String errorMessage = check.checkHealth();
-            if (errorMessage != null) {
-                overallHealth.addError(errorMessage);
-            }
+    private void addErrorIfUnhealthy(boolean healthy, String locationName, List<String> errors) {
+        if (!healthy) {
+            String locationNameWithoutPackages = locationName.replaceAll(".*\\.", "");
+            errors.add(locationNameWithoutPackages);
         }
-
-        // Construct the response map directly
-        Map<String, Object> response = new HashMap<>();
-        response.put("healthy", overallHealth.isHealthy());
-        if (!overallHealth.isHealthy()) {
-            response.put("errors", overallHealth.getErrors());
-        }
-
-        return response;
     }
+
 }

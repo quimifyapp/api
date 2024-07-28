@@ -12,7 +12,6 @@ import com.quimify.api.classification.Classification;
 import com.quimify.api.classification.ClassificationService;
 import com.quimify.api.correction.CorrectionService;
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthCheck;
 import com.quimify.api.metrics.MetricsService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.notfoundquery.NotFoundQueryService;
@@ -26,7 +25,7 @@ import com.quimify.organic.molecules.openchain.Simple;
 // This class implements the logic behind HTTP methods in "/organic".
 
 @Service
-public class OrganicService implements HealthCheck {
+public class OrganicService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -57,24 +56,20 @@ public class OrganicService implements HealthCheck {
 
     // Internal:
 
-    public String checkHealth() {
-        String testCompoundName = "metano";
-        int[] testCompoundStructure = { 0, 18 };
+    public boolean isHealthy() {
+        return checkStructureToNameHealth() && checkNameToStructureHealth();
+    }
 
-        // 1. Check name-to-structure resolution
-        Optional<OrganicResult> resultFromName = tryGetFromName(testCompoundName);
-        if (resultFromName.isEmpty() || !resultFromName.get().isFound()) {
-            return "Error resolving organic compound from name: " + testCompoundName;
-        }
+    private boolean checkStructureToNameHealth() {
+        int[] testInputSequence = {0, 18};
+        OrganicResult resultFromStructure = tryGetFromStructure(testInputSequence);
+        return resultFromStructure.isFound();
+    }
 
-        // 2. Check structure-to-name resolution (only if name-to-structure was
-        // successful)
-        OrganicResult resultFromStructure = tryGetFromStructure(testCompoundStructure);
-        if (!resultFromStructure.isFound()) {
-            return "Error resolving organic compound from structure: " + Arrays.toString(testCompoundStructure);
-        }
-
-        return null;
+    private boolean checkNameToStructureHealth() {
+        String testName = "metano";
+        Optional<OrganicResult> resultFromName = tryGetFromName(testName);
+        return resultFromName.isPresent() && resultFromName.get().isFound();
     }
 
     // Client:

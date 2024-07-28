@@ -8,15 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.quimify.api.error.ErrorService;
-import com.quimify.api.health.HealthCheck;
 import com.quimify.api.settings.SettingsService;
 import com.quimify.api.utils.Connection;
 import com.quimify.api.utils.Normalizer;
 
-// This class classifies input and handles calls to the Quimify Classifier AI API when necessary.
-
 @Service
-public class ClassificationService implements HealthCheck {
+public class ClassificationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,40 +26,42 @@ public class ClassificationService implements HealthCheck {
     @Autowired
     ErrorService errorService;
 
+    // Internal:
+
+    public boolean isHealthy() {
+        String testInput = "h2o";
+        Classification testResult = Classification.inorganicFormula;
+        Optional<Classification> result = classify(testInput, true);
+        return result.isPresent() && result.get() == testResult;
+    }
+
     // Public:
 
     public Optional<Classification> classify(String input) {
-        String adaptedInput = Normalizer.getWithSpacesAndSymbols(input);
-
-        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
-            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
-                logger.warn("Classified \"{}\" with DB: {}.", input, classificationModel.getClassification());
-
-                return filteredResult(input, classificationModel.getClassification());
-            }
-
-        return classifyWithAi(input);
+        return classify(input, false);
     }
 
     public boolean isInorganic(Classification classification) {
         return classification == Classification.inorganicFormula || classification == Classification.inorganicName;
     }
 
-    public String checkHealth() {
-        String testFormula = "h2o";
-
-        Optional<Classification> inorganicFormulaResult = classify(testFormula);
-
-        if (inorganicFormulaResult.isEmpty() || inorganicFormulaResult.get() != Classification.inorganicFormula) {
-            return "Error classifying inorganic formula: " + testFormula;
-        }
-
-        return null;
-    }
-
     // Private:
 
-    private Optional<Classification> classifyWithAi(String input) {
+    private Optional<Classification> classify(String input, boolean silent) {
+        String adaptedInput = Normalizer.getWithSpacesAndSymbols(input);
+
+        for (ClassificationModel classificationModel : classificationRepository.findAllByOrderByPriority())
+            if (adaptedInput.matches(classificationModel.getRegexPattern())) {
+                if(!silent)
+                    logger.warn("Classified \"{}\" with DB: {}.", input, classificationModel.getClassification());
+
+                return filteredResult(input, classificationModel.getClassification());
+            }
+
+        return classifyWithAi(input, silent);
+    }
+
+    private Optional<Classification> classifyWithAi(String input, boolean silent) {
         try {
             String name = new Connection(settingsService.getClassifierAiUrl(), input).getText();
 
@@ -73,7 +72,8 @@ public class ClassificationService implements HealthCheck {
 
             Classification classification = Classification.valueOf(name);
 
-            logger.warn("Classified \"{}\" with AI: {}.", input, classification);
+            if(!silent)
+                logger.warn("Classified \"{}\" with AI: {}.", input, classification);
 
             return filteredResult(input, classification);
         } catch (Exception exception) {
