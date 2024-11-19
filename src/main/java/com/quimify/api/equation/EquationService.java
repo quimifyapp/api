@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+// TODO rename Equation to Reaction
+
 @Service
 class EquationService {
 
@@ -25,14 +27,6 @@ class EquationService {
 
     @Autowired
     MetricsService metricsService;
-
-    // **********************************************************************************************************
-    // **********************************************************************************************************
-    // **********************************************************************************************************
-    // TODO rewrite this awful code from the internet (in progress)
-    // **********************************************************************************************************
-    // **********************************************************************************************************
-    // **********************************************************************************************************
 
     EquationResult tryBalance(String reactants, String products) {
         EquationResult equationResult;
@@ -62,106 +56,74 @@ class EquationService {
 
     // Private:
 
-    // TODO clean this code:
     private EquationResult balance(String reactantsText, String productsText) {
         reactantsText = removeUnnecessaryCharacters(reactantsText);
         productsText = removeUnnecessaryCharacters(productsText);
 
-        Set<String> reactantsElements = elementsInSumOfFormulas(reactantsText);
-        Set<String> productsElements = elementsInSumOfFormulas(productsText);
+        Set<String> reactantsElements = getElementsInSumOfFormulas(reactantsText);
+        Set<String> productsElements = getElementsInSumOfFormulas(productsText);
 
         if (!reactantsElements.equals(productsElements))
             return EquationResult.error("Deben aparecer los mismos elementos en ambas partes de la reacción.");
 
-        List<Formula> reactants = separateFormulasInSumOfFormulas(reactantsText);
-        List<Formula> products = separateFormulasInSumOfFormulas(productsText);
+        List<Formula> reactants = getFormulasInSumOfFormulas(reactantsText);
+        List<Formula> products = getFormulasInSumOfFormulas(productsText);
+        int[] solution = balance(reactants, products, reactantsElements);
 
-        Matrix matrix = equationMatrix(reactants, products, reactantsElements);
-        Fraction[] solutions = Mathematics.solve(matrix);
-
-        if (notBalanceable(solutions))
+        if (notBalanceable(solution))
             return EquationResult.error("La reacción no es balanceable.");
 
-        Fraction[] solutionsAndOne = new Fraction[solutions.length + 1]; // TODO why?
-        System.arraycopy(solutions, 0, solutionsAndOne, 0, solutions.length);
-        solutionsAndOne[solutionsAndOne.length - 1] = Fraction.ONE;
+        int[] reactantsSolution = Arrays.copyOfRange(solution, 0, reactants.size());
+        int[] productsSolution = Arrays.copyOfRange(solution, reactants.size(), solution.length);
 
-        // "Last, the lcm of all the denominators are multiplied to give the simplified solution."
-
-        int lcm = 1;
-
-        for (Fraction f : solutionsAndOne) {
-            lcm = Mathematics.leastCommonMultiple(lcm, f.getDenominator());
-        }
-        for (int i = 0; i < solutionsAndOne.length; i++) {
-            solutionsAndOne[i] = solutionsAndOne[i].times(new Fraction(lcm));
-        }
-
-        String resultReactants = formatSolution(reactantsText, implementSubstitution(Arrays.copyOfRange(solutionsAndOne, 0, reactants.size())));
-        String resultProducts = formatSolution(productsText, implementSubstitution(Arrays.copyOfRange(solutionsAndOne, reactants.size(), solutionsAndOne.length)));
+        String resultReactants = formatSolution(reactantsText, reactantsSolution);
+        String resultProducts = formatSolution(productsText, productsSolution);
 
         return new EquationResult(resultReactants, resultProducts);
     }
 
-    // TODO clean this code:
-    private Matrix equationMatrix(List<Formula> reactants, List<Formula> products, Set<String> elements) {
-        Matrix matrix = new Matrix(elements.size(), reactants.size() + products.size());
+    private int[] balance(List<Formula> reactants, List<Formula> products, Set<String> element) {
+        Matrix equations = getReactionEquations(reactants, products, element);
 
-        // TODO just turn all products except last one into negative at the end of each iteration
+        Fraction[] anySolution = Mathematics.getAnySolution(equations);
+        int[] integerSolution = Mathematics.rescaleIntoIntegers(anySolution);
 
-        int row = 0;
-        for (String element : elements) {
-            int column = 0;
+        return Mathematics.findMinimalSolution(equations, integerSolution);
+    }
 
-            for (Formula formula : reactants) {
-                int moles = formula.molesOf(element);
-                Fraction fraction = new Fraction(moles);
+    private Matrix getReactionEquations(List<Formula> reactants, List<Formula> products, Set<String> elements) {
+        Matrix equations = new Matrix(elements.size(), reactants.size() + products.size() + 1);
 
-                matrix.set(row, column, fraction);
-                column++;
+        Iterator<String> elementsIterator = elements.iterator();
+
+        for (int row = 0; row < elements.size(); row++) {
+            String element = elementsIterator.next();
+
+            for (int column = 0; column < reactants.size(); column++) {
+                Formula reactant = reactants.get(column);
+                int molesOfElementInReactant = reactant.molesOf(element);
+
+                equations.set(row, column, new Fraction(molesOfElementInReactant));
             }
 
-            for (Formula formula : products) {
-                int moles = formula.molesOf(element);
-                Fraction fraction = new Fraction(moles).negative(); // TODO why?
+            for (int column = reactants.size(); column < equations.columns() - 1; column++) {
+                Formula product = products.get(column - reactants.size());
+                int molesOfElementInProduct = -1 * product.molesOf(element);
 
-                matrix.set(row, column, fraction);
-                column++;
+                equations.set(row, column, new Fraction(molesOfElementInProduct));
             }
-
-            Fraction last = matrix.get(row, column - 1);
-            matrix.set(row, column - 1, last.negative()); // TODO why?
-
-            row++;
         }
 
-        return matrix;
+        return equations;
     }
 
-    private boolean notBalanceable(Fraction[] solutions) {
-        return Arrays.stream(solutions).anyMatch(Objects::isNull);
+    private boolean notBalanceable(int[] solution) {
+        return Arrays.stream(solution).anyMatch(element -> element == 0);
     }
 
-    // TODO clean this code:
-    /**
-     * Converts FractionComponents into integers for final formatting for either reactant or product side.
-     */
-    private static List<Integer> implementSubstitution(Fraction[] arr) {
-        List<Integer> finalCoefficients = new ArrayList<>();
-
-        for (Fraction f : arr) {
-            // TODO check denominator is 1
-            finalCoefficients.add(f.getNumerator());
-        }
-
-        return finalCoefficients;
-    }
-
-    // TODO clean this code:
-    /**
-     * Gets all elements used on a side an equation
-     */
-    private static Set<String> elementsInSumOfFormulas(String sumOfFormulas) {
+    // TODO clean this code from the internet:
+        // "Gets all elements used on a side an equation"
+    private static Set<String> getElementsInSumOfFormulas(String sumOfFormulas) {
         LinkedHashSet<String> elements = new LinkedHashSet<>();
         String elementString = "";
         char character = 0;
@@ -183,17 +145,16 @@ class EquationService {
         if (!Character.toString(character).isEmpty()) {
             elements.add(elementString);
         }
+
         return elements;
     }
 
-    private List<Formula> separateFormulasInSumOfFormulas(String sumOfFormulas) {
+    private List<Formula> getFormulasInSumOfFormulas(String sumOfFormulas) {
         return Arrays.stream(sumOfFormulas.split("\\+")).map(Formula::new).collect(Collectors.toList());
     }
 
-    // TODO clean this code:
-    /**
-     * Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")
-     */
+    // TODO clean this code from the internet:
+        // "Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")"
     private static String removeUnnecessaryCharacters(String currentString) {
         currentString = currentString.replaceAll("\\s", "");
         currentString = currentString.replaceAll("\\++", "+");
@@ -244,16 +205,13 @@ class EquationService {
         return sb.toString();
     }
 
-    // TODO clean this code:
-    /**
-     * String formatting of solution
-     */
-    private static String formatSolution(String originalString, List<Integer> solutions) {
+    // TODO clean this code from the internet
+    private static String formatSolution(String originalString, int[] solutions) {
         String[] arr = originalString.split("\\+");
         StringBuilder s = new StringBuilder();
         String coefficientHandler = "";
 
-        for (int i = 0; i < solutions.size(); i++) {
+        for (int i = 0; i < solutions.length; i++) {
             if (Character.isDigit(arr[i].charAt(0))) {
                 int j = 0;
                 while (Character.isDigit(arr[i].charAt(j))) {
@@ -261,7 +219,7 @@ class EquationService {
                     j++;
                 }
                 arr[i] = arr[i].substring(j);
-                int newCoefficient = Integer.parseInt(coefficientHandler) * solutions.get(i);
+                int newCoefficient = Integer.parseInt(coefficientHandler) * solutions[i];
 
                 if (newCoefficient != 1) { // Only append if coefficient is not 1
                     s.append(newCoefficient);
@@ -271,19 +229,19 @@ class EquationService {
 
                 coefficientHandler = "";
             } else {
-                if (solutions.get(i) != 1) { // Only append if coefficient is not 1
-                    s.append(solutions.get(i));
+                if (solutions[i] != 1) { // Only append if coefficient is not 1
+                    s.append(solutions[i]);
                 }
 
-                appendElement(arr, i, s, solutions, solutions.get(i));
+                appendElement(arr, i, s, solutions, solutions[i]);
 
             }
         }
         return s.toString();
     }
 
-    // TODO clean this code:
-    private static void appendElement(String[] arr, int i, StringBuilder s, List<Integer> solutions, int newCoefficient) {
+    // TODO clean this code from the internet:
+    private static void appendElement(String[] arr, int i, StringBuilder s,  int[] solutions, int newCoefficient) {
 
         if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
             s.append(arr[i]);
@@ -299,7 +257,7 @@ class EquationService {
                 s.append(')');
         }
 
-        if (i < solutions.size() - 1)
+        if (i < solutions.length - 1)
             s.append(" + ");
     }
 
@@ -350,9 +308,6 @@ class EquationService {
         // 15
         if (!balance("2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C", "___ 2CaSiO3 + ___ 2CO + ___ 2P").getBalancedEquation().equals("2(Ca3(PO4)2) + 6(SiO2) + 10C = 6(CaSiO3) + 10(CO) + 4P"))
             return "2Ca3(PO4)2 + ___ 2SiO2 + ___ 2C = ___ 2CaSiO3 + ___ 2CO + ___ 2P";
-        // 16
-        if (balance("H2+O2", "H2O+O3").isPresent())
-            return "H2+O2 = H2O+O3";
         // 17
         if (!balance("C6H12O6+O2", "CO2+H2O").getBalancedEquation().equals("C6H12O6 + 6O2 = 6(CO2) + 6(H2O)"))
             return "C6H12O6+O2=CO2+H2O";

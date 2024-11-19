@@ -4,8 +4,8 @@ import java.util.Objects;
 
 class Fraction {
 
-    private int numerator;
-    private int denominator;
+    private final int numerator;
+    private final int denominator;
 
     // Constants:
 
@@ -18,38 +18,21 @@ class Fraction {
         if (denominator == 0)
             throw new IllegalArgumentException("Denominator can't be zero.");
 
-        this.numerator = numerator;
-        this.denominator = denominator;
+        int[] simplifiedNumeratorAndDenominator = simplify(numerator, denominator);
 
-        simplify();
+        this.numerator = simplifiedNumeratorAndDenominator[0];
+        this.denominator = simplifiedNumeratorAndDenominator[1];
     }
 
     Fraction(int scalar) {
-        this.numerator = scalar;
-        this.denominator = 1;
-    }
-
-    Fraction(Fraction other) {
-        this.numerator = other.numerator;
-        this.denominator = other.denominator;
-    }
-
-    private Fraction() {
-    }
-
-    private static Fraction unsimplified(int numerator, int denominator) {
-        Fraction unsimplified = new Fraction();
-
-        unsimplified.numerator = numerator;
-        unsimplified.denominator = denominator;
-
-        return unsimplified;
+        numerator = scalar;
+        denominator = 1;
     }
 
     // Internal:
 
     Fraction plus(Fraction other) {
-        int newDenominator = Mathematics.leastCommonMultiple(denominator, other.denominator);
+        int newDenominator = Mathematics.calculateLeastCommonMultiple(denominator, other.denominator);
         int newNumerator = rebasedNumerator(newDenominator) + other.rebasedNumerator(newDenominator);
 
         return new Fraction(newNumerator, newDenominator);
@@ -63,27 +46,29 @@ class Fraction {
     }
 
     Fraction negative() {
-        return unsimplified(-numerator, denominator);
+        return new Fraction(-numerator, denominator);
     }
 
     Fraction inverse() {
         if (numerator == 0)
             throw new IllegalStateException("Fraction zero has no inverse.");
 
-        return unsimplified(denominator, numerator);
+        return new Fraction(denominator, numerator);
     }
 
     // Private:
 
-    private void simplify() {
+    private int[] simplify(int numerator, int denominator) {
         if (denominator < 0) {
-            numerator *= -1;
-            denominator *= -1;
+            numerator = -numerator;
+            denominator = -denominator;
         }
 
-        int greatestCommonDivisor = Mathematics.greatestCommonDivisor(numerator, denominator);
+        int greatestCommonDivisor = Mathematics.calculateGreatestCommonDivisor(numerator, denominator);
         numerator /= greatestCommonDivisor;
         denominator /= greatestCommonDivisor;
+
+        return new int[]{numerator, denominator};
     }
 
     private int rebasedNumerator(int newDenominator) {

@@ -7,15 +7,26 @@ class Matrix {
     // Constructors:
 
     Matrix(int rows, int columns) {
-        this.matrix = new Fraction[rows][columns];
-    }
-
-    Matrix(Matrix other) {
-        this.matrix = new Fraction[other.rows()][other.columns()];
+        matrix = new Fraction[rows][columns];
 
         for (int row = 0; row < rows(); row++)
             for (int column = 0; column < columns(); column++)
-                this.matrix[row][column] = new Fraction(other.get(row, column));
+                matrix[row][column] = Fraction.ZERO;
+    }
+
+    Matrix(Matrix other, int rows, int columns) {
+        this(rows, columns);
+
+        int rowsToCopy = Math.min(rows, other.rows());
+        int columnsToCopy = Math.min(columns, other.columns());
+
+        for (int row = 0; row < rowsToCopy; row++)
+            for (int column = 0; column < columnsToCopy; column++)
+                matrix[row][column] = other.get(row, column);
+    }
+
+    Matrix(Matrix other) {
+        this(other, other.rows(), other.columns());
     }
 
     // Internal:
@@ -38,14 +49,10 @@ class Matrix {
 
     // Private:
 
-    boolean isEmpty() {
-        return rows() == 0 || columns() == 0;
-    }
-
     void swapRows(int row1, int row2) {
-        Fraction[] oldRow1 = matrix[row1];
+        Fraction[] originalRow1 = matrix[row1];
         matrix[row1] = matrix[row2];
-        matrix[row2] = oldRow1;
+        matrix[row2] = originalRow1;
     }
 
     void addRowTo(int addendRow, int destinationRow) {
@@ -53,9 +60,9 @@ class Matrix {
             matrix[destinationRow][j] = get(destinationRow, j).plus(get(addendRow, j));
     }
 
-    void multiplyRow(int row, Fraction fraction) {
+    void multiplyRow(int row, Fraction factor) {
         for (int j = 0; j < columns(); j++)
-            matrix[row][j] = get(row, j).times(fraction);
+            matrix[row][j] = get(row, j).times(factor);
     }
 
 }
