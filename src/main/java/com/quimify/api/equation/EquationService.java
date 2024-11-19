@@ -85,7 +85,7 @@ class EquationService {
     private int[] balance(List<Formula> reactants, List<Formula> products, Set<String> element) {
         Matrix equations = getReactionEquations(reactants, products, element);
 
-        Fraction[] anySolution = Mathematics.getAnySolution(equations);
+        Fraction[] anySolution = Mathematics.calculateAnySolution(equations);
         int[] integerSolution = Mathematics.rescaleIntoIntegers(anySolution);
 
         return Mathematics.findMinimalSolution(equations, integerSolution);

@@ -8,12 +8,12 @@ class Mathematics {
 
     // Internal:
 
-    static Fraction[] getAnySolution(Matrix equations) {
-        Matrix reducedEchelonFormEquations = calculateReducedRowEchelonForm(equations);
-        Matrix augmentedEquations = addMissingEquations(reducedEchelonFormEquations);
-        Matrix augmentedReducedEchelonFormEquations = calculateReducedRowEchelonForm(augmentedEquations);
+    static Fraction[] calculateAnySolution(Matrix equations) {
+        Matrix reducedRowEchelonFormEquations = calculateReducedRowEchelonForm(equations);
+        Matrix augmentedEquations = addMissingEquations(reducedRowEchelonFormEquations);
+        Matrix reducedRowEchelonFormAugmentedEquations = calculateReducedRowEchelonForm(augmentedEquations);
 
-        return getOnlyPossibleSolution(augmentedReducedEchelonFormEquations);
+        return extractOnlyPossibleSolution(reducedRowEchelonFormAugmentedEquations);
     }
 
     static int[] rescaleIntoIntegers(Fraction[] fractions) {
@@ -32,6 +32,7 @@ class Mathematics {
         return normalizedFractions;
     }
 
+    // TODO optimize time and space complexity
     static int[] findMinimalSolution(Matrix equations, int[] anySolution) {
         int[] smallestSolution = Arrays.copyOf(anySolution, anySolution.length);
 
@@ -62,7 +63,7 @@ class Mathematics {
         return leastCommonMultiple;
     }
 
-    public static int calculateGreatestCommonDivisor(int... numbers) {
+    static int calculateGreatestCommonDivisor(int... numbers) {
         int greatestCommonDivisor = numbers[0];
 
         for (int i = 1; i < numbers.length; i++)
@@ -73,31 +74,29 @@ class Mathematics {
 
     // Private:
 
-    // TODO check if it's accurate, and if it's actually reduced or if it matters
-    static private Matrix calculateReducedRowEchelonForm(Matrix matrix) {
+    private static Matrix calculateReducedRowEchelonForm(Matrix matrix) {
         Matrix reducedRowEchelonForm = new Matrix(matrix);
 
-        for (int row = 0, column = 0; column < reducedRowEchelonForm.columns(); column++) {
-            Integer pivotRow = findFirstNonZeroRowInColumnAfter(reducedRowEchelonForm, column, row);
+        for (int pivot = 0; pivot < reducedRowEchelonForm.columns(); pivot++) {
+            Integer pivotRow = findFirstNonZeroRowBelowOrAtDiagonalCell(reducedRowEchelonForm, pivot);
 
             if (pivotRow == null)
                 continue;
 
-            reducedRowEchelonForm.swapRows(row, pivotRow);
-            Fraction pivotInverse = reducedRowEchelonForm.get(row, column).inverse();
-            reducedRowEchelonForm.multiplyRow(row, pivotInverse);
+            reducedRowEchelonForm.swapRows(pivot, pivotRow);
+
+            Fraction pivotInverse = reducedRowEchelonForm.get(pivot, pivot).inverse();
+            reducedRowEchelonForm.multiplyRow(pivot, pivotInverse);
 
             for (int otherRow = 0; otherRow < reducedRowEchelonForm.rows(); otherRow++)
-                if (otherRow != row) // TODO is if needed?
-                    makeZeroIn(reducedRowEchelonForm, otherRow, column);
-
-            row++;
+                if (otherRow != pivot)
+                    makeZeroInRowAndPivotColumn(reducedRowEchelonForm, otherRow, pivot);
         }
 
         return reducedRowEchelonForm;
     }
 
-    static private Matrix addMissingEquations(Matrix reducedRowEchelonFormEquations) {
+    private static Matrix addMissingEquations(Matrix reducedRowEchelonFormEquations) {
         int rows = reducedRowEchelonFormEquations.columns() - 1;
         int columns = reducedRowEchelonFormEquations.columns();
 
@@ -105,12 +104,12 @@ class Mathematics {
 
         for (int row = 0; row < rows; row++)
             if (isAllZerosInRow(equations, row))
-                addIdentityEquationInRow(equations, row);
+                writeIdentityEquationInRow(equations, row);
 
         return equations;
     }
 
-    static private Fraction[] getOnlyPossibleSolution(Matrix reducedRowEchelonFormEquations) {
+    private static Fraction[] extractOnlyPossibleSolution(Matrix reducedRowEchelonFormEquations) {
         Fraction[] solution = new Fraction[reducedRowEchelonFormEquations.rows()];
 
         int lastColumn = reducedRowEchelonFormEquations.columns() - 1;
@@ -121,25 +120,24 @@ class Mathematics {
         return solution;
     }
 
-    private static Integer findFirstNonZeroRowInColumnAfter(Matrix matrix, int column, int startRow) {
-        for (int row = startRow; row < matrix.rows(); row++)
-            if (!matrix.get(row, column).equals(Fraction.ZERO))
+    private static Integer findFirstNonZeroRowBelowOrAtDiagonalCell(Matrix matrix, int diagonal) {
+        for (int row = diagonal; row < matrix.rows(); row++)
+            if (!matrix.get(row, diagonal).equals(Fraction.ZERO))
                 return row;
 
         return null;
     }
 
-    // TODO is name correct?
-    private static void makeZeroIn(Matrix matrix, int row, int column) {
-        if (matrix.get(row, column).equals(Fraction.ZERO))
+    private static void makeZeroInRowAndPivotColumn(Matrix matrix, int row, int pivot) {
+        if (matrix.get(row, pivot).equals(Fraction.ZERO))
             return;
 
-        Fraction multiple = matrix.get(row, column).negative();
-        matrix.multiplyRow(column, multiple);
-        matrix.addRowTo(column, row);
+        Fraction multiple = matrix.get(row, pivot).negative();
+        matrix.multiplyRow(pivot, multiple);
+        matrix.addRowTo(pivot, row);
 
-        Fraction inverse = matrix.get(column, column).inverse();
-        matrix.multiplyRow(column, inverse);
+        Fraction inverse = matrix.get(pivot, pivot).inverse();
+        matrix.multiplyRow(pivot, inverse);
     }
 
     private static boolean isAllZerosInRow(Matrix matrix, int row) {
@@ -150,12 +148,12 @@ class Mathematics {
         return true;
     }
 
-    private static void addIdentityEquationInRow(Matrix matrix, int row) {
+    private static void writeIdentityEquationInRow(Matrix matrix, int row) {
         matrix.set(row, row, Fraction.ONE);
         matrix.set(row, matrix.columns() - 1, Fraction.ONE);
     }
 
-    static private boolean isAnySolution(Matrix equations, int[] solutionCandidate) {
+    private static boolean isAnySolution(Matrix equations, int[] solutionCandidate) {
         for (int row = 0; row < equations.rows(); row++) {
             Fraction equationEvaluation = Fraction.ZERO;
 
@@ -177,7 +175,7 @@ class Mathematics {
         return (Math.abs(a * b) / calculateGreatestCommonDivisor(a, b));
     }
 
-    static int calculateGreatestCommonDivisor(int a, int b) {
+    private static int calculateGreatestCommonDivisor(int a, int b) {
         if (a == 0 || b == 0)
             return a + b;
 
@@ -190,7 +188,7 @@ class Mathematics {
         return calculateGreatestCommonDivisor(greater % lesser, lesser);
     }
 
-    public static List<List<Integer>> getSubsetsOfNaturalsFromSizeTwoTo(int maximumSubsetSize) {
+    private static List<List<Integer>> getSubsetsOfNaturalsFromSizeTwoTo(int maximumSubsetSize) {
         List<List<Integer>> subsetsOfNaturals = new ArrayList<>();
 
         for (int i = 2; i <= maximumSubsetSize - 1; i++)
