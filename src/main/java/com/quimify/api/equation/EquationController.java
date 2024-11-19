@@ -31,10 +31,4 @@ class EquationController {
         return equationResult;
     }
 
-    // TODO remove
-    @GetMapping("/test")
-    String temporalTest() {
-        return equationService.testTemporal();
-    }
-
 }

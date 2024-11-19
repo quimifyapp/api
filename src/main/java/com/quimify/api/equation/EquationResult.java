@@ -29,11 +29,6 @@ class EquationResult {
         return new EquationResult(null);
     }
 
-    // TODO remove
-    String getBalancedEquation() {
-        return balancedReactants + " = " + balancedProducts;
-    }
-
     // Getters and setters (must be public to enable JSON serialization):
 
     public boolean isPresent() {
