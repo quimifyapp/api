@@ -84,8 +84,8 @@ class EquationService {
         return new EquationResult(resultReactants, resultProducts);
     }
 
-    private int[] balance(List<Formula> reactants, List<Formula> products, Set<String> element) {
-        Matrix equations = getReactionEquations(reactants, products, element);
+    private int[] balance(List<Formula> reactants, List<Formula> products, Set<String> elements) {
+        Matrix equations = getReactionEquations(reactants, products, elements);
 
         Fraction[] anySolution = Mathematics.calculateAnySolution(equations);
         int[] integerSolution = Mathematics.rescaleIntoIntegers(anySolution);
