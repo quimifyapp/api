@@ -67,9 +67,6 @@ class EquationService {
         List<Formula> reactants = getFormulasInSumOfFormulas(reactantsText);
         List<Formula> products = getFormulasInSumOfFormulas(productsText);
 
-        if (reactants.size() + products.size() > 20)
-            return EquationResult.error("La reacción es demasiado larga.");
-
         int[] solution = balance(reactants, products, reactantsElements);
 
         if (notBalanceable(solution))
