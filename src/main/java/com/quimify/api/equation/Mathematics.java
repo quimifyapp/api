@@ -1,8 +1,6 @@
 package com.quimify.api.equation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 class Mathematics {
 
@@ -32,12 +30,10 @@ class Mathematics {
         return normalizedFractions;
     }
 
-    // TODO optimize time and space complexity:
-        // TODO generate separate groups of codependent columns
     static int[] findMinimalSolution(Matrix equations, int[] anySolution) {
         int[] smallestSolution = Arrays.copyOf(anySolution, anySolution.length);
 
-        for (List<Integer> indexes : getSubsetsOfNaturalsFromSizeTwoTo(anySolution.length)) {
+        for (Set<Integer> indexes : groupCodependentColumns(equations)) {
             int[] values = indexes.stream().mapToInt(index -> anySolution[index]).toArray();
             int greatestCommonDivisor = calculateGreatestCommonDivisor(values);
 
@@ -189,27 +185,33 @@ class Mathematics {
         return calculateGreatestCommonDivisor(greater % lesser, lesser);
     }
 
-    private static List<List<Integer>> getSubsetsOfNaturalsFromSizeTwoTo(int maximumSubsetSize) {
-        List<List<Integer>> subsetsOfNaturals = new ArrayList<>();
+    private static List<Set<Integer>> groupCodependentColumns(Matrix matrix) {
+        List<Set<Integer>> codependentColumns = new ArrayList<>();
 
-        for (int i = 2; i <= maximumSubsetSize - 1; i++)
-            generateSubsetCombinations(subsetsOfNaturals, new ArrayList<>(), 0, maximumSubsetSize, i);
+        Matrix reducedEchelonForm = calculateReducedRowEchelonForm(matrix);
 
-        return subsetsOfNaturals;
+        for (int row = 0; row < reducedEchelonForm.rows(); row++)
+            for (int column = row + 1; column < reducedEchelonForm.columns(); column++) {
+                if (reducedEchelonForm.get(row, column).equals(Fraction.ZERO))
+                    continue;
+
+                Set<Integer> columnCodependentGroup = findOrCreateGroupOfColumn(codependentColumns, column);
+                columnCodependentGroup.add(row);
+            }
+
+        return codependentColumns;
     }
 
-    private static void generateSubsetCombinations(List<List<Integer>> result, List<Integer> currentSubset, int start,
-                                                   int maximumSubsetSize, int size) {
-        if (currentSubset.size() == size) {
-            result.add(new ArrayList<>(currentSubset));
-            return;
-        }
+    private static Set<Integer> findOrCreateGroupOfColumn(List<Set<Integer>> columnGroups, int column) {
+        Optional<Set<Integer>> existingGroup = columnGroups.stream().filter(set -> set.contains(column)).findAny();
 
-        for (int i = start; i < maximumSubsetSize; i++) {
-            currentSubset.add(i);
-            generateSubsetCombinations(result, currentSubset, i + 1, maximumSubsetSize, size);
-            currentSubset.remove(currentSubset.size() - 1);
-        }
+        if (existingGroup.isPresent())
+            return existingGroup.get();
+
+        Set<Integer> newGroup = new HashSet<>(Set.of(column));
+        columnGroups.add(newGroup);
+
+        return newGroup;
     }
 
 }
