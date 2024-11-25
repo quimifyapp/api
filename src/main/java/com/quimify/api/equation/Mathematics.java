@@ -32,7 +32,8 @@ class Mathematics {
         return normalizedFractions;
     }
 
-    // TODO optimize time and space complexity
+    // TODO optimize time and space complexity:
+        // TODO generate separate groups of codependent columns
     static int[] findMinimalSolution(Matrix equations, int[] anySolution) {
         int[] smallestSolution = Arrays.copyOf(anySolution, anySolution.length);
 
