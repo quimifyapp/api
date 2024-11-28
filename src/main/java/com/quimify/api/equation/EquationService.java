@@ -90,14 +90,14 @@ class EquationService {
     }
 
     private boolean hasInvalidDigits(String formula) {
-        return hasLeadingZeros(formula) || hasMisplacedCoefficients(formula);
+        return hasLeadingZeros(formula) || hasCoefficients(formula);
     }
 
     private boolean hasLeadingZeros(String formula) {
         return formula.matches(".*(^|\\D)0.*");
     }
 
-    private boolean hasMisplacedCoefficients(String formula) {
+    private boolean hasCoefficients(String formula) {
         return formula.matches(".*(^|\\(| )\\d.*");
     }
 
@@ -106,9 +106,14 @@ class EquationService {
     }
 
     private boolean hasInvalidParentheses(String formula) {
-        if (formula.contains("()"))
-            return true;
+        return hasEmptyParentheses(formula) || hasUnbalancedParentheses(formula);
+    }
 
+    private boolean hasEmptyParentheses(String formula) {
+        return formula.contains("()");
+    }
+
+    private boolean hasUnbalancedParentheses(String formula) {
         int balance = 0;
 
         for (char character : formula.toCharArray()) {
@@ -143,13 +148,13 @@ class EquationService {
         return uniqueCorrectedFormulas.stream().map(Formula::new).collect(Collectors.toList());
     }
 
-    private String correctParentheses(String text) {
+    private String correctParentheses(String formula) {
         final String pattern = "\\((.*)\\)";
 
-        while (text.matches(pattern))
-            text = text.replaceAll(pattern, "$1");
+        while (formula.matches(pattern))
+            formula = formula.replaceAll(pattern, "$1");
 
-        return text;
+        return formula;
     }
 
     private Set<String> getElementsIn(List<Formula> formulas) {
