@@ -1,6 +1,8 @@
 package com.quimify.api.equation;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 class Mathematics {
 
@@ -99,9 +101,13 @@ class Mathematics {
 
         Matrix equations = new Matrix(reducedRowEchelonFormEquations, rows, columns);
 
-        for (int row = 0; row < rows; row++)
-            if (isAllZerosInRow(equations, row))
-                writeIdentityEquationInRow(equations, row);
+        List<Integer> missingPivots = findMissingPivots(equations);
+
+        for (int row = 0, nextPivotIndex = 0; row < rows; row++)
+            if (isAllZerosInRow(equations, row)) {
+                writeIdentityEquationIn(equations, row, missingPivots.get(nextPivotIndex));
+                nextPivotIndex++;
+            }
 
         return equations;
     }
@@ -137,6 +143,29 @@ class Mathematics {
         matrix.multiplyRow(pivot, inverse);
     }
 
+    private static List<Integer> findMissingPivots(Matrix reducedRowEchelonForm) {
+        int rows = reducedRowEchelonForm.rows();
+        List<Integer> allPossiblePivots = IntStream.rangeClosed(0, rows - 1).boxed().collect(Collectors.toList());
+
+        List<Integer> existingPivots = findExistingPivots(reducedRowEchelonForm);
+        allPossiblePivots.removeAll(existingPivots);
+
+        return allPossiblePivots;
+    }
+
+    private static List<Integer> findExistingPivots(Matrix reducedRowEchelonForm) {
+        List<Integer> existingPivots = new ArrayList<>();
+
+        for (int row = 0; row < reducedRowEchelonForm.rows(); row++)
+            for (int column = 0; column < reducedRowEchelonForm.columns(); column++)
+                if (reducedRowEchelonForm.get(row, column).equals(Fraction.ONE)) {
+                    existingPivots.add(column);
+                    break;
+                }
+
+        return existingPivots;
+    }
+
     private static boolean isAllZerosInRow(Matrix matrix, int row) {
         for (int column = 0; column < matrix.columns(); column++)
             if (!matrix.get(row, column).equals(Fraction.ZERO))
@@ -145,8 +174,8 @@ class Mathematics {
         return true;
     }
 
-    private static void writeIdentityEquationInRow(Matrix matrix, int row) {
-        matrix.set(row, row, Fraction.ONE);
+    private static void writeIdentityEquationIn(Matrix matrix, int row, int column) {
+        matrix.set(row, column, Fraction.ONE);
         matrix.set(row, matrix.columns() - 1, Fraction.ONE);
     }
 
