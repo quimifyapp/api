@@ -2,37 +2,40 @@ package com.quimify.api.equation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 class Formula {
 
-    Map<String, Integer> elementToMoles;
+    private final String text;
+    private final Map<String, Integer> elementToMoles;
 
-    Formula(String formulaWithOrWithoutMultiplier) {
-        String initialDigits = formulaWithOrWithoutMultiplier.replaceAll("\\D.*$", "");
-        String formula = formulaWithOrWithoutMultiplier.replaceAll("^" + initialDigits, "");
-
-        Map<String, Integer> elementToMoles = parseFormula(formula);
-
-        Integer multiplier = initialDigits.isEmpty() ? 1 : Integer.parseInt(initialDigits);
-        for (String element : elementToMoles.keySet())
-            elementToMoles.replace(element, elementToMoles.get(element) * multiplier);
-
-        this.elementToMoles = elementToMoles;
+    Formula(String formula) {
+        this.text = formula;
+        this.elementToMoles = parse(formula);
     }
 
-    int molesOf(String element) {
+    int getMolesOf(String element) {
         Integer moles = elementToMoles.get(element);
         return moles != null ? moles : 0;
     }
 
-    // Private:
-
-    private static Map<String, Integer> parseFormula(String formula) {
-        int[] index = new int[]{0}; // So it's shared along the stack
-        return parseFormula(formula.toCharArray(), index);
+    Set<String> getElements() {
+        return elementToMoles.keySet();
     }
 
-    private static Map<String, Integer> parseFormula(char[] formula, int[] index) {
+    @Override
+    public String toString() {
+        return text;
+    }
+
+    // Private:
+
+    private static Map<String, Integer> parse(String formula) {
+        int[] index = new int[]{0}; // So it's shared along the stack
+        return parse(formula.toCharArray(), index);
+    }
+
+    private static Map<String, Integer> parse(char[] formula, int[] index) {
         Map<String, Integer> elementToMoles = new HashMap<>();
 
         while (index[0] < formula.length) {
@@ -45,7 +48,7 @@ class Formula {
 
             if (character == '(') {
                 index[0]++;
-                Map<String, Integer> nestedCount = parseFormula(formula, index);
+                Map<String, Integer> nestedCount = parse(formula, index);
                 int multiplier = getMultiplier(formula, index);
                 for (Map.Entry<String, Integer> entry : nestedCount.entrySet()) {
                     int currentMoles = elementToMoles.getOrDefault(entry.getKey(), 0);

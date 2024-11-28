@@ -26,26 +26,34 @@ class EquationService {
     @Autowired
     MetricsService metricsService;
 
+    private static final String equationTooLongError = "La reacción es demasiado larga.";
+    private static final String invalidDigitsInReactantsError = "Los reactivos contienen dígitos inválidos.";
+    private static final String invalidDigitsInProductsError = "Los productos contienen dígitos inválidos.";
+    private static final String invalidParenthesesInReactantsError = "Los reactivos contienen paréntesis inválidos.";
+    private static final String invalidParenthesesInProductsError = "Los productos contienen paréntesis inválidos.";
+    private static final String mismatchedElementsError = "Los reactivos y los productos no tienen los mismos elementos.";
+    private static final String equationNotBalanceableError = "Esta reacción no es balanceable.";
+
     EquationResult tryBalance(String reactants, String products) {
         EquationResult equationResult;
 
-        String equation = reactants + " = " + products;
+        String equationForLogs = reactants + " = " + products;
 
         try {
             equationResult = balance(reactants, products);
 
             if (!equationResult.isPresent())
-                logger.warn("Couldn't calculate \"" + equation + "\". " + "RESULT: " + equationResult.getError());
+                logger.warn("Couldn't calculate \"" + equationForLogs + "\". " + "RESULT: " + equationResult.getError());
         } catch (StackOverflowError error) {
-            errorService.log("StackOverflow error", equation, getClass());
-            equationResult = EquationResult.error("La reacción es demasiado larga.");
+            errorService.log("StackOverflow error", equationForLogs, getClass());
+            equationResult = EquationResult.error(equationTooLongError);
         } catch (Exception exception) {
-            errorService.log("Exception calculating: " + equation, exception.toString(), getClass());
+            errorService.log("Exception calculating: " + equationForLogs, exception.toString(), getClass());
             equationResult = EquationResult.notPresent();
         }
 
         if (!equationResult.isPresent())
-            notFoundQueryService.log(equation, getClass());
+            notFoundQueryService.log(equationForLogs, getClass());
 
         metricsService.balanceEquationQueried(equationResult.isPresent());
 
@@ -55,33 +63,115 @@ class EquationService {
     // Private:
 
     private EquationResult balance(String reactantsText, String productsText) {
-        reactantsText = removeUnnecessaryCharacters(reactantsText);
-        productsText = removeUnnecessaryCharacters(productsText);
+        List<String> reactantFormulas = getFormulas(reactantsText);
+        List<String> productFormulas = getFormulas(productsText);
 
-        Set<String> reactantsElements = getElementsInSumOfFormulas(reactantsText);
-        Set<String> productsElements = getElementsInSumOfFormulas(productsText);
+        if (hasInvalidDigits(reactantFormulas))
+            return EquationResult.error(invalidDigitsInReactantsError);
+
+        if (hasInvalidDigits(productFormulas))
+            return EquationResult.error(invalidDigitsInProductsError);
+
+        if (hasInvalidParentheses(reactantFormulas))
+            return EquationResult.error(invalidParenthesesInReactantsError);
+
+        if (hasInvalidParentheses(productFormulas))
+            return EquationResult.error(invalidParenthesesInProductsError);
+
+        return balance(reactantFormulas, productFormulas);
+    }
+
+    private List<String> getFormulas(String sumOfFormulas) {
+        return Arrays.stream(sumOfFormulas.split(" \\+ ")).collect(Collectors.toList());
+    }
+
+    private boolean hasInvalidDigits(List<String> formulas) {
+        return formulas.stream().anyMatch(this::hasInvalidDigits);
+    }
+
+    private boolean hasInvalidDigits(String formula) {
+        return hasLeadingZeros(formula) || hasMisplacedCoefficients(formula);
+    }
+
+    private boolean hasLeadingZeros(String formula) {
+        return formula.matches(".*(^|\\D)0.*");
+    }
+
+    private boolean hasMisplacedCoefficients(String formula) {
+        return formula.matches(".*(^|\\(| )\\d.*");
+    }
+
+    private boolean hasInvalidParentheses(List<String> formulas) {
+        return formulas.stream().anyMatch(this::hasInvalidParentheses);
+    }
+
+    private boolean hasInvalidParentheses(String formula) {
+        if (formula.contains("()"))
+            return true;
+
+        int balance = 0;
+
+        for (char character : formula.toCharArray()) {
+            if (character == '(')
+                balance++;
+            else if (character == ')')
+                balance--;
+
+            if (balance < 0)
+                return true;
+        }
+
+        return balance != 0;
+    }
+
+    private EquationResult balance(List<String> reactantFormulas, List<String> productFormulas) {
+        List<Formula> reactants = correctAndParseFormulas(reactantFormulas);
+        List<Formula> products = correctAndParseFormulas(productFormulas);
+
+        Set<String> reactantsElements = getElementsIn(reactants);
+        Set<String> productsElements = getElementsIn(products);
 
         if (!reactantsElements.equals(productsElements))
-            return EquationResult.error("Deben aparecer los mismos elementos en ambas partes de la reacción.");
+            return EquationResult.error(mismatchedElementsError);
 
-        List<Formula> reactants = getFormulasInSumOfFormulas(reactantsText);
-        List<Formula> products = getFormulasInSumOfFormulas(productsText);
+        return balance(reactants, products, reactantsElements);
+    }
 
-        int[] solution = balance(reactants, products, reactantsElements);
+    private List<Formula> correctAndParseFormulas(List<String> formulas) {
+        List<String> correctedFormulas = formulas.stream().map(this::correctParentheses).collect(Collectors.toList());
+        List<String> uniqueCorrectedFormulas = correctedFormulas.stream().distinct().collect(Collectors.toList());
+        return uniqueCorrectedFormulas.stream().map(Formula::new).collect(Collectors.toList());
+    }
 
-        if (notBalanceable(solution))
-            return EquationResult.error("La reacción no es balanceable.");
+    private String correctParentheses(String text) {
+        final String pattern = "\\((.*)\\)";
+
+        while (text.matches(pattern))
+            text = text.replaceAll(pattern, "$1");
+
+        return text;
+    }
+
+    private Set<String> getElementsIn(List<Formula> formulas) {
+        return formulas.stream().map(Formula::getElements).flatMap(Set::stream).collect(Collectors.toSet());
+    }
+
+    private EquationResult balance(List<Formula> reactants, List<Formula> products, Set<String> elements) {
+        int[] solution = solve(reactants, products, elements);
+
+        if (meansEquationNotBalanceable(solution))
+            return EquationResult.error(equationNotBalanceableError);
 
         int[] reactantsSolution = Arrays.copyOfRange(solution, 0, reactants.size());
         int[] productsSolution = Arrays.copyOfRange(solution, reactants.size(), solution.length);
 
-        String resultReactants = formatSolution(reactantsText, reactantsSolution);
-        String resultProducts = formatSolution(productsText, productsSolution);
+        String resultReactants = writeSumOfFormulasWithCoefficients(reactants, reactantsSolution);
+        String resultProducts = writeSumOfFormulasWithCoefficients(products, productsSolution);
 
         return new EquationResult(resultReactants, resultProducts);
     }
 
-    private int[] balance(List<Formula> reactants, List<Formula> products, Set<String> elements) {
+    private int[] solve(List<Formula> reactants, List<Formula> products, Set<String> elements) {
         Matrix equations = getReactionEquations(reactants, products, elements);
 
         Fraction[] anySolution = Mathematics.calculateAnySolution(equations);
@@ -100,14 +190,14 @@ class EquationService {
 
             for (int column = 0; column < reactants.size(); column++) {
                 Formula reactant = reactants.get(column);
-                int molesOfElementInReactant = reactant.molesOf(element);
+                int molesOfElementInReactant = reactant.getMolesOf(element);
 
                 equations.set(row, column, new Fraction(molesOfElementInReactant));
             }
 
             for (int column = reactants.size(); column < equations.columns() - 1; column++) {
                 Formula product = products.get(column - reactants.size());
-                int molesOfElementInProduct = -1 * product.molesOf(element);
+                int molesOfElementInProduct = -1 * product.getMolesOf(element);
 
                 equations.set(row, column, new Fraction(molesOfElementInProduct));
             }
@@ -116,148 +206,24 @@ class EquationService {
         return equations;
     }
 
-    private boolean notBalanceable(int[] solution) {
+    private boolean meansEquationNotBalanceable(int[] solution) {
         return Arrays.stream(solution).anyMatch(element -> element == 0);
     }
 
-    // TODO clean this code from the internet:
-        // "Gets all elements used on a side an equation"
-    private static Set<String> getElementsInSumOfFormulas(String sumOfFormulas) {
-        LinkedHashSet<String> elements = new LinkedHashSet<>();
-        String elementString = "";
-        char character = 0;
-        for (int i = 0; i < sumOfFormulas.length(); i++) {
-            character = sumOfFormulas.charAt(i);
-            if (Character.isLetter(character)) {
-                if (String.valueOf(character).toUpperCase().equals(String.valueOf(character))) {
-                    if (!elementString.isEmpty()) {
-                        elements.add(elementString);
-                        elementString = "";
-                    }
-                }
-                elementString = elementString.concat(Character.toString(character));
-            } else if (Character.toString(character).equals("+")) {
-                elements.add(elementString);
-                elementString = "";
-            }
-        }
-        if (!Character.toString(character).isEmpty()) {
-            elements.add(elementString);
+    private String writeSumOfFormulasWithCoefficients(List<Formula> formulas, int[] solutions) {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < formulas.size(); i++) {
+            if (i > 0)
+                result.append(" + ");
+
+            if (solutions[i] != 1)
+                result.append(solutions[i]);
+
+            result.append(formulas.get(i));
         }
 
-        return elements;
-    }
-
-    private List<Formula> getFormulasInSumOfFormulas(String sumOfFormulas) {
-        return Arrays.stream(sumOfFormulas.split("\\+")).map(Formula::new).collect(Collectors.toList());
-    }
-
-    // TODO clean this code from the internet:
-        // "Removes all characters that are not letters, numbers, parentheses(), and plus signs("+")"
-    private static String removeUnnecessaryCharacters(String currentString) {
-        currentString = currentString.replaceAll("\\s", "");
-        currentString = currentString.replaceAll("\\++", "+");
-        currentString = currentString.replaceAll("^\\++|\\++$", "");
-        currentString = currentString.replaceAll("[^a-zA-Z0-9()+=]", "");
-
-        // Stack to hold the index and content status of unmatched opening parentheses
-        Stack<Integer> stack = new Stack<>();
-        StringBuilder sb = new StringBuilder();
-        boolean[] hasContent = new boolean[currentString.length()];  // Tracks content between parentheses
-
-        for (int i = 0; i < currentString.length(); i++) {
-            char ch = currentString.charAt(i);
-            if (ch == '(') {
-                // Push the current length (position of '(') onto the stack and assume no content initially
-                stack.push(sb.length());
-                hasContent[sb.length()] = false;  // Default to no content
-                sb.append(ch);
-            } else if (ch == ')') {
-                if (stack.isEmpty()) {
-                    // There's a closing parenthesis without a matching opening, ignore it
-                    continue;
-                }
-                // Check if there was content
-                int openPos = stack.pop();
-                if (!hasContent[openPos]) {
-                    // No content between the parentheses, remove the opening parenthesis
-                    sb.deleteCharAt(openPos);
-                } else {
-                    // Valid content found, append closing parenthesis
-                    sb.append(ch);
-                }
-            } else {
-                // Append other characters directly
-                sb.append(ch);
-                if (!stack.isEmpty()) {
-                    // Mark that there has been content since the last '('
-                    hasContent[stack.peek()] = true;
-                }
-            }
-        }
-
-        // Any remaining '(' in the stack are unmatched, remove them
-        while (!stack.isEmpty()) {
-            sb.deleteCharAt(stack.pop());
-        }
-
-        return sb.toString();
-    }
-
-    // TODO clean this code from the internet
-    private static String formatSolution(String originalString, int[] solutions) {
-        String[] arr = originalString.split("\\+");
-        StringBuilder s = new StringBuilder();
-        String coefficientHandler = "";
-
-        for (int i = 0; i < solutions.length; i++) {
-            if (Character.isDigit(arr[i].charAt(0))) {
-                int j = 0;
-                while (Character.isDigit(arr[i].charAt(j))) {
-                    coefficientHandler = coefficientHandler.concat(String.valueOf(arr[i].charAt(j)));
-                    j++;
-                }
-                arr[i] = arr[i].substring(j);
-                int newCoefficient = Integer.parseInt(coefficientHandler) * solutions[i];
-
-                if (newCoefficient != 1) { // Only append if coefficient is not 1
-                    s.append(newCoefficient);
-                }
-
-                appendElement(arr, i, s, solutions, newCoefficient);
-
-                coefficientHandler = "";
-            } else {
-                if (solutions[i] != 1) { // Only append if coefficient is not 1
-                    s.append(solutions[i]);
-                }
-
-                appendElement(arr, i, s, solutions, solutions[i]);
-
-            }
-        }
-        return s.toString();
-    }
-
-    // TODO clean this code from the internet:
-    private static void appendElement(String[] arr, int i, StringBuilder s,  int[] solutions, int newCoefficient) {
-
-        if (arr[i].length() == 2 && (Character.isDigit(arr[i].charAt(1)) || Character.isLowerCase(arr[i].charAt(1))))
-            s.append(arr[i]);
-        else if (arr[i].length() == 3 && Character.isDigit(arr[i].charAt(2)) && Character.isLowerCase(arr[i].charAt(1)))
-            s.append(arr[i]);
-        else {
-            if (arr[i].length() > 1 && newCoefficient != 1)
-                s.append('(');
-
-            s.append(arr[i]);
-
-            if (arr[i].length() > 1 && newCoefficient != 1)
-                s.append(')');
-        }
-
-        if (i < solutions.length - 1)
-            s.append(" + ");
+        return result.toString();
     }
 
 }
