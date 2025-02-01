@@ -60,6 +60,13 @@ class ClientModel {
     private Integer interstitialAdOffset;
     private String interstitialAdUnitId;
 
+    @Column(nullable = false)
+    private Boolean rewardedAdPresent;
+
+    // If rewardedAdPresent = true:
+    private String rewardedAdUnitId;
+
+
     // Getters and setters:
 
     Boolean getUpdateAvailable() {
@@ -120,6 +127,14 @@ class ClientModel {
 
     String getInterstitialAdUnitId() {
         return interstitialAdUnitId;
+    }
+
+    public Boolean getRewardedAdPresent() {
+        return rewardedAdPresent;
+    }
+
+    public String getRewardedAdUnitId() {
+        return rewardedAdUnitId;
     }
 
 }

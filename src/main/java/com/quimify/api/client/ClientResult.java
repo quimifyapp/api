@@ -23,8 +23,10 @@ class ClientResult {
     private Integer interstitialAdOffset; // Minimum attempts before 1st one
     private String interstitialAdUnitId;
 
-    // Constructors:
+    private Boolean rewardedAdPresent;
+    private String rewardedAdUnitId;
 
+    // Constructors:
     ClientResult(ClientModel clientModel) {
         this.updateAvailable = clientModel.getUpdateAvailable();
         this.updateNeeded = clientModel.getUpdateNeeded();
@@ -41,6 +43,8 @@ class ClientResult {
         this.interstitialAdPeriod = clientModel.getInterstitialAdPeriod();
         this.interstitialAdOffset = clientModel.getInterstitialAdOffset();
         this.interstitialAdUnitId = clientModel.getInterstitialAdUnitId();
+        this.rewardedAdPresent = clientModel.getRewardedAdPresent();
+        this.rewardedAdUnitId = clientModel.getRewardedAdUnitId();
     }
 
     private ClientResult(boolean updateAvailable, boolean messagePresent) {
@@ -214,4 +218,23 @@ class ClientResult {
         this.interstitialAdUnitId = interstitialAdUnitId;
     }
 
+    @SuppressWarnings("unused")
+    public Boolean getRewardedAdPresent() {
+        return rewardedAdPresent;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRewardedAdPresent(Boolean rewardedAdPresent) {
+        this.rewardedAdPresent = rewardedAdPresent;
+    }
+
+    @SuppressWarnings("unused")
+    public String getRewardedAdUnitId() {
+        return rewardedAdUnitId;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRewardedAdUnitId(String rewardedAdUnitId) {
+        this.rewardedAdUnitId = rewardedAdUnitId;
+    }
 }
