@@ -23,8 +23,8 @@ class OrganicController {
 	// Client:
 
 	@GetMapping("/structure")
-	OrganicResult getFromName(@RequestParam("name") String name) {
-		OrganicResult result = organicService.getFromName(name);
+	OrganicResult getFromName(@RequestParam("name") String name, @RequestHeader(value = "language", defaultValue = "en") String language) {
+		OrganicResult result = organicService.getFromName(name, language);
 
 		if (result.isFound())
 			logger.info(String.format(getOrganicMessage, "name", name, result.getStructure()));

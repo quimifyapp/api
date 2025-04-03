@@ -68,17 +68,17 @@ public class OrganicService {
 
     private boolean checkNameToStructureHealth() {
         String testName = "metano";
-        Optional<OrganicResult> resultFromName = tryGetFromName(testName);
+        Optional<OrganicResult> resultFromName = tryGetFromName(testName, "es");
         return resultFromName.isPresent() && resultFromName.get().isFound();
     }
 
     // Client:
 
-    OrganicResult getFromName(String input) {
-        Optional<OrganicResult> result = tryGetFromName(input);
+    OrganicResult getFromName(String input, String language) {
+        Optional<OrganicResult> result = tryGetFromName(input, language);
 
         if (result.isEmpty())
-            result = getFromCorrectedName(input);
+            result = getFromCorrectedName(input, language);
 
         if (result.isEmpty())
             result = Optional.of(OrganicResult.notFound());
@@ -119,13 +119,13 @@ public class OrganicService {
 
     // Private:
 
-    Optional<OrganicResult> getFromCorrectedName(String input) {
+    Optional<OrganicResult> getFromCorrectedName(String input, String language) {
         Optional<OrganicResult> organicResult = Optional.empty();
 
         String correctedInput = correctionService.correct(input, false);
 
         if (!input.equals(correctedInput)) {
-            organicResult = tryGetFromName(correctedInput);
+            organicResult = tryGetFromName(correctedInput, language);
 
             if (organicResult.isPresent() && organicResult.get().isFound()) {
                 organicResult.get().setSuggestion(correctedInput);
@@ -138,7 +138,7 @@ public class OrganicService {
         if (organicResult.isEmpty()) {
             String acidCorrectedInput = "ácido " + correctedInput;
 
-            organicResult = tryGetFromName(acidCorrectedInput);
+            organicResult = tryGetFromName(acidCorrectedInput, language);
 
             if (organicResult.isPresent()) {
                 organicResult.get().setSuggestion(acidCorrectedInput);
@@ -151,7 +151,7 @@ public class OrganicService {
         if (organicResult.isEmpty()) {
             String locatorCorrectedInput = "1-" + correctedInput;
 
-            organicResult = tryGetFromName(locatorCorrectedInput);
+            organicResult = tryGetFromName(locatorCorrectedInput, language);
 
             if (organicResult.isPresent()) {
                 organicResult.get().setSuggestion(locatorCorrectedInput);
@@ -162,11 +162,11 @@ public class OrganicService {
         return organicResult;
     }
 
-    Optional<OrganicResult> tryGetFromName(String name) {
+    Optional<OrganicResult> tryGetFromName(String name, String language) {
         Optional<OrganicResult> result = Optional.empty();
 
         try {
-            Optional<Organic> organic = OrganicFactory.getFromName(name);
+            Optional<Organic> organic = OrganicFactory.getFromName(name, language);
 
             if (organic.isPresent()) {
                 result = Optional.of(processSolved(organic.get()));
