@@ -6,12 +6,9 @@ import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// This class represents inorganic compounds.
-
 @Entity
-@Table(name = "inorganic")
 @Check(constraints = "(stock_name IS NOT NULL OR systematic_name IS NOT NULL OR traditional_name IS NOT NULL)")
-class InorganicModel {
+public abstract class InorganicModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,35 +77,35 @@ class InorganicModel {
         return id;
     }
 
-    String getFormula() {
+    public String getFormula() {
         return formula;
     }
 
-    void setFormula(String formula) {
+    public void setFormula(String formula) {
         this.formula = formula;
     }
 
-    String getStockName() {
+    public String getStockName() {
         return stockName;
     }
 
-    void setStockName(String stockName) {
+    public void setStockName(String stockName) {
         this.stockName = stockName;
     }
 
-    String getSystematicName() {
+    public String getSystematicName() {
         return systematicName;
     }
 
-    void setSystematicName(String systematicName) {
+    public void setSystematicName(String systematicName) {
         this.systematicName = systematicName;
     }
 
-    String getTraditionalName() {
+    public String getTraditionalName() {
         return traditionalName;
     }
 
-    void setTraditionalName(String traditionalName) {
+    public void setTraditionalName(String traditionalName) {
         this.traditionalName = traditionalName;
     }
 
@@ -120,7 +117,7 @@ class InorganicModel {
         return molecularMass;
     }
 
-    void setMolecularMass(String molecularMass) {
+    public void setMolecularMass(String molecularMass) {
         this.molecularMass = molecularMass;
     }
 
@@ -128,7 +125,7 @@ class InorganicModel {
         return density;
     }
 
-    void setDensity(String density) {
+    public void setDensity(String density) {
         this.density = density;
     }
 
@@ -136,7 +133,7 @@ class InorganicModel {
         return meltingPoint;
     }
 
-    void setMeltingPoint(String meltingPoint) {
+    public void setMeltingPoint(String meltingPoint) {
         this.meltingPoint = meltingPoint;
     }
 
@@ -144,7 +141,7 @@ class InorganicModel {
         return boilingPoint;
     }
 
-    void setBoilingPoint(String boilingPoint) {
+    public void setBoilingPoint(String boilingPoint) {
         this.boilingPoint = boilingPoint;
     }
 

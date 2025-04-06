@@ -17,30 +17,24 @@ import com.quimify.api.notfoundquery.NotFoundQueryService;
 import com.quimify.api.utils.Normalizer;
 
 @Service
-public class InorganicService {
+public abstract class InorganicService<InorganicModel extends com.quimify.api.inorganic.InorganicModel> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    InorganicRepository inorganicRepository;
+    protected abstract InorganicRepository<InorganicModel> getRepository();
 
-    @Autowired
-    CacheComponent cacheComponent;
+    protected abstract CacheComponent<InorganicModel> getCacheComponent();
 
-    @Autowired
-    ClassificationService classificationService;
+    protected abstract ClassificationService getClassificationService();
 
-    @Autowired
-    CorrectionService correctionService;
+    protected abstract CorrectionService getCorrectionService();
 
-    @Autowired
-    CompletionComponent completionComponent;
+    protected abstract CompletionComponent<InorganicModel> getCompletionComponent();
+
+    protected abstract WebParseComponent<InorganicModel> getWebParseComponent();
 
     @Autowired
     WebSearchComponent webSearchComponent;
-
-    @Autowired
-    WebParseComponent webParseComponent;
 
     @Autowired
     MolecularMassService molecularMassService;
@@ -57,13 +51,13 @@ public class InorganicService {
     // Internal:
 
     public boolean isHealthy() {
-        Optional<Integer> cachedId = cacheComponent.find(Normalizer.get("h2o"));
+        Optional<Integer> cachedId = getCacheComponent().find(Normalizer.get("h2o"));
         return cachedId.isPresent();
     }
 
     // Client:
 
-    InorganicResult search(String input) {
+    protected InorganicResult search(String input) {
         Optional<InorganicResult> stored = memorySearch(input);
 
         if (stored.isPresent())
@@ -85,7 +79,7 @@ public class InorganicService {
         return deepSearch(input);
     }
 
-    InorganicResult deepSearch(String input) {
+    protected InorganicResult deepSearch(String input) {
         Optional<String> url = webSearchComponent.search(input);
 
         if (url.isEmpty()) {
@@ -95,7 +89,7 @@ public class InorganicService {
             return InorganicResult.notFound();
         }
 
-        Optional<InorganicModel> parsedInorganic = webParseComponent.tryParse(url.get());
+        Optional<InorganicModel> parsedInorganic = getWebParseComponent().tryParse(url.get());
 
         if (parsedInorganic.isEmpty()) {
             metricsService.inorganicDeepSearchFailed();
@@ -125,20 +119,20 @@ public class InorganicService {
         return new InorganicResult(parsedInorganic.get()); // TODO with suggestion + evaluate max similarity
     }
 
-    String complete(String input) {
-        String completion = completionComponent.tryComplete(input);
+    protected String complete(String input) {
+        String completion = getCompletionComponent().tryComplete(input);
 
         if (completion.equals(CompletionComponent.notFound)) {
-            String correctedInput = correctionService.correct(input, true);
+            String correctedInput =getCorrectionService().correct(input, true);
 
             if (!input.equals(correctedInput))
-                completion = completionComponent.tryComplete(correctedInput);
+                completion = getCompletionComponent().tryComplete(correctedInput);
         }
 
         return completion;
     }
 
-    InorganicResult completionSearch(String completion) {
+    protected InorganicResult completionSearch(String completion) {
         InorganicResult inorganicResult;
 
         Optional<InorganicModel> searchedInMemory = fetch(completion);
@@ -176,7 +170,7 @@ public class InorganicService {
     private Optional<InorganicResult> correctionSearch(String input) {
         Optional<InorganicResult> inorganicResult = Optional.empty();
 
-        String correctedInput = correctionService.correct(input, false);
+        String correctedInput = getCorrectionService().correct(input, false);
 
         if (!input.equals(correctedInput)) {
             Optional<InorganicModel> searchedInMemory = fetch(correctedInput);
@@ -221,23 +215,23 @@ public class InorganicService {
     }
 
     private Optional<InorganicResult> classificationSearch(String input) {
-        Optional<Classification> result = classificationService.classify(input);
+        Optional<Classification> result = getClassificationService().classify(input);
 
         metricsService.inorganicClassificationSearched(result.isPresent());
 
-        if (result.isEmpty() || classificationService.isInorganic(result.get()))
+        if (result.isEmpty() || getClassificationService().isInorganic(result.get()))
             return Optional.empty();
 
         return Optional.of(InorganicResult.classification(result.get()));
     }
 
     private Optional<InorganicModel> fetch(String input) {
-        Optional<Integer> id = cacheComponent.find(Normalizer.get(input));
+        Optional<Integer> id = getCacheComponent().find(Normalizer.get(input));
 
         if (id.isEmpty())
             return Optional.empty();
 
-        Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id.get());
+        Optional<InorganicModel> inorganicModel = getRepository().findById(id.get());
 
         if (inorganicModel.isPresent())
             inorganicModel.get().countSearch();
@@ -248,8 +242,8 @@ public class InorganicService {
     }
 
     private void learnParsed(InorganicModel parsedInorganic) {
-        inorganicRepository.save(parsedInorganic);
-        cacheComponent.save(parsedInorganic);
+        getRepository().save(parsedInorganic);
+        getCacheComponent().save(parsedInorganic);
 
         metricsService.inorganicDeepSearchLearned();
         logger.warn("Learned inorganic: {}", parsedInorganic);

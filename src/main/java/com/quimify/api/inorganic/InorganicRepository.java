@@ -5,10 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// This class implements connections to the DB automatically thanks to the JPA library.
-
 @Repository
-interface InorganicRepository extends CrudRepository<InorganicModel, Integer> {
+public interface InorganicRepository<InorganicModel extends com.quimify.api.inorganic.InorganicModel>
+        extends CrudRepository<InorganicModel, Integer> {
 
     List<InorganicModel> findAllByOrderBySearchesDesc();
 

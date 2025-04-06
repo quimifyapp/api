@@ -4,8 +4,6 @@ import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
 
-// This class represents one of the search tags an inorganic compound might have.
-
 @Entity
 @Table(name = "inorganic_search_tag")
 @Check(constraints = "REGEXP_LIKE(normalized_text, '^[a-z0-9]+$', 'c')") // Case-sensitive matching with 'c'

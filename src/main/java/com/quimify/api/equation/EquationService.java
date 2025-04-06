@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+// TODO A2 + A = A
+// TODO A2B + A = AB
+
 @Service
 class EquationService {
 
