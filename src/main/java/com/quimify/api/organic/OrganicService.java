@@ -68,7 +68,7 @@ public class OrganicService {
 
     private boolean checkNameToStructureHealth() {
         String testName = "metano";
-        Optional<OrganicResult> resultFromName = tryGetFromName(testName, "es");
+        Optional<OrganicResult> resultFromName = tryGetFromName(testName, "sp");
         return resultFromName.isPresent() && resultFromName.get().isFound();
     }
 
