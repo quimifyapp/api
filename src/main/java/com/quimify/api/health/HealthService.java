@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.quimify.api.error.ErrorService;
+import com.quimify.api.inorganic.InorganicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import com.quimify.api.classification.ClassificationService;
-import com.quimify.api.inorganic.InorganicService;
 import com.quimify.api.molecularmass.MolecularMassService;
 import com.quimify.api.organic.OrganicService;
 

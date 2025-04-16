@@ -1,15 +1,16 @@
 package com.quimify.api.inorganic;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// This class implements connections to the DB automatically thanks to the JPA library.
+import org.springframework.data.repository.NoRepositoryBean;
 
-@Repository
-interface InorganicRepository extends CrudRepository<InorganicModel, Integer> {
+@NoRepositoryBean
+public interface InorganicRepository<T extends InorganicModel>
+        extends CrudRepository<T, Integer> {
 
-    List<InorganicModel> findAllByOrderBySearchesDesc();
-
+    // Example custom query method
+    List<T> findAllByOrderBySearchesDesc();
 }
+

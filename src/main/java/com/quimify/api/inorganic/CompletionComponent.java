@@ -10,19 +10,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-// This class solves inorganic completions.
-
 @Component
 @EnableScheduling
-class CompletionComponent {
+public abstract class CompletionComponent<InorganicModel extends com.quimify.api.inorganic.InorganicModel> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    InorganicRepository inorganicRepository; 
+    protected abstract InorganicRepository<InorganicModel> getRepository();
 
-    @Autowired
-    CacheComponent cacheComponent;
+    protected abstract CacheComponent<InorganicModel> getCacheComponent();
 
     @Autowired
     ErrorService errorService; // API errors logic
@@ -36,7 +32,7 @@ class CompletionComponent {
     String tryComplete(String input) {
         try {
             String normalizedInput = Normalizer.get(input);
-            Optional<Integer> id = cacheComponent.findCompletion(normalizedInput);
+            Optional<Integer> id = getCacheComponent().findCompletion(normalizedInput);
 
             if (id.isPresent())
                 return findNormalizedTextIn(normalizedInput, id.get());
@@ -50,7 +46,7 @@ class CompletionComponent {
     // Private:
 
     private String findNormalizedTextIn(String normalizedInput, Integer id) {
-        Optional<InorganicModel> inorganicModel = inorganicRepository.findById(id);
+        Optional<InorganicModel> inorganicModel = getRepository().findById(id);
 
         if (inorganicModel.isEmpty()) {
             logger.warn("Discrepancy between DB and cached ID: {}", id);

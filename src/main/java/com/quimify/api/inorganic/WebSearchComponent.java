@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-// This class runs web searches through Google's and Bing's API.
-
 @Component
 class WebSearchComponent {
 

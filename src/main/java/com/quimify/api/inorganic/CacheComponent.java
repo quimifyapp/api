@@ -13,19 +13,17 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-// This Spring bean handles the runtime cache of all inorganics stored in DB.
-
 @Component
 @EnableScheduling
-class CacheComponent {
+public abstract class CacheComponent<InorganicModel extends com.quimify.api.inorganic.InorganicModel> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    InorganicRepository inorganicRepository;
+    protected abstract InorganicRepository<InorganicModel> getRepository();
 
     @Autowired
     ErrorService errorService; // API errors logic
+
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); // Avoids reading main cache while writing
 
     private final Map<String, Integer> cache = new LinkedHashMap<>(); // Ordered by searches
@@ -43,7 +41,7 @@ class CacheComponent {
             logger.info("Updating inorganic cache...");
 
             cache.clear();
-            for (InorganicModel inorganicModel : inorganicRepository.findAllByOrderBySearchesDesc())
+            for (InorganicModel inorganicModel : getRepository().findAllByOrderBySearchesDesc())
                 add(inorganicModel);
 
             logger.info("Updated inorganic cache.");

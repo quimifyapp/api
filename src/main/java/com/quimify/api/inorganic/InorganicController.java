@@ -1,13 +1,13 @@
 package com.quimify.api.inorganic;
 
+import com.quimify.api.inorganic.english.InorganicEnglishService;
+import com.quimify.api.inorganic.spanish.InorganicSpanishService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-// This class implements HTTP methods in "/inorganic".
 
 @RestController
 @RequestMapping("/inorganic")
@@ -16,17 +16,31 @@ class InorganicController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    InorganicService inorganicService;
+    InorganicSpanishService inorganicSpanishService;
+
+    @Autowired
+    InorganicEnglishService inorganicEnglishService;
 
     // Constants:
 
     private static final String getInorganicMessage = "GET inorganic %s: \"%s\". RESULT: %s.";
 
+    // Helper method to select service based on language
+    private InorganicService getInorganicService(String language) {
+        if ("sp".equalsIgnoreCase(language)) {
+            return inorganicSpanishService;
+        }
+        // Default to English for "en" or any other value
+        return inorganicEnglishService;
+    }
+
     // Client:
 
     @GetMapping("/completion")
     @ResponseBody
-    ResponseEntity<String> complete(@RequestParam("input") String input) {
+    ResponseEntity<String> complete(@RequestParam("input") String input,
+                                    @RequestHeader(value = "language", defaultValue = "en") String language) {
+        InorganicService inorganicService = getInorganicService(language);
         String completion = inorganicService.complete(input);
 
         CacheControl cacheHeader = CacheControl.empty().cachePublic(); // It allows clients and CDN to cache it
@@ -35,7 +49,9 @@ class InorganicController {
     }
 
     @GetMapping("/from-completion")
-    InorganicResult completionSearch(@RequestParam("completion") String completion) {
+    InorganicResult completionSearch(@RequestParam("completion") String completion,
+                                     @RequestHeader(value = "language", defaultValue = "en") String language) {
+        InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.completionSearch(completion);
 
         if (inorganicResult.isFound())
@@ -45,7 +61,9 @@ class InorganicController {
     }
 
     @GetMapping()
-    InorganicResult search(@RequestParam("input") String input) {
+    InorganicResult search(@RequestParam("input") String input,
+                           @RequestHeader(value = "language", defaultValue = "en") String language) {
+        InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.search(input);
 
         if (inorganicResult.isFound())
@@ -55,7 +73,9 @@ class InorganicController {
     }
 
     @GetMapping("/deep")
-    InorganicResult deepSearch(@RequestParam("input") String input) {
+    InorganicResult deepSearch(@RequestParam("input") String input,
+                               @RequestHeader(value = "language", defaultValue = "en") String language) {
+        InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.deepSearch(input);
 
         if (inorganicResult.isFound())
