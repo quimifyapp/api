@@ -2,6 +2,7 @@ package com.quimify.api.molecularmass;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +42,7 @@ public class MolecularMassService {
 
     public boolean isHealthy() {
         String testFormula = "H"; // Expected ~1.00794
-        MolecularMassResult result = tryCalculate(testFormula);
+        MolecularMassResult result = tryCalculate(testFormula, "en");
         return result.isPresent();
     }
 
@@ -49,7 +50,7 @@ public class MolecularMassService {
         Optional<Float> molecularMass;
 
         try {
-            MolecularMassResult molecularMassResult = calculate(formula);
+            MolecularMassResult molecularMassResult = calculate(formula, "en");
 
             if (molecularMassResult.isPresent())
                 molecularMass = Optional.ofNullable(molecularMassResult.getMolecularMass());
@@ -71,11 +72,11 @@ public class MolecularMassService {
 
     // Client:
 
-    MolecularMassResult tryCalculate(String query) {
+    MolecularMassResult tryCalculate(String query, String language) {
         MolecularMassResult molecularMassResult;
 
         try {
-            molecularMassResult = calculate(query);
+            molecularMassResult = calculate(query, language);
 
             if (!molecularMassResult.isPresent())
                 logger.warn("Couldn't calculate \"{}\". RESULT: {}", query, molecularMassResult.getError());
@@ -96,7 +97,7 @@ public class MolecularMassService {
     }
     // Private:
 
-    private MolecularMassResult calculate(String formula) { // TODO translate code
+    private MolecularMassResult calculate(String formula, String language) { // TODO translate code
         // Se comprueba si tiene aspecto de fórmula:
         String adapted = formula.replaceAll("[≡=-]", ""); // Bonds
 
@@ -104,20 +105,31 @@ public class MolecularMassService {
         Pattern structurePattern = Pattern.compile("(\\(*[A-Z][a-z]?(([2-9])|([1-9]\\d+))?" +
                 "((\\(*)|(\\)(([2-9])|([1-9]\\d+))?))*)+"); // Once or more TODO constant
 
-        if (!structurePattern.matcher(adapted).matches())
-            return MolecularMassResult.error("La fórmula \"" + formula + "\" no es válida.");
-        else if (StringUtils.countOccurrencesOf(adapted, "(") != StringUtils.countOccurrencesOf(adapted, ")"))
-            return MolecularMassResult.error("Los paréntesis no están balanceados.");
-        else if (adapted.contains("()"))
-            return MolecularMassResult.error("Los paréntesis huecos \"()\" no son válidos.");
-
+        if (language.equals("en")) {
+            if (!structurePattern.matcher(adapted).matches())
+                return MolecularMassResult.error("The formula \"" + formula + "\" is not valid.");
+            else if (StringUtils.countOccurrencesOf(adapted, "(") != StringUtils.countOccurrencesOf(adapted, ")"))
+                return MolecularMassResult.error("Parentheses are not balanced.");
+            else if (adapted.contains("()"))
+                return MolecularMassResult.error("Empty parentheses \"()\" are not valid.");
+        }
+        else if (language.equals("sp")) {
+            if (!structurePattern.matcher(adapted).matches())
+                return MolecularMassResult.error("La fórmula \"" + formula + "\" no es válida.");
+            else if (StringUtils.countOccurrencesOf(adapted, "(") != StringUtils.countOccurrencesOf(adapted, ")"))
+                return MolecularMassResult.error("Los paréntesis no están balanceados.");
+            else if (adapted.contains("()"))
+                return MolecularMassResult.error("Los paréntesis huecos \"()\" no son válidos.");
+        }
         // Parece que sí:
 
         Optional<Map<String, Integer>> elementToMoles = getElementToMolesIn(adapted); // Se analiza la fórmula
 
         // Se calcula la masa molecular:
 
-        if (elementToMoles.isEmpty())
+        if (elementToMoles.isEmpty() && Objects.equals(language, "en"))
+            return MolecularMassResult.error("Couldn't calculate molecular mass.");
+        else if (elementToMoles.isEmpty() && Objects.equals(language, "sp"))
             return MolecularMassResult.error("No se ha podido calcular la masa molecular.");
 
         float molecularMass = 0;
@@ -130,8 +142,10 @@ public class MolecularMassService {
 
             Optional<Float> elementMolecularMass = getMolecularMassOf(symbol);
 
-            if (elementMolecularMass.isEmpty())
+            if (elementMolecularMass.isEmpty() && Objects.equals(language, "sp"))
                 return MolecularMassResult.error("No se reconoce el elemento \"" + symbol + "\".");
+            else if (elementMolecularMass.isEmpty() && Objects.equals(language, "en"))
+                return MolecularMassResult.error("Couldn't recognize the element \"" + symbol + "\".");
 
             float grams = element.getValue() * elementMolecularMass.get();
             elementToGrams.put(symbol, grams);

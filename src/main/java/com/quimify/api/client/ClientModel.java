@@ -26,16 +26,22 @@ class ClientModel {
     @Column()
     private Boolean updateNeeded;
     @Column()
-    private String updateDetails;
+    private String updateDetailsSpanish;
+    @Column()
+    private String updateDetailsEnglish;
 
     @Column(nullable = false)
     private Boolean messagePresent;
 
     // If messagePresent = true:
     @Column()
-    private String messageTitle;
+    private String messageTitleSpanish;
     @Column()
-    private String messageDetails;
+    private String messageDetailsSpanish;
+    @Column()
+    private String messageTitleEnglish;
+    @Column()
+    private String messageDetailsEnglish;
 
     @Column()
     private Boolean messageLinkPresent;
@@ -77,20 +83,35 @@ class ClientModel {
         return updateNeeded;
     }
 
-    String getUpdateDetails() {
-        return updateDetails;
+    // Specific getters for update details
+    String getUpdateDetailsSpanish() {
+        return updateDetailsSpanish;
+    }
+
+    String getUpdateDetailsEnglish() {
+        return updateDetailsEnglish;
     }
 
     Boolean getMessagePresent() {
         return messagePresent;
     }
 
-    String getMessageTitle() {
-        return messageTitle;
+    // Specific getters for message titles
+    String getMessageTitleSpanish() {
+        return messageTitleSpanish;
     }
 
-    String getMessageDetails() {
-        return messageDetails;
+    String getMessageTitleEnglish() {
+        return messageTitleEnglish;
+    }
+
+    // Specific getters for message details
+    String getMessageDetailsSpanish() {
+        return messageDetailsSpanish;
+    }
+
+    String getMessageDetailsEnglish() {
+        return messageDetailsEnglish;
     }
 
     Boolean getMessageLinkPresent() {

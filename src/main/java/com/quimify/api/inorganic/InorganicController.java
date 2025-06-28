@@ -39,7 +39,7 @@ class InorganicController {
     @GetMapping("/completion")
     @ResponseBody
     ResponseEntity<String> complete(@RequestParam("input") String input,
-                                    @RequestHeader(value = "language", defaultValue = "en") String language) {
+                                    @RequestHeader(value = "language", defaultValue = "sp") String language) {
         InorganicService inorganicService = getInorganicService(language);
         String completion = inorganicService.complete(input);
 
@@ -50,7 +50,7 @@ class InorganicController {
 
     @GetMapping("/from-completion")
     InorganicResult completionSearch(@RequestParam("completion") String completion,
-                                     @RequestHeader(value = "language", defaultValue = "en") String language) {
+                                     @RequestHeader(value = "language", defaultValue = "sp") String language) {
         InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.completionSearch(completion);
 
@@ -62,7 +62,7 @@ class InorganicController {
 
     @GetMapping()
     InorganicResult search(@RequestParam("input") String input,
-                           @RequestHeader(value = "language", defaultValue = "en") String language) {
+                           @RequestHeader(value = "language", defaultValue = "sp") String language) {
         InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.search(input);
 
@@ -74,7 +74,7 @@ class InorganicController {
 
     @GetMapping("/deep")
     InorganicResult deepSearch(@RequestParam("input") String input,
-                               @RequestHeader(value = "language", defaultValue = "en") String language) {
+                               @RequestHeader(value = "language", defaultValue = "sp") String language) {
         InorganicService inorganicService = getInorganicService(language);
         InorganicResult inorganicResult = inorganicService.deepSearch(input);
 

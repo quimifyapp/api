@@ -6,6 +6,7 @@ import java.util.List;
 import com.quimify.api.error.ErrorService;
 import com.quimify.api.inorganic.InorganicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -18,7 +19,12 @@ import com.quimify.api.organic.OrganicService;
 class HealthService {
 
     @Autowired
-    InorganicService inorganicService;
+    @Qualifier("inorganicEnglishService")
+    InorganicService inorganicEnglishService;
+
+    @Autowired
+    @Qualifier("inorganicSpanishService")
+    InorganicService inorganicSpanishService;
 
     @Autowired
     OrganicService organicService;
@@ -37,7 +43,10 @@ class HealthService {
     public HealthResult checkHealth() {
         List<String> errors = new ArrayList<>();
 
-        addErrorIfUnhealthy(inorganicService.isHealthy(), inorganicService.getClass().getName(), errors);
+        // Check health for both inorganic services
+        addErrorIfUnhealthy(inorganicEnglishService.isHealthy(), inorganicEnglishService.getClass().getName(), errors);
+        addErrorIfUnhealthy(inorganicSpanishService.isHealthy(), inorganicSpanishService.getClass().getName(), errors);
+
         addErrorIfUnhealthy(organicService.isHealthy(), organicService.getClass().getName(), errors);
         addErrorIfUnhealthy(molecularMassService.isHealthy(), molecularMassService.getClass().getName(), errors);
         addErrorIfUnhealthy(classificationService.isHealthy(), classificationService.getClass().getName(), errors);

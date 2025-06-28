@@ -6,11 +6,16 @@ class ClientResult {
 
     private boolean updateAvailable;
     private Boolean updateNeeded;
-    private String updateDetails;
+
+    private String updateDetailsSpanish;
+    private String updateDetailsEnglish;
 
     private boolean messagePresent;
-    private String messageTitle;
-    private String messageDetails;
+    private String messageTitleSpanish;
+    private String messageTitleEnglish;
+    private String messageDetailsSpanish;
+    private String messageDetailsEnglish;
+
     private Boolean messageLinkPresent;
     private String messageLinkLabel;
     private String messageLink;
@@ -30,10 +35,13 @@ class ClientResult {
     ClientResult(ClientModel clientModel) {
         this.updateAvailable = clientModel.getUpdateAvailable();
         this.updateNeeded = clientModel.getUpdateNeeded();
-        this.updateDetails = clientModel.getUpdateDetails();
+        this.updateDetailsSpanish = clientModel.getUpdateDetailsSpanish();
+        this.updateDetailsEnglish = clientModel.getUpdateDetailsEnglish();
         this.messagePresent = clientModel.getMessagePresent();
-        this.messageTitle = clientModel.getMessageTitle();
-        this.messageDetails = clientModel.getMessageDetails();
+        this.messageTitleSpanish = clientModel.getMessageTitleSpanish();
+        this.messageTitleEnglish = clientModel.getMessageTitleEnglish();
+        this.messageDetailsSpanish = clientModel.getMessageDetailsSpanish();
+        this.messageDetailsEnglish = clientModel.getMessageDetailsEnglish();
         this.messageLinkPresent = clientModel.getMessageLinkPresent();
         this.messageLinkLabel = clientModel.getMessageLinkLabel();
         this.messageLink = clientModel.getMessageLink();
@@ -79,43 +87,64 @@ class ClientResult {
     }
 
     @SuppressWarnings("unused")
-    public String getUpdateDetails() {
-        return updateDetails;
+    public String getUpdateDetailsSpanish() {
+        return updateDetailsSpanish;
     }
 
     @SuppressWarnings("unused")
-    public void setUpdateDetails(String updateDetails) {
-        this.updateDetails = updateDetails;
+    public void setUpdateDetailsSpanish(String updateDetailsSpanish) {
+        this.updateDetailsSpanish = updateDetailsSpanish;
     }
 
     @SuppressWarnings("unused")
-    public boolean getMessagePresent() {
-        return messagePresent;
+    public String getUpdateDetailsEnglish() {
+        return updateDetailsEnglish;
     }
 
     @SuppressWarnings("unused")
-    public void setMessagePresent(boolean messagePresent) {
-        this.messagePresent = messagePresent;
+    public void setUpdateDetailsEnglish(String updateDetailsEnglish) {
+        this.updateDetailsEnglish = updateDetailsEnglish;
     }
 
     @SuppressWarnings("unused")
-    public String getMessageTitle() {
-        return messageTitle;
+    public String getMessageTitleSpanish() {
+        return messageTitleSpanish;
     }
 
     @SuppressWarnings("unused")
-    public void setMessageTitle(String messageTitle) {
-        this.messageTitle = messageTitle;
+    public void setMessageTitleSpanish(String messageTitleSpanish) {
+        this.messageTitleSpanish = messageTitleSpanish;
     }
 
     @SuppressWarnings("unused")
-    public String getMessageDetails() {
-        return messageDetails;
+    public String getMessageTitleEnglish() {
+        return messageTitleEnglish;
     }
 
     @SuppressWarnings("unused")
-    public void setMessageDetails(String messageDetails) {
-        this.messageDetails = messageDetails;
+    public void setMessageTitleEnglish(String messageTitleEnglish) {
+        this.messageTitleEnglish = messageTitleEnglish;
+    }
+
+    // Add getters and setters for new Spanish/English fields
+    @SuppressWarnings("unused")
+    public String getMessageDetailsSpanish() {
+        return messageDetailsSpanish;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMessageDetailsSpanish(String messageDetailsSpanish) {
+        this.messageDetailsSpanish = messageDetailsSpanish;
+    }
+
+    @SuppressWarnings("unused")
+    public String getMessageDetailsEnglish() {
+        return messageDetailsEnglish;
+    }
+
+    @SuppressWarnings("unused")
+    public void setMessageDetailsEnglish(String messageDetailsEnglish) {
+        this.messageDetailsEnglish = messageDetailsEnglish;
     }
 
     @SuppressWarnings("unused")

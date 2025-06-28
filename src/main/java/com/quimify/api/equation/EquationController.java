@@ -21,8 +21,9 @@ class EquationController {
     // Client:
 
     @GetMapping()
-    EquationResult balance(@RequestParam("reactants") String reactants, @RequestParam("products") String products) {
-        EquationResult equationResult = equationService.tryBalance(reactants, products);
+    EquationResult balance(@RequestParam("reactants") String reactants, @RequestParam("products") String products,
+                           @RequestHeader(value = "language", defaultValue = "sp") String language) {
+        EquationResult equationResult = equationService.tryBalance(reactants, products, language);
 
         if (equationResult.isPresent())
             logger.info(String.format(getEquationMessage, reactants, products,

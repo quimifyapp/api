@@ -26,27 +26,37 @@ class EquationService {
     @Autowired
     MetricsService metricsService;
 
-    private static final String equationTooLongError = "La reacción es demasiado larga.";
-    private static final String invalidDigitsInReactantsError = "Los reactivos contienen dígitos inválidos.";
-    private static final String invalidDigitsInProductsError = "Los productos contienen dígitos inválidos.";
-    private static final String invalidParenthesesInReactantsError = "Los reactivos contienen paréntesis inválidos.";
-    private static final String invalidParenthesesInProductsError = "Los productos contienen paréntesis inválidos.";
-    private static final String mismatchedElementsError = "Los reactivos y los productos no tienen los mismos elementos.";
-    private static final String equationNotBalanceableError = "Esta reacción no es balanceable.";
+    private static final String equationTooLongErrorSpanish = "La reacción es demasiado larga.";
+    private static final String invalidDigitsInReactantsErrorSpanish = "Los reactivos contienen dígitos inválidos.";
+    private static final String invalidDigitsInProductsErrorSpanish = "Los productos contienen dígitos inválidos.";
+    private static final String invalidParenthesesInReactantsErrorSpanish = "Los reactivos contienen paréntesis inválidos.";
+    private static final String invalidParenthesesInProductsErrorSpanish = "Los productos contienen paréntesis inválidos.";
+    private static final String mismatchedElementsErrorSpanish = "Los reactivos y los productos no tienen los mismos elementos.";
+    private static final String equationNotBalanceableErrorSpanish = "Esta reacción no es balanceable.";
+    private static final String equationTooLongErrorEnglish = "The equation is too long.";
+    private static final String invalidDigitsInReactantsErrorEnglish = "The reactants contain invalid digits.";
+    private static final String invalidDigitsInProductsErrorEnglish = "The products contain invalid digits.";
+    private static final String invalidParenthesesInReactantsErrorEnglish = "The reactants contain invalid parentheses.";
+    private static final String invalidParenthesesInProductsErrorEnglish = "The products contain invalid parentheses.";
+    private static final String mismatchedElementsErrorEnglish = "The reactants and products do not have the same elements.";
+    private static final String equationNotBalanceableErrorEnglish = "This equation can not be balanced.";
 
-    EquationResult tryBalance(String reactants, String products) {
+    EquationResult tryBalance(String reactants, String products, String language) {
         EquationResult equationResult;
 
         String equationForLogs = reactants + " = " + products;
 
         try {
-            equationResult = balance(reactants, products);
+            equationResult = balance(reactants, products, language);
 
             if (!equationResult.isPresent())
                 logger.warn("Couldn't calculate \"" + equationForLogs + "\". " + "RESULT: " + equationResult.getError());
         } catch (StackOverflowError error) {
             errorService.log("StackOverflow error", equationForLogs, getClass());
-            equationResult = EquationResult.error(equationTooLongError);
+            if (language == "sp")
+                equationResult = EquationResult.error(equationTooLongErrorSpanish);
+            else
+                equationResult = EquationResult.error(equationTooLongErrorEnglish);
         } catch (Exception exception) {
             errorService.log("Exception calculating: " + equationForLogs, exception.toString(), getClass());
             equationResult = EquationResult.notPresent();
@@ -62,23 +72,31 @@ class EquationService {
 
     // Private:
 
-    private EquationResult balance(String reactantsText, String productsText) {
+    private EquationResult balance(String reactantsText, String productsText, String language) {
         List<String> reactantFormulas = getFormulas(reactantsText);
         List<String> productFormulas = getFormulas(productsText);
 
-        if (hasInvalidDigits(reactantFormulas))
-            return EquationResult.error(invalidDigitsInReactantsError);
+        if (hasInvalidDigits(reactantFormulas) && Objects.equals(language, "sp"))
+            return EquationResult.error(invalidDigitsInReactantsErrorSpanish);
+        else if (hasInvalidDigits(reactantFormulas) && Objects.equals(language, "en"))
+            return EquationResult.error(invalidDigitsInReactantsErrorEnglish);
 
-        if (hasInvalidDigits(productFormulas))
-            return EquationResult.error(invalidDigitsInProductsError);
+        if (hasInvalidDigits(productFormulas) && Objects.equals(language, "sp"))
+            return EquationResult.error(invalidDigitsInProductsErrorSpanish);
+        else if (hasInvalidDigits(productFormulas) && Objects.equals(language, "en"))
+            return EquationResult.error(invalidDigitsInProductsErrorEnglish);
 
-        if (hasInvalidParentheses(reactantFormulas))
-            return EquationResult.error(invalidParenthesesInReactantsError);
+        if (hasInvalidParentheses(reactantFormulas) && Objects.equals(language, "sp"))
+            return EquationResult.error(invalidParenthesesInReactantsErrorSpanish);
+        else if (hasInvalidParentheses(reactantFormulas) && Objects.equals(language, "en"))
+            return EquationResult.error(invalidParenthesesInReactantsErrorEnglish);
 
-        if (hasInvalidParentheses(productFormulas))
-            return EquationResult.error(invalidParenthesesInProductsError);
+        if (hasInvalidParentheses(productFormulas) && Objects.equals(language, "sp"))
+            return EquationResult.error(invalidParenthesesInProductsErrorSpanish);
+        else if (hasInvalidParentheses(productFormulas) && Objects.equals(language, "en"))
+            return EquationResult.error(invalidParenthesesInProductsErrorEnglish);
 
-        return balance(reactantFormulas, productFormulas);
+        return balance(reactantFormulas, productFormulas, language);
     }
 
     private List<String> getFormulas(String sumOfFormulas) {
@@ -129,17 +147,19 @@ class EquationService {
         return balance != 0;
     }
 
-    private EquationResult balance(List<String> reactantFormulas, List<String> productFormulas) {
+    private EquationResult balance(List<String> reactantFormulas, List<String> productFormulas, String language) {
         List<Formula> reactants = correctAndParseFormulas(reactantFormulas);
         List<Formula> products = correctAndParseFormulas(productFormulas);
 
         Set<String> reactantsElements = getElementsIn(reactants);
         Set<String> productsElements = getElementsIn(products);
 
-        if (!reactantsElements.equals(productsElements))
-            return EquationResult.error(mismatchedElementsError);
+        if (!reactantsElements.equals(productsElements) && Objects.equals(language, "sp"))
+            return EquationResult.error(mismatchedElementsErrorSpanish);
+        else if (!reactantsElements.equals(productsElements) && Objects.equals(language, "en"))
+            return EquationResult.error(mismatchedElementsErrorEnglish);
 
-        return balance(reactants, products, reactantsElements);
+        return balance(reactants, products, reactantsElements, language);
     }
 
     private List<Formula> correctAndParseFormulas(List<String> formulas) {
@@ -161,11 +181,13 @@ class EquationService {
         return formulas.stream().map(Formula::getElements).flatMap(Set::stream).collect(Collectors.toSet());
     }
 
-    private EquationResult balance(List<Formula> reactants, List<Formula> products, Set<String> elements) {
+    private EquationResult balance(List<Formula> reactants, List<Formula> products, Set<String> elements, String language) {
         int[] solution = solve(reactants, products, elements);
 
-        if (meansEquationNotBalanceable(solution))
-            return EquationResult.error(equationNotBalanceableError);
+        if (meansEquationNotBalanceable(solution) && Objects.equals(language, "sp"))
+            return EquationResult.error(equationNotBalanceableErrorSpanish);
+        else if (meansEquationNotBalanceable(solution) && Objects.equals(language, "en"))
+            return EquationResult.error(equationNotBalanceableErrorEnglish);
 
         int[] reactantsSolution = Arrays.copyOfRange(solution, 0, reactants.size());
         int[] productsSolution = Arrays.copyOfRange(solution, reactants.size(), solution.length);

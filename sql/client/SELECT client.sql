@@ -1,2 +1,25 @@
-SELECT * FROM client
+SELECT
+  platform,
+  version,
+  update_available,
+  update_needed,
+  update_details_spanish,
+  update_details_english,
+  message_present,
+  message_title_spanish,
+  message_title_english,
+  message_details_spanish,
+  message_details_english,
+  message_link_present,
+  message_link_label,
+  message_link,
+  banner_ad_present,
+  banner_ad_unit_id,
+  interstitial_ad_present,
+  interstitial_ad_period,
+  interstitial_ad_offset,
+  interstitial_ad_unit_id,
+  rewarded_ad_present,
+  rewarded_ad_unit_id
+FROM client
 ORDER BY version DESC;

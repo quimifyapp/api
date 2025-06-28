@@ -23,8 +23,9 @@ class MolecularMassController {
     // Client:
 
     @GetMapping()
-    MolecularMassResult calculate(@RequestParam("formula") String formula) {
-        MolecularMassResult molecularMassResult = molecularMassService.tryCalculate(formula);
+    MolecularMassResult calculate(@RequestParam("formula") String formula,
+                                  @RequestHeader(value = "language", defaultValue = "sp") String language) {
+        MolecularMassResult molecularMassResult = molecularMassService.tryCalculate(formula, language);
 
         if(molecularMassResult.isPresent())
             logger.info(String.format(getMolecularMassMessage, formula, molecularMassResult.getMolecularMass()));
